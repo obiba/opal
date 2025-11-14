@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.NewCookie;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -25,6 +26,7 @@ import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -42,6 +44,8 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   @Value("${org.obiba.opal.server.context-path}")
   private String contextPath;
 
+  @Autowired
+  private CSRFTokenHelper csrfTokenHelper;
 
   @Override
   public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
@@ -70,7 +74,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   @Override
   public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     // Set the cookie if the user is still authenticated
-    if(isUserAuthenticated()) {
+    if (isUserAuthenticated()) {
       Session session = SecurityUtils.getSubject().getSession();
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
@@ -87,6 +91,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       if(cookieValue != null) {
         responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, new NewCookie.Builder(cookieValue.toString()).build());
       }
+      responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.createCsrfTokenCookie());
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(resourceMethod == null || isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
@@ -101,6 +106,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
                 .httpOnly(true)
                 .sameSite(NewCookie.SameSite.LAX)
                 .build());
+        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, csrfTokenHelper.deleteCsrfTokenCookie());
       }
     }
   }
