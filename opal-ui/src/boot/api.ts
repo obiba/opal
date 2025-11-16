@@ -33,8 +33,8 @@ function requiresCode(response: AxiosResponse): boolean {
 }
 
 // Axios automatically reads XSRF-TOKEN cookie and sends as X-XSRF-TOKEN header
-axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
-axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
+api.defaults.xsrfCookieName = 'XSRF-TOKEN';
+api.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
 
 api.interceptors.response.use(
   function (response) {

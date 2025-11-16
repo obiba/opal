@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/**
+ * Helper class to manage CSRF tokens.
+ */
 @Component
 public class CSRFTokenHelper {
 

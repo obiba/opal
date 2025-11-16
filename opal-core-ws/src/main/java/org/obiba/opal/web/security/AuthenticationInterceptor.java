@@ -21,7 +21,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.session.Session;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
@@ -78,7 +77,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       Session session = SecurityUtils.getSubject().getSession();
       session.touch();
       int timeout = (int) (session.getTimeout() / 1000);
-      responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
+      responseContext.getHeaders().add(HttpHeaders.SET_COOKIE,
           new NewCookie.Builder(OPAL_SESSION_ID_COOKIE_NAME)
               .value(session.getId().toString())
               .path(getCookiePath())
@@ -87,16 +86,16 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
               .httpOnly(true)
               .sameSite(NewCookie.SameSite.LAX)
               .build());
-      Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
+      Object cookieValue = session.getAttribute(HttpHeaders.SET_COOKIE);
       if(cookieValue != null) {
-        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, new NewCookie.Builder(cookieValue.toString()).build());
+        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, new NewCookie.Builder(cookieValue.toString()).build());
       }
       responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.createCsrfTokenCookie());
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(resourceMethod == null || isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {
         // Only web service calls that require authentication will lose their opalsid cookie
-        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE,
+        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE,
             new NewCookie.Builder(OPAL_SESSION_ID_COOKIE_NAME)
                 .value(null)
                 .path(getCookiePath())
@@ -106,7 +105,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
                 .httpOnly(true)
                 .sameSite(NewCookie.SameSite.LAX)
                 .build());
-        responseContext.getHeaders().add(HttpHeaderNames.SET_COOKIE, csrfTokenHelper.deleteCsrfTokenCookie());
+        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.deleteCsrfTokenCookie());
       }
     }
   }
