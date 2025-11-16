@@ -17,6 +17,7 @@ import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.session.Session;
@@ -88,7 +89,9 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
               .build());
       Object cookieValue = session.getAttribute(HttpHeaders.SET_COOKIE);
       if(cookieValue != null) {
-        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, new NewCookie.Builder(cookieValue.toString()).build());
+        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, RuntimeDelegate.getInstance()
+            .createHeaderDelegate(NewCookie.class)
+            .fromString(cookieValue.toString()));
       }
       responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.createCsrfTokenCookie());
     } else {
