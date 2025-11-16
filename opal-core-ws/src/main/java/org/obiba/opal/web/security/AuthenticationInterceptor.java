@@ -93,7 +93,9 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
             .createHeaderDelegate(NewCookie.class)
             .fromString(cookieValue.toString()));
       }
-      responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfTokenHelper.createCsrfTokenCookie());
+      NewCookie csrfCookie = csrfTokenHelper.createCsrfTokenCookie();
+      if (csrfCookie != null)
+        responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, csrfCookie);
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(resourceMethod == null || isWebServiceAuthenticated(resourceMethod.getMethod().getAnnotations())) {

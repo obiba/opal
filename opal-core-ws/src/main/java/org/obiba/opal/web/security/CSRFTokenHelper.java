@@ -25,10 +25,13 @@ public class CSRFTokenHelper {
 
   /**
    * Create a new CSRF token cookie. If a token is already associated with the current user's session, it is reused.
-   * @return
+   * @return a NewCookie containing the CSRF token, or null if no subject is authenticated
    */
   public NewCookie createCsrfTokenCookie() {
     String csrfToken = getOrGenerateCsrfToken();
+    if (csrfToken == null) {
+      return null;
+    }
     return new NewCookie.Builder(CSRF_TOKEN_COOKIE_NAME)
         .value(csrfToken)
         .path(getCookiePath())
@@ -41,7 +44,7 @@ public class CSRFTokenHelper {
 
   /**
    * Create a CSRF token cookie that will delete the cookie from the client.
-   * @return
+   * @return a NewCookie that will delete the CSRF token cookie from the client
    */
   public NewCookie deleteCsrfTokenCookie() {
     return new NewCookie.Builder(CSRF_TOKEN_COOKIE_NAME)
