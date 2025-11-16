@@ -10,6 +10,7 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -119,10 +120,19 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       SecurityUtils.getSubject().logout();
 
       if (cookieValue != null) {
-        NewCookie cookie = NewCookie.valueOf(cookieValue.toString());
+        NewCookie cookie = RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class).fromString(cookieValue.toString());
         if (OBIBA_ID_COOKIE_NAME.equals(cookie.getName())) {
           return Response.ok().header(HttpHeaders.SET_COOKIE,
-              new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", cookie.getDomain(), "Obiba session deleted", 0, true, true)).build();
+              new NewCookie.Builder(OBIBA_ID_COOKIE_NAME)
+                  .value(null)
+                  .path("/")
+                  .domain(cookie.getDomain())
+                  .comment("Obiba session deleted")
+                  .maxAge(0)
+                  .httpOnly(true)
+                  .secure(true)
+                  .sameSite(NewCookie.SameSite.LAX)
+                  .build()).build();
         }
       }
     } catch (InvalidSessionException e) {

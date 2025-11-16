@@ -124,7 +124,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   static String asHeader(Iterable<String> values) {
     StringBuilder sb = new StringBuilder();
     for(String s : values) {
-      if(sb.length() > 0) sb.append(", ");
+      if(!sb.isEmpty()) sb.append(", ");
       sb.append(s);
     }
     return sb.toString();

@@ -129,6 +129,7 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
       cookie.setPath("/");
       cookie.setSecure(true);
       cookie.setHttpOnly(true);
+      cookie.setAttribute("SameSite", "Lax");
       response.addCookie(cookie);
       log.debug("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
     }
