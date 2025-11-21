@@ -13,6 +13,7 @@ import jakarta.annotation.Nullable;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
@@ -23,7 +24,10 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
 
 abstract class AbstractSecurityComponent {
 
@@ -47,6 +51,52 @@ abstract class AbstractSecurityComponent {
   static boolean isUserAuthenticated() {
     Subject subject = ThreadContext.getSubject();
     return subject != null && subject.isAuthenticated();
+  }
+
+  /**
+   * Returns true when resource method or class is annotated with {@link ReAuthenticate} and the elapsed time since
+   * session start is greater than the timeout defined in the annotation, false otherwise.
+   *
+   * @param method
+   * @return
+   */
+  boolean needsReauthenticateSubject(ResourceMethodInvoker method) {
+    boolean hasAnnotation = method.getMethod().isAnnotationPresent(ReAuthenticate.class) ||
+        method.getResourceClass().isAnnotationPresent(ReAuthenticate.class);
+    if (!hasAnnotation) return false;
+    Subject subject = getSubject();
+    if (subject == null || !subject.isAuthenticated()) {
+      return false;
+    }
+    Session session = subject.getSession(false);
+    if (session == null) {
+      return false;
+    }
+    ReAuthenticate reAuth = method.getMethod().getAnnotation(ReAuthenticate.class);
+    if (reAuth == null) {
+      reAuth = method.getResourceClass().getAnnotation(ReAuthenticate.class);
+    }
+    if (reAuth == null) return false;
+    Date startDate = session.getStartTimestamp();
+    long now = System.currentTimeMillis();
+    long elapsed = now - startDate.getTime();
+    long timeoutMillis = reAuth.timeoutSeconds() * 1000L;
+    return elapsed >= timeoutMillis;
+  }
+
+  void invalidateSession() {
+    Subject subject = getSubject();
+    if(subject != null) {
+      try {
+        Session session = subject.getSession(false);
+        if(session != null) {
+          session.stop();
+        }
+        subject.logout();
+      } catch(InvalidSessionException e) {
+        // Session is already stopped/invalidated.
+      }
+    }
   }
 
   /**

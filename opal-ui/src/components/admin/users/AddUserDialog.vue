@@ -11,6 +11,7 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
             v-model="newUser.name"
+            autocomplete="nope"
             dense
             type="text"
             :label="t('name') + '*'"
@@ -23,7 +24,7 @@
 
           <template v-if="authPassword">
             <q-input
-              autocomplete="off"
+              autocomplete="new-password"
               type="password"
               :label="t('password') + '*'"
               v-model="newUser.password"
@@ -38,7 +39,7 @@
             </q-input>
 
             <q-input
-              autocomplete="off"
+              autocomplete="new-password"
               v-model="confirmPassword"
               dense
               type="password"
@@ -89,7 +90,7 @@
 
 <script setup lang="ts">
 import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import { notifyError, isReAuthError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -100,6 +101,8 @@ interface DialogProps {
 const { t } = useI18n();
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
+const authStore = useAuthStore();
+
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
@@ -224,7 +227,12 @@ async function onAddUser() {
         certificate.value = '';
         showDialog.value = false;
       })
-      .catch(notifyError);
+      .catch((error) => {
+        if (isReAuthError(error)) {
+          authStore.confirmAuthentication();
+        }
+        notifyError(error);
+      });
   }
 }
 </script>

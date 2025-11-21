@@ -79,8 +79,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import type { SubjectTokenDto } from 'src/models/Opal';
+import { isReAuthError, notifyError } from 'src/utils/notify';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
 import AddTokenDialogAccessSection from './AddTokenDialogAccessSection.vue';
@@ -99,6 +99,8 @@ const formRef = ref();
 const emit = defineEmits(['update:modelValue', 'added']);
 const tokensStore = useTokensStore();
 const projectsStore = useProjectsStore();
+const authStore = useAuthStore();
+
 let projectsFilterOptions = Array<string>();
 const projectFilters = ref(Array<string>());
 const tokenAdmin = ref<string[]>([]);
@@ -252,6 +254,9 @@ async function onAddToken() {
       showDialog.value = false;
       emit('added', created);
     } catch (error) {
+      if (isReAuthError(error)) {
+        authStore.confirmAuthentication();
+      }
       notifyError(error);
     }
   }

@@ -21,6 +21,7 @@ import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,7 @@ public class SubjectCredentialCurrentResource {
   @PUT
   @Path("/password")
   @NoAuthorization
+  @ReAuthenticate
   public Response updatePassword(@NotNull Opal.PasswordDto passwordDto) {
 
     if(!getName().equals(passwordDto.getName())) {

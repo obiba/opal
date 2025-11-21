@@ -12,26 +12,26 @@
           <div class="col">
             <q-card class="bg-white text-dark">
               <q-card-section class="q-pb-none">
-                <div class="text-help text-center q-pt-xs q-pb-xs">{{ t('auth.title') }}</div>
+                <div class="text-help text-center q-pt-xs q-pb-xs">{{ t(isConfirmSignin ? 'auth.confirm_title' : 'auth.title') }}</div>
                 <q-card-section v-show="!withToken">
-                  <q-form @submit="onSubmit" class="q-gutter-md">
-                    <q-input autofocus color="grey-10" v-model="username" :label="t('auth.username')" lazy-rules>
-                      <template v-slot:prepend>
-                        <q-icon name="fas fa-user" size="xs" />
-                      </template>
-                    </q-input>
-
-                    <q-input type="password" color="grey-10" v-model="password" :label="t('auth.password')" lazy-rules>
-                      <template v-slot:prepend>
-                        <q-icon name="fas fa-lock" size="xs" />
-                      </template>
-                    </q-input>
-
-                    <div>
-                      <q-btn :label="t('auth.signin')" type="submit" color="primary" :disable="disableSubmit" />
+                  <q-form @submit="onSubmit">
+                    <div v-if="!isConfirmSignin || isAnOpalRealm" class="q-gutter-md q-mb-md">
+                      <q-input autofocus color="grey-10" v-model="username" :disable="isConfirmSignin" :label="t('auth.username')" autocomplete="nope">
+                        <template v-slot:prepend>
+                          <q-icon name="fas fa-user" size="xs" />
+                        </template>
+                      </q-input>
+                      <q-input type="password" color="grey-10" v-model="password" :label="t('auth.password')" autocomplete="new-password">
+                        <template v-slot:prepend>
+                          <q-icon name="fas fa-lock" size="xs" />
+                        </template>
+                      </q-input>
+                      <div>
+                        <q-btn :label="t('auth.signin')" type="submit" color="primary" :disable="disableSubmit" />
+                      </div>
                     </div>
                     <div v-if="authProviders.length > 0">
-                      <q-separator class="q-mb-md" />
+                      <q-separator v-if="!isConfirmSignin" class="q-mb-md" />
                       <div v-for="provider in authProviders" :key="provider.name">
                         <q-btn
                           no-caps
@@ -74,7 +74,7 @@
                   </q-form>
                 </q-card-section>
               </q-card-section>
-              <q-card-section class="q-pt-none">
+              <q-card-section v-if="!isConfirmSignin" class="q-pt-none">
                 <q-btn-dropdown flat :label="t(locale)">
                   <q-list>
                     <q-item
@@ -159,39 +159,56 @@ const showForm = ref(true);
 const authProviders = ref<AuthProviderDto[]>([]);
 
 const appName = computed(() => systemStore.generalConf.name || t('main.brand'));
+const isConfirmSignin = computed(() => router.currentRoute.value.path === '/confirm-signin' && authStore.isAuthenticated);
+const isAnOpalRealm = computed(
+  () => authStore.profile && ['opal-user-realm', 'opal-ini-realm'].includes(authStore.profile.realm || ''),
+);
 
 const disableSubmit = computed(() => {
   return !username.value || !password.value;
 });
 
-onMounted(() => {
-  systemStore.initGeneralConf();
-  authStore.reset();
-  authzStore.reset();
-  commandsStore.reset();
-  datasourceStore.reset();
-  resourcesStore.reset();
-  filesStore.reset();
-  pluginsStore.reset();
-  projectsStore.reset();
-  transientDatasourceStore.reset();
-  usersStore.reset();
-  groupsStore.reset();
-  rStore.reset();
-  datashieldStore.reset();
-  profilesStore.reset();
-  profileAclsStore.reset();
-  profileActivityStore.reset();
-  identityProvidersStore.reset();
-  tokensStore.reset();
+onMounted(init);
+
+function init() {
   authStore.getProviders().then((providers) => {
+    if (authStore.profile.realm) {
+      providers = providers.filter((p) => p.name === authStore.profile.realm);
+    }
     authProviders.value = providers;
   });
-  identifiersStore.reset();
-  appsStore.reset();
-  searchStore.reset();
-  cartStore.reset();
-});
+  // Check if we are at confirm-signin page
+  if (isConfirmSignin.value && authStore.isAuthenticated) {
+    username.value = authStore.profile.principal || '';
+    password.value = '';
+  } else {
+    // Reset all stores
+    showForm.value = true;
+    systemStore.initGeneralConf();
+    authStore.reset();
+    authzStore.reset();
+    commandsStore.reset();
+    datasourceStore.reset();
+    resourcesStore.reset();
+    filesStore.reset();
+    pluginsStore.reset();
+    projectsStore.reset();
+    transientDatasourceStore.reset();
+    usersStore.reset();
+    groupsStore.reset();
+    rStore.reset();
+    datashieldStore.reset();
+    profilesStore.reset();
+    profileAclsStore.reset();
+    profileActivityStore.reset();
+    identityProvidersStore.reset();
+    tokensStore.reset();
+    identifiersStore.reset();
+    appsStore.reset();
+    searchStore.reset();
+    cartStore.reset();
+  }
+}
 
 function onLocaleSelection(localeOpt: { label: string; value: string }) {
   locale.value = localeOpt.value;
@@ -202,7 +219,7 @@ async function onSubmit() {
   try {
     await authStore.signin(username.value, password.value, authMethod.value, token.value);
     if (authStore.sid) {
-      router.push('/');
+      router.push(authStore.redirectPath || '/');
     }
   } catch (err) {
     const error = err as AxiosError;

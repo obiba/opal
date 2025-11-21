@@ -19,6 +19,7 @@ import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,7 @@ public class SubjectTokensCurrentResource {
 
   @POST
   @NoAuthorization
+  @ReAuthenticate
   public Response create(Opal.SubjectTokenDto token) {
     checkSubjectNotToken();
     if (Strings.isNullOrEmpty(token.getName()))

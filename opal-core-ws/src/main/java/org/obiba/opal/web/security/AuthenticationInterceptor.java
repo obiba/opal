@@ -52,8 +52,13 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     // Check authentication before processing.
     // If resource requires authentication and user is not authenticated, return "401: Unauthorized"
 
+
+
     // If we have an authenticated user, let method through
     if(isUserAuthenticated()) {
+      if (needsReauthenticateSubject(resourceMethod)) {
+        throw new UnauthorizedException("reauthentication_required");
+      }
       return;
     }
 

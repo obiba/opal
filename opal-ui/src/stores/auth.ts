@@ -3,12 +3,15 @@ import { api } from 'src/boot/api';
 import type { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
+  const router = useRouter();
+  
   const sid = ref('');
   const version = ref('');
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
-
+  const redirectPath = ref<string | null>(null);
+  
   const otpMessage = computed(
     () => profile.value && profile.value.realm?.startsWith('opal-') && !profile.value.otpEnabled,
   );
@@ -17,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
     sid.value = '';
     version.value = '';
     profile.value = {} as SubjectProfileDto;
+    redirectPath.value = null;
   }
 
   const isAuthenticated = computed(() => {
@@ -98,6 +102,12 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
+  function confirmAuthentication() {
+    // Implementation for confirming authentication
+    redirectPath.value = router.currentRoute.value.path;
+    router.push({ name: 'ReAuthenticate' });
+  }
+
   return {
     sid,
     version,
@@ -106,6 +116,7 @@ export const useAuthStore = defineStore('auth', () => {
     bookmarks,
     isAdministrator,
     otpMessage,
+    redirectPath,
     signin,
     signout,
     userProfile,
@@ -115,5 +126,6 @@ export const useAuthStore = defineStore('auth', () => {
     getProviders,
     reset,
     checkIsAdministrator,
+    confirmAuthentication,
   };
 });

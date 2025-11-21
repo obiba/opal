@@ -11,7 +11,7 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             type="password"
             :label="t('user_profile.password_dialog.old_password') + ' *'"
             v-model="password.oldPassword"
@@ -26,7 +26,7 @@
 
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             type="password"
             :label="t('user_profile.password_dialog.new_password') + ' *'"
             v-model="password.newPassword"
@@ -41,7 +41,7 @@
 
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             v-model="confirmPassword"
             type="password"
             :label="t('password_confirm') + '*'"
@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import type { PasswordDto } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import { notifyError, isReAuthError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -76,6 +76,8 @@ interface DialogProps {
 
 const usersStore = useUsersStore();
 const { t } = useI18n();
+const authStore = useAuthStore();
+
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
@@ -124,7 +126,12 @@ async function onUpdatePassword() {
       .then(() => {
         showDialog.value = false;
       })
-      .catch(notifyError);
+      .catch((error => {
+        if (isReAuthError(error)) {
+          authStore.confirmAuthentication();
+        }
+        notifyError(error);
+      }));
   }
 }
 </script>

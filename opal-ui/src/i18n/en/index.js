@@ -41,6 +41,7 @@ export default {
   },
   auth: {
     title: 'Sign in to start your session',
+    confirm_title: 'Please re-authenticate to continue',
     password: 'Password',
     signin: 'Sign in',
     signout: 'Sign out',
@@ -148,6 +149,10 @@ export default {
     SQLError: 'An error occurred while processing the query: {0}',
     NoSuchVariableInTable: 'The variable does not exist in the table',
     AccessDeniedToTableValues: 'Access to the table values is denied',
+    Unauthorized: 'Operation not authorized',
+    argument: {
+      reauthentication_required: 'Re-authentication is required',
+    },
   },
   kubernetes: {
     title: 'Kubernetes',
