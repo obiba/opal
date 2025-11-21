@@ -442,6 +442,8 @@ message IDProviderDto {
   optional string groupsScript = 16;
   optional string callbackURL = 17;
   optional bool useLogout = 18;
+  optional string prompt = 19;
+  optional int32 maxAge = 20;
 }
 
 message AuthProviderDto {

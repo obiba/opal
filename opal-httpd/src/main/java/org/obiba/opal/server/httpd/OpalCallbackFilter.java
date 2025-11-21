@@ -53,6 +53,9 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
   @Value("${org.obiba.opal.public.url}")
   private String defaultOpalPublicUrl;
 
+  @Value("${org.obiba.opal.server.context-path}")
+  private String contextPath;
+
   private String opalPublicUrl;
 
   @Autowired
@@ -126,13 +129,16 @@ public class OpalCallbackFilter extends OIDCCallbackFilter {
       int timeout = (int) (subjectSession.getTimeout() / 1000);
       Cookie cookie = new Cookie("opalsid", subjectSession.getId().toString());
       cookie.setMaxAge(timeout);
-      cookie.setPath("/");
+      cookie.setPath(getCookiePath());
       cookie.setSecure(true);
       cookie.setHttpOnly(true);
       cookie.setAttribute("SameSite", "Lax");
       response.addCookie(cookie);
       log.debug("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
     }
+  }
+  private String getCookiePath() {
+    return Strings.isNullOrEmpty(contextPath) ? "/" : contextPath;
   }
 
   public static class Wrapper extends DelegatingFilterProxy {

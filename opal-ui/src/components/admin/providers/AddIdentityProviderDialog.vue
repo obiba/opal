@@ -159,6 +159,26 @@
                 header-class="text-primary text-caption q-pl-none"
                 :label="t('advanced_options')"
               >
+                <q-input
+                  v-model="newProvider.prompt"
+                  dense
+                  type="text"
+                  :label="t('identity_provider.prompt')"
+                  :hint="t('identity_provider.prompt_hint')"
+                  class="q-mb-md"
+                  lazy-rules
+                >
+                </q-input>
+                <q-input
+                  v-model.number="newProvider.maxAge"
+                  dense
+                  type="number"
+                  :label="t('identity_provider.max_age')"
+                  :hint="t('identity_provider.max_age_hint')"
+                  class="q-mb-md"
+                  lazy-rules
+                >
+                </q-input>
                 <q-checkbox dense v-model="newProvider.useNonce" class="q-my-md">
                   <template v-slot:default>
                     <span
@@ -332,17 +352,23 @@ function cleanupFields() {
     delete newProvider.value.groupsClaim;
   if (!newProvider.value.groupsScript || newProvider.value.groupsScript.trim().length === 0)
     delete newProvider.value.groupsScript;
-
   if (groupsMapping.value === 'groupsClaim') {
     delete newProvider.value.groupsScript;
   } else {
     delete newProvider.value.groupsClaim;
   }
-
   if (!newProvider.value.usernameClaim || newProvider.value.usernameClaim.trim().length === 0)
     delete newProvider.value.usernameClaim;
   if (!newProvider.value.callbackURL || newProvider.value.callbackURL.trim().length === 0)
     delete newProvider.value.callbackURL;
+  if (!newProvider.value.prompt || newProvider.value.prompt.trim().length === 0) delete newProvider.value.prompt;
+  // ensure maxAge and connectTimeout are numbers
+  if (newProvider.value.maxAge === undefined || isNaN(newProvider.value.maxAge)) {
+    delete newProvider.value.maxAge;
+  }
+  if (newProvider.value.connectTimeout === undefined || isNaN(newProvider.value.connectTimeout)) {
+    delete newProvider.value.connectTimeout;
+  }
 }
 
 async function onAddProvider() {

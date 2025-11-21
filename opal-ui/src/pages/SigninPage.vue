@@ -35,10 +35,10 @@
                       <div v-for="provider in authProviders" :key="provider.name">
                         <q-btn
                           no-caps
-                          :label="t('signin_with', { provider: provider.name })"
+                          :label="t('signin_with', { provider: provider.label || provider.name })"
                           @click="onSigninProvider(provider)"
                           color="primary"
-                          class="full-width"
+                          class="full-width q-mb-sm"
                           stretch
                         />
                       </div>
