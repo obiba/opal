@@ -3,8 +3,6 @@ import { api } from 'src/boot/api';
 import type { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
-  const router = useRouter();
-  
   const sid = ref('');
   const version = ref('');
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
@@ -102,12 +100,6 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
-  function confirmAuthentication() {
-    // Implementation for confirming authentication
-    redirectPath.value = router.currentRoute.value.path;
-    router.push({ name: 'ReAuthenticate' });
-  }
-
   return {
     sid,
     version,
@@ -126,6 +118,5 @@ export const useAuthStore = defineStore('auth', () => {
     getProviders,
     reset,
     checkIsAdministrator,
-    confirmAuthentication,
   };
 });

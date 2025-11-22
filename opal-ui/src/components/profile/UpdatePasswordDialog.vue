@@ -62,11 +62,14 @@
         <q-btn flat :label="t('update')" type="submit" color="primary" @click="onUpdatePassword" />
       </q-card-actions>
     </q-card>
+
+    <re-signin-dialog v-model="showReSigninDialog" />
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import type { PasswordDto } from 'src/models/Opal';
+import ReSigninDialog from 'src/components/ReSigninDialog.vue';
 import { notifyError, isReAuthError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -76,7 +79,6 @@ interface DialogProps {
 
 const usersStore = useUsersStore();
 const { t } = useI18n();
-const authStore = useAuthStore();
 
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
@@ -88,6 +90,7 @@ const password = ref<PasswordDto>({
   newPassword: '',
   oldPassword: '',
 });
+const showReSigninDialog = ref(false);
 
 const validateRequiredOldPassword = (val: string) =>
   (val && val.length > 0) || t('validation.update_password.old_password');
@@ -128,7 +131,7 @@ async function onUpdatePassword() {
       })
       .catch((error => {
         if (isReAuthError(error)) {
-          authStore.confirmAuthentication();
+          showReSigninDialog.value = true;
         }
         notifyError(error);
       }));

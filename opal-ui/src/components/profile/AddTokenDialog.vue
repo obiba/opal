@@ -75,6 +75,8 @@
         <q-btn flat :label="t('add')" type="submit" color="primary" @click="onAddToken" />
       </q-card-actions>
     </q-card>
+
+    <re-signin-dialog v-model="showReSigninDialog" />
   </q-dialog>
 </template>
 
@@ -85,6 +87,7 @@ import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
 import AddTokenDialogAccessSection from './AddTokenDialogAccessSection.vue';
 import AddTokenDialogOptionGroups from './AddTokenDialogOptionGroups.vue';
+import ReSigninDialog from 'src/components/ReSigninDialog.vue';
 
 interface DialogProps {
   modelValue: boolean;
@@ -99,12 +102,13 @@ const formRef = ref();
 const emit = defineEmits(['update:modelValue', 'added']);
 const tokensStore = useTokensStore();
 const projectsStore = useProjectsStore();
-const authStore = useAuthStore();
 
 let projectsFilterOptions = Array<string>();
 const projectFilters = ref(Array<string>());
 const tokenAdmin = ref<string[]>([]);
 const tokenServices = ref<string[]>([]);
+const showReSigninDialog = ref(false);
+
 const showAccessTasks = computed(() => [TOKEN_TYPES.R, TOKEN_TYPES.CUSTOM].includes(props.type as TOKEN_TYPES));
 const showAdminOptions = computed(() => TOKEN_TYPES.CUSTOM === props.type);
 
@@ -255,7 +259,7 @@ async function onAddToken() {
       emit('added', created);
     } catch (error) {
       if (isReAuthError(error)) {
-        authStore.confirmAuthentication();
+        showReSigninDialog.value = true;
       }
       notifyError(error);
     }
