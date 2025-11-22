@@ -4,7 +4,7 @@
       <div class="text-help text-center q-pt-xs q-pb-xs">{{ t(authStore.isAuthenticated ? 'auth.confirm_title' : 'auth.title') }}</div>
       <q-card-section v-show="!withToken">
         <q-form @submit="onSubmit">
-          <div v-if="!authStore.isAuthenticated || isAnOpalRealm" class="q-gutter-md q-mb-md">
+          <div v-if="!authStore.isAuthenticated || isCredentialsRealm" class="q-gutter-md q-mb-md">
             <q-input autofocus color="grey-10" v-model="username" :disable="authStore.isAuthenticated" :label="t('auth.username')" autocomplete="nope">
               <template v-slot:prepend>
                 <q-icon name="fas fa-user" size="xs" />
@@ -121,8 +121,8 @@ const authMethod = ref('');
 const withToken = ref(false);
 const authProviders = ref<AuthProviderDto[]>([]);
 
-const isAnOpalRealm = computed(
-  () => authStore.profile && ['opal-user-realm', 'opal-ini-realm'].includes(authStore.profile.realm || ''),
+const isCredentialsRealm = computed(
+  () => authStore.profile && ['opal-user-realm', 'opal-ini-realm', 'obiba-realm'].includes(authStore.profile.realm || ''),
 );
 
 const disableSubmit = computed(() => {
