@@ -26,12 +26,19 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 
 abstract class AbstractSecurityComponent {
 
   protected SessionsSecurityManager securityManager;
+
+  /**
+   * Re-authentication timeout in seconds.
+   */
+  @Value("${org.obiba.opal.security.login.reAuthTimeout}")
+  private int reAuthTimeout;
 
   @Autowired
   void setSecurityManager(SessionsSecurityManager securityManager) {
@@ -61,6 +68,9 @@ abstract class AbstractSecurityComponent {
    * @return
    */
   boolean needsReauthenticateSubject(ResourceMethodInvoker method) {
+    if (reAuthTimeout <= 0) {
+      return false;
+    }
     boolean hasAnnotation = method.getMethod().isAnnotationPresent(ReAuthenticate.class) ||
         method.getResourceClass().isAnnotationPresent(ReAuthenticate.class);
     if (!hasAnnotation) return false;
@@ -80,7 +90,7 @@ abstract class AbstractSecurityComponent {
     Date startDate = session.getStartTimestamp();
     long now = System.currentTimeMillis();
     long elapsed = now - startDate.getTime();
-    long timeoutMillis = reAuth.timeoutSeconds() * 1000L;
+    long timeoutMillis = reAuthTimeout * 1000L;
     return elapsed >= timeoutMillis;
   }
 

@@ -7,13 +7,9 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that re-authentication is required to access the annotated resource or method, if the
- * session duration is longer than the specified timeout.
+ * session duration is longer than the configured timeout.
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReAuthenticate {
-
-  // Timeout in seconds before re-authentication is required
-  int timeoutSeconds() default 300;
-
 }
