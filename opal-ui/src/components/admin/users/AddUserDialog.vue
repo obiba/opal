@@ -78,14 +78,12 @@
         <q-btn flat :label="submitCaption" type="submit" color="primary" @click="onAddUser" />
       </q-card-actions>
     </q-card>
-    <re-signin-dialog v-model="showReSigninDialog" />
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
-import ReSigninDialog from 'src/components/ReSigninDialog.vue';
-import { notifyError, isReAuthError } from 'src/utils/notify';
+import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -101,7 +99,6 @@ const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 const showDialog = ref(props.modelValue);
-const showReSigninDialog = ref(false);
 
 const newUser = ref<SubjectCredentialsDto>({
   name: '',
@@ -223,12 +220,7 @@ async function onAddUser() {
         certificate.value = '';
         showDialog.value = false;
       })
-      .catch((error) => {
-        if (isReAuthError(error)) {
-          showReSigninDialog.value = true;
-        }
-        notifyError(error);
-      });
+      .catch(notifyError);
   }
 }
 </script>
