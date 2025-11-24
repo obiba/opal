@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.web.security;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.InvalidSessionException;
@@ -29,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 abstract class AbstractSecurityComponent {
 
@@ -37,8 +42,13 @@ abstract class AbstractSecurityComponent {
   /**
    * Re-authentication timeout in seconds.
    */
-  @Value("${org.obiba.opal.security.login.reAuthTimeout}")
+  @Value("${org.obiba.opal.security.login.reAuth.timeout}")
   private int reAuthTimeout;
+
+  @Value("${org.obiba.opal.security.login.reAuth.endpoints}")
+  private String reAuthEndpoints;
+
+  private List<Endpoint> reAuthEnpointsList;
 
   @Autowired
   void setSecurityManager(SessionsSecurityManager securityManager) {
@@ -61,19 +71,17 @@ abstract class AbstractSecurityComponent {
   }
 
   /**
-   * Returns true when resource method or class is annotated with {@link ReAuthenticate} and the elapsed time since
-   * session start is greater than the timeout defined in the annotation, false otherwise.
+   * Returns true when request method and path are identified as bein critical
+   * and the elapsed time since session start is greater than the timeout defined
+   * in the configuration, false otherwise.
    *
-   * @param method
+   * @param request
    * @return
    */
-  boolean needsReauthenticateSubject(ResourceMethodInvoker method) {
+  boolean needsReauthenticateSubject(HttpServletRequest request) {
     if (reAuthTimeout <= 0) {
       return false;
     }
-    boolean hasAnnotation = method.getMethod().isAnnotationPresent(ReAuthenticate.class) ||
-        method.getResourceClass().isAnnotationPresent(ReAuthenticate.class);
-    if (!hasAnnotation) return false;
     Subject subject = getSubject();
     if (subject == null || !subject.isAuthenticated()) {
       return false;
@@ -82,11 +90,8 @@ abstract class AbstractSecurityComponent {
     if (session == null) {
       return false;
     }
-    ReAuthenticate reAuth = method.getMethod().getAnnotation(ReAuthenticate.class);
-    if (reAuth == null) {
-      reAuth = method.getResourceClass().getAnnotation(ReAuthenticate.class);
-    }
-    if (reAuth == null) return false;
+    boolean isCritical = getReAuthEnpointsList().stream().anyMatch((endpoint) -> endpoint.appliesTo(request));
+    if (!isCritical) return false;
     Date startDate = session.getStartTimestamp();
     long now = System.currentTimeMillis();
     long elapsed = now - startDate.getTime();
@@ -158,4 +163,31 @@ abstract class AbstractSecurityComponent {
     }
     return null;
   }
+
+  private List<Endpoint> getReAuthEnpointsList() {
+    if (reAuthEnpointsList == null) {
+      reAuthEnpointsList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(reAuthEndpoints).stream()
+        .map((key) -> {
+          String[] parts = key.split(":");
+          if (parts.length == 2) {
+            String method = parts[0];
+            String path = parts[1];
+            return new Endpoint(method, path);
+          }
+          return null;
+        }).filter(Objects::nonNull).toList();
+    }
+    return reAuthEnpointsList;
+  }
+
+  private record Endpoint(String method, String path) {
+
+    public boolean appliesTo(HttpServletRequest request) {
+        if (!request.getMethod().equals(this.method)) return false;
+        String requestPath = request.getPathInfo();
+        if (this.path.equals(requestPath)) return true;
+        if (requestPath.endsWith("/**")) return this.path.startsWith(requestPath.substring(0, requestPath.length() - 2));
+        return false;
+      }
+    }
 }

@@ -10,8 +10,9 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
-import dev.samstevens.totp.secret.DefaultSecretGenerator;
-import dev.samstevens.totp.secret.SecretGenerator;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.domain.security.SubjectToken;
 import org.obiba.opal.core.service.SubjectTokenService;
@@ -19,14 +20,10 @@ import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
-import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +47,6 @@ public class SubjectTokensCurrentResource {
 
   @POST
   @NoAuthorization
-  @ReAuthenticate
   public Response create(Opal.SubjectTokenDto token) {
     checkSubjectNotToken();
     if (Strings.isNullOrEmpty(token.getName()))
