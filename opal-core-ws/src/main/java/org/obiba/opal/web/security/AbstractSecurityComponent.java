@@ -27,7 +27,6 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
-import org.obiba.opal.web.ws.security.ReAuthenticate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -48,7 +47,7 @@ abstract class AbstractSecurityComponent {
   @Value("${org.obiba.opal.security.login.reAuth.endpoints}")
   private String reAuthEndpoints;
 
-  private List<Endpoint> reAuthEnpointsList;
+  private List<Endpoint> reAuthEndpointsList;
 
   @Autowired
   void setSecurityManager(SessionsSecurityManager securityManager) {
@@ -71,7 +70,7 @@ abstract class AbstractSecurityComponent {
   }
 
   /**
-   * Returns true when request method and path are identified as bein critical
+   * Returns true when request method and path are identified as being critical
    * and the elapsed time since session start is greater than the timeout defined
    * in the configuration, false otherwise.
    *
@@ -90,7 +89,7 @@ abstract class AbstractSecurityComponent {
     if (session == null) {
       return false;
     }
-    boolean isCritical = getReAuthEnpointsList().stream().anyMatch((endpoint) -> endpoint.appliesTo(request));
+    boolean isCritical = getReAuthEndpointsList().stream().anyMatch((endpoint) -> endpoint.appliesTo(request));
     if (!isCritical) return false;
     Date startDate = session.getStartTimestamp();
     long now = System.currentTimeMillis();
@@ -164,20 +163,24 @@ abstract class AbstractSecurityComponent {
     return null;
   }
 
-  private List<Endpoint> getReAuthEnpointsList() {
-    if (reAuthEnpointsList == null) {
-      reAuthEnpointsList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(reAuthEndpoints).stream()
-        .map((key) -> {
-          String[] parts = key.split(":");
-          if (parts.length == 2) {
-            String method = parts[0];
-            String path = parts[1];
-            return new Endpoint(method, path);
-          }
-          return null;
-        }).filter(Objects::nonNull).toList();
+  private List<Endpoint> getReAuthEndpointsList() {
+    if (reAuthEndpointsList == null) {
+      if (reAuthEndpoints == null || reAuthEndpoints.isEmpty()) {
+        reAuthEndpointsList = Lists.newArrayList();
+      } else {
+        reAuthEndpointsList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(reAuthEndpoints).stream()
+            .map((key) -> {
+              String[] parts = key.split(":");
+              if (parts.length == 2) {
+                String method = parts[0];
+                String path = parts[1];
+                return new Endpoint(method.toUpperCase(), path);
+              }
+              return null;
+            }).filter(Objects::nonNull).toList();
+      }
     }
-    return reAuthEnpointsList;
+    return reAuthEndpointsList;
   }
 
   record Endpoint(String method, String path) {
@@ -196,6 +199,9 @@ abstract class AbstractSecurityComponent {
         String[] requestParts = requestPath.split("/");
         if (patternParts.length != requestParts.length) return false;
         for (int i = 0; i < patternParts.length; i++) {
+          if (patternParts[i].equals("*") && requestParts[i].isEmpty()) {
+            return false;
+          }
           if (!patternParts[i].equals("*") && !patternParts[i].equals(requestParts[i])) {
             return false;
           }

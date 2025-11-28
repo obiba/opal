@@ -129,12 +129,12 @@ async function onUpdatePassword() {
       .then(() => {
         showDialog.value = false;
       })
-      .catch((error => {
+      .catch(error => {
         if (isReAuthError(error)) {
           showReSigninDialog.value = true;
         }
         notifyError(error);
-      }));
+      });
   }
 }
 </script>
