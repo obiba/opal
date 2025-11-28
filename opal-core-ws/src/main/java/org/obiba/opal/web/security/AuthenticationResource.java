@@ -61,6 +61,9 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @NotAuthenticated
   public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
                                 @FormParam("username") String username, @FormParam("password") String password) {
+    if (isUserAuthenticated()) {
+      invalidateSession();
+    }
     try {
       authenticationExecutor.login(servletRequest, makeUsernamePasswordToken(username, password, servletRequest));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();

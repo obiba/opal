@@ -475,6 +475,8 @@ export interface IDProviderDto {
   groupsScript?: string | undefined;
   callbackURL?: string | undefined;
   useLogout?: boolean | undefined;
+  prompt?: string | undefined;
+  maxAge?: number | undefined;
 }
 
 export interface AuthProviderDto {

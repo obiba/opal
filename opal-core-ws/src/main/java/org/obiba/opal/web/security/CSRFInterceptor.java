@@ -68,7 +68,7 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
 
   @Override
   public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
-    if (!productionMode) return;
+    if (!productionMode || csrfAllowed.contains("*")) return;
 
     String method = requestContext.getMethod();
     if (!SAFE_METHODS.contains(method)) {
@@ -79,8 +79,6 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
         throw new ForbiddenException("XSRF token validation failed");
       }
     }
-
-    if (csrfAllowed.contains("*")) return;
 
     String host = requestContext.getHeaderString(HOST_HEADER);
     if (matchesLocalhost(host)) return;

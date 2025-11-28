@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SubjectTokenDto /*, ProjectDto*/ } from 'src/models/Opal';
+import type { SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { generateName } from 'src/utils/strings';
 import { TOKEN_TYPES } from 'src/stores/tokens';
@@ -99,10 +99,12 @@ const formRef = ref();
 const emit = defineEmits(['update:modelValue', 'added']);
 const tokensStore = useTokensStore();
 const projectsStore = useProjectsStore();
+
 let projectsFilterOptions = Array<string>();
 const projectFilters = ref(Array<string>());
 const tokenAdmin = ref<string[]>([]);
 const tokenServices = ref<string[]>([]);
+
 const showAccessTasks = computed(() => [TOKEN_TYPES.R, TOKEN_TYPES.CUSTOM].includes(props.type as TOKEN_TYPES));
 const showAdminOptions = computed(() => TOKEN_TYPES.CUSTOM === props.type);
 

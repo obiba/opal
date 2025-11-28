@@ -11,7 +11,7 @@
         <q-form ref="formRef" class="q-gutter-md" persistent>
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             type="password"
             :label="t('user_profile.password_dialog.old_password') + ' *'"
             v-model="password.oldPassword"
@@ -26,7 +26,7 @@
 
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             type="password"
             :label="t('user_profile.password_dialog.new_password') + ' *'"
             v-model="password.newPassword"
@@ -41,7 +41,7 @@
 
           <q-input
             dense
-            autocomplete="off"
+            autocomplete="new-password"
             v-model="confirmPassword"
             type="password"
             :label="t('password_confirm') + '*'"
@@ -62,12 +62,15 @@
         <q-btn flat :label="t('update')" type="submit" color="primary" @click="onUpdatePassword" />
       </q-card-actions>
     </q-card>
+
+    <re-signin-dialog v-model="showReSigninDialog" />
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import type { PasswordDto } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import ReSigninDialog from 'src/components/ReSigninDialog.vue';
+import { notifyError, isReAuthError } from 'src/utils/notify';
 
 interface DialogProps {
   modelValue: boolean;
@@ -76,6 +79,7 @@ interface DialogProps {
 
 const usersStore = useUsersStore();
 const { t } = useI18n();
+
 const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
@@ -86,6 +90,7 @@ const password = ref<PasswordDto>({
   newPassword: '',
   oldPassword: '',
 });
+const showReSigninDialog = ref(false);
 
 const validateRequiredOldPassword = (val: string) =>
   (val && val.length > 0) || t('validation.update_password.old_password');
@@ -124,7 +129,12 @@ async function onUpdatePassword() {
       .then(() => {
         showDialog.value = false;
       })
-      .catch(notifyError);
+      .catch(error => {
+        if (isReAuthError(error)) {
+          showReSigninDialog.value = true;
+        }
+        notifyError(error);
+      });
   }
 }
 </script>

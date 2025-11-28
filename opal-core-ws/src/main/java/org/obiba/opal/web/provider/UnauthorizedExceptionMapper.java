@@ -21,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 import static jakarta.ws.rs.core.Response.Status.FORBIDDEN;
+import static jakarta.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Component
 @Provider
@@ -30,14 +31,14 @@ public class UnauthorizedExceptionMapper extends ErrorDtoExceptionMapper<Unautho
 
   @Override
   protected Response.Status getStatus() {
-    return FORBIDDEN;
+    return UNAUTHORIZED;
   }
 
   @Override
   protected Ws.ClientErrorDto getErrorDto(UnauthorizedException exception) {
     if (log.isDebugEnabled())
       log.warn("Unauthorized exception", exception);
-    return ClientErrorDtos.getErrorMessage(getStatus(), "Forbidden", exception);
+    return ClientErrorDtos.getErrorMessage(getStatus(), "Unauthorized", exception);
   }
 
 }

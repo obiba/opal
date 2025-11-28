@@ -41,6 +41,7 @@ export default {
   },
   auth: {
     title: 'Sign in to start your session',
+    confirm_title: 'Please re-authenticate to continue',
     password: 'Password',
     signin: 'Sign in',
     signout: 'Sign out',
@@ -148,6 +149,10 @@ export default {
     SQLError: 'An error occurred while processing the query: {0}',
     NoSuchVariableInTable: 'The variable does not exist in the table',
     AccessDeniedToTableValues: 'Access to the table values is denied',
+    Unauthorized: 'Operation not authorized',
+    argument: {
+      reauthentication_required: 'Re-authentication is required',
+    },
   },
   kubernetes: {
     title: 'Kubernetes',
@@ -221,6 +226,10 @@ export default {
     groups_hint: 'Space separated list of group names that will be applied to each user who signs from this ID provider.',
     username_claim: 'Username Mapping',
     username_claim_hint: 'Optional name of the claim in the ID token and in the UserInfo response which value will represent the username in Opal. If not explicitly specified (or not found), the username will be looked up with the claims in the following order: "preferred_username", "username", "email", "name" and "sub" (subject ID).',
+    prompt: 'Prompt',
+    prompt_hint: 'Optional space separated list of prompt values to be sent to the authorization endpoint: none, login, consent, select_account.',
+    max_age: 'Max Age',
+    max_age_hint: 'Optional maximum authentication age in seconds to be sent to the authorization endpoint.',
     scope: 'Scope',
     scope_hint: 'List of scope names to be specified to retrieve user information. Usually {openid} is enough and is the default.',
     groups_mapping: 'Groups Mapping',

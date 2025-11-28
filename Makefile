@@ -3,7 +3,7 @@
 ##
 version=5.4-SNAPSHOT
 magma_version=5.1-SNAPSHOT
-commons_version=4.3-SNAPSHOT
+commons_version=4.4-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:+UseG1GC"
 #java_opts="-Xms1G -Xmx4G"
 

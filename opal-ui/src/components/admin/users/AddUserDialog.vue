@@ -8,46 +8,41 @@
       <q-separator />
 
       <q-card-section>
-        <q-form ref="formRef" class="q-gutter-md" persistent>
+        <q-form ref="formRef" persistent>
           <q-input
             v-model="newUser.name"
+            autocomplete="nope"
             dense
             type="text"
-            :label="t('name') + '*'"
-            class="q-mb-md"
+            :label="t('name') + ' *'"
             lazy-rules
             :rules="[validateRequiredName]"
             :disable="editMode"
           >
           </q-input>
-
           <template v-if="authPassword">
             <q-input
-              autocomplete="off"
+              autocomplete="new-password"
               type="password"
-              :label="t('password') + '*'"
+              :label="t('password') + ' *'"
               v-model="newUser.password"
-              color="grey-10"
-              :hint="t('password_hint')"
               lazy-rules
               :rules="[validateRequiredPassword]"
             >
-              <template v-slot:prepend>
-                <q-icon name="fas fa-lock" size="xs" />
-              </template>
             </q-input>
-
             <q-input
-              autocomplete="off"
+              autocomplete="new-password"
               v-model="confirmPassword"
               dense
               type="password"
-              :label="t('password_confirm') + '*'"
-              class="q-mb-md"
+              :label="t('password_confirm') + ' *'"
               lazy-rules
               :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
             >
             </q-input>
+            <div class="text-hint">
+              {{ t('password_hint') }}
+            </div>
           </template>
           <template v-else>
             <q-input
@@ -57,7 +52,6 @@
               type="textarea"
               :label="t('certificate') + '*'"
               :placeholder="t('certificate_placeholder')"
-              class="q-mb-md"
               lazy-rules
               :rules="[validateRequiredCertificate]"
             >
@@ -100,6 +94,7 @@ interface DialogProps {
 const { t } = useI18n();
 const usersStore = useUsersStore();
 const groupsStore = useGroupsStore();
+
 const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
@@ -112,6 +107,7 @@ const newUser = ref<SubjectCredentialsDto>({
   groups: [],
 } as SubjectCredentialsDto);
 
+const MIN_PASSWORD_LENGTH = 8;
 const confirmPassword = ref('');
 const certificate = ref('');
 let groupFilterOptions = Array<string>();
@@ -169,7 +165,7 @@ const validateRequiredCertificate = (val: string) =>
   (val && val.trim().length > 0) ||
   t('validation.user.certificate_required');
 const validateRequiredPassword = (val: string) =>
-  (editMode.value && (!val || val.length === 0)) || (val && val.length >= 8) || t('password_hint');
+  (editMode.value && (!val || val.length === 0)) || (val && val.length >= MIN_PASSWORD_LENGTH) || t('validation.password_min_length', { min: MIN_PASSWORD_LENGTH });
 const validateMatchingPasswords = () =>
   !confirmPassword.value ||
   newUser.value.password === confirmPassword.value ||

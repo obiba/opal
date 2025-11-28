@@ -92,7 +92,7 @@
     <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
-    <obiba-commons.version>4.3.1</obiba-commons.version>
+    <obiba-commons.version>4.4.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.45</orientdb.version>

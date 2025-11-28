@@ -9,12 +9,10 @@
  */
 package org.obiba.opal.web.system.subject;
 
-import javax.validation.constraints.NotNull;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
-
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
@@ -24,6 +22,8 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
 
 @Component
 @Scope("request")
