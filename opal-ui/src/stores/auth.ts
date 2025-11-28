@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('auth', () => {
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
-  const redirectPath = ref<string | null>(null);
   const reAuthRequired = ref(false);
 
   const otpMessage = computed(
@@ -19,7 +18,6 @@ export const useAuthStore = defineStore('auth', () => {
     sid.value = '';
     version.value = '';
     profile.value = {} as SubjectProfileDto;
-    redirectPath.value = null;
   }
 
   const isAuthenticated = computed(() => {
@@ -109,7 +107,6 @@ export const useAuthStore = defineStore('auth', () => {
     bookmarks,
     isAdministrator,
     otpMessage,
-    redirectPath,
     reAuthRequired,
     signin,
     signout,

@@ -79,6 +79,6 @@ onMounted(() => {
 });
 
 function onSignedIn() {
-  router.push(authStore.redirectPath || '/');
+  router.push('/');
 }
 </script>
