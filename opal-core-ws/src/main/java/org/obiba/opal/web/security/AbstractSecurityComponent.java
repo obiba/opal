@@ -180,14 +180,29 @@ abstract class AbstractSecurityComponent {
     return reAuthEnpointsList;
   }
 
-  private record Endpoint(String method, String path) {
+  record Endpoint(String method, String path) {
 
     public boolean appliesTo(HttpServletRequest request) {
-        if (!request.getMethod().equals(this.method)) return false;
-        String requestPath = request.getPathInfo();
-        if (this.path.equals(requestPath)) return true;
-        if (requestPath.endsWith("/**")) return this.path.startsWith(requestPath.substring(0, requestPath.length() - 2));
-        return false;
-      }
+      String requestPath = request.getPathInfo();
+      return appliesTo(request.getMethod(), requestPath);
     }
+
+    public boolean appliesTo(String requestMethod, String requestPath) {
+      if (!requestMethod.equals(this.method)) return false;
+      if (this.path.equals(requestPath)) return true;
+      // check for wildcards '*'
+      if (this.path.contains("/*")) {
+        String[] patternParts = this.path.split("/");
+        String[] requestParts = requestPath.split("/");
+        if (patternParts.length != requestParts.length) return false;
+        for (int i = 0; i < patternParts.length; i++) {
+          if (!patternParts[i].equals("*") && !patternParts[i].equals(requestParts[i])) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+  }
 }
