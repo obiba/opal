@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
@@ -16,9 +18,6 @@ import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
 
 @Component
 @Scope("request")

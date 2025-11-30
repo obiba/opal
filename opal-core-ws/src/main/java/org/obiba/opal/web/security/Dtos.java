@@ -201,6 +201,10 @@ public class Dtos {
     builder.setReadTimeout(configuration.getReadTimeout());
     if (configuration.hasCallbackURL())
       builder.setCallbackURL(configuration.getCallbackURL());
+    if (configuration.hasPrompt())
+      builder.setPrompt(configuration.getPrompt());
+    if (configuration.hasMaxAge())
+      builder.setMaxAge(configuration.getMaxAge());
     return builder.build();
   }
 
@@ -211,6 +215,10 @@ public class Dtos {
     configuration.setDiscoveryURI(dto.getDiscoveryURI());
     configuration.setScope(dto.getScope());
     configuration.setUseNonce(dto.getUseNonce());
+    if (dto.hasPrompt())
+      configuration.setPrompt(dto.getPrompt());
+    if (dto.hasMaxAge())
+      configuration.setMaxAge(dto.getMaxAge());
     if (dto.hasConnectTimeout())
       configuration.setConnectTimeout(dto.getConnectTimeout());
     if (dto.hasReadTimeout())

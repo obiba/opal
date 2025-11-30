@@ -41,6 +41,7 @@ export default {
   },
   auth: {
     title: 'Identifiez-vous pour commencer une session',
+    confirm_title: 'Veuillez vous ré-authentifier pour continuer',
     password: 'Mot de passe',
     signin: 'Se connecter',
     signout: 'Se déconnecter',
@@ -148,6 +149,10 @@ export default {
     SQLError: "Une erreur SQL s'est produite lors de l'exécution de la requête, veuillez vérifiez sa syntaxe",
     NoSuchVariableInTable: "La variable n'existe pas dans la table",
     AccessDeniedToTableValues: "L'accès aux valeurs de la table est refusé",
+    Unauthorized: "Opération non autorisée",
+    argument: {
+      reauthentication_required: 'La ré-authentification est requise',
+    },
   },
   kubernetes: {
     title: 'Kubernetes',
@@ -221,6 +226,10 @@ export default {
     groups_hint: "Liste de noms de groupes séparés par des espaces qui seront appliqués à chaque utilisateur qui signe à partir de ce fournisseur d'ID.",
     username_claim: "Mappage du nom d'utilisateur",
     username_claim_hint: 'Nom facultatif de la revendication dans le jeton d\'identification et dans la réponse UserInfo dont la valeur représentera le nom d\'utilisateur dans Opal. S\'il n\'est pas explicitement spécifié (ou introuvable), le nom d\'utilisateur sera recherché avec les revendications dans l\'ordre suivant: "preferred_username", "username", "email", "name" et "sub" (sujet ID).',
+    prompt: 'Prompt',
+    prompt_hint: 'Liste facultative de valeurs de prompt séparées par des espaces à envoyer au point de terminaison d\'autorisation: none, login, consent, select_account.',
+    max_age: 'Âge maximal',
+    max_age_hint: "Âge maximal facultatif (en secondes) du jeton d'authentification de l'utilisateur. Si l'âge du jeton dépasse cette valeur, l'utilisateur devra se ré-authentifier.",
     scope: 'Portée',
     scope_hint: 'Liste des noms de portée à spécifier pour récupérer les informations utilisateur. Habituellement, {openid} suffit et constitue la valeur par défaut.',
     groups_mapping: 'Mappage des groupes',

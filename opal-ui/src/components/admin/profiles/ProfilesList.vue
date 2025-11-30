@@ -47,10 +47,12 @@
       </template>
       <template v-slot:body-cell-otpEnabled="props">
         <q-td :props="props">
-          <q-checkbox v-model="props.row.otpEnabled" :disable="!props.value" @click="disableOtp(props.row)" />
-          <q-tooltip>{{
-            t(props.value ? 'profile_otp_disable' : 'profile_otp_disabled', { user: props.row.principal })
-          }}</q-tooltip>
+          <div v-if="props.value">
+            <q-checkbox v-model="props.row.otpEnabled" @click="disableOtp(props.row)" />
+            <q-tooltip>{{
+              t('profile_otp_disable', { user: props.row.principal })
+            }}</q-tooltip>
+          </div>
         </q-td>
       </template>
     </q-table>

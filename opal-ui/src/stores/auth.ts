@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
+  const reAuthRequired = ref(false);
 
   const otpMessage = computed(
     () => profile.value && profile.value.realm?.startsWith('opal-') && !profile.value.otpEnabled,
@@ -106,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
     bookmarks,
     isAdministrator,
     otpMessage,
+    reAuthRequired,
     signin,
     signout,
     userProfile,

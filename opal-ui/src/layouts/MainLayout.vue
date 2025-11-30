@@ -108,6 +108,7 @@
 
     <q-page-container>
       <router-view />
+      <re-signin-dialog v-model="authStore.reAuthRequired" />
     </q-page-container>
   </q-layout>
 </template>
@@ -120,6 +121,7 @@ import MainDrawer from 'src/components/MainDrawer.vue';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
+import ReSigninDialog from 'src/components/ReSigninDialog.vue';
 import type { QueryResultDto } from 'src/models/Search';
 import type { ItemFieldsResultDto } from 'src/stores/search';
 
