@@ -13,7 +13,7 @@
     </q-input>
 
     <q-input
-      autocomplete="off"
+      autocomplete="new-password"
       type="password"
       :label="t('password') + ' *'"
       :hint="t('apps.name_hint', { type: type })"

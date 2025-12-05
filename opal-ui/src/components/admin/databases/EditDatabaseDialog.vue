@@ -55,7 +55,7 @@
               <div class="col">
                 <q-input
                   v-model="database.sqlSettings.password"
-                  autocomplete="off"
+                  autocomplete="new-password"
                   type="password"
                   :label="t('password')"
                   lazy-rules
