@@ -48,10 +48,14 @@ export const useUsersStore = defineStore('users', () => {
 
     const allChars = upperCase + lowerCase + numbers + specialChars;
 
-    const getRandomChar = (chars: string) => chars[Math.floor(Math.random() * chars.length)];
+    const getRandomChar = (chars: string) => {
+      const randomValues = new Uint32Array(1);
+      crypto.getRandomValues(randomValues);
+      return chars[(randomValues[0] ?? 0) % chars.length];
+    };
 
     // Ensure the password contains at least one of each character type
-    let password = [
+    const password = [
       getRandomChar(upperCase),
       getRandomChar(lowerCase),
       getRandomChar(numbers),
@@ -63,9 +67,13 @@ export const useUsersStore = defineStore('users', () => {
       password.push(getRandomChar(allChars));
     }
 
-    // Shuffle the password to make it more random
-    password = password.sort(() => Math.random() - 0.5);
-
+    // Shuffle the password to make it more random using Fisher-Yates and crypto.getRandomValues()
+    for (let i = password.length - 1; i > 0; i--) {
+      const randomValues = new Uint32Array(1);
+      crypto.getRandomValues(randomValues);
+      const j = (randomValues[0] ?? 0) % (i + 1);
+      [password[i], password[j]] = [password[j], password[i]];
+    }
     return password.join('');
   }
 
