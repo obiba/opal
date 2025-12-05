@@ -18,41 +18,47 @@
             color="grey-10"
             lazy-rules
             :rules="[validateRequiredOldPassword]"
-          >
-            <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="12px" />
-            </template>
-          </q-input>
+          />
 
           <q-input
-            dense
-            autocomplete="new-password"
-            type="password"
-            :label="t('user_profile.password_dialog.new_password') + ' *'"
-            v-model="password.newPassword"
-            color="grey-10"
-            lazy-rules
-            :rules="[validateRequiredNewPassword]"
-          >
-            <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="12px" />
-            </template>
-          </q-input>
-
-          <q-input
-            dense
-            autocomplete="new-password"
-            v-model="confirmPassword"
-            type="password"
-            :label="t('password_confirm') + '*'"
-            class="q-mb-md"
-            lazy-rules
-            :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
-          >
-            <template v-slot:prepend>
-              <q-icon name="fas fa-lock" size="12px" />
-            </template>
-          </q-input>
+              v-model="password.newPassword"
+              :label="t('password') + ' *'"
+              :type="passwordVisible ? 'text' : 'password'"
+              dense
+              lazy-rules
+              autocomplete="new-password"
+              :rules="[validateRequiredNewPassword]"
+            >
+              <template v-slot:after>
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.show_password')"
+                  flat
+                  :icon="passwordVisible ? 'visibility_off' : 'visibility'"
+                  @click="passwordVisible = !passwordVisible"
+                />
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.copy_password')"
+                  flat
+                  icon="content_copy"
+                  @click="copyPasswordToClipboard"
+                />
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.generate_password')"
+                  flat
+                  icon="lock_reset"
+                  @click="generatePassword"
+                />
+              </template>
+            </q-input>
         </q-form>
       </q-card-section>
       <q-separator />
@@ -63,14 +69,13 @@
       </q-card-actions>
     </q-card>
 
-    <re-signin-dialog v-model="showReSigninDialog" />
   </q-dialog>
 </template>
 
 <script setup lang="ts">
 import type { PasswordDto } from 'src/models/Opal';
-import ReSigninDialog from 'src/components/ReSigninDialog.vue';
-import { notifyError, isReAuthError } from 'src/utils/notify';
+import { notifyError, notifyInfo } from 'src/utils/notify';
+import { copyToClipboard } from 'quasar';
 
 interface DialogProps {
   modelValue: boolean;
@@ -84,22 +89,17 @@ const props = defineProps<DialogProps>();
 const showDialog = ref(props.modelValue);
 const formRef = ref();
 const emit = defineEmits(['update:modelValue']);
-const confirmPassword = ref('');
 const password = ref<PasswordDto>({
   name: props.name,
   newPassword: '',
   oldPassword: '',
 });
-const showReSigninDialog = ref(false);
+const passwordVisible = ref(false);
 
 const validateRequiredOldPassword = (val: string) =>
   (val && val.length > 0) || t('validation.update_password.old_password');
 const validateRequiredNewPassword = (val: string) =>
   (val && val.length >= 8) || t('validation.update_password.new_password');
-const validateMatchingPasswords = () =>
-  password.value.newPassword === confirmPassword.value || t('validation.user.passwords_not_matching');
-const validateRequiredConfirmPassword = (val: string) =>
-  (val && val.trim().length > 0) || t('validation.user.confirm_password_required');
 
 watch(
   () => props.modelValue,
@@ -111,7 +111,6 @@ watch(
 );
 
 function onHide() {
-  confirmPassword.value = '';
   password.value = {
     name: props.name,
     newPassword: '',
@@ -129,12 +128,19 @@ async function onUpdatePassword() {
       .then(() => {
         showDialog.value = false;
       })
-      .catch(error => {
-        if (isReAuthError(error)) {
-          showReSigninDialog.value = true;
-        }
-        notifyError(error);
-      });
+      .catch(notifyError);
+  }
+}
+
+function generatePassword() {
+  password.value.newPassword = usersStore.generatePassword();
+}
+
+function copyPasswordToClipboard() {
+  if (password.value.newPassword) {
+    copyToClipboard(password.value.newPassword).then(() => {
+      notifyInfo(t('password_copied'));
+    });
   }
 }
 </script>

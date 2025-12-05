@@ -535,7 +535,7 @@ export default {
     add_custom_token: 'Ajouter un jeton personnalisé',
     no_tokens: "Aucun jeton d'accès personnel.",
     password_dialog: {
-      old_password: 'Ancien mot de passe',
+      old_password: 'Mot de passe actuel',
       new_password: 'Nouveau mot de passe',
       info: "{'Le mot de passe doit comporter au moins 8 caractères, dont un chiffre, une lettre majuscule, une lettre minuscule, un caractère spécial (par exemple, @#$%^&+= !) et aucun espace blanc.'}",
     },
@@ -596,8 +596,9 @@ export default {
     user: {
       password_required: 'Le mot de passe est requis et doit comporter au moins 8 caractères',
       certificate_required: 'Le certificat est requis',
-      confirm_password_required: 'La confirmation du mot de passe est requise',
-      passwords_not_matching: 'Les mots de passe ne correspondent pas',
+      show_password: 'Afficher le mot de passe',
+      copy_password: 'Copier le mot de passe',
+      generate_password: 'Générer un mot de passe',
     },
     identity_provider: {
       clientId_required: "L'ID client est requis",
@@ -1002,6 +1003,7 @@ export default {
   duplicate: 'Dupliquer',
   duration: 'Durée',
   edit_category: 'Éditer la catégorie',
+  edit_password_hint: 'Laissez vide pour conserver le mot de passe actuel.',
   edit_permission: 'Éditer la permission',
   edit_project: 'Éditer le projet',
   edit_script: 'Éditer le script',
@@ -1196,6 +1198,7 @@ export default {
   participant_id: 'ID Participant',
   participants: 'Participants',
   password_confirm: 'Confirmer le mot de passe',
+  password_copied: 'Mot de passe copié',
   password_hint: "{'Le mot de passe doit comporter au moins 8 caractères, dont un chiffre, une lettre majuscule, une lettre minuscule, un caractère spécial (par exemple, @#$%^&+= !) et aucun espace blanc.'}",
   password: 'Mot de passe',
   pending: 'En attente',

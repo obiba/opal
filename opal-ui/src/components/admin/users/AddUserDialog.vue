@@ -22,26 +22,49 @@
           </q-input>
           <template v-if="authPassword">
             <q-input
-              autocomplete="new-password"
-              type="password"
-              :label="t('password') + ' *'"
               v-model="newUser.password"
+              :label="t('password') + (editMode ? '' : ' *')"
+              :type="passwordVisible ? 'text' : 'password'"
+              dense
               lazy-rules
+              autocomplete="new-password"
               :rules="[validateRequiredPassword]"
             >
-            </q-input>
-            <q-input
-              autocomplete="new-password"
-              v-model="confirmPassword"
-              dense
-              type="password"
-              :label="t('password_confirm') + ' *'"
-              lazy-rules
-              :rules="[validateRequiredConfirmPassword, validateMatchingPasswords]"
-            >
+              <template v-slot:after>
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.show_password')"
+                  flat
+                  :icon="passwordVisible ? 'visibility_off' : 'visibility'"
+                  @click="passwordVisible = !passwordVisible"
+                />
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.copy_password')"
+                  flat
+                  icon="content_copy"
+                  @click="copyPasswordToClipboard"
+                />
+                <q-btn
+                  round
+                  dense
+                  size="sm"
+                  :title="t('validation.user.generate_password')"
+                  flat
+                  icon="lock_reset"
+                  @click="generatePassword"
+                />
+              </template>
             </q-input>
             <div class="text-hint">
               {{ t('password_hint') }}
+            </div>
+            <div v-if="editMode" class="text-hint">
+              {{ t('edit_password_hint') }}
             </div>
           </template>
           <template v-else>
@@ -83,7 +106,8 @@
 
 <script setup lang="ts">
 import { type SubjectCredentialsDto, SubjectCredentialsDto_AuthenticationType } from 'src/models/Opal';
-import { notifyError } from 'src/utils/notify';
+import { notifyError, notifyInfo } from 'src/utils/notify';
+import { copyToClipboard } from 'quasar';
 
 interface DialogProps {
   modelValue: boolean;
@@ -99,6 +123,7 @@ const formRef = ref();
 const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 const showDialog = ref(props.modelValue);
+const passwordVisible = ref(false);
 
 const newUser = ref<SubjectCredentialsDto>({
   name: '',
@@ -166,14 +191,6 @@ const validateRequiredCertificate = (val: string) =>
   t('validation.user.certificate_required');
 const validateRequiredPassword = (val: string) =>
   (editMode.value && (!val || val.length === 0)) || (val && val.length >= MIN_PASSWORD_LENGTH) || t('validation.password_min_length', { min: MIN_PASSWORD_LENGTH });
-const validateMatchingPasswords = () =>
-  !confirmPassword.value ||
-  newUser.value.password === confirmPassword.value ||
-  t('validation.user.passwords_not_matching');
-const validateRequiredConfirmPassword = (val: string) =>
-  (editMode.value && (!val || val.length === 0)) ||
-  (val && val.trim().length > 0) ||
-  t('validation.user.confirm_password_required');
 
 watch(
   () => props.modelValue,
@@ -221,6 +238,18 @@ async function onAddUser() {
         showDialog.value = false;
       })
       .catch(notifyError);
+  }
+}
+
+function generatePassword() {
+  newUser.value.password = usersStore.generatePassword();
+}
+
+function copyPasswordToClipboard() {
+  if (newUser.value.password) {
+    copyToClipboard(newUser.value.password).then(() => {
+      notifyInfo(t('password_copied'));
+    });
   }
 }
 </script>

@@ -535,7 +535,7 @@ export default {
     add_custom_token: 'Add Custom Token',
     no_tokens: 'No personal access tokens.',
     password_dialog: {
-      old_password: 'Old Password',
+      old_password: 'Current Password',
       new_password: 'New Password',
       info: "{'The password must contain at least 8 characters, with at least one digit, one upper case alphabet, one lower case alphabet, one special character (which includes @#$%^&+=!) and no white space.'}",
     },
@@ -596,8 +596,9 @@ export default {
     user: {
       password_required: 'Password is required and must be at least 8 characters long',
       certificate_required: 'Certificate is required',
-      confirm_password_required: 'Confirm password is required',
-      passwords_not_matching: 'Passwords do not match',
+      show_password: 'Show password',
+      copy_password: 'Copy password',
+      generate_password: 'Generate password',
     },
     identity_provider: {
       clientId_required: 'Client ID is required',
@@ -1002,6 +1003,7 @@ export default {
   duplicate: 'Duplicate',
   duration: 'Duration',
   edit_category: 'Edit category',
+  edit_password_hint: 'Leave empty to keep the current password.',
   edit_permission: 'Edit permission',
   edit_project: 'Edit project',
   edit_script: 'Edit script',
@@ -1196,6 +1198,7 @@ export default {
   participant_id: 'Participant ID',
   participants: 'Participants',
   password_confirm: 'Confirm password',
+  password_copied: 'Password copied',
   password_hint: "{'The password must be at least 8 characters long, including one digit, one uppercase letter, one lowercase letter, one special character (e.g., @#$%^&+=!), and no white space.'}",
   password: 'Password',
   pending: 'Pending',

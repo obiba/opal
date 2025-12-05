@@ -23,7 +23,7 @@
           </file-select>
 
           <q-input
-            autocomplete="off"
+            autocomplete="new-password"
             type="password"
             :label="t('password')"
             v-model="restoreOptions.password"

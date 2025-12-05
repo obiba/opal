@@ -39,6 +39,7 @@
       v-if="isCredentials"
       v-model="password"
       :label="t('password')"
+      autocomplete="new-password"
       type="password"
       dense
       class="q-mb-md"
