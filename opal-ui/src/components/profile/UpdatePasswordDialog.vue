@@ -36,7 +36,7 @@
                   size="sm"
                   :title="t('validation.user.show_password')"
                   flat
-                  icon="visibility"
+                  :icon="passwordVisible ? 'visibility_off' : 'visibility'"
                   @click="passwordVisible = !passwordVisible"
                 />
                 <q-btn
