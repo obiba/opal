@@ -1,0 +1,12 @@
+{
+  "resourcePackages": ["org.obiba.opal.web"],
+  "prettyPrint": true,
+  "cacheTTL": 0,
+  "openAPI": {
+    "info": {
+      "title": "OBIBA OPAL REST API",
+      "description": "REST API for OBiBa’s core database application for biobanks or epidemiological studies."
+    }
+  },
+  "modelConverterClasses": ["org.obiba.opal.web.swagger.ProtobufModelResolver"]
+}
