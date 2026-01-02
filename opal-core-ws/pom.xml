@@ -142,6 +142,11 @@
       <groupId>org.mozilla</groupId>
       <artifactId>rhino</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-jaxrs2-jakarta</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
