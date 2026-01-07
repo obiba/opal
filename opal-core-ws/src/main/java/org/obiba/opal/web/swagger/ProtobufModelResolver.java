@@ -43,7 +43,7 @@ public class ProtobufModelResolver extends ModelResolver {
     }
 
     private Schema<?> createSchema(Descriptors.Descriptor messageDescriptor, ModelConverterContext modelConverterContext) {
-        String refId = messageDescriptor.getName();
+        String refId = messageDescriptor.getFullName().replace('.', '_');
         Schema<?> refSchema = new Schema<>();
         refSchema.set$ref(refId);
         if (modelConverterContext.getDefinedModels().containsKey(refId)) {
