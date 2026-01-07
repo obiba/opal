@@ -102,7 +102,7 @@ public class ProtobufModelResolver extends ModelResolver {
                 return createSchema(descriptor.getMessageType(), modelConverterContext);
             }
         }
-        throw new IllegalStateException();
+        throw new IllegalStateException("Unsupported Protobuf JavaType: " + descriptor.getJavaType());
     }
 
     private StringSchema createEnumSchema(Descriptors.EnumDescriptor enumDescriptor) {
