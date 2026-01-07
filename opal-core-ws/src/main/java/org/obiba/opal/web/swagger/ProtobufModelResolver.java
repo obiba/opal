@@ -13,6 +13,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * Custom {@link ModelResolver} that converts Protocol Buffers message types into
+ * OpenAPI {@link io.swagger.v3.oas.models.media.Schema} definitions during Swagger model resolution.
+ */
 public class ProtobufModelResolver extends ModelResolver {
 
     public ProtobufModelResolver() {
