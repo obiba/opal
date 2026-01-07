@@ -38,7 +38,7 @@ public class ProtobufModelResolver extends ModelResolver {
             Descriptors.Descriptor messageDescriptor = (Descriptors.Descriptor) newBuilder.invoke(null);
             return createSchema(messageDescriptor, modelConverterContext);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to get descriptor for Protobuf message class: " + cls.getName(), e);
         }
     }
 
