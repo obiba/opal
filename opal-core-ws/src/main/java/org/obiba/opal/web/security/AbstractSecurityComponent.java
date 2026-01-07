@@ -135,7 +135,7 @@ abstract class AbstractSecurityComponent {
   boolean isWebServiceWithoutAuthorization(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NoAuthorization.class) ||
         method.getResourceClass().isAnnotationPresent(NoAuthorization.class) ||
-            method.getResourceClass() == OpenApiResource.class;
+        method.getResourceClass() == OpenApiResource.class;
   }
 
   /**
