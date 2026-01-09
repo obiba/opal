@@ -22,21 +22,18 @@ public class SwaggerResource extends io.swagger.v3.jaxrs2.integration.resources.
   @Produces("application/json")
   @Override
   public Response getOpenApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type) throws Exception {
-    URI baseUri = uriInfo.getBaseUri();
-
     // Parse the OpenAPI string to an OpenAPI object
-    String openAPIStr = super.getOpenApi(headers, uriInfo, type).getEntity().toString();
+    String openAPIStr = super.getOpenApi(headers, uriInfo, type).readEntity(String.class);
     OpenAPI openAPI = io.swagger.v3.core.util.Json.mapper().readValue(openAPIStr, OpenAPI.class);
 
     // Add server information explicitly, otherwise the /ws prefix is missing in the generated spec
-    if (openAPI != null) {
-      List<Server> servers = new ArrayList<>();
-      Server server = new Server();
-      server.setUrl(baseUri.toString());
-      server.setDescription("OPAL API Server");
-      servers.add(server);
-      openAPI.setServers(servers);
-    }
+    URI baseUri = uriInfo.getBaseUri();
+    List<Server> servers = new ArrayList<>();
+    Server server = new Server();
+    server.setUrl(baseUri.toString());
+    server.setDescription("OPAL API Server");
+    servers.add(server);
+    openAPI.setServers(servers);
 
     // Dump the modified OpenAPI object back to a string
     openAPIStr = io.swagger.v3.core.util.Json.mapper().writeValueAsString(openAPI);
