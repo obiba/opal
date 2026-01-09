@@ -152,7 +152,7 @@
             <q-item>
               <q-item-section>
                 <q-item-label>
-                  <a href="../api-docs">{{ t('apidocs.title') }}</a>
+                  <a href="../api-docs" target="_blank" rel="noopener noreferrer">{{ t('apidocs.title') }}</a>
                 </q-item-label>
                 <q-item-label caption lines="2">{{ t('apidocs.caption') }}</q-item-label>
               </q-item-section>

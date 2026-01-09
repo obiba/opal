@@ -15,8 +15,7 @@
 
   <script>
     (async () => {
-      const baseUrl = window.BASE_URL || '/ws'; // set to your API base
-      const specUrl = `${baseUrl}/openapi.json`;
+      const specUrl = `/ws/openapi.json`;
 
       const redocConfig = {};
       const container = document.getElementById('redoc-container');
