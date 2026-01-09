@@ -115,6 +115,7 @@
     <truezip.version>6.6</truezip.version>
     <xmlunit.version>1.6</xmlunit.version>
     <xstream.version>1.4.21</xstream.version>
+    <swagger.version>2.2.41</swagger.version>
 
     <!-- maven plugins -->
     <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
@@ -1289,6 +1290,13 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <!-- Swagger -->
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-jaxrs2-jakarta</artifactId>
+        <version>${swagger.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

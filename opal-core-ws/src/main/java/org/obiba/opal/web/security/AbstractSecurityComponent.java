@@ -11,6 +11,7 @@ package org.obiba.opal.web.security;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import jakarta.annotation.Nullable;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -121,7 +122,8 @@ abstract class AbstractSecurityComponent {
    */
   boolean isWebServicePublic(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NotAuthenticated.class) ||
-        method.getResourceClass().isAnnotationPresent(NotAuthenticated.class);
+        method.getResourceClass().isAnnotationPresent(NotAuthenticated.class) ||
+        method.getResourceClass() == OpenApiResource.class;
   }
 
   /**
@@ -132,7 +134,8 @@ abstract class AbstractSecurityComponent {
    */
   boolean isWebServiceWithoutAuthorization(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NoAuthorization.class) ||
-        method.getResourceClass().isAnnotationPresent(NoAuthorization.class);
+        method.getResourceClass().isAnnotationPresent(NoAuthorization.class) ||
+        method.getResourceClass() == OpenApiResource.class;
   }
 
   /**
