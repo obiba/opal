@@ -209,6 +209,10 @@ export default {
     terminate_pods: 'Terminate Pods',
     terminate_pods_confirm: 'Are you sure you want to terminate the pods for the pod specification "{id}"?',
   },
+  apidocs: {
+    title: 'API Documentation',
+    caption: 'Access the OpenAPI documentation for the Opal REST API',
+  },
   identity_provider: {
     title: 'Identity Provider',
     name_hint: 'A unique name for the identity provider.',
