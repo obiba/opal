@@ -2,26 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Opal API Docs</title>
+  <title>Opal API Docs - Swagger UI</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css" >
   <style>
-    html, body { margin: 0; height: 100%; }
-    #redoc-container { height: 100vh; }
+    html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; padding: 0; }
+    .topbar { display: none; }
   </style>
-  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
 </head>
 <body>
-  <div id="redoc-container"></div>
+  <div id="swagger-ui"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-standalone-preset.js"></script>
   <script>
-    (async () => {
-      const specUrl = `/ws/openapi.json`;
-
-      const redocConfig = {};
-      const container = document.getElementById('redoc-container');
-      // load by URL
-      window.Redoc.init(specUrl, redocConfig, container);
-    })();
+    const ui = SwaggerUIBundle({
+        url: "/ws/openapi.json",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+        ],
+        plugins: [
+            SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        requestInterceptor: (request) => {
+            request.headers['Accept'] = 'application/json';
+            return request;
+        }
+    });
   </script>
 </body>
 </html>
