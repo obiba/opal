@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -29,6 +30,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 @Component
 @Scope("request")
 @Path("/system/subject-profile/{principal}")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectProfileResource {
 
   @PathParam("principal")

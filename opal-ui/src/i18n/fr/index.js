@@ -209,6 +209,10 @@ export default {
     terminate_pods: 'Terminer les pods',
     terminate_pods_confirm: 'Êtes-vous sûr de vouloir terminer les pods pour la spécification du pod "{id}" ?',
   },
+  apidocs: {
+    title: 'Documentation de l\'API',
+    caption: 'Accédez à la documentation OpenAPI pour l\'API REST d\'Opal',
+  },
   identity_provider: {
     title: "Fournisseur d'identité",
     name_hint: "Un nom unique pour le fournisseur d'identité.",

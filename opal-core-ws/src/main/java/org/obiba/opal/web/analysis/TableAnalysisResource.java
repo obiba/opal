@@ -11,6 +11,7 @@
 package org.obiba.opal.web.analysis;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -37,6 +38,7 @@ import java.util.stream.StreamSupport;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Tag(name = "Projects", description = "Operations on projects")
 public class TableAnalysisResource {
 
   private final OpalAnalysisService analysisService;

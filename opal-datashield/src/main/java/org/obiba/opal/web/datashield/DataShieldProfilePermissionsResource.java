@@ -11,6 +11,7 @@
 package org.obiba.opal.web.datashield;
 
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.security.DataShieldProfilePermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -30,6 +31,8 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/datashield/profile/{name}/permissions")
+@Tag(name = "DataSHIELD", description = "Operations on DataSHIELD")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class DataShieldProfilePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired

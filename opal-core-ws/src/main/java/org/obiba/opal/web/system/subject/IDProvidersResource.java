@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/system/idproviders")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class IDProvidersResource {
 
   private static final Logger log = LoggerFactory.getLogger(IDProvidersResource.class);

@@ -12,6 +12,8 @@ package org.obiba.opal.web.plugins;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import org.obiba.opal.core.cfg.PluginsService;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Path("/analysis-plugins")
+@Tag(name = "Plugins", description = "Operations on service plugins")
 public class AnalysisPluginsResource {
 
   private final OpalRuntime opalRuntime;

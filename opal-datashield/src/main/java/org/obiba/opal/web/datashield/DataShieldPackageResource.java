@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Scope("request")
 @Path("/datashield/package/{name}")
+@Tag(name = "DataSHIELD", description = "Operations on DataSHIELD")
 public class DataShieldPackageResource {
 
   @Autowired

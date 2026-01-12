@@ -15,6 +15,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -36,6 +38,7 @@ import com.google.common.collect.Lists;
 @Component
 @Scope("request")
 @Path("/service/search/indices")
+@Tag(name = "Search", description = "Operations on the search service")
 public class SearchServiceResource extends IndexResource {
 
   @Autowired

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.obiba.opal.web.model.Opal;
@@ -26,6 +27,7 @@ import java.io.IOException;
 @Component
 @Scope("request")
 @Path("/system/idprovider/{name}")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class IDProviderResource {
 
   private static final Logger log = LoggerFactory.getLogger(IDProvidersResource.class);

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.resources;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/resource-providers")
+@Tag(name = "Resource Providers", description = "Operations on R resource providers")
 public class ResourceProvidersResource {
 
   @Autowired

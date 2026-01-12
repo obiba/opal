@@ -11,6 +11,7 @@
 package org.obiba.opal.web.project.permissions;
 
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.security.TablePermissionConverter;
@@ -32,6 +33,8 @@ import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/table/{table}")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class ProjectTablePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired

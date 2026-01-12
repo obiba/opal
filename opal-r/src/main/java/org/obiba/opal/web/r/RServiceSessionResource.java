@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import jakarta.ws.rs.core.Response;
 @Component
 @Scope("request")
 @Path("/service/r/session/{id}")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceSessionResource {
 
   @Autowired

@@ -12,6 +12,7 @@ package org.obiba.opal.web.plugins;
 
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/plugins")
+@Tag(name = "Plugins", description = "Operations on service plugins")
 public class PluginsResource {
 
   @Autowired

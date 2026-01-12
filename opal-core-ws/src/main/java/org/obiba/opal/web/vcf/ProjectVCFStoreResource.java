@@ -12,6 +12,7 @@ package org.obiba.opal.web.vcf;
 
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/project/{name}/vcf-store")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectVCFStoreResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

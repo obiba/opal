@@ -10,6 +10,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -37,6 +38,7 @@ import jakarta.ws.rs.core.Response.Status;
 @Component
 @Transactional
 @Path("/r")
+@Tag(name = "R", description = "Operations on R")
 public class RResource {
 
   private static final Logger log = LoggerFactory.getLogger(RResource.class);

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/index")
+@Tag(name = "Datasources", description = "Operations on datasources")
+@Tag(name = "Search", description = "Operations on the search service")
 public class ValueTableIndexResource extends IndexResource {
 
   @PathParam("ds")

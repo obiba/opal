@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Opal API Docs</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    html, body { margin: 0; height: 100%; }
+    #redoc-container { height: 100vh; }
+  </style>
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+</head>
+<body>
+  <div id="redoc-container"></div>
+
+  <script>
+    (async () => {
+      const specUrl = `/ws/openapi.json`;
+
+      const redocConfig = {};
+      const container = document.getElementById('redoc-container');
+      // load by URL
+      window.Redoc.init(specUrl, redocConfig, container);
+    })();
+  </script>
+</body>
+</html>

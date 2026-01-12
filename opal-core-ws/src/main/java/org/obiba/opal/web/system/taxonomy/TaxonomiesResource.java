@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -38,6 +39,7 @@ import com.google.common.base.Strings;
 
 @Component
 @Path("/system/conf/taxonomies")
+@Tag(name = "Taxonomies", description = "Operations on taxonomies")
 public class TaxonomiesResource implements BaseResource {
 
   @Autowired

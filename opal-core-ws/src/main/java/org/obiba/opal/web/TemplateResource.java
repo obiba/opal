@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/templates")
 @NoAuthorization
+@Tag(name="Templates", description="Operations on template files")
 public class TemplateResource {
 
   private final MimetypesFileTypeMap mimeTypes;

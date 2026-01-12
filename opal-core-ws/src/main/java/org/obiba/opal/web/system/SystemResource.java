@@ -13,6 +13,8 @@ package org.obiba.opal.web.system;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -53,6 +55,7 @@ import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
 @Component
 @Path("/system")
+@Tag(name = "System", description = "Operations on system administration")
 public class SystemResource {
 
   private static final Logger log = LoggerFactory.getLogger(SystemResource.class);
@@ -84,6 +87,7 @@ public class SystemResource {
   @GET
   @NoAuthorization
   @Path("/version")
+  @Operation(summary = "Get the current Opal version", description = "Returns the current Opal version.")
   public String getVersion() {
     return opalVersionProvider.getVersion().toString();
   }
@@ -91,6 +95,7 @@ public class SystemResource {
   @GET
   @NoAuthorization
   @Path("/news")
+  @Operation(summary = "Get the latest Opal news", description = "Returns the latest Opal news.")
   public Opal.NewsDto getNews() {
     Opal.NewsDto.Builder builder = Opal.NewsDto.newBuilder();
     try {
@@ -114,6 +119,7 @@ public class SystemResource {
 
   @GET
   @Path("/env")
+  @Operation(summary = "Get the Opal environment information", description = "Returns information about the Opal environment.")
   public Opal.OpalEnv getEnvironment() {
 
     Collection<Opal.EntryDto> systemProperties = new ArrayList<>();
@@ -136,6 +142,7 @@ public class SystemResource {
 
   @GET
   @Path("/status")
+  @Operation(summary = "Get the Opal status", description = "Returns information about the Opal status.")
   public Opal.OpalStatus getStatus() {
     List<GarbageCollectorMXBean> garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
     Collection<Opal.OpalStatus.GarbageCollectorUsage> garbageCollectorUsagesValues = new ArrayList<>();
@@ -155,6 +162,7 @@ public class SystemResource {
 
   @PUT
   @Path("/status/gc")
+  @Operation(summary = "Launch the garbage collector", description = "Triggers the Java garbage collector.")
   public Response launchGC() {
     System.gc();
     return Response.noContent().build();
@@ -163,6 +171,7 @@ public class SystemResource {
   @GET
   @Path("/status/databases")
   @NoAuthorization
+  @Operation(summary = "Get the status of Opal databases", description = "Returns information about the Opal databases status.")
   public DatabasesStatusDto getDatabasesStatus() {
     DatabasesStatusDto.Builder db = DatabasesStatusDto.newBuilder();
     db.setHasIdentifiers(databaseRegistry.hasIdentifiersDatabase());
@@ -196,6 +205,7 @@ public class SystemResource {
 
   @GET
   @Path("/conf")
+  @Operation(summary = "Get the Opal configuration", description = "Returns the Opal configuration.")
   public Opal.OpalConf getOpalConfiguration() {
     Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<>();
     for (Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
@@ -209,6 +219,7 @@ public class SystemResource {
   @GET
   @Path("/conf/general")
   @NotAuthenticated // allow anonymous to be able to retrieve Opal instance name
+  @Operation(summary = "Get the Opal general configuration", description = "Returns the Opal general configuration.")
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     Opal.GeneralConf.Builder builder = Opal.GeneralConf.newBuilder()
@@ -232,6 +243,7 @@ public class SystemResource {
 
   @PUT
   @Path("/conf/general")
+  @Operation(summary = "Update the Opal general configuration", description = "Updates the Opal general configuration.")
   public Response updateGeneralConfigurations(Opal.GeneralConf dto) {
     OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
@@ -256,6 +268,7 @@ public class SystemResource {
 
   @PUT
   @Path("/conf/general/_rPackage")
+  @Operation(summary = "Enable R package management", description = "Enables R package management in Opal.")
   public Response enableAllowRPackageManagement() {
     OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     if (!conf.isAllowRPackageManagement()) {
@@ -267,6 +280,7 @@ public class SystemResource {
 
   @DELETE
   @Path("/conf/general/_rPackage")
+  @Operation(summary = "Disable R package management", description = "Disables R package management in Opal.")
   public Response disableAllowRPackageManagement() {
     OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     if (conf.isAllowRPackageManagement()) {
@@ -280,6 +294,7 @@ public class SystemResource {
   @Path("/name")
   @Produces("text/plain")
   @NotAuthenticated
+  @Operation(summary = "Get the Opal application name", description = "Returns the Opal application name.")
   public Response getApplicationName() {
     OpalGeneralConfig conf = opalGeneralConfigService.getConfig();
     return Response.ok().entity(conf.getName()).build();
@@ -289,6 +304,7 @@ public class SystemResource {
   @Path("/charset")
   @Produces("text/plain")
   @NoAuthorization
+  @Operation(summary = "Get the default character set", description = "Returns the default character set used by Opal.")
   public Response getDefaultCharset() {
     return Response.ok().entity(opalGeneralConfigService.getConfig().getDefaultCharacterSet()).build();
   }

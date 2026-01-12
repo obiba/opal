@@ -10,6 +10,7 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -43,6 +44,7 @@ import static org.obiba.opal.web.model.Opal.BookmarkDto;
 @Component
 @Scope("request")
 @Path("/system/subject-profile/_current")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectProfileCurrentResource {
   private static final Logger log = LoggerFactory.getLogger(SubjectProfileCurrentResource.class);
 

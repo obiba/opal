@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import java.io.PrintWriter;
 @Component
 @Scope("request")
 @Path("/service/r/log")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceLogResource {
 
   private static final Logger log = LoggerFactory.getLogger(RServiceLogResource.class);

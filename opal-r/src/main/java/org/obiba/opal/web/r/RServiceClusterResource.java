@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
@@ -31,6 +32,7 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/service/r/cluster/{cname}")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceClusterResource extends AbstractRServiceResource {
 
   private static final Logger log = LoggerFactory.getLogger(RServiceClusterResource.class);

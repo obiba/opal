@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 @Component
 @Path("/shell")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class WebShellResource extends AbstractCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(WebShellResource.class);

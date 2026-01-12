@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.database;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.web.model.Database;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.Collection;
 @Component
 @Transactional
 @Path("/system/databases/jdbc-drivers")
+@Tag(name = "Databases", description = "Operations on databases")
 public class JdbcDriversResource {
 
   @GET

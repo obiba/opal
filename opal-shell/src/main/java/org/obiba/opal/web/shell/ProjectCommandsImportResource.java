@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -32,6 +33,8 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/project/{name}/commands/_import")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class ProjectCommandsImportResource extends AbstractProjectCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectCommandsImportResource.class);

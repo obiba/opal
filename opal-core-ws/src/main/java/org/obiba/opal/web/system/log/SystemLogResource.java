@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.log;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.SystemLogService;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.util.List;
 
 @Component
 @Path("/system/log")
+@Tag(name = "System", description = "Operations on system administration")
 public class SystemLogResource {
 
   @Autowired

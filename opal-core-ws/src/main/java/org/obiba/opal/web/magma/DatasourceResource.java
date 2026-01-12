@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.protobuf.format.JsonFormat;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -63,6 +64,7 @@ import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 @Transactional
 @Scope("request")
 @Path("/datasource/{name}")
+@Tag(name = "Datasources", description = "Operations on datasources")
 public class DatasourceResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

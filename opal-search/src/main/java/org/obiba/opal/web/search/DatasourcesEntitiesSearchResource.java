@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/datasources/entities")
+@Tag(name = "Search", description = "Operations on the search service")
 public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourcesEntitiesSearchResource.class);

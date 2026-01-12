@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/project/{name}/command/{id}")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class ProjectCommandResource {
 
   @PathParam("name")

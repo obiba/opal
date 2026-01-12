@@ -10,6 +10,7 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -31,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/_contingency")
+@Tag(name = "Datasources", description = "Operations on datasources")
+@Tag(name = "Search", description = "Operations on the search service")
 public class ValueTableContingencyResource {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableContingencyResource.class);

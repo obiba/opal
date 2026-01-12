@@ -10,6 +10,7 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/system/subject-token/_current/tokens")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectTokensCurrentResource {
 
   @Autowired
