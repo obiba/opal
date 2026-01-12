@@ -11,6 +11,7 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/auth/providers")
+@Tag(name = "Authentication", description = "Operations related to user authentication")
 public class AuthenticationProvidersResource {
 
   private final OIDCConfigurationProvider authConfigurationProvider;

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.web.model.OpalR;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/service/r/sessions")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceSessionsResource {
 
   @Autowired

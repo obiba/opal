@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.datasource.DatasourceService;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/datasource-plugins")
+@Tag(name = "Plugins", description = "Operations on service plugins")
 public class DatasourcePluginsResource {
   
   @Autowired

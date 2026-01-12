@@ -13,6 +13,7 @@ package org.obiba.opal.web.identifiers;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.Disposables;
@@ -45,6 +46,7 @@ import java.util.stream.StreamSupport;
 @Transactional
 @Scope("request")
 @Path("/identifiers/mapping/{name}")
+@Tag(name = "Identifiers", description = "Operations on identifiers")
 public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @Autowired

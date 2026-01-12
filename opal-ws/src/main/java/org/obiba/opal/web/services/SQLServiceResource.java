@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.services;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.sql.SQLExecution;
 import org.obiba.opal.core.service.SQLService;
 import org.obiba.opal.web.model.SQL;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/service/sql")
+@Tag(name = "Services", description = "Operations on services")
 public class SQLServiceResource {
 
   @Autowired

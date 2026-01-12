@@ -11,6 +11,7 @@
 package org.obiba.opal.web.project.resource;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
@@ -31,6 +32,7 @@ import jakarta.ws.rs.core.Response;
 
 @Component
 @Path("/project/{project}/resource/{name}")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectResourceReferenceResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

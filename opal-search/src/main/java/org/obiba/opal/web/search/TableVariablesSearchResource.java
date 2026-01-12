@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
@@ -29,6 +30,8 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/variables/_search")
+@Tag(name = "Datasources", description = "Operations on datasources")
+@Tag(name = "Search", description = "Operations on the search service")
 public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @PathParam("ds")

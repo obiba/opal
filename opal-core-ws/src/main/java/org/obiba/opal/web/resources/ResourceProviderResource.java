@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.resources;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.ResourceProvidersService;
 import org.obiba.opal.web.model.Resources;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @Component
 @Path("/resource-provider/{name}")
 @Scope("request")
+@Tag(name = "Resource Providers", description = "Operations on R resource providers")
 public class ResourceProviderResource {
 
   @Autowired
@@ -35,14 +37,14 @@ public class ResourceProviderResource {
 
   @GET
   @NoAuthorization
-  public Resources.ResourceProviderDto get() {
+  public Resources.ResourceProviderDto getResourceProvider() {
     return Dtos.asDto(resourceProvidersService.getResourceProvider(name));
   }
 
   @GET
   @NoAuthorization
   @Path("/factory/{type}")
-  public Resources.ResourceFactoryDto get(@PathParam("type") String type) {
+  public Resources.ResourceFactoryDto getResourceFactory(@PathParam("type") String type) {
     return Dtos.asDto(resourceProvidersService.getResourceFactory(name, type));
   }
 }

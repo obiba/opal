@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/service/r/cluster/{cname}/server/{sname}")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceClusterServerResource extends AbstractRServiceResource {
 
   private static final Logger log = LoggerFactory.getLogger(RServiceClusterServerResource.class);

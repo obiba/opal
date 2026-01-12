@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 @Path("/datasources")
+@Tag(name = "Datasources", description = "Operations on datasources")
 public class DatasourcesResource {
 
   @Autowired

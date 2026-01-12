@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
@@ -23,6 +24,7 @@ import jakarta.ws.rs.core.Response;
 @Component
 @Scope("request")
 @Path("/system/subject-token/_current/token/{name}")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectTokenCurrentResource {
 
   @PathParam("name")

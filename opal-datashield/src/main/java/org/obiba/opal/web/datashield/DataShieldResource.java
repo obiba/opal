@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -24,6 +25,7 @@ import jakarta.ws.rs.PathParam;
 @Component
 @Transactional
 @Path("/datashield")
+@Tag(name = "DataSHIELD", description = "Operations on DataSHIELD")
 public class DataShieldResource {
 
   @Autowired

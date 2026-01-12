@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.UriBuilder;
@@ -34,6 +35,7 @@ import com.google.common.collect.Lists;
 @Transactional
 @Scope("request")
 @Path("/services")
+@Tag(name = "Services", description = "Operations on services")
 public class ServicesResource {
 
   @Autowired

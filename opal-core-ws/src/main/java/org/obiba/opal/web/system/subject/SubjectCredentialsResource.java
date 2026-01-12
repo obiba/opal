@@ -12,6 +12,7 @@ package org.obiba.opal.web.system.subject;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -30,6 +31,7 @@ import java.util.List;
 
 @Component
 @Path("/system/subject-credentials")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectCredentialsResource implements BaseResource {
 
   @Autowired

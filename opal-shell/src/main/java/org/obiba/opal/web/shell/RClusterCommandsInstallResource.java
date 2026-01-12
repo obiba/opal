@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/service/r/cluster/{cname}/commands/_install")
+@Tag(name = "R", description = "Operations on the R service")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class RClusterCommandsInstallResource extends AbstractCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsInstallResource.class);

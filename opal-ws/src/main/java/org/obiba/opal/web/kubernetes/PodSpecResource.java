@@ -1,5 +1,6 @@
 package org.obiba.opal.web.kubernetes;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.cfg.PodsService;
@@ -15,6 +16,7 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/pod-spec/{id}")
+@Tag(name = "Kubernetes", description = "Operations on registered pod specifications")
 public class PodSpecResource {
 
   @PathParam("id")

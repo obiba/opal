@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
@@ -30,6 +31,7 @@ import java.util.stream.StreamSupport;
 @Component
 @Transactional
 @Path("/datashield/profiles")
+@Tag(name = "DataSHIELD", description = "Operations on DataSHIELD")
 public class DataShieldProfilesResource {
 
   @Autowired

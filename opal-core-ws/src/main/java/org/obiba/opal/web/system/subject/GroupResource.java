@@ -9,12 +9,12 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.security.Dtos;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/system/group/{name}")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class GroupResource {
 
   @PathParam("name")

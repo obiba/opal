@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Scope("request")
 @Path("/entity/{id}/type/{type}")
+@Tag(name = "Entities", description = "Operations on entities")
 public class VariableEntityResource {
 
   @PathParam("id")

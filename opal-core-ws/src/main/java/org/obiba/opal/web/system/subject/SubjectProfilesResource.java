@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -27,6 +28,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 
 @Component
 @Path("/system/subject-profiles")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectProfilesResource {
 
   @Autowired

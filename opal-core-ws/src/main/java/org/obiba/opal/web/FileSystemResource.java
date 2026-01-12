@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -27,6 +30,7 @@ import java.util.List;
 @Component
 @Path("/filesystem")
 // TODO We should delete this once the new FileSelection dialog has been integrated in the DataImport UI.
+@Tag(name = "File System", description = "File System operations")
 public class FileSystemResource {
 
   private OpalFileSystemService opalFileSystemService;
@@ -37,6 +41,9 @@ public class FileSystemResource {
   }
 
   @GET
+  @Operation(summary = "Get file system structure",
+      description = "Returns the complete file system structure starting from the root")
+  @ApiResponse(responseCode = "200", description = "File system structure retrieved successfully")
   public Opal.FileDto getFileSystem() throws FileSystemException {
     FileObject root = opalFileSystemService.getFileSystem().getRoot();
 

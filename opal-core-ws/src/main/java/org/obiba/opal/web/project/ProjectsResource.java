@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Path("/projects")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectsResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

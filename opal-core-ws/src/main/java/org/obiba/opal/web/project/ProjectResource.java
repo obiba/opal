@@ -11,6 +11,7 @@ package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/project/{name}")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectResource implements BaseResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

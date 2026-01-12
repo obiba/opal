@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.*;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.StaticDatasource;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Scope("request")
 @Path("/identifiers/mappings")
+@Tag(name = "Identifiers", description = "Operations on identifiers")
 public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
 
   @Autowired

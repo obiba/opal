@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -28,6 +29,7 @@ import javax.validation.constraints.NotNull;
 @Component
 @Scope("request")
 @Path("/system/subject-credential/_current")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectCredentialCurrentResource {
 
   @Autowired

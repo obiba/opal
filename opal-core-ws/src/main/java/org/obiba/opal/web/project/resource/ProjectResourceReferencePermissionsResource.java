@@ -11,6 +11,7 @@
 package org.obiba.opal.web.project.resource;
 
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.security.ProjectResourceReferencePermissionConverter;
 import org.obiba.opal.core.service.ProjectService;
@@ -30,6 +31,8 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/resource/{resource}")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class ProjectResourceReferencePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired

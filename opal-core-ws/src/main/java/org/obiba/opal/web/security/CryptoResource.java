@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.security;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Path("/system/crypto")
+@Tag(name = "System", description = "Operations on system administration")
 public class CryptoResource {
 
   @Autowired

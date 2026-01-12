@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope("request")
 @Path("/datasources/variables")
+@Tag(name = "Search", description = "Operations on the search service")
 public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);

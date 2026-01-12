@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -38,6 +39,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 @Component
 @Scope("request")
 @Path("/authz/query")
+@Tag(name = "Authorization", description = "Operations related to user authorization")
 public class AuthorizationQueryResource {
 
   @Autowired

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/system/subject-credential/{name}")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectCredentialResource {
 
   @PathParam("name")

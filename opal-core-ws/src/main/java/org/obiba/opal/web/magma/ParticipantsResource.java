@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
@@ -30,6 +31,7 @@ import com.google.common.collect.Iterables;
 @Component
 @Transactional
 @Path("/participants")
+@Tag(name = "Datasources", description = "Operations on datasources")
 public class ParticipantsResource {
 
   private static final String PARTICIPANT_ENTITY_TYPE = "Participant";

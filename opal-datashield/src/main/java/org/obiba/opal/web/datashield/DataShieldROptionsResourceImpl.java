@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.datashield.core.DSOption;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -31,6 +32,7 @@ import java.util.stream.StreamSupport;
 @Transactional
 @Scope("request")
 @Path("/datashield/options")
+@Tag(name = "DataSHIELD", description = "Operations on DataSHIELD")
 public class DataShieldROptionsResourceImpl implements DataShieldROptionsResource {
 
   @Autowired

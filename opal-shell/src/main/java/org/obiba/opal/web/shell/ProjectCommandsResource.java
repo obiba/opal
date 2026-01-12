@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -29,6 +30,8 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/project/{name}/commands")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Tasks", description = "Operations on tasks")
 @SuppressWarnings("OverlyCoupledClass")
 public class ProjectCommandsResource implements BaseResource {
 

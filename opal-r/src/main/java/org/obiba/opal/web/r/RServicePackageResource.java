@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
@@ -26,6 +27,7 @@ import jakarta.ws.rs.core.Response;
 @Component
 @Scope("request")
 @Path("/service/r/package/{name}")
+@Tag(name = "R", description = "Operations on R")
 public class RServicePackageResource {
 
   @Autowired

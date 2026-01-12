@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.app;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.web.model.Apps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import jakarta.ws.rs.core.Response;
 @Component
 @Scope("request")
 @Path("/app/{id}")
+@Tag(name = "Applications", description = "Operations on registered applications")
 public class AppResource {
 
   @PathParam("id")

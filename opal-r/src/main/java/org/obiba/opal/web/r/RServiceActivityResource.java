@@ -11,6 +11,7 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.RActivityService;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/service/r/activity")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceActivityResource {
 
   private final RActivityService rActivityService;

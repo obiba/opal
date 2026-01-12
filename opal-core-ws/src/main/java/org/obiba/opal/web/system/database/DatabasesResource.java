@@ -13,6 +13,7 @@ package org.obiba.opal.web.system.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -35,6 +36,7 @@ import static org.obiba.opal.web.model.Database.DatabaseDto;
 @Component
 @Transactional
 @Path("/system/databases")
+@Tag(name = "Databases", description = "Operations on databases")
 public class DatabasesResource {
 
   @Autowired

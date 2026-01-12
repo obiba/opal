@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -33,6 +35,7 @@ import jakarta.annotation.Nullable;
 @Transactional
 @Scope("request")
 @Path("/datasource/{datasourceName}/view/{viewName}/vcs")
+@Tag(name = "Datasources", description = "Operations on datasources")
 public class ViewVcsLogResource {
 
   @Autowired

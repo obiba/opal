@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -29,6 +30,8 @@ import java.util.List;
 @Component
 @Scope("request")
 @Path("/service/r/cluster/{cname}/commands")
+@Tag(name = "R", description = "Operations on the R service")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class RClusterCommandsResource implements BaseResource {
 
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsResource.class);
