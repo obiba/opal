@@ -1,5 +1,6 @@
 package org.obiba.opal.web.kubernetes;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Component
 @Path("/pod-specs")
+@Tag(name = "Kubernetes", description = "Operations on registered pod specifications")
 public class PodSpecsResource {
 
   private final PodsService podsService;

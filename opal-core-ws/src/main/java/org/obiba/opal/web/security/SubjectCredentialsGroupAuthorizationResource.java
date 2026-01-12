@@ -12,6 +12,7 @@ package org.obiba.opal.web.security;
 import java.util.Collection;
 import java.util.HashSet;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -32,6 +33,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 @Component
 @Scope("request")
 @Path("/authz-subject/{subject:.*}")
+@Tag(name = "Authorization", description = "Operations related to user authorization")
 public class SubjectCredentialsGroupAuthorizationResource {
 
   @Autowired

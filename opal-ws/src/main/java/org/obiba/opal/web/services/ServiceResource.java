@@ -11,6 +11,7 @@ package org.obiba.opal.web.services;
 
 import java.net.URI;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Scope("request")
 @Path("/service/{name}")
+@Tag(name = "Services", description = "Operations on services")
 public class ServiceResource {
 
   @PathParam("name")

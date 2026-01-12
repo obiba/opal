@@ -114,7 +114,6 @@ const routes: RouteRecordRaw[] = [
     name: 'ReAuthenticate',
     component: () => import('pages/SigninPage.vue'),
   },
-
   // Always leave this as last one,
   // but you can also remove it
   {

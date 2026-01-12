@@ -12,6 +12,7 @@ package org.obiba.opal.web.system.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -36,6 +37,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 @Component
 @Scope("request")
 @Path("/system/permissions/r")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class RPermissionsResource extends AbstractPermissionsResource {
 
   @Autowired
@@ -44,7 +46,6 @@ public class RPermissionsResource extends AbstractPermissionsResource {
   /**
    * Get R permissions.
    *
-   * @param domain
    * @param type
    * @return
    */

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/service/r/clusters")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceClustersResource {
 
   @Autowired

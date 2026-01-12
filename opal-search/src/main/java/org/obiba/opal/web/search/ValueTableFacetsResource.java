@@ -10,6 +10,7 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.service.ContingencyService;
@@ -37,6 +38,8 @@ import java.util.Optional;
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facets")
+@Tag(name = "Datasources", description = "Operations on datasources")
+@Tag(name = "Search", description = "Operations on the search service")
 public class ValueTableFacetsResource {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableFacetsResource.class);

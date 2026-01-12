@@ -149,6 +149,14 @@
                 <q-item-label caption lines="2">{{ t('kubernetes.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>
+                  <a href="../api-docs" target="_blank" rel="noopener noreferrer">{{ t('apidocs.title') }}</a>
+                </q-item-label>
+                <q-item-label caption lines="2">{{ t('apidocs.caption') }}</q-item-label>
+              </q-item-section>
+            </q-item>
             <!-- <q-item>
               <q-item-section>
                 <q-item-label><router-link to="/admin/jvm">{{ t('jvm') }}</router-link></q-item-label>

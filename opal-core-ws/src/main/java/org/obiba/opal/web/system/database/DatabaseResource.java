@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.database;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.obiba.magma.SocketFactoryProvider;
@@ -43,6 +44,7 @@ import static org.obiba.opal.web.model.Database.DatabaseDto;
 @Component
 @Scope("request")
 @Path("/system/database/{name}")
+@Tag(name = "Databases", description = "Operations on databases")
 public class DatabaseResource {
 
   @Autowired

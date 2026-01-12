@@ -11,6 +11,7 @@
 package org.obiba.opal.web.app;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.web.model.Apps;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Path("/apps")
+@Tag(name = "Applications", description = "Operations on registered applications")
 public class AppsResource {
 
   private static final String APP_AUTH_HEADER = "X-App-Auth";

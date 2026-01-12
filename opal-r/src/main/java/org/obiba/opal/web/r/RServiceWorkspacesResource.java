@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/service/r/workspaces")
+@Tag(name = "R", description = "Operations on R")
 public class RServiceWorkspacesResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();

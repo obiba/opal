@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/service/search/cfg/enabled")
+@Tag(name = "Search", description = "Operations on the search service")
 public class SearchServiceConfigResource {
 
   @Autowired

@@ -12,6 +12,7 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -38,6 +39,8 @@ import com.google.common.collect.Iterables;
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/vcf-store")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired

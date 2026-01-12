@@ -11,6 +11,7 @@ package org.obiba.opal.web.project;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
@@ -48,6 +49,7 @@ import java.util.Arrays;
 @Scope("request")
 @Transactional
 @Path("/project/{name}/transient-datasources")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectTransientDatasourcesResource {
   private static final Logger log = LoggerFactory.getLogger(ProjectTransientDatasourcesResource.class);
 

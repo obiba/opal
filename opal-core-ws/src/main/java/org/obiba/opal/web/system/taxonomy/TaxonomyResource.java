@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -42,6 +44,7 @@ import jakarta.annotation.Nullable;
 @Component
 @Scope("request")
 @Path("/system/conf/taxonomy/{name}")
+@Tag(name = "Taxonomies", description = "Operations on taxonomies")
 public class TaxonomyResource {
 
   @Autowired

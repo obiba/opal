@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.spi.datasource.DatasourceService;
@@ -26,6 +27,7 @@ import jakarta.ws.rs.*;
 @Component
 @Scope("request")
 @Path("/datasource-plugin/{name}")
+@Tag(name = "Plugins", description = "Operations on service plugins")
 public class DatasourcePluginResource {
 
   @PathParam("name")

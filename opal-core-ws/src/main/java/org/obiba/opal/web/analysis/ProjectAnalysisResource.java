@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.analysis;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.OpalAnalysisService;
@@ -33,6 +34,7 @@ import java.util.stream.StreamSupport;
 @Component
 @Scope("request")
 @Path("/project/{name}")
+@Tag(name = "Projects", description = "Operations on projects")
 public class ProjectAnalysisResource {
 
   @Autowired

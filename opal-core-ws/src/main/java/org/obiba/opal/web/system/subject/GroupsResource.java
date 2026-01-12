@@ -13,6 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.obiba.opal.core.domain.security.Group;
@@ -32,6 +33,7 @@ import java.util.List;
 
 @Component
 @Path("/system/groups")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class GroupsResource {
 
   private final SubjectCredentialsService subjectCredentialsService;

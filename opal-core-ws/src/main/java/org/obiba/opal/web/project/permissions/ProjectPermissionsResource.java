@@ -12,6 +12,7 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -45,6 +46,8 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Permissions", description = "Operations on permissions")
 public class ProjectPermissionsResource extends AbstractPermissionsResource {
 
   @Autowired

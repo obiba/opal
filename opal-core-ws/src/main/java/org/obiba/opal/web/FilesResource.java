@@ -12,6 +12,9 @@ package org.obiba.opal.web;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.*;
 import org.apache.commons.io.FileUtils;
@@ -56,6 +59,7 @@ import java.util.*;
 
 @Component
 @Path("/files")
+@Tag(name = "File System", description = "File System operations")
 public class FilesResource {
 
   private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
@@ -87,6 +91,9 @@ public class FilesResource {
   @GET
   @Path("/_meta")
   @NoAuthorization
+  @Operation(summary = "Get file system root details",
+      description = "Returns the details of the file system root folder")
+  @ApiResponse(responseCode = "200", description = "File system root details retrieved successfully")
   public Response getFileSystemRootDetails() throws IOException {
     return getFileDetails("/");
   }
@@ -94,6 +101,10 @@ public class FilesResource {
   @GET
   @Path("/_meta/{path:.*}")
   @NoAuthorization
+  @Operation(summary = "Get file or folder details",
+      description = "Returns the details of a file or folder identified by its path")
+  @ApiResponse(responseCode = "200", description = "File or folder details retrieved successfully")
+  @ApiResponse(responseCode = "404", description = "File or folder not found")
   public Response getFileDetails(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     if (file.getParent() != null && !file.getParent().isReadable() || !file.exists()) {
@@ -108,6 +119,9 @@ public class FilesResource {
   @GET
   @Path("/")
   @AuthenticatedByCookie
+  @Operation(summary = "Get file system root",
+      description = "Returns the file system root folder")
+  @ApiResponse(responseCode = "200", description = "File system root retrieved successfully")
   public Response getFileSystemRoot(@HeaderParam("X-File-Key") String password) throws IOException {
     return getFile("/", null, password);
   }
@@ -116,6 +130,11 @@ public class FilesResource {
   @POST
   @Path("/{path:.*}")
   @AuthenticatedByCookie
+  @Operation(summary = "Get file or folder from form",
+      description = "Returns a file or folder identified by its path, using form parameters")
+  @ApiResponse(responseCode = "200", description = "File or folder retrieved successfully")
+  @ApiResponse(responseCode = "404", description = "File or folder not found")
+  @ApiResponse(responseCode = "400", description = "Bad request")
   public Response getFileFromForm(@PathParam("path") String path, @QueryParam("file") List<String> children,
                                   @Nullable @FormParam("key") String fileKey) throws IOException {
     return getFileInternal(path, children, fileKey);
@@ -124,6 +143,10 @@ public class FilesResource {
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
+  @Operation(summary = "Get file or folder",
+      description = "Returns a file or folder identified by its path")
+  @ApiResponse(responseCode = "200", description = "File or folder retrieved successfully")
+  @ApiResponse(responseCode = "404", description = "File or folder not found")
   public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children, @HeaderParam("X-File-Key") String fileKey)
       throws IOException {
     return getFileInternal(path, children, fileKey);
@@ -151,6 +174,12 @@ public class FilesResource {
   @PUT
   @Path("/{path:.*}")
   @AuthenticatedByCookie
+  @Operation(summary = "Update file or folder",
+      description = "Copy or move a file or folder to a destination path")
+  @ApiResponse(responseCode = "200", description = "File or folder updated successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when source or destination is not readable/writable")
+  @ApiResponse(responseCode = "404", description = "File or folder not found")
   public Response updateFile(@PathParam("path") String destinationPath,
                              @QueryParam("action") @DefaultValue("copy") String action, @QueryParam("file") List<String> sourcesPath)
       throws IOException {
@@ -312,6 +341,12 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
+  @Operation(summary = "Upload file to root folder",
+      description = "Uploads a file to the root folder")
+  @ApiResponse(responseCode = "200", description = "File uploaded successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when destination folder is not writable")
+  @ApiResponse(responseCode = "404", description = "Destination folder not found")
   public Response uploadFile(@Context UriInfo uriInfo, @MultipartForm MultipartFormDataInput input)
       throws IOException {
     return uploadFile("/", uriInfo, input);
@@ -323,6 +358,12 @@ public class FilesResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
+  @Operation(summary = "Upload file to specified folder",
+      description = "Uploads a file to a folder identified by its path")
+  @ApiResponse(responseCode = "200", description = "File uploaded successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when destination folder is not writable")
+  @ApiResponse(responseCode = "404", description = "Destination folder not found")
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo,
                              @MultipartForm MultipartFormDataInput input) throws IOException {
 
@@ -382,6 +423,12 @@ public class FilesResource {
   @POST
   @Path("/")
   @Consumes("text/plain")
+  @Operation(summary = "Create folder in root folder",
+      description = "Creates a new folder in the root folder")
+  @ApiResponse(responseCode = "201", description = "Folder created successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when parent folder is not writable")
+  @ApiResponse(responseCode = "404", description = "Parent folder not found")
   public Response createFolder(String folderName, @Context UriInfo uriInfo) throws IOException {
     return createFolder("/", folderName, uriInfo);
   }
@@ -389,6 +436,12 @@ public class FilesResource {
   @POST
   @Path("/{path:.*}")
   @Consumes("text/plain")
+  @Operation(summary = "Create folder in specified folder",
+      description = "Creates a new folder in a folder identified by its path")
+  @ApiResponse(responseCode = "201", description = "Folder created successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when parent folder is not writable")
+  @ApiResponse(responseCode = "404", description = "Parent folder not found")
   public Response createFolder(@PathParam("path") String path, String folderName, @Context UriInfo uriInfo)
       throws IOException {
     if (folderName == null || folderName.trim().isEmpty()) return Response.status(Status.BAD_REQUEST).build();
@@ -421,6 +474,12 @@ public class FilesResource {
   @POST
   @Path("/{path:.*}")
   @Consumes("application/json")
+  @Operation(summary = "Unzip archive file",
+      description = "Unzips a .zip archive file to a specified destination folder")
+  @ApiResponse(responseCode = "200", description = "Archive file unzipped successfully")
+  @ApiResponse(responseCode = "400", description = "Bad request")
+  @ApiResponse(responseCode = "403", description = "Forbidden when archive file or destination folder is not accessible")
+  @ApiResponse(responseCode = "404", description = "Archive file or destination folder not found")
   public Response processFile(@PathParam("path") String archivePath, @QueryParam("action") @DefaultValue("unzip") String action, @QueryParam("destination") String destinationPath, @QueryParam("key") String archiveKey, @Context UriInfo uriInfo) throws IOException {
     return unzipArchive(archivePath, destinationPath, archiveKey, uriInfo);
   }
@@ -453,6 +512,11 @@ public class FilesResource {
 
   @DELETE
   @Path("/{path:.*}")
+  @Operation(summary = "Delete file or folder",
+      description = "Deletes a file or folder identified by its path")
+  @ApiResponse(responseCode = "200", description = "File or folder deleted successfully")
+  @ApiResponse(responseCode = "403", description = "Forbidden when file or folder is read-only")
+  @ApiResponse(responseCode = "404", description = "File or folder not found")
   public Response deleteFile(@PathParam("path") String path) throws IOException {
     FileObject file = resolveFileInFileSystem(path);
 
@@ -487,6 +551,9 @@ public class FilesResource {
   @Cache
   @Path("/charsets/available")
   @NoAuthorization
+  @Operation(summary = "Get available charsets",
+      description = "Returns the list of available charsets")
+  @ApiResponse(responseCode = "200", description = "Available charsets retrieved successfully")
   public Response getAvailableCharsets() {
     SortedMap<String, Charset> charsets = Charset.availableCharsets();
     List<String> names = new ArrayList<>();

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -41,6 +42,7 @@ import java.util.stream.StreamSupport;
 
 @Component
 @Path("/auth")
+@Tag(name = "Authentication", description = "Operations related to user authentication")
 public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);

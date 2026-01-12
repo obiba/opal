@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 @Path("/project/{name}/commands/_restore")
+@Tag(name = "Projects", description = "Operations on projects")
+@Tag(name = "Tasks", description = "Operations on tasks")
 public class ProjectCommandsRestoreResource extends AbstractProjectCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectCommandsRestoreResource.class);

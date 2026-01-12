@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import jakarta.ws.rs.PathParam;
 @Transactional
 @Scope("request")
 @Path("/r/session")
+@Tag(name = "R", description = "Operations on R")
 public class OpalRSessionParentResource {
 
   @Autowired

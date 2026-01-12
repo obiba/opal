@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.services.ServicePluginResource;
@@ -24,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 @Component
 @Scope("request")
 @Path("/plugin/{name}")
+@Tag(name = "Plugins", description = "Operations on service plugins")
 public class PluginResource {
 
   @PathParam("name")

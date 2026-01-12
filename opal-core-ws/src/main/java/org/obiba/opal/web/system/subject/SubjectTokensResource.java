@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @Component
 @Scope("request")
 @Path("/system/subject-token/{principal}/tokens")
+@Tag(name = "Subjects", description = "Operations on subjects")
 public class SubjectTokensResource {
 
   @PathParam("principal")

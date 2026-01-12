@@ -11,6 +11,7 @@
 package org.obiba.opal.web.identifiers;
 
 import com.google.common.collect.Sets;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -33,6 +34,7 @@ import java.util.Set;
 @Transactional
 @Scope("request")
 @Path("/identifiers")
+@Tag(name = "Identifiers", description = "Operations on identifiers")
 public class IdentifiersResource extends AbstractIdentifiersResource {
 
   @Autowired
