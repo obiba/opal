@@ -20,6 +20,7 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SubjectProfile extends AbstractTimestamped implements HasUniqueProperties {
@@ -39,6 +40,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   private String secret;
 
   private String tmpSecret;
+
+  private Map<String, Object> userInfo;
 
   public SubjectProfile() {
   }
@@ -152,6 +155,14 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   public void setTmpSecret(String tmpSecret) {
     this.tmpSecret = tmpSecret;
     this.secret = null;
+  }
+
+  public Map<String, Object> getUserInfo() {
+    return userInfo;
+  }
+
+  public void setUserInfo(Map<String, Object> userInfo) {
+    this.userInfo = userInfo;
   }
 
   @Override

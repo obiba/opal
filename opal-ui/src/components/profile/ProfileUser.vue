@@ -33,6 +33,7 @@
           <span class="on-right">{{ t('user_profile.password_update_not_allowed', { realm: profile?.realm }) }}</span>
         </div>
       </div>
+      <user-info-panel :profile="profile" class="q-mt-md" />
       <!-- !Account -->
 
       <!-- 2FA -->
@@ -247,6 +248,7 @@
 import { copyToClipboard } from 'quasar';
 import type { SubjectProfileDto, SubjectTokenDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
+import UserInfoPanel from 'src/components/admin/profiles/UserInfoPanel.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vue';
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';

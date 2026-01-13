@@ -519,6 +519,7 @@ export default {
   user_profile: {
     title: 'Mon profil',
     groups: 'Votre compte appartient au groupe | Votre compte appartient aux {count} groupes',
+    user_info: 'Informations utilisateur',
     password_update_not_allowed: "Votre compte a été défini dans le répertoire d'utilisateurs '{realm}'. Veuillez contacter votre administrateur du système pour modifier le mot de passe dans ce répertoire",
     '2fa_info': "En plus de l'authentification par nom d'utilisateur/mot de passe, un mot de passe dynamique (également appelé mot de passe à usage unique) peut être demandé pour renforcer la sécurité de l'accès à votre compte. Ce mot de passe unique est basé sur le temps (TOTP) : pour générer le code PIN temporaire, installez l'application Microsoft Authenticator ({androidOtp} ou {iosOtp}) ou l'application FreeOTP+ ({androidOnlyOtp}) sur votre appareil mobile, activez 2FA dans votre profil et suivez les instructions pour initialiser l'application Authenticator...",
     android_otp: 'Android',

@@ -244,6 +244,7 @@ message SubjectProfileDto {
   repeated string groups = 6;
   optional bool otpEnabled = 7 [default = false];
   optional bool otpRequired = 8;
+  optional string userInfo = 9;
 }
 
 message SubjectTokenDto {

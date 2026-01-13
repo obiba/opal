@@ -13,6 +13,7 @@
         <q-icon name="person" class="q-mb-xs on-left" />
         <span>{{ principal }}</span>
       </div>
+      <profile-user-info :principal="principal" class="q-mb-md" />
       <div class="text-h6 q-mb-md">
         {{ t('permissions') }}
       </div>
@@ -30,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import ProfileUserInfo from 'src/components/admin/profiles/ProfileUserInfo.vue';
 import ProfileAcls from 'src/components/admin/profiles/ProfileAcls.vue';
 import RActivity from 'src/components/admin/profiles/RActivity.vue';
 

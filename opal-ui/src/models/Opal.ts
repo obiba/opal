@@ -260,6 +260,7 @@ export interface SubjectProfileDto {
   groups: string[];
   otpEnabled?: boolean | undefined;
   otpRequired?: boolean | undefined;
+  userInfo?: string | undefined;
 }
 
 export interface SubjectTokenDto {
