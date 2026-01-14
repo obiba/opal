@@ -1002,6 +1002,7 @@ export default {
   documentation_cookbook: 'Documentation et recettes',
   download_dictionaries: 'Télécharger les dictionnaires',
   download_dictionary: 'Télécharger le dictionnaire',
+  download_user_profiles: 'Télécharger les profils utilisateurs',
   download_logs: 'Télécharger les logs',
   download_view: 'Télécharger la vue',
   download_views_backup: 'Sauvegarder les vues',

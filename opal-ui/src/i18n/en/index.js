@@ -1003,6 +1003,7 @@ export default {
   download_dictionaries: 'Download dictionaries',
   download_dictionary: 'Download dictionary',
   download_logs: 'Download logs',
+  download_user_profiles: 'Download user profiles',
   download_view: 'Download view',
   download_views_backup: 'Backup views',
   download: 'Download',
