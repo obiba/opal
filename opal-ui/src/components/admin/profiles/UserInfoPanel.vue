@@ -1,14 +1,18 @@
 <template>
   <div v-if="userInfo">
-    <div class="row">
+    <div class="row q-col-gutter-lg">
       <div class="col-12 col-md-6">
-        <fields-list :items="items" :dbobject="userInfo" max-width="200" />
+        <fields-list :items="items1" :dbobject="userInfo" max-width="200" />
+      </div>
+      <div class="col-12 col-md-6">
+        <fields-list :items="items2" :dbobject="userInfo" max-width="200" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import DOMPurify from 'dompurify';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import { type SubjectProfileDto } from 'src/models/Opal';
 
@@ -39,8 +43,16 @@ const userInfo = computed(() => {
   if (!props.profile.userInfo) {
     return null;
   }
-  const info = JSON.parse(props.profile.userInfo);
-  return flattenObject(info);
+  try {
+    const info = JSON.parse(props.profile.userInfo);
+    if (!info || typeof info !== 'object') {
+      return null;
+    }
+    return flattenObject(info);
+  } catch (e) {
+    console.error('Failed to parse userInfo JSON', e);
+    return null;
+  }
 });
 
 const items = computed<FieldItem[]>(() => {
@@ -52,20 +64,27 @@ const items = computed<FieldItem[]>(() => {
       field: key,
     } as FieldItem;
     const value = userInfo.value ? userInfo.value[key] : null;
-    // if value is an url make it a link
-    if (typeof value === 'string' && value.startsWith('http')) {
-      if (['image', 'avatar', 'photo', 'picture'].includes(key.toLowerCase())) {
-        item.html = (val) => `<img src="${val[key]}" alt="${key}" style="max-width: 100px; max-height: 100px;" />`;
-      } else {
-        item.html = (val) => `<a href="${val[key]}" target="_blank">${val[key]}</a>`;
-      }
+    // html sanitize value
+    if (value === null || value === undefined) {
+      return item;
     }
-    // if value is an email make it a mailto link
-    else if (typeof value === 'string' && value.includes('@')) {
-      item.html = (val) => `<a href="mailto:${val[key]}">${val[key]}</a>`;
+    const sanitizedValue = DOMPurify.sanitize(String(value));
+    if (typeof value === 'string' && value.startsWith('http')) {
+      // if value is an url make it a link or an image
+      if (['image', 'avatar', 'photo', 'picture'].includes(key.toLowerCase())) {
+        item.html = () => `<img src="${sanitizedValue}" alt="${DOMPurify.sanitize(key)}" style="max-width: 100px; max-height: 100px;" />`;
+      } else {
+        item.html = () => `<a href="${sanitizedValue}" target="_blank">${sanitizedValue}</a>`;
+      }
+    } else if (typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      // if value is an email make it a mailto link
+      item.html = () => `<a href="mailto:${sanitizedValue}">${sanitizedValue}</a>`;
     }
     return item;
   });
 });
+
+const items1 = computed(() => items.value.slice(0, Math.ceil(items.value.length / 2)));
+const items2 = computed(() => items.value.slice(Math.ceil(items.value.length / 2)));
 
 </script>

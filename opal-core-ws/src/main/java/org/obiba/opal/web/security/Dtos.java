@@ -17,6 +17,8 @@ import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.web.model.Opal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +27,8 @@ import java.util.Map;
 import static org.obiba.opal.web.model.Opal.BookmarkDto.ResourceType;
 
 public class Dtos {
+
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -137,6 +141,7 @@ public class Dtos {
         builder.setUserInfo(userInfoStr);
       } catch (Exception e) {
         // ignore
+        log.warn("Failed to convert user info to JSON string for principal {}", profile.getPrincipal(), e);
       }
     }
 

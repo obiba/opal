@@ -206,16 +206,25 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     try {
       SubjectProfile profile = getProfile(principal);
       updateProfileRealm(profile, realm);
-      if (principalCollection != null) {
-        // find user info from principal collection and set it to profile
-        principalCollection.byType(Map.class).stream().findFirst()
-                .ifPresent(obj -> profile.setUserInfo((Map<String, Object>) obj));
-      }
+      updateUserInfo(profile, principalCollection);
       profile.setUpdated(new Date());
       orientDbService.save(profile, profile);
     } catch (NoSuchSubjectProfileException e) {
-      HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
+      SubjectProfile newProfile = new SubjectProfile(principal, realm);
+      updateUserInfo(newProfile, principalCollection);
       orientDbService.save(newProfile, newProfile);
+    }
+  }
+
+  private void updateUserInfo(SubjectProfile profile, PrincipalCollection principalCollection) {
+    if(principalCollection != null) {
+      // find user info from principal collection and set it to profile
+      try {
+        principalCollection.byType(Map.class).stream().findFirst()
+                .ifPresent(obj -> profile.setUserInfo((Map<String, Object>) obj));
+      } catch (Exception e) {
+        log.warn("Failed to extract user info from principal collection for user {}", profile.getPrincipal(), e);
+      }
     }
   }
 
