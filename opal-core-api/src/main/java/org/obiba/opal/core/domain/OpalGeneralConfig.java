@@ -47,6 +47,9 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   private boolean allowRPackageManagement = false;
 
+  // Allow only Personal Access Token for R/Datashield sessions
+  private boolean allowRPatOnly = false;
+
   @NotNull
   public String getName() {
     return name;
@@ -123,6 +126,14 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public void setAllowRPackageManagement(boolean allowRPackageManagement) {
     this.allowRPackageManagement = allowRPackageManagement;
+  }
+
+  public boolean isAllowRPatOnly() {
+    return allowRPatOnly;
+  }
+
+  public void setAllowRPatOnly(boolean allowRPatOnly) {
+    this.allowRPatOnly = allowRPatOnly;
   }
 
   @Override

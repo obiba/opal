@@ -12,7 +12,9 @@ export default {
     enforced_2fa_hint: "Activer l'authentification à deux facteurs pour tous les utilisateurs. Ne s'applique pas aux utilisateurs de registres extérieurs.",
     allow_r_packages_management: 'Gestion des paquets R autorisée',
     allow_r_packages_management_hint: 'Autoriser les administrateurs à installer, mettre à jour et à supprimer des paquets R dans les sessions R. Non recommandé pour les environnements de production.',
-  },
+    allow_r_pat_only: 'Autoriser uniquement les PAT R/DataSHIELD',
+    allow_r_pat_only_hint: "Restreindre les sessions R/DataSHIELD par authentification avec jeton d'accès personnel (PAT) uniquement, en interdisant l'authentification par nom d'utilisateur/mot de passe. Cela renforce la sécurité en utilisant des jetons qui peuvent être gérés et révoqués individuellement sans affecter les identifiants des utilisateurs.",
+},
   apps: {
     title: 'Applications',
     caption: 'Gérer les applications externes fournissant des services',

@@ -19,7 +19,6 @@ import org.obiba.opal.r.service.RContextInitiator;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
-import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.r.RSessionsResourceImpl;
@@ -51,10 +50,10 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   static final String DS_CONTEXT = "DataSHIELD";
 
   @Autowired
-  private DataShieldProfileService datashieldProfileService;
+  private OpalConfigurationService configurationService;
 
   @Autowired
-  private OpalConfigurationService configurationService;
+  private DataShieldProfileService datashieldProfileService;
 
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;

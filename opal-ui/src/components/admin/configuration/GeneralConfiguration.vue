@@ -1,12 +1,17 @@
 <template>
-  <div class="row">
-    <div class="col-12 col-md-6">
-      <div class="q-mb-md">
-        <q-btn :title="t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
-      </div>
-      <fields-list :items="items" :dbobject="systemStore.generalConf" max-width="400" />
+  <div>
+    <div class="q-mb-md">
+      <q-btn :title="t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
     </div>
-
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-6">
+        <fields-list :items="items1" :dbobject="systemStore.generalConf" max-width="400" />
+      </div>
+      <div class="col-12 col-md-6">
+        <fields-list :items="items2" :dbobject="systemStore.generalConf" max-width="400" />
+      </div>
+    </div>
+    
     <q-dialog v-model="showEdit">
       <q-card class="dialog-sm">
         <q-card-section>
@@ -41,7 +46,7 @@
             dense
             multiple
             use-chips
-            :label="t('laguages')"
+            :label="t('languages')"
             :hint="t('app_configuration.languages_hint')"
             class="q-mb-md"
           />
@@ -62,8 +67,17 @@
             :label="t('app_configuration.allow_r_packages_management')"
             class="q-mb-sm"
           />
-          <div class="text-hint">
+          <div class="text-hint q-mb-md">
             {{ t('app_configuration.allow_r_packages_management_hint') }}
+          </div>
+          <q-toggle
+            v-model="config.allowRPatOnly"
+            dense
+            :label="t('app_configuration.allow_r_pat_only')"
+            class="q-mb-sm"
+          />
+          <div class="text-hint">
+            {{ t('app_configuration.allow_r_pat_only_hint') }}
           </div>
         </q-card-section>
         <q-separator />
@@ -81,7 +95,7 @@ import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 
 const { t } = useI18n();
 
-const items: FieldItem[] = [
+const items1: FieldItem[] = [
   { field: 'name', label: 'name', hint: 'app_configuration.name_hint' },
   {
     field: 'publicURL',
@@ -97,7 +111,7 @@ const items: FieldItem[] = [
   },
   {
     field: 'languages',
-    label: 'laguages',
+    label: 'languages',
     hint: 'app_configuration.languages_hint',
     format: (val) => (val.languages ? (val.languages as string[]).join(', ') : '-'),
   },
@@ -106,6 +120,9 @@ const items: FieldItem[] = [
     label: 'default_charset',
     hint: 'app_configuration.default_charset_hint',
   },
+];
+
+const items2: FieldItem[] = [
   {
     field: 'enforced2FA',
     label: 'enforced_2fa',
@@ -117,6 +134,12 @@ const items: FieldItem[] = [
     label: 'app_configuration.allow_r_packages_management',
     hint: 'app_configuration.allow_r_packages_management_hint',
     icon: (val) => (val.allowRPackageManagement ? 'check' : 'close'),
+  },
+  {
+    field: 'allowRPatOnly',
+    label: 'app_configuration.allow_r_pat_only',
+    hint: 'app_configuration.allow_r_pat_only_hint',
+    icon: (val) => (val.allowRPatOnly ? 'check' : 'close'),
   },
 ];
 

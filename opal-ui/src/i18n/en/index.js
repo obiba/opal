@@ -12,6 +12,8 @@ export default {
     enforced_2fa_hint: 'Enforce users to set up their two-factor authentication secret. Does not apply to users defined in external user registries.',
     allow_r_packages_management: 'Allow R packages management',
     allow_r_packages_management_hint: 'Allow administrators to install, update and remove R packages on the R servers. Not recommended in a production environment.',
+    allow_r_pat_only: 'Allow R/DataSHIELD PAT only',
+    allow_r_pat_only_hint: 'Restrict R/DataSHIELD sessions authentication to Personal Access Tokens (PAT) only, disallowing username/password authentication. This enhances security by using tokens that can be individually managed and revoked without affecting user credentials.',
   },
   apps: {
     title: 'Apps',
