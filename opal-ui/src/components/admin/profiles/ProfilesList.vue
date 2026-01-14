@@ -16,8 +16,15 @@
       v-model:selected="selectedProfiles"
     >
       <template v-slot:top>
-        <div class="row items-center q-gutter-sm">
-          <span :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ t('delete_profiles_selected') }}</span>
+        <div class="row items-center q-gutter-md">
+          <q-btn
+            outline
+            color="primary"
+            icon="download"
+            size="sm"
+            :title="t('download_user_profiles')"
+            @click="onProfilesDownload"
+          ></q-btn>
           <q-btn
             outline
             color="red"
@@ -26,15 +33,17 @@
             :disable="selectedProfiles.length === 0"
             @click="onDeleteProfiles"
           ></q-btn>
+          <span class="text-caption" :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ t('delete_profiles_selected') }}</span>
         </div>
       </template>
       <template v-slot:body-cell-principal="props">
         <q-td :props="props">
           <router-link :to="`/admin/profile/${props.value}`" class="text-primary">{{ props.value }}</router-link>
+          <q-icon name="info" color="secondary" size="xs" v-if="props.row.userInfo" :title="t('user_profile.user_info')" class="q-ml-sm" />
         </q-td>
       </template>
       <template v-slot:body-cell-realm="props">
-        <q-td :props="props">
+        <q-td :props="props" class="text-caption">
           {{ props.value }}
         </q-td>
       </template>
@@ -72,6 +81,7 @@ import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { DefaultAlignment } from 'src/components/models';
+import Papa from 'papaparse';
 
 const { t } = useI18n();
 
@@ -89,7 +99,7 @@ const columns = computed(() => [
     field: 'principal',
     format: (val: string) => val,
     sortable: true,
-    style: 'width: 25%',
+    style: 'width: 20%',
   },
   {
     name: 'realm',
@@ -137,8 +147,16 @@ const initialPagination = ref({
   rowsPerPage: 10,
   minRowsForPagination: 10,
 });
+const loading = ref(false);
 
 const principalsToDelete = computed(() => selectedProfiles.value.map((p) => p.principal).join(', '));
+
+onMounted(async () => {
+  loading.value = true;
+  profilesStore.initProfiles().then(() => {
+    loading.value = false;
+  });
+});
 
 async function disableOtp(profile: SubjectProfileDto) {
   try {
@@ -170,12 +188,25 @@ async function doDeleteProfiles() {
   }
 }
 
-const loading = ref(false);
-
-onMounted(async () => {
-  loading.value = true;
-  profilesStore.initProfiles().then(() => {
-    loading.value = false;
-  });
-});
+function onProfilesDownload() {
+  // trigger download of profiles CSV
+  const csv = Papa.unparse(
+    (selectedProfiles.value.length > 0 ? selectedProfiles.value : profiles.value).map((p) => ({
+      principal: p.principal,
+      realm: p.realm,
+      groups: (p.groups || []).join(','),
+      otpEnabled: p.otpEnabled,
+      userInfo: p.userInfo || '',
+      created: p.created,
+      lastUpdate: p.lastUpdate,
+    })),
+    { header: true, delimiter: ';' },
+  );
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'profiles.csv';
+  a.click();
+}
 </script>
