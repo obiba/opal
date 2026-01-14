@@ -14,6 +14,11 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
+import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.web.model.OpalR;
@@ -37,6 +42,9 @@ import java.util.concurrent.CompletableFuture;
 public class RSessionsResourceImpl implements RSessionsResource {
 
   static final String R_CONTEXT = "R";
+
+  @Autowired
+  private OpalGeneralConfigService generalConfigService;
 
   @Autowired
   private RServerManagerService rServerManagerService;
@@ -69,6 +77,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
   public Response newRSession(UriInfo info, String restore, String profile, boolean wait) {
     if (!createRSessionEnabled())
       throw new ForbiddenException("Plain R service endpoint is not enabled");
+    checkAuthenticationMethod();
     RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), withInitiator());
     onNewRSession(rSession);
     if (wait || !Strings.isNullOrEmpty(restore)) {
@@ -118,6 +127,16 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   protected RContextInitiator withInitiator() {
     return null;
+  }
+
+  protected void checkAuthenticationMethod() throws ForbiddenException {
+    boolean patOnly = generalConfigService.getConfig().isAllowRPatOnly();
+    if (!patOnly) return;
+    Subject subject = SecurityUtils.getSubject();
+    PrincipalCollection principals = subject.getPrincipals();
+    if (!principals.getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) {
+      throw new ForbiddenException("R/DataSHIELD sessions can only be created using Personal Access Token (PAT) authentication");
+    }
   }
 
   URI getLocation(UriInfo info, String id) {

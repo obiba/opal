@@ -227,7 +227,8 @@ public class SystemResource {
         .addAllLanguages(conf.getLocalesAsString())
         .setDefaultCharSet(conf.getDefaultCharacterSet())
         .setEnforced2FA(conf.isEnforced2FA())
-        .setAllowRPackageManagement(conf.isAllowRPackageManagement());
+        .setAllowRPackageManagement(conf.isAllowRPackageManagement())
+        .setAllowRPatOnly(conf.isAllowRPatOnly());
 
     if (!Strings.isNullOrEmpty(conf.getPublicUrl())) {
       builder.setPublicURL(conf.getPublicUrl());
@@ -251,6 +252,7 @@ public class SystemResource {
     conf.setLogoutUrl(dto.getLogoutURL());
     conf.setEnforced2FA(dto.getEnforced2FA());
     conf.setAllowRPackageManagement(dto.getAllowRPackageManagement());
+    conf.setAllowRPatOnly(dto.getAllowRPatOnly());
 
     if (dto.getLanguagesList().isEmpty()) {
       conf.setLocales(Lists.newArrayList(OpalGeneralConfig.DEFAULT_LOCALE));

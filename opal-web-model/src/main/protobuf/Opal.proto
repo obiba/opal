@@ -333,6 +333,7 @@ message GeneralConf {
   optional string logoutURL = 5;
   required bool enforced2FA = 6;
   required bool allowRPackageManagement = 7;
+  required bool allowRPatOnly = 8;
 }
 
 message AttributeConf {
