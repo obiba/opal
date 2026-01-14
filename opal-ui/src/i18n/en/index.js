@@ -519,6 +519,8 @@ export default {
   user_profile: {
     title: 'My profile',
     groups: 'Your account belongs to the group | Your account belongs to the {count} groups',
+    user_info: 'User Information',
+    load_error: "Error loading user profile '{user}'",
     password_update_not_allowed: "Your account was defined in the user directory '{realm}'. Please contact your system administrator to change the password in this directory.",
     '2fa_info': 'In addition to your username/password authentication, a dynamic password (also called one-time password) can be requested for an enhanced security of your account access. This one-time password is time-based (TOTP): to generate the temporary PIN code, install the Microsoft Authenticator app ({androidOtp} or {iosOtp}) or the FreeOTP+ app ({androidOnlyOtp}) on your mobile device, enable 2FA in your profile and follow instructions to initialise the authenticator app.',
     android_otp: 'Android',

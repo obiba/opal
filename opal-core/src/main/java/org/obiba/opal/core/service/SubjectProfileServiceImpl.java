@@ -40,6 +40,7 @@ import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,37 +86,15 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public synchronized void ensureProfile(@NotNull String principal, @NotNull String realm) {
-    log.debug("ensure profile of user {} from realm: {}", principal, realm);
-
-    try {
-      SubjectProfile profile = getProfile(principal);
-      if (isMultipleRealms()) {
-        List<String> realms = Splitter.on(",").splitToList(profile.getRealm());
-        if (!realms.contains(realm)) {
-          List<String> newRealms = Lists.newArrayList(realms);
-          newRealms.add(realm);
-          profile.setRealm(Joiner.on(",").join(newRealms));
-        }
-      } else if (!profile.getRealm().equals(realm)) {
-        throw new AuthenticationException(
-            "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
-                " expected). Make sure the same subject is not defined in several realms."
-        );
-      }
-      profile.setUpdated(new Date());
-      orientDbService.save(profile, profile);
-    } catch (NoSuchSubjectProfileException e) {
-      HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
-      orientDbService.save(newProfile, newProfile);
-    }
+  public void ensureProfile(@NotNull String principal, @NotNull String realm) {
+    ensureProfile(principal, realm, null);
   }
 
   @Override
   public void ensureProfile(@NotNull PrincipalCollection principalCollection) {
     String principal = principalCollection.getPrimaryPrincipal().toString();
     String realm = principalCollection.getRealmNames().iterator().next();
-    ensureProfile(principal, realm);
+    ensureProfile(principal, realm, principalCollection);
     ensureUserHomeExists(principal);
     ensureFolderPermissions(principal, "/home/" + principal);
     ensureFolderPermissions(principal, "/tmp");
@@ -220,6 +199,50 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   //
   // Private methods
   //
+
+  private synchronized void ensureProfile(@NotNull String principal, @NotNull String realm, PrincipalCollection principalCollection) {
+    log.debug("ensure profile of user {} from realm: {}", principal, realm);
+
+    try {
+      SubjectProfile profile = getProfile(principal);
+      updateProfileRealm(profile, realm);
+      updateUserInfo(profile, principalCollection);
+      profile.setUpdated(new Date());
+      orientDbService.save(profile, profile);
+    } catch (NoSuchSubjectProfileException e) {
+      SubjectProfile newProfile = new SubjectProfile(principal, realm);
+      updateUserInfo(newProfile, principalCollection);
+      orientDbService.save(newProfile, newProfile);
+    }
+  }
+
+  private void updateUserInfo(SubjectProfile profile, PrincipalCollection principalCollection) {
+    if(principalCollection != null) {
+      // find user info from principal collection and set it to profile
+      try {
+        principalCollection.byType(Map.class).stream().findFirst()
+                .ifPresent(obj -> profile.setUserInfo((Map<String, Object>) obj));
+      } catch (Exception e) {
+        log.warn("Failed to extract user info from principal collection for user {}", profile.getPrincipal(), e);
+      }
+    }
+  }
+
+  private void updateProfileRealm(SubjectProfile profile, String realm) {
+    if (isMultipleRealms()) {
+      List<String> realms = Splitter.on(",").splitToList(profile.getRealm());
+      if (!realms.contains(realm)) {
+        List<String> newRealms = Lists.newArrayList(realms);
+        newRealms.add(realm);
+        profile.setRealm(Joiner.on(",").join(newRealms));
+      }
+    } else if (!profile.getRealm().equals(realm)) {
+      throw new AuthenticationException(
+          "Wrong realm for subject '" + profile.getPrincipal() + "': " + realm + " (" + profile.getRealm() +
+              " expected). Make sure the same subject is not defined in several realms."
+      );
+    }
+  }
 
   private boolean isMultipleRealms() {
     return multiProfile;

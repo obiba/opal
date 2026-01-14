@@ -12,10 +12,13 @@ package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import org.json.JSONObject;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.web.model.Opal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +27,8 @@ import java.util.Map;
 import static org.obiba.opal.web.model.Opal.BookmarkDto.ResourceType;
 
 public class Dtos {
+
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -128,6 +133,17 @@ public class Dtos {
         .setOtpEnabled(profile.hasSecret())
         .setCreated(ISO_8601.format(profile.getCreated()))
         .setLastUpdate(ISO_8601.format(profile.getUpdated()));
+
+    if (profile.getUserInfo() != null && !profile.getUserInfo().isEmpty()) {
+      try {
+        // convert userInfo to JSON string
+        String userInfoStr = new JSONObject(profile.getUserInfo()).toString();
+        builder.setUserInfo(userInfoStr);
+      } catch (Exception e) {
+        // ignore
+        log.warn("Failed to convert user info to JSON string for principal {}", profile.getPrincipal(), e);
+      }
+    }
 
     if (!Strings.isNullOrEmpty(accountUrl))
       builder.setAccountUrl(accountUrl);
