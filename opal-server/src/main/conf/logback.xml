@@ -87,6 +87,12 @@
     </encoder-->
   </appender>
 
+  <appender name="otel" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    <endpoint>${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4317}</endpoint>
+    <resourceAttributes>service.name=${OTEL_SERVICE_NAME:-opal-server}</resourceAttributes>
+    <flushInterval>1000</flushInterval>
+  </appender>
+
   <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${OPAL_LOG}/sql.log</file>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -119,6 +125,7 @@
   <root level="info">
     <appender-ref ref="console"/>
     <appender-ref ref="opal"/>
+    <appender-ref ref="otel"/>
   </root>
 
 </configuration>

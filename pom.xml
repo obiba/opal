@@ -80,6 +80,7 @@
     <lang-tag.version>1.4.4</lang-tag.version>
     <logback.version>1.5.19</logback.version>
     <logstash-logback.version>7.4</logstash-logback.version>
+    <opentelemetry.logback-appender.version>2.23.0-alpha</opentelemetry.logback-appender.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
     <magma.version>5.1.0</magma.version>
@@ -820,6 +821,11 @@
         <groupId>net.logstash.logback</groupId>
         <artifactId>logstash-logback-encoder</artifactId>
         <version>${logstash-logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+        <version>${opentelemetry.logback-appender.version}</version>
       </dependency>
       <dependency>
         <groupId>janino</groupId>
