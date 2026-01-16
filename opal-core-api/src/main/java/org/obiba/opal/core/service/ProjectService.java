@@ -49,6 +49,14 @@ public interface ProjectService extends SystemService {
   @NotNull
   String getProjectDirectoryPath(@NotNull Project project);
 
+  /**
+   * Get the number of files in the project directory, recursively.
+   *
+   * @param project
+   * @return
+   */
+  int getProjectFilesCount(Project project);
+
   @NotNull
   String getProjectState(@NotNull Project project);
 

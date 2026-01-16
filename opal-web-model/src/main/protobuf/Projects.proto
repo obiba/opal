@@ -47,16 +47,23 @@ message ProjectFactoryDto {
   optional string exportFolder = 7;
 }
 
+message EntityTypeCountDto {
+  required string type = 1;
+  required int32 count = 2;
+}
+
 message ProjectSummaryDto {
   required string name = 1;
   required int32 tableCount = 2;
   required int32 variableCount = 3;
   required int32 entityCount = 4;
-  required int32 viewCount = 5;
-  required int32 derivedVariableCount = 6;
-  required int32 resourceCount = 7;
-  required ProjectDatasourceStatusDto datasourceStatus = 8;
-  optional Magma.TimestampsDto timestamps = 9;
+  repeated EntityTypeCountDto entityTypeCounts = 5;
+  required int32 viewCount = 6;
+  required int32 derivedVariableCount = 7;
+  required int32 resourceCount = 8;
+  required int32 filesCount = 9;
+  required ProjectDatasourceStatusDto datasourceStatus = 10;
+  optional Magma.TimestampsDto timestamps = 11;
 }
 
 message OpalAnalysisDto {
