@@ -189,13 +189,14 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { DefaultAlignment } from 'src/components/models';
+import { formatNumber } from 'src/utils/numbers';
 
 const route = useRoute();
 const router = useRouter();
 const datasourceStore = useDatasourceStore();
 const projectsStore = useProjectsStore();
 const searchStore = useSearchStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const filter = ref('');
 const showAddTable = ref(false);
@@ -242,6 +243,7 @@ const columns = computed(() => [
     label: t('variables'),
     align: DefaultAlignment,
     field: 'variableCount',
+    format: (val: number) => formatNumber(val, locale.value),
     sortable: true,
   },
   {
@@ -250,6 +252,7 @@ const columns = computed(() => [
     label: t('entities'),
     align: DefaultAlignment,
     field: 'valueSetCount',
+    format: (val: number) => formatNumber(val, locale.value),
     sortable: true,
   },
   {

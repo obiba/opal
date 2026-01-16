@@ -10,6 +10,8 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.datasource.nil.NullDatasource;
@@ -31,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import jakarta.ws.rs.core.UriBuilder;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
@@ -148,6 +152,7 @@ public class Dtos {
     int viewCount = 0;
     int variableCount = 0;
     int derivedVariableCount = 0;
+    Map<String, Set<VariableEntity>> entitiesByType = Maps.newHashMap();
     if (!"LOADING".equals(projectService.getProjectState(project))) {
       for (ValueTable table : project.getDatasource().getValueTables()) {
         tableCount++;
@@ -156,6 +161,13 @@ public class Dtos {
         if (table.isView()) {
           viewCount++;
           derivedVariableCount = derivedVariableCount + tableVariableCount;
+        } else {
+          // count only entities from non-view tables
+          if (entitiesByType.containsKey(table.getEntityType())) {
+            entitiesByType.get(table.getEntityType()).addAll(table.getVariableEntities());
+          } else {
+            entitiesByType.put(table.getEntityType(), Sets.newHashSet(table.getVariableEntities()));
+          }
         }
       }
     }
@@ -163,7 +175,14 @@ public class Dtos {
     builder.setViewCount(viewCount);
     builder.setVariableCount(variableCount);
     builder.setDerivedVariableCount(derivedVariableCount);
-    builder.setEntityCount(-1);
+    builder.setEntityCount(entitiesByType.values().stream().mapToInt(Set::size).sum());
+    entitiesByType.keySet().forEach((type) -> {
+      Projects.EntityTypeCountDto entityCountDto = Projects.EntityTypeCountDto.newBuilder()
+          .setType(type)
+          .setCount(entitiesByType.get(type).size())
+          .build();
+      builder.addEntityTypeCounts(entityCountDto);
+    });
     builder.setResourceCount(projectService.getResourceReferences(project).size());
     if (project.hasDatabase()) {
       builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));

@@ -59,11 +59,17 @@ export interface ProjectFactoryDto {
   exportFolder?: string | undefined;
 }
 
+export interface EntityTypeCountDto {
+  type: string;
+  count: number;
+}
+
 export interface ProjectSummaryDto {
   name: string;
   tableCount: number;
   variableCount: number;
   entityCount: number;
+  entityTypeCounts?: EntityTypeCountDto[] | undefined;
   viewCount: number;
   derivedVariableCount: number;
   resourceCount: number;
