@@ -6,5 +6,11 @@ export function toMaxDecimals(x: number | null, n: number): number | null {
 }
 
 export function formatNumber(x: number | null, locale: string | undefined = undefined): string {
-  return x?.toLocaleString(locale, { maximumFractionDigits: 2 }) ?? '';
+  if (x === null) {
+    return '';
+  }
+  if (Number.isInteger(x)) {
+    return x.toLocaleString(locale);
+  }
+  return x.toLocaleString(locale, { maximumFractionDigits: 2 });
 }

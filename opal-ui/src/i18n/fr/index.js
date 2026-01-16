@@ -1403,7 +1403,6 @@ export default {
   values: 'Valeurs',
   variable_name_hint: 'Le nom de la variable doit être unique dans sa table.',
   variable: 'Variable',
-  variables_count: 'Variables {count}',
   variables_hint: "Sélectionnez des variables pour accèder à plus d'actions.",
   variables_index_clear_error: "Erreur lors de la suppression de l'index des variables.",
   variables_index_cleared: "L'index des variables a été supprimé.",

@@ -31,8 +31,10 @@
                   </div>
                   <div class="text-white">
                     <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
-                    <span class="text-h3">{{ formatNumber(projectsStore.summary.tableCount, locale) }}</span>
-                    <span class="text-h5" v-if="projectsStore.summary.viewCount">({{ formatNumber(projectsStore.summary.viewCount, locale) }})</span>
+                    <div v-else>
+                      <span class="text-h3">{{ formatNumber(projectsStore.summary.tableCount, locale) }}</span>
+                      <span class="text-h5 q-ml-sm" v-if="projectsStore.summary.viewCount">({{ formatNumber(projectsStore.summary.viewCount, locale) }})</span>
+                    </div>
                   </div>
                 </q-item-label>
               </q-item-section>
@@ -81,7 +83,9 @@
                   </div>
                   <div class="text-h3 text-white">
                     <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
-                    {{ formatNumber(projectsStore.summary.resourceCount, locale) }}
+                    <div v-else>
+                      {{ formatNumber(projectsStore.summary.resourceCount, locale) }}
+                    </div>
                   </div>
                 </q-item-label>
               </q-item-section>
@@ -116,7 +120,9 @@
                   </div>
                   <div class="text-h3 text-white">
                     <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
-                    {{ formatNumber(projectsStore.summary.filesCount, locale) }}
+                    <div v-else>
+                      {{ formatNumber(projectsStore.summary.filesCount, locale) }}
+                    </div>
                   </div>
                 </q-item-label>
               </q-item-section>
