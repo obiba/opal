@@ -50,10 +50,6 @@
         </div>
       </div>
     </div>
-    <div v-if="reference && factory">
-      <code>
-      </code>
-    </div>
     <div v-if="reference && factory" class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
         <div class="text-h6 q-mb-md">{{ t('parameters') }}</div>
@@ -104,17 +100,21 @@ const rCode = computed(() => {
   if (!reference.value || !factory.value) {
     return '';
   }
+
+  const escapeRString = (str: string | undefined) => {
+    return str ? str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/`/g, '\\`') : '';
+  };
+
   let code = `library(${reference.value.provider})
 
 # Create a resource object
 res <- newResource(
-  name = "${reference.value.name}",
-  url = "${reference.value.resource?.url}"`;
+  name = "${escapeRString(reference.value.name)}",
+  url = "${escapeRString(reference.value.resource?.url)}"`;
 
   if (reference.value.resource?.format) 
     code = code + `,
-  format = "${reference.value.resource?.format}"`;
-
+  format = "${escapeRString(reference.value.resource?.format)}"`;
   code = code + `,
   identity = NULL, # Add identity as needed
   secret = NULL    # Add secret as needed
