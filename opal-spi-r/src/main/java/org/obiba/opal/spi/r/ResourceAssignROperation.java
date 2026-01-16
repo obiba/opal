@@ -48,11 +48,11 @@ public class ResourceAssignROperation extends AbstractROperation {
       if (requiredPackages != null && !requiredPackages.isEmpty())
         requiredPackages.forEach(this::loadPackage);
       String script = String.format("resourcer::newResourceClient(resourcer::newResource(name='%s', url='%s', identity=%s, secret=%s, format=%s))",
-          resource.getName(),
-          resource.toURI().toString(),
-          credentials.getIdentity() == null ? "NULL" : "'" + credentials.getIdentity() + "'",
-          credentials.getSecret() == null ? "NULL" : "'" + credentials.getSecret() + "'",
-          resource.getFormat() == null ? "NULL" : "'" + resource.getFormat() + "'");
+          resource.getName().replaceAll("'", "\\\\'"),
+          resource.toURI().toString().replaceAll("'", "\\\\'"),
+          credentials.getIdentity() == null ? "NULL" : "'" + credentials.getIdentity().replaceAll("'", "\\\\'") + "'",
+          credentials.getSecret() == null ? "NULL" : "'" + credentials.getSecret().replaceAll("'", "\\\\'") + "'",
+          resource.getFormat() == null ? "NULL" : "'" + resource.getFormat().replaceAll("'", "\\\\'") + "'");
       eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
     } catch (URISyntaxException e) {
       throw new RRuntimeException(e);

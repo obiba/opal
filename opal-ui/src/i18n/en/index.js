@@ -710,6 +710,9 @@ export default {
     r_server_profile: 'R server profile',
     r_server_profile_hint: 'Optional R server profile name to be used for establishing the connection with the resource. If not specified, the profile will be guessed based on the R package associated to the resource.',
     from_hint: 'The full name of the resource to be connected and coerced to its tabular representation.',
+    r_example_code: 'Example R code',
+    r_example_code_hint: 'Example R code to connect to the resource and get its tabular or object representation.',
+    r_example_code_copied: 'Example R code copied to clipboard.',
   },
   taxonomy: {
     title: 'Taxonomy',
@@ -1421,5 +1424,6 @@ export default {
   vocabularies: 'Vocabularies',
   vocabulary: 'Vocabulary',
   waiting: 'Waiting',
+  website: 'Website',
   yes: 'Yes',
 };

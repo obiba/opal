@@ -18,8 +18,27 @@
           <div class="text-bold q-mb-sm">{{ provider.title }}</div>
           <q-markdown :src="provider.description" no-heading-anchor-links />
           <a v-if="provider.web" :href="provider.web" target="_blank" class="q-mt-md"
-            >{{ t('Website') }} <q-icon name="open_in_new"
+            >{{ t('website') }} <q-icon name="open_in_new"
           /></a>
+          <div>
+            <div class="text-bold q-mt-md">{{ t('resource_ref.r_example_code') }}</div>
+            <div class="text-hint q-my-sm">{{ t('resource_ref.r_example_code_hint') }}</div>
+            <div>
+              <q-btn
+                flat
+                dense
+                size="sm"
+                icon="content_copy"
+                color="white"
+                :title="t('clipboard.copy')"
+                @click="onCopyToClipboard"
+                aria-label="Copy to clipboard"
+                class="copy-button"
+              />
+              <code class="r-code">
+{{ rCode }}</code>
+            </div>
+          </div>
         </div>
         <div v-else>
           <div class="q-mb-md box-warning">
@@ -55,8 +74,10 @@
 </template>
 
 <script setup lang="ts">
+import { copyToClipboard } from 'quasar';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import SchemaForm from 'src/components/SchemaForm.vue';
+import { notifyInfo } from 'src/utils/notify';
 
 const route = useRoute();
 const resourcesStore = useResourcesStore();
@@ -74,6 +95,41 @@ const parametersSchemaForm = computed(() => (factory.value ? JSON.parse(factory.
 const credentialsSchemaForm = computed(() => (factory.value ? JSON.parse(factory.value.credentialsSchemaForm) : {}));
 const refParameters = computed(() => (reference.value?.parameters ? JSON.parse(reference.value.parameters) : {}));
 const refCredentials = computed(() => (reference.value?.credentials ? JSON.parse(reference.value.credentials) : {}));
+
+const rCode = computed(() => {
+  if (!reference.value || !factory.value) {
+    return '';
+  }
+
+  const escapeRString = (str: string | undefined) => {
+    return str ? str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/`/g, '\\`') : '';
+  };
+
+  let code = `library(${reference.value.provider})
+
+# Create a resource object
+res <- newResource(
+  name = "${escapeRString(reference.value.name)}",
+  url = "${escapeRString(reference.value.resource?.url)}"`;
+
+  if (reference.value.resource?.format) 
+    code = code + `,
+  format = "${escapeRString(reference.value.resource?.format)}"`;
+  code = code + `,
+  identity = NULL, # Add identity as needed
+  secret = NULL    # Add secret as needed
+)
+
+# Create a connection client to this resource
+client <- newResourceClient(res)
+
+# Coerce to a data frame (if it applies)
+as.resource.data.frame(client)
+
+# Or as a raw object (if it applies)
+as.resource.object(client)`;
+  return code;
+});
 
 watch([pName, rName], () => {
   init();
@@ -111,4 +167,26 @@ const itemsFactory: FieldItem[] = [{ field: 'title', label: 'type' }];
 function onParametersUpdate() {
   console.debug('onParametersUpdate');
 }
+
+function onCopyToClipboard() {
+  copyToClipboard(rCode.value).then(() => {
+    notifyInfo(t('resource_ref.r_example_code_copied'));
+  });
+}
 </script>
+
+<style scoped>
+.copy-button {
+  float: right;
+  margin-top: 20px;
+  margin-right: 20px;
+}
+.r-code {
+  background-color: #333;
+  color: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+  display: block;
+  white-space: pre-wrap;
+}
+</style>
