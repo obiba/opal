@@ -710,6 +710,9 @@ export default {
     r_server_profile: 'Profile du serveur R',
     r_server_profile_hint: 'Nom (optionnel) du serveur R à utiliser pour établir la connexion avec la ressource. Si non spécifié, le profile sera deviné à partir du paquet R associé à la ressource.',
     from_hint: 'Le nom complet de la ressource à laquelle se connecter et à représenter sous forme de tableau.',
+    r_example_code: 'Exemple de code R',
+    r_example_code_hint: "Exemple de code R pour se connecter à la ressource référencée et la représenter sous forme de tableau ou d'objet.",
+    r_example_code_copied: 'Exemple de code R copié dans le presse-papiers.',
   },
   taxonomy: {
     title: 'Taxonomie',
@@ -1421,5 +1424,6 @@ export default {
   vocabularies: 'Vocabulaires',
   vocabulary: 'Vocabulaire',
   waiting: 'En attente',
+  website: 'Site web',
   yes: 'Oui',
 };
