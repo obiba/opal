@@ -1080,6 +1080,7 @@ export default {
   gh_ref: 'Reference',
   gh_repo_hint: 'Example: dsBase',
   gh_repo: 'Repository',
+  go_to_files: 'View files',
   go_to_tables: 'View tables',
   go_to_resources: 'View resources',
   group: 'Group',

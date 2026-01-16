@@ -61,8 +61,9 @@ message ProjectSummaryDto {
   required int32 viewCount = 6;
   required int32 derivedVariableCount = 7;
   required int32 resourceCount = 8;
-  required ProjectDatasourceStatusDto datasourceStatus = 9;
-  optional Magma.TimestampsDto timestamps = 10;
+  required int32 filesCount = 9;
+  required ProjectDatasourceStatusDto datasourceStatus = 10;
+  optional Magma.TimestampsDto timestamps = 11;
 }
 
 message OpalAnalysisDto {

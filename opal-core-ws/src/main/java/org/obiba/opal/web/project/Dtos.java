@@ -184,6 +184,7 @@ public class Dtos {
       builder.addEntityTypeCounts(entityCountDto);
     });
     builder.setResourceCount(projectService.getResourceReferences(project).size());
+    builder.setFilesCount(projectService.getProjectFilesCount(project));
     if (project.hasDatabase()) {
       builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
     } else {

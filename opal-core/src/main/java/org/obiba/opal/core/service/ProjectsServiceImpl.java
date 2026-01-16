@@ -11,9 +11,7 @@ package org.obiba.opal.core.service;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -224,6 +222,32 @@ public class ProjectsServiceImpl implements ProjectService {
   @Override
   public List<ResourceReference> getResourceReferences(Project project) {
     return resourceReferenceService.getResourceReferences(project.getName());
+  }
+
+  @Override
+  public int getProjectFilesCount(Project project) {
+    try {
+      FileObject projectDir = getProjectDirectory(project);
+      return projectDir.findFiles(new FileSelector() {
+        @Override
+        public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
+          return !fileSelectInfo.getFile().isFolder();
+        }
+
+        @Override
+        public boolean traverseDescendants(FileSelectInfo fileInfo) throws Exception {
+          return true;
+        }
+
+        @Override
+        public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {
+          return true;
+        }
+      }).length;
+    } catch (FileSystemException e) {
+      log.warn("Unable to count files for project: {}", project.getName(), e);
+      return 0;
+    }
   }
 
   @NotNull

@@ -73,6 +73,7 @@ export interface ProjectSummaryDto {
   viewCount: number;
   derivedVariableCount: number;
   resourceCount: number;
+  filesCount: number;
   datasourceStatus: ProjectDatasourceStatusDto;
   timestamps?: TimestampsDto | undefined;
 }

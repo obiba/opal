@@ -30,6 +30,7 @@
                     {{ t('tables_views') }}
                   </div>
                   <div class="text-white">
+                    <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
                     <span class="text-h3">{{ formatNumber(projectsStore.summary.tableCount, locale) }}</span>
                     <span class="text-h5" v-if="projectsStore.summary.viewCount">({{ formatNumber(projectsStore.summary.viewCount, locale) }})</span>
                   </div>
@@ -43,10 +44,10 @@
               </q-item-section>
             </q-item>
           </q-card-section>
-          <q-card-section class="q-pt-none">
+          <q-card-section v-if="!loadingSummary" class="q-pt-none">
             <q-item-section class="q-px-md">
               <q-item-label>
-              <div class="text-caption text-white">
+                <div class="text-caption text-white">
                   {{ t('variables') }} <b>{{ formatNumber(projectsStore.summary.variableCount, locale) }}</b>
                 </div>
                 <div class="text-caption text-white">
@@ -79,6 +80,7 @@
                     {{ t('resources') }}
                   </div>
                   <div class="text-h3 text-white">
+                    <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
                     {{ formatNumber(projectsStore.summary.resourceCount, locale) }}
                   </div>
                 </q-item-label>
@@ -104,6 +106,41 @@
             ></q-btn>
           </q-card-actions>
         </q-card>
+        <q-card flat bordered class="q-mb-md card bg-amber-9">
+          <q-card-section @click="router.push(`/project/${name}/files`)">
+            <q-item class="q-pb-none">
+              <q-item-section>
+                <q-item-label>
+                  <div class="text-subtitle2 text-caption text-grey-2 text-uppercase">
+                    {{ t('files') }}
+                  </div>
+                  <div class="text-h3 text-white">
+                    <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
+                    {{ formatNumber(projectsStore.summary.filesCount, locale) }}
+                  </div>
+                </q-item-label>
+              </q-item-section>
+              <q-item-section avatar>
+                <q-icon
+                  name="folder"
+                  size="64px"
+                  color="amber-2" />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <q-card-actions class="footer">
+            <q-btn
+              flat
+              rounded
+              :label="t('go_to_files')"
+              icon-right="arrow_forward"
+              size="sm"
+              color="white"
+              class="q-pa-sm q-ml-md"
+              :to="`/project/${name}/files`"
+            ></q-btn>
+          </q-card-actions>
+        </q-card>
       </div>
     </q-page>
   </div>
@@ -120,6 +157,7 @@ const route = useRoute();
 const router = useRouter();
 const projectsStore = useProjectsStore();
 
+const loadingSummary = ref(false);
 const name = computed(() => route.params.id as string);
 const tags = computed(() => (projectsStore.project.tags ? projectsStore.project.tags : []));
 const canViewSummary = ref(false);
@@ -133,7 +171,14 @@ onMounted(() => {
     .initProject(name.value)
     .then(() => {
       canViewSummary.value = projectsStore.perms.summary ? projectsStore.perms.summary.canRead() : false;
-      if (canViewSummary.value) projectsStore.loadSummary();
+      if (canViewSummary.value) {
+        loadingSummary.value = true;
+        projectsStore
+          .loadSummary()
+          .finally(() => {
+            loadingSummary.value = false;
+          });
+      }
     })
     .catch((error) => {
       notifyError(error);
