@@ -10,10 +10,6 @@
 
 package org.obiba.opal.core.service;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.ORecord;
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
@@ -21,6 +17,7 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Map;
 
 public interface OrientDbService {
@@ -73,11 +70,7 @@ public interface OrientDbService {
 
   void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz);
 
-  void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @NotNull String... propertyPath);
-
-  void copyToDocument(Object obj, ORecord document);
-
-  <T> T fromDocument(Class<T> clazz, ORecord document);
+  void createIndex(Class<?> clazz, IndexType indexType, FieldType type, @NotNull String... propertyPath);
 
   void exportDatabase(File target) throws IOException;
 
@@ -89,20 +82,31 @@ public interface OrientDbService {
 
   <T> T fromJson(String json, Class<T> classOfT);
 
+  enum IndexType {
+    UNIQUE,
+    NOT_UNIQUE
+  }
+
+  enum FieldType {
+    STRING,
+    INTEGER,
+    LONG,
+    DOUBLE,
+    BOOLEAN,
+    DATE
+  }
+
   interface WithinDocumentTxCallback<T> {
-
-    T withinDocumentTx(ODatabaseDocument db);
-
+    T withinDocumentTx(Connection db);
   }
 
   abstract class WithinDocumentTxCallbackWithoutResult implements WithinDocumentTxCallback<Void> {
-
     @Override
-    public final Void withinDocumentTx(ODatabaseDocument db) {
+    public final Void withinDocumentTx(Connection db) {
       withinDocumentTxWithoutResult(db);
       return null;
     }
 
-    protected abstract void withinDocumentTxWithoutResult(ODatabaseDocument db);
+    protected abstract void withinDocumentTxWithoutResult(Connection db);
   }
 }

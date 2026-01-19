@@ -12,16 +12,12 @@ package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import java.util.Locale;
 
@@ -39,16 +35,8 @@ public class OpalGeneralConfigServiceImplTest extends AbstractOrientdbServiceTes
   @Override
   public void startDB() throws Exception {
     super.startDB();
-    orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
-      @Override
-      protected void withinDocumentTxWithoutResult(ODatabaseDocument db) {
-        String className = OpalGeneralConfig.class.getSimpleName();
-        OSchema schema = db.getMetadata().getSchema();
-        if(schema.getClass(className) != null) {
-          schema.dropClass(className);
-        }
-      }
-    });
+    // Clean up existing config data
+    orientDbService.deleteAll(OpalGeneralConfig.class);
   }
 
   @Test(expected = OpalGeneralConfigMissingException.class)

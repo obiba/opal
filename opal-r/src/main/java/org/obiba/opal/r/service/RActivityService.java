@@ -12,8 +12,6 @@ package org.obiba.opal.r.service;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.apache.commons.compress.utils.Lists;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.service.OrientDbService;
@@ -141,9 +139,9 @@ public class RActivityService implements SystemService {
   @PostConstruct
   public void start() {
     orientDbService.createUniqueIndex(RSessionActivity.class);
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "user");
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "context");
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "profile");
+    orientDbService.createIndex(RSessionActivity.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "user");
+    orientDbService.createIndex(RSessionActivity.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "context");
+    orientDbService.createIndex(RSessionActivity.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "profile");
   }
 
   @Override

@@ -20,7 +20,6 @@ import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.spi.resource.Resource;
 import org.slf4j.Logger;
@@ -58,11 +57,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public List<ResourceReference> getResourceReferences(String project) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(ResourceReference.class.getSimpleName())
-        .whereClauses("project = ?")
-        .build();
-    return StreamSupport.stream(orientDbService.list(ResourceReference.class, query, project).spliterator(), false)
+    return StreamSupport.stream(orientDbService.list(ResourceReference.class,
+            "SELECT * FROM ResourceReference WHERE project = ?", project).spliterator(), false)
         .filter(ref -> canViewResourceReference(project, ref.getName()))
         .map(this::decryptCredentials)
         .collect(Collectors.toList());
@@ -185,11 +181,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   //
 
   private ResourceReference getResourceReferenceInternal(String project, String name) throws NoSuchResourceReferenceException {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(ResourceReference.class.getSimpleName())
-        .whereClauses("project = ?", "name = ?")
-        .build();
-    ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
+    ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class,
+        "SELECT * FROM ResourceReference WHERE project = ? AND name = ?", project, name);
     if (resourceReference == null)
       throw new NoSuchResourceReferenceException(project, name);
     return decryptCredentials(resourceReference);

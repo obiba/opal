@@ -16,7 +16,6 @@ import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.slf4j.Logger;
@@ -44,11 +43,9 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public OpalAnalysis getAnalysis(String datasource, String table, String name) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "name = ?")
-      .build();
-    return orientDbService.uniqueResult(OpalAnalysis.class, query, datasource, table, name);
+    return orientDbService.uniqueResult(OpalAnalysis.class,
+        "SELECT * FROM OpalAnalysis WHERE datasource = ? AND table = ? AND name = ?",
+        datasource, table, name);
   }
 
   @Override
@@ -58,25 +55,14 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?")
-      .order("desc")
-      .build();
-
-    return orientDbService.list(OpalAnalysis.class, query, datasource);
+    return orientDbService.list(OpalAnalysis.class,
+        "SELECT * FROM OpalAnalysis WHERE datasource = ?", datasource);
   }
 
   @Override
-  public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource,
-                                                                String table) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?")
-      .order("desc")
-      .build();
-
-    return orientDbService.list(OpalAnalysis.class, query, datasource, table);
+  public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table) {
+    return orientDbService.list(OpalAnalysis.class,
+        "SELECT * FROM OpalAnalysis WHERE datasource = ? AND table = ?", datasource, table);
   }
 
   @Override
@@ -93,13 +79,8 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
     orientDbService.delete(analysis);
 
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(OpalAnalysisResult.class.getSimpleName())
-        .whereClauses("analysisName = ? ")
-        .build();
-
-    StreamSupport
-        .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getName()).spliterator(), false)
+    StreamSupport.stream(orientDbService.list(OpalAnalysisResult.class,
+            "SELECT * FROM OpalAnalysisResult WHERE analysisName = ?", analysis.getName()).spliterator(), false)
         .forEach(orientDbService::delete);
 
     deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));

@@ -18,7 +18,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -42,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
@@ -68,10 +66,10 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   @Override
   public void start() {
     orientDbService.createUniqueIndex(SubjectAcl.class);
-    orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");
-    orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
-    orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
-    orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "type");
+    orientDbService.createIndex(SubjectAcl.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "domain");
+    orientDbService.createIndex(SubjectAcl.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "node");
+    orientDbService.createIndex(SubjectAcl.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "principal");
+    orientDbService.createIndex(SubjectAcl.class, OrientDbService.IndexType.NOT_UNIQUE, OrientDbService.FieldType.STRING, "type");
     // upgrade procedure: delete any permission related to report templates
     deletePermissionPermissions("REPORT_TEMPLATE_READ");
     deletePermissionPermissions("REPORT_TEMPLATE_ALL");

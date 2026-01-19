@@ -120,10 +120,6 @@
       <artifactId>javax.el</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-server</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-shiro</artifactId>
     </dependency>

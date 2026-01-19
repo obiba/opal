@@ -11,17 +11,15 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.server.OServer;
 import javax.validation.constraints.NotNull;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public interface OrientDbServerFactory {
 
   @NotNull
-  OServer getServer();
-
-  @NotNull
-  ODatabaseDocument getDocumentTx();
+  Connection getConnection() throws SQLException;
 
   @VisibleForTesting
   void setUrl(@NotNull String url);
