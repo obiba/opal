@@ -99,12 +99,6 @@ public class H2OrientDbServerFactory implements OrientDbServerFactory, Initializ
   public void stop() {
     if (connectionPool != null) {
       log.info("Stopping H2 config database");
-      try (Connection conn = connectionPool.getConnection();
-           Statement stmt = conn.createStatement()) {
-        stmt.execute("DROP ALL OBJECTS");
-      } catch (SQLException e) {
-        log.debug("Error dropping database objects on stop", e);
-      }
       connectionPool.dispose();
       connectionPool = null;
     }
