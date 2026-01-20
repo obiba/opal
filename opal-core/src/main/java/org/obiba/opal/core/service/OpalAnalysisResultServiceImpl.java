@@ -10,8 +10,8 @@
 
 package org.obiba.opal.core.service;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.slf4j.Logger;
@@ -38,40 +38,35 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
 
   @Override
   public OpalAnalysisResult getAnalysisResult(String analysisName, String resultId) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("analysisName = ?", "id = ?")
-      .build();
-
-    return orientDbService.uniqueResult(OpalAnalysisResult.class, query, analysisName, resultId);
+    return orientDbService.uniqueResult(OpalAnalysisResult.class,
+        "SELECT * FROM OpalAnalysisResult WHERE analysisName = ? AND id = ?", analysisName, resultId);
   }
 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult) {
-    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .order("desc");
-
+    Iterable<OpalAnalysisResult> results = orientDbService.list(OpalAnalysisResult.class);
     if (lastResult) {
-      builder.limit(1);
+      return Lists.newArrayList(results).stream()
+          .sorted((a, b) -> b.getStartDate().compareTo(a.getStartDate()))
+          .limit(1)
+          .toList();
     }
-
-    return orientDbService.list(OpalAnalysisResult.class, builder.build());
+    return results;
   }
 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(String datasource, String table, String analysisName, boolean lastResult)
       throws NoSuchAnalysisException {
-    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "analysisName = ?")
-      .order("desc");
-
+    Iterable<OpalAnalysisResult> results = orientDbService.list(OpalAnalysisResult.class,
+        "SELECT * FROM OpalAnalysisResult WHERE datasource = ? AND table = ? AND analysisName = ?",
+        datasource, table, analysisName);
     if (lastResult) {
-      builder.limit(1);
+      return Lists.newArrayList(results).stream()
+          .sorted((a, b) -> b.getStartDate().compareTo(a.getStartDate()))
+          .limit(1)
+          .toList();
     }
-
-    return orientDbService.list(OpalAnalysisResult.class, builder.build(), datasource, table, analysisName);
+    return results;
   }
 
   @Override

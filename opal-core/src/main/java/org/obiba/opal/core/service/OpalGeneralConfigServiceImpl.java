@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.service;
 
-import jakarta.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.eventbus.EventBus;
@@ -21,10 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.tx.OTransaction;
 
 /**
  * Default implementation of System Service
@@ -54,47 +49,27 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
 
   @Override
   public void save(@NotNull final OpalGeneralConfig config) {
-    orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
-      @Override
-      protected void withinDocumentTxWithoutResult(ODatabaseDocument db) {
-
-        ODocument document = getDocument(db);
-        if(document == null) {
-          document = new ODocument(OpalGeneralConfig.class.getSimpleName());
-        }
-        orientDbService.copyToDocument(config, document);
-
-        db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-        log.debug("save {}", document);
-        document.save();
-        db.commit();
-        eventBus.post(new OpalGeneralConfigUpdatedEvent(config));
-      }
-    });
+    OpalGeneralConfig existing = getConfigOrNull();
+    if (existing == null) {
+      orientDbService.save(null, config);
+    } else {
+      orientDbService.save(existing, config);
+    }
+    log.debug("save {}", config);
+    eventBus.post(new OpalGeneralConfigUpdatedEvent(config));
   }
 
   @Override
   @NotNull
   public OpalGeneralConfig getConfig() throws OpalGeneralConfigMissingException {
-    return orientDbService.execute(new OrientDbService.WithinDocumentTxCallback<OpalGeneralConfig>() {
-      @Override
-      public OpalGeneralConfig withinDocumentTx(ODatabaseDocument db) {
-        ODocument document = getDocument(db);
-        if(document == null) {
-          throw new OpalGeneralConfigMissingException();
-        }
-        return orientDbService.fromDocument(OpalGeneralConfig.class, document);
-      }
-    });
-  }
-
-  @Nullable
-  private ODocument getDocument(ODatabaseDocument db) {
-    String className = OpalGeneralConfig.class.getSimpleName();
-    if(db.getMetadata().getSchema().getClass(className) == null) {
-      return null;
+    OpalGeneralConfig config = getConfigOrNull();
+    if (config == null) {
+      throw new OpalGeneralConfigMissingException();
     }
-    return Iterables.getOnlyElement(db.browseClass(className), null);
+    return config;
   }
 
+  private OpalGeneralConfig getConfigOrNull() {
+    return Iterables.getFirst(orientDbService.list(OpalGeneralConfig.class), null);
+  }
 }

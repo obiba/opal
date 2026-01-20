@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class OpalGeneralConfig extends AbstractTimestamped {
+public class OpalGeneralConfig extends AbstractTimestamped implements HasUniqueProperties {
+
+  private static final String SINGLETON_ID = "1";
 
   public static final String DEFAULT_NAME = "Opal";
 
@@ -134,6 +136,16 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public void setAllowRPatOnly(boolean allowRPatOnly) {
     this.allowRPatOnly = allowRPatOnly;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("id");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.newArrayList(SINGLETON_ID);
   }
 
   @Override

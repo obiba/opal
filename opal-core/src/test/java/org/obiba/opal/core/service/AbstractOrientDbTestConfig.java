@@ -50,14 +50,15 @@ public abstract class AbstractOrientDbTestConfig {
 
   @Bean
   public OrientDbServerFactory orientDbServerFactory() {
-    OrientDbServerFactory factory = new LocalOrientDbServerFactory();
-    factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));
+    H2OrientDbServerFactory factory = new H2OrientDbServerFactory();
+    // Use file-based database in temp dir for proper isolation
+    factory.setUrl("jdbc:h2:" + TEMP_FILE.getAbsolutePath() + "/data/h2/opal-config;MODE=PostgreSQL");
     return factory;
   }
 
   @Bean
   public OrientDbService orientDbService() {
-    return new OrientDbServiceImpl();
+    return new H2OrientDbServiceImpl();
   }
 
   @Bean
