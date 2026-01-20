@@ -22,7 +22,7 @@ else
 endif
 
 skipTests=false
-mvn_exec=mvn -Dmaven.test.skip=${skipTests}
+mvn_exec=./mvnw -Dmaven.test.skip=${skipTests}
 orientdb_version=3.2.27
 hsqldb_version=2.7.1
 

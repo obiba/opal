@@ -11,7 +11,7 @@ Opal is OBiBa’s core database application for biobanks or epidemiological stud
 
 Set up a development environment:
 
-* Make sure Java8 is available.
+* Make sure Java 25 is available.
 * Make sure you have a MongoDB, MySQL or MariaDB database running.
 * Compile with `make all`
 * Get the [obiba-home](https://github.com/obiba/obiba-home) repository to have some seeding material.

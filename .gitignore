@@ -18,3 +18,4 @@ opal-gwt-client/war/org.obiba.opal.web.gwt.*
 *.lck
 opal_home
 opal_home.*/
+/.claude/settings.local.json
