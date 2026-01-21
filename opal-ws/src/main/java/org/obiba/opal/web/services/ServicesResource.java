@@ -13,6 +13,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -46,6 +49,14 @@ public class ServicesResource {
   private OpalRuntime opalRuntime;
 
   @GET
+  @Operation(
+    summary = "List all services",
+    description = "Retrieves a comprehensive list of all available services including their status and links"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Services list retrieved successfully"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Opal.ServiceDto> services() {
     List<Opal.ServiceDto> serviceDtos = Lists.newArrayList();
 

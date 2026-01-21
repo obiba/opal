@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -42,6 +45,16 @@ public class ProjectCommandsAnalyseResource extends AbstractProjectCommandsResou
   }
 
   @POST
+  @Operation(
+    summary = "Analyse project data",
+    description = "Performs statistical analysis on project data tables using specified analysis configurations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Analysis command successfully launched"),
+    @ApiResponse(responseCode = "400", description = "Invalid project name or analysis configuration"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access tables"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response analyse(Commands.AnalyseCommandOptionsDto options) {
     if(!name.equals(options.getProject())) {
       throw new InvalidRequestException("InvalidProjectName", name);

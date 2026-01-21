@@ -10,6 +10,9 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -63,6 +66,12 @@ public class ValueTableFacetsResource {
   @POST
   @Path("/_search")
   @Transactional(readOnly = true)
+  @Operation(summary = "Search table facets", description = "Perform faceted search within a specific datasource table using query terms. Supports contingency table generation and complex filtering.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Faceted search results successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid query terms or missing required parameters"),
+      @ApiResponse(responseCode = "404", description = "Table not found")
+  })
   public Response search(Search.QueryTermsDto dtoQueries) {
     List<Search.QueryTermDto> queries = dtoQueries.getQueriesList();
     Optional<Search.QueryTermDto> queryOpt = queries.stream().filter((q) -> q.hasFacet() && "_total".equals(q.getFacet()))

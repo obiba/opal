@@ -12,6 +12,9 @@ package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.security.Authorizer;
@@ -44,6 +47,14 @@ public class RServiceWorkspacesResource {
   private OpalRSessionManager opalRSessionManager;
 
   @GET
+  @Operation(
+    summary = "Get R workspaces",
+    description = "Retrieves a list of R workspaces, optionally filtered by context and user. Only workspaces the user has permission to access are returned."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R workspaces"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RWorkspaceDto> getRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user) {
     List<OpalR.RWorkspaceDto> ws = Lists.newArrayList();
     opalRSessionManager.getWorkspaces().stream()
@@ -70,6 +81,14 @@ public class RServiceWorkspacesResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Remove R workspaces",
+    description = "Removes R workspaces, optionally filtered by context, user, and name. Only workspaces the user has permission to access are removed."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Workspaces successfully removed"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response removeRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user, @QueryParam("name") String name) {
     opalRSessionManager.getWorkspaces().stream()
         .filter(File::isDirectory)

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -38,6 +41,15 @@ public class AnalysisPluginResource {
   @GET
   @Path("/{plg}")
   @NoAuthorization
+  @Operation(
+    summary = "Get analysis plugin details",
+    description = "Retrieves detailed information about a specific analysis plugin"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis plugin details retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Plugin not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response get(@PathParam("plg") String pluginName) {
     if (opalRuntime.hasServicePlugin(pluginName)) {
       ServicePlugin servicePlugin = opalRuntime.getServicePlugin(pluginName);

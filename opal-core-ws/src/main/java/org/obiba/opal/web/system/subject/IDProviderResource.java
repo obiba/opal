@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.opal.core.service.security.IDProvidersService;
@@ -43,12 +46,22 @@ public class IDProviderResource {
   }
 
   @GET
+  @Operation(summary = "Get ID provider", description = "Retrieves a specific identity provider configuration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID provider retrieved successfully")
+  })
   public Response get() {
     OIDCConfiguration configuration = idProvidersService.getConfiguration(name);
     return Response.ok().entity(Dtos.asDto(configuration)).build();
   }
 
   @PUT
+  @Operation(summary = "Update ID provider", description = "Updates a specific identity provider configuration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID provider updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid provider data provided"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response update(Opal.IDProviderDto dto) {
     if (!name.equals(dto.getName())) return Response.status(Response.Status.BAD_REQUEST).build();
     // ensure it exists
@@ -64,17 +77,31 @@ public class IDProviderResource {
 
   @PUT
   @Path("/_enable")
+  @Operation(summary = "Enable ID provider", description = "Enables a specific identity provider.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID provider enabled successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response enable() {
     return enableConfiguration(true);
   }
 
   @DELETE
   @Path("/_enable")
+  @Operation(summary = "Disable ID provider", description = "Disables a specific identity provider.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID provider disabled successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response disable() {
     return enableConfiguration(false);
   }
 
   @DELETE
+  @Operation(summary = "Delete ID provider", description = "Deletes a specific identity provider configuration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID provider deleted successfully")
+  })
   public Response delete() {
     idProvidersService.deleteConfiguration(name);
     return Response.ok().build();

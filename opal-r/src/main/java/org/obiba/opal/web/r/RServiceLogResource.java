@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.slf4j.Logger;
@@ -39,6 +42,16 @@ public class RServiceLogResource {
 
   @GET
   @Path("Rserve.log")
+  @Operation(
+    summary = "Get R server log",
+    description = "Retrieves the R server log file content, optionally limited to a specific number of lines from the end of the file."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server log"),
+    @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+    @ApiResponse(responseCode = "404", description = "R server or profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response tailRserveLog(@QueryParam("n") @DefaultValue("10000") Integer nbLines, @QueryParam("profile") String profile) {
     String[] rlog = rServerManagerService.getRServer(profile).getLog(nbLines);
     log.info("received {} lines", rlog.length);

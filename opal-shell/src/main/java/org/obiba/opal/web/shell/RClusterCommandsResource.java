@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -40,6 +43,14 @@ public class RClusterCommandsResource implements BaseResource {
   private CommandJobService commandJobService;
 
   @GET
+  @Operation(
+    summary = "Get R cluster commands",
+    description = "Retrieves the list of command jobs associated with a specific R cluster."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R cluster command list"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Commands.CommandStateDto> getCommands(@PathParam("cname") String name) {
     List<Commands.CommandStateDto> commandDtoList = new ArrayList<>();
 

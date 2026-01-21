@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -42,6 +45,16 @@ public class ProjectCommandsExportResource extends AbstractProjectCommandsResour
   }
 
   @POST
+  @Operation(
+    summary = "Export project data",
+    description = "Exports data tables from the project to various formats (CSV, JSON, Excel, etc.) or destinations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Export command successfully launched"),
+    @ApiResponse(responseCode = "409", description = "Project is momentarily not reloadable"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access tables or write to destination"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response exportData(Commands.ExportCommandOptionsDto options) {
     if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 

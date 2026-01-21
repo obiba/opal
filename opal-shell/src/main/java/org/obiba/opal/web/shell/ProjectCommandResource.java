@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -41,6 +44,15 @@ public class ProjectCommandResource {
   protected CommandJobService commandJobService;
 
   @GET
+  @Operation(
+    summary = "Get project command",
+    description = "Retrieves detailed information about a specific command job within a project."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getCommand() {
     CommandJob commandJob = getCommandJob();
 
@@ -50,6 +62,16 @@ public class ProjectCommandResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete project command",
+    description = "Deletes a specific command job within a project. Only completed or failed commands can be deleted."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Command successfully deleted"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteCommand() {
     try {
       CommandJob commandJob = getCommandJob();

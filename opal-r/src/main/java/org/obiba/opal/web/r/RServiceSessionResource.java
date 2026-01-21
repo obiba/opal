@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
@@ -36,11 +39,29 @@ public class RServiceSessionResource {
   private String id;
 
   @GET
+  @Operation(
+    summary = "Get R session",
+    description = "Retrieves detailed information about a specific R session identified by its ID."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session"),
+    @ApiResponse(responseCode = "404", description = "R session not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public OpalR.RSessionDto getRSession() {
     return Dtos.asDto(opalRSessionManager.getRSession(id));
   }
 
   @DELETE
+  @Operation(
+    summary = "Remove R session",
+    description = "Removes a specific R session identified by its ID."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "R session successfully removed"),
+    @ApiResponse(responseCode = "404", description = "R session not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response removeRSession() {
     opalRSessionManager.removeRSession(id);
     return Response.ok().build();

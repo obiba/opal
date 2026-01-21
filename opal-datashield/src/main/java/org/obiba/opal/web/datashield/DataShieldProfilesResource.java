@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.datashield.core.DSMethodType;
@@ -38,6 +41,15 @@ public class DataShieldProfilesResource {
   private DataShieldProfileService datashieldProfileService;
 
   @GET
+  @Operation(
+    summary = "Get DataSHIELD profiles",
+    description = "Retrieves all DataSHIELD profiles, optionally filtered by enabled status. Access to profiles is restricted based on user permissions."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved profiles"),
+    @ApiResponse(responseCode = "403", description = "Access to profile forbidden"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<DataShield.DataShieldProfileDto> getProfiles(@QueryParam("enabled") Boolean enabled) {
     return datashieldProfileService.getProfiles().stream()
         .filter(this::canAccessProfile)
@@ -47,6 +59,16 @@ public class DataShieldProfilesResource {
   }
 
   @POST
+  @Operation(
+    summary = "Add DataSHIELD profile",
+    description = "Creates a new DataSHIELD profile with the provided configuration. If based on a cluster profile, inherits its methods and options."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Successfully created profile"),
+    @ApiResponse(responseCode = "400", description = "Invalid profile data or profile already exists"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response addProfile(DataShield.DataShieldProfileDto profileDto) {
     if (profileDto == null)
       throw new BadRequestException("DataSHIELD profile is missing");

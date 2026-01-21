@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -44,6 +47,14 @@ public class ProjectCommandsResource implements BaseResource {
   private CommandJobService commandJobService;
 
   @GET
+  @Operation(
+    summary = "Get project commands",
+    description = "Retrieves the list of command jobs associated with a specific project."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved project command list"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Commands.CommandStateDto> getCommands() {
     List<Commands.CommandStateDto> commandDtoList = new ArrayList<>();
 

@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -41,6 +44,15 @@ public class ProjectCommandsExportVCFResource extends AbstractProjectCommandsRes
   }
 
   @POST
+  @Operation(
+    summary = "Export VCF data",
+    description = "Exports genomic data from the project to Variant Call Format (VCF) files for genomic analysis."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "VCF export command successfully launched"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access tables or write to destination"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response exportVCF(Commands.ExportVCFCommandOptionsDto optionsDto) {
     ExportVCFCommandOptions options = new ExportVCFCommandOptionsDtoImpl(optionsDto);
     Command<ExportVCFCommandOptions> command = commandRegistry.newCommand("export-vcf");

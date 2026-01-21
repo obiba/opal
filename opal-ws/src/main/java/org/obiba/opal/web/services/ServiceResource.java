@@ -11,6 +11,9 @@ package org.obiba.opal.web.services;
 
 import java.net.URI;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -45,6 +48,12 @@ public class ServiceResource {
   private ServiceConfigurationHandlerRegistry configHandler;
 
   @GET
+  @Operation(summary = "Get service information", description = "Returns detailed information about a specific service including its status and configuration link.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Service information successfully retrieved"),
+      @ApiResponse(responseCode = "404", description = "Service not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response service() {
 
     Service service = opalRuntime.getService(name);
@@ -59,6 +68,13 @@ public class ServiceResource {
   }
 
   @PUT
+  @Operation(summary = "Start service", description = "Starts a specific service that is currently stopped.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Service successfully started"),
+      @ApiResponse(responseCode = "404", description = "Service not found"),
+      @ApiResponse(responseCode = "409", description = "Service is already running"),
+      @ApiResponse(responseCode = "500", description = "Internal server error or failed to start service")
+  })
   public Response start() {
 
     Service service = opalRuntime.getService(name);
@@ -68,6 +84,13 @@ public class ServiceResource {
   }
 
   @DELETE
+  @Operation(summary = "Stop service", description = "Stops a specific service that is currently running.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Service successfully stopped"),
+      @ApiResponse(responseCode = "404", description = "Service not found"),
+      @ApiResponse(responseCode = "409", description = "Service is already stopped"),
+      @ApiResponse(responseCode = "500", description = "Internal server error or failed to stop service")
+  })
   public Response stop() {
 
     Service service = opalRuntime.getService(name);
@@ -78,6 +101,12 @@ public class ServiceResource {
 
   @GET
   @Path("/cfg")
+  @Operation(summary = "Get service configuration", description = "Returns the configuration details of a specific service.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Service configuration successfully retrieved"),
+      @ApiResponse(responseCode = "404", description = "Service not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getConfig() {
     Service service = opalRuntime.getService(name);
 
@@ -88,6 +117,13 @@ public class ServiceResource {
 
   @PUT
   @Path("/cfg")
+  @Operation(summary = "Save service configuration", description = "Updates and saves the configuration for a specific service.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Service configuration successfully saved"),
+      @ApiResponse(responseCode = "400", description = "Invalid configuration data"),
+      @ApiResponse(responseCode = "404", description = "Service not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error or failed to save configuration")
+  })
   public Response saveConfig(Opal.ServiceCfgDto serviceDto) {
 
     opalRuntime.getService(name);

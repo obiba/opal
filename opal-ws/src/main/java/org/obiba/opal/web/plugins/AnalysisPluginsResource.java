@@ -13,6 +13,9 @@ package org.obiba.opal.web.plugins;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -46,6 +49,14 @@ public class AnalysisPluginsResource {
 
   @GET
   @NoAuthorization
+  @Operation(
+    summary = "List analysis plugins",
+    description = "Retrieves a list of installed analysis plugins including R analysis services"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginPackagesDto list() {
     List<PluginPackageDto> packageDtos = pluginsService.getInstalledPlugins().stream()
         .filter(pluginPackage -> AnalysisService.SERVICE_TYPE.equals(pluginPackage.getType()) || RAnalysisService.SERVICE_TYPE.equals(pluginPackage.getType()))

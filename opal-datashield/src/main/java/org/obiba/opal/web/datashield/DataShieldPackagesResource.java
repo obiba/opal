@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
@@ -46,11 +49,30 @@ public class DataShieldPackagesResource {
   private OpalGeneralConfigService opalGeneralConfigService;
 
   @GET
+  @Operation(
+    summary = "Get DataSHIELD packages",
+    description = "Retrieves all installed DataSHIELD packages in the specified profile, including package metadata and version information."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved packages"),
+    @ApiResponse(responseCode = "404", description = "Profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
     return dsPackageMethodeHelper.getInstalledPackagesDtos(getDataShieldProfile(profile));
   }
 
   @POST
+  @Operation(
+    summary = "Install DataSHIELD package",
+    description = "Installs a new DataSHIELD package in the specified profile using the provided name, reference, and package manager. Automatically publishes package settings after installation."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Successfully installed package"),
+    @ApiResponse(responseCode = "403", description = "R package management not allowed"),
+    @ApiResponse(responseCode = "404", description = "Profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager, @QueryParam("profile") String profile) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
@@ -80,6 +102,15 @@ public class DataShieldPackagesResource {
    */
   @PUT
   @Path("_publish")
+  @Operation(
+    summary = "Publish DataSHIELD packages settings",
+    description = "Bulk operation to append DataSHIELD package settings to profile configuration. If no names provided, publishes all installed packages."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully published packages settings"),
+    @ApiResponse(responseCode = "404", description = "Profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response publishPackagesSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
     DataShieldProfile profileObj = getDataShieldProfile(profile);
     profileObj.clear();
@@ -101,6 +132,15 @@ public class DataShieldPackagesResource {
    */
   @DELETE
   @Path("_publish")
+  @Operation(
+    summary = "Delete DataSHIELD packages settings",
+    description = "Bulk operation to remove DataSHIELD package settings from profile configuration. If no names provided, clears all settings."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Successfully deleted packages settings"),
+    @ApiResponse(responseCode = "404", description = "Profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePackageSettings(@QueryParam("name") List<String> names, @QueryParam("profile") String profile) {
     DataShieldProfile profileObj = getDataShieldProfile(profile);
     if (names == null || names.isEmpty()) {
@@ -112,6 +152,16 @@ public class DataShieldPackagesResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete DataSHIELD packages",
+    description = "Deletes all installed DataSHIELD packages from the specified profile. This is a destructive operation that removes packages and their methods."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully deleted packages"),
+    @ApiResponse(responseCode = "403", description = "R package management not allowed"),
+    @ApiResponse(responseCode = "404", description = "Profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePackages(@QueryParam("profile") String profile) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();

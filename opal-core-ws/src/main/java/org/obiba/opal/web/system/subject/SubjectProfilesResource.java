@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -38,6 +41,10 @@ public class SubjectProfilesResource {
   private SubjectAclService subjectAclService;
 
   @GET
+  @Operation(summary = "Get all subject profiles", description = "Retrieves all subject profiles.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject profiles retrieved successfully")
+  })
   public List<Opal.SubjectProfileDto> getAll() {
     return StreamSupport.stream(subjectProfileService.getProfiles().spliterator(), false)
         .map(Dtos::asDto)
@@ -46,6 +53,10 @@ public class SubjectProfilesResource {
 
   @GET
   @Path("/_search")
+  @Operation(summary = "Search subject profiles", description = "Searches for subject profiles by name and type.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Search results retrieved successfully")
+  })
   public Opal.SuggestionsDto suggestNames(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
                                           @QueryParam("query") String query) {
     List<String> suggestions = subjectAclService.suggestSubjects(SubjectAcl.SubjectType.GROUP.equals(type) ? SubjectAcl.SubjectType.GROUP : SubjectAcl.SubjectType.USER, query);
@@ -56,6 +67,10 @@ public class SubjectProfilesResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete subject profiles", description = "Deletes multiple subject profiles.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject profiles deleted successfully")
+  })
   public Response deleteProfiles(@QueryParam("p") List<String> principals) {
     for (String principal : principals) {
       try {

@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -40,11 +43,20 @@ public class ValueTableIndexResource extends IndexResource {
   private String table;
 
   @OPTIONS
+  @Operation(summary = "Get table index options", description = "Retrieve supported HTTP methods for table index operations.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Options successfully retrieved")
+  })
   public Response getOptions() {
     return Response.ok().build();
   }
 
   @GET
+  @Operation(summary = "Get table index status", description = "Retrieve detailed indexation status for a specific datasource table, including progress, timestamps, and configuration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Table index status successfully retrieved"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response getTableStatus() {
     if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
@@ -80,6 +92,11 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @PUT
+  @Operation(summary = "Update table index", description = "Trigger re-indexing of variables and values for a specific table. Synchronizes both variable and value indices.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Index update successfully triggered"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response updateIndex() {
     if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
@@ -95,6 +112,11 @@ public class ValueTableIndexResource extends IndexResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete table index", description = "Delete the search index for a specific table. Cancels any ongoing indexation and removes both variable and value indices.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Index successfully deleted"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response deleteIndex() {
     if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
@@ -114,12 +136,20 @@ public class ValueTableIndexResource extends IndexResource {
 
   @GET
   @Path("schedule")
+  @Operation(summary = "Get table index schedule", description = "Retrieve the automatic indexing schedule configuration for a specific table.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Schedule configuration successfully retrieved")
+  })
   public Opal.ScheduleDto getSchedule() {
     return getScheduleDto(datasource, table);
   }
 
   @DELETE
   @Path("schedule")
+  @Operation(summary = "Delete table index schedule", description = "Remove the automatic indexing schedule for a specific table.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Schedule successfully deleted")
+  })
   public Response deleteSchedule() {
     configService.getConfig().removeSchedule(getValueTable(datasource, table));
     return Response.ok().build();
@@ -127,6 +157,10 @@ public class ValueTableIndexResource extends IndexResource {
 
   @PUT
   @Path("schedule")
+  @Operation(summary = "Set table index schedule", description = "Configure automatic indexing schedule for a specific table with specified timing and recurrence.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Schedule successfully configured")
+  })
   public Response setSchedule(Opal.ScheduleDto scheduleDto) {
 
     Schedule schedule = new Schedule();
@@ -148,6 +182,11 @@ public class ValueTableIndexResource extends IndexResource {
 
   @GET
   @Path("_schema")
+  @Operation(summary = "Get table index schema", description = "Retrieve the search index schema mapping for a specific table, showing variable names and their corresponding field names in the index.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Index schema successfully retrieved"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response search() {
     if(!isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();

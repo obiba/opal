@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
@@ -40,6 +43,15 @@ public class RServicePackageResource {
   private OpalGeneralConfigService opalGeneralConfigService;
 
   @GET
+  @Operation(
+    summary = "Get R package",
+    description = "Retrieves detailed information about a specific R package installed in the default R server."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R package"),
+    @ApiResponse(responseCode = "404", description = "R package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public OpalR.RPackageDto getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile)).stream()
         .filter(dto -> dto.getName().equals(name))
@@ -48,6 +60,16 @@ public class RServicePackageResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete R package",
+    description = "Removes a specific R package from the default R server."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Package successfully deleted"),
+    @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
+    @ApiResponse(responseCode = "404", description = "R package not found"),
+    @ApiResponse(responseCode = "500", description = "Failed to delete package")
+  })
   public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();

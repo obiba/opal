@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.r.service.RServerManagerService;
@@ -48,11 +51,28 @@ public class RServicePackagesResource {
   private OpalGeneralConfigService opalGeneralConfigService;
 
   @GET
+  @Operation(
+    summary = "Get all R packages",
+    description = "Retrieves a list of all R packages installed in the default R server."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R packages"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
     return rPackageHelper.getInstalledPackagesDtos(rServerManagerService.getRServer(profile));
   }
 
   @PUT
+  @Operation(
+    summary = "Update all R packages",
+    description = "Updates all installed R packages to their latest versions from CRAN."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Packages successfully updated"),
+    @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
+    @ApiResponse(responseCode = "500", description = "Failed to update packages")
+  })
   public Response updateAllPackages(@QueryParam("profile") String profile) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();
@@ -66,6 +86,16 @@ public class RServicePackagesResource {
   }
 
   @POST
+  @Operation(
+    summary = "Install R package",
+    description = "Installs a specified R package from CRAN, GitHub, or other repositories."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Package successfully installed"),
+    @ApiResponse(responseCode = "400", description = "Invalid package name or reference"),
+    @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
+    @ApiResponse(responseCode = "500", description = "Failed to install package")
+  })
   public Response installPackage(@Context UriInfo uriInfo, @QueryParam("name") String name,
                                  @QueryParam("ref") String ref, @QueryParam("manager") String manager,
                                  @QueryParam("profile") String profile) {

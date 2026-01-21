@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -48,6 +51,17 @@ public class ProjectCommandsImportResource extends AbstractProjectCommandsResour
   }
 
   @POST
+  @Operation(
+    summary = "Import data to project",
+    description = "Imports data from various sources (files, databases, other projects) into the current project."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Import command successfully launched"),
+    @ApiResponse(responseCode = "409", description = "Project is momentarily not reloadable"),
+    @ApiResponse(responseCode = "400", description = "Invalid destination or import configuration"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access source or write to tables"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response importData(Commands.ImportCommandOptionsDto options) {
     if (checkCommandIsBlocked(name, false)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 

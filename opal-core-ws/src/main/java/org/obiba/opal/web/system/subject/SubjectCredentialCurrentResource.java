@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -37,6 +40,11 @@ public class SubjectCredentialCurrentResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject credentials", description = "Retrieves the credentials of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Subject credentials not found")
+  })
   public Response get() {
     SubjectCredentials subjectCredentials = getSubjectCredentials();
     return (subjectCredentials == null //
@@ -47,6 +55,11 @@ public class SubjectCredentialCurrentResource {
   @PUT
   @Path("/password")
   @NoAuthorization
+  @Operation(summary = "Update current subject password", description = "Updates the password of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Password updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid password data provided")
+  })
   public Response updatePassword(@NotNull Opal.PasswordDto passwordDto) {
 
     if(!getName().equals(passwordDto.getName())) {

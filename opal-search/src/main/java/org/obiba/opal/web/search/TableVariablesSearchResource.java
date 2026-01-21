@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -42,6 +45,13 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @GET
   @Transactional(readOnly = true)
+  @Operation(summary = "Search variables in table", description = "Search for variables within a specific datasource table using Elasticsearch query syntax. Supports pagination, sorting, field selection, and faceted search.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Search results successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid search query or parameters"),
+      @ApiResponse(responseCode = "404", description = "Table not found or not indexed"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@QueryParam("query") String query, @QueryParam("limit") @DefaultValue("10") int limit,
                          @QueryParam("lastDoc") String lastDoc, @QueryParam("variable") @DefaultValue("false") boolean addVariableDto,

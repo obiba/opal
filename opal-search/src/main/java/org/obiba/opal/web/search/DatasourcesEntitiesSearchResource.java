@@ -11,6 +11,9 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -54,6 +57,11 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @Path("_suggest")
+  @Operation(summary = "Suggest entity identifiers", description = "Get suggestions for entity identifiers based on partial match. Returns matching identifiers from the identifiers table for the specified entity type.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Identifier suggestions successfully retrieved"),
+      @ApiResponse(responseCode = "404", description = "Identifiers table not found for entity type")
+  })
   public Identifiers.IdentifierSuggestions search(@QueryParam("query") String query,
                                                   @QueryParam("type") @DefaultValue("Participant") String entityType,
                                                   @QueryParam("limit") @DefaultValue("10") int limit) {
@@ -84,6 +92,10 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @Path("_search")
+  @Operation(summary = "Search entities", description = "Search for entities across datasources. Note: This operation is deprecated since Opal 5 as values are no longer indexed.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "501", description = "Operation deprecated and not implemented")
+  })
   public Response search(@QueryParam("query") String query,
                          @QueryParam("id") String idQuery,
                          @QueryParam("type") @DefaultValue("Participant") String entityType,
@@ -96,6 +108,10 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @Path("_count")
+  @Operation(summary = "Count entities", description = "Count entities matching search criteria. Note: This operation is deprecated since Opal 5 as values are no longer indexed.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "501", description = "Operation deprecated and not implemented")
+  })
   public Response count(@QueryParam("query") String query,
                         @QueryParam("id") String idQuery,
                         @QueryParam("type") @DefaultValue("Participant") String entityType) throws SearchException {
@@ -105,6 +121,11 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @Path("_contingency")
+  @Operation(summary = "Get contingency table", description = "Generate contingency table for two variables across all datasources.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated"),
+      @ApiResponse(responseCode = "400", description = "Invalid variables or search parameters")
+  })
   public Response facets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) throws SearchException {
     return Response.ok().entity(contingencyService.getContingency(crossVar0, crossVar1)).build();
   }

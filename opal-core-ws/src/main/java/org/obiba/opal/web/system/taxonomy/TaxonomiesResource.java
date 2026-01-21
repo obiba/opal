@@ -14,6 +14,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -47,6 +50,10 @@ public class TaxonomiesResource implements BaseResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get all taxonomies", description = "Retrieves all available taxonomies.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Taxonomies retrieved successfully")
+  })
   public List<TaxonomyDto> getTaxonomies() {
     List<TaxonomyDto> taxonomies = new ArrayList<>();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
@@ -58,6 +65,10 @@ public class TaxonomiesResource implements BaseResource {
   @GET
   @Path("summaries")
   @NoAuthorization
+  @Operation(summary = "Get taxonomy summaries", description = "Retrieves summary information for all taxonomies.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Taxonomy summaries retrieved successfully")
+  })
   public Opal.TaxonomiesDto getTaxonomySummaries() {
     Opal.TaxonomiesDto.Builder builder = Opal.TaxonomiesDto.newBuilder();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {

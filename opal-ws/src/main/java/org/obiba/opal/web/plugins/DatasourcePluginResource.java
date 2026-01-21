@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -41,6 +44,15 @@ public class DatasourcePluginResource {
 
   @GET
   @NoAuthorization
+  @Operation(
+    summary = "Get datasource plugin details",
+    description = "Retrieves detailed information about a specific datasource plugin"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Datasource plugin details retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Plugin not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginDto get() {
     return Dtos.asDto(pluginsService.getInstalledPlugin(name));
   }
@@ -48,6 +60,16 @@ public class DatasourcePluginResource {
   @GET
   @Path("form")
   @NoAuthorization
+  @Operation(
+    summary = "Get plugin schema form",
+    description = "Retrieves the JSON schema form for configuring a datasource plugin based on usage type"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Schema form retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid usage parameter"),
+    @ApiResponse(responseCode = "404", description = "Plugin not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public String getSchemaJsonForUsage(@QueryParam("usage") @DefaultValue("import") String usage) {
     if (opalRuntime.hasServicePlugin(name)) {
       ServicePlugin servicePlugin = opalRuntime.getServicePlugin(name);

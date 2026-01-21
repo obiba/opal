@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -41,6 +44,14 @@ public class ProjectCommandsImportVCFResource extends AbstractProjectCommandsRes
   }
 
   @POST
+  @Operation(
+    summary = "Import VCF data",
+    description = "Imports Variant Call Format (VCF) files into the project for genomic data analysis."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "VCF import command successfully launched"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response importVCF(Commands.ImportVCFCommandOptionsDto optionsDto) {
     ImportVCFCommandOptions options = new ImportVCFCommandOptionsDtoImpl(optionsDto);
     Command<ImportVCFCommandOptions> command = commandRegistry.newCommand("import-vcf");

@@ -1,5 +1,8 @@
 package org.obiba.opal.web.kubernetes;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -27,11 +30,28 @@ public class PodSpecsResource {
   }
 
   @GET
+  @Operation(
+    summary = "List pod specifications",
+    description = "Retrieves a list of all registered pod specifications"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Pod specifications list retrieved successfully"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<K8S.PodSpecDto> list() {
     return podsService.getSpecs().stream().map(Dtos::asDto).toList();
   }
 
   @POST
+  @Operation(
+    summary = "Create or update pod specification",
+    description = "Creates a new pod specification or updates an existing one"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Pod specification created or updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid pod specification provided"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response createOrUpdate(K8S.PodSpecDto dto) {
     PodSpec spec = Dtos.fromDto(dto);
     podsService.saveSpec(spec);
@@ -39,6 +59,14 @@ public class PodSpecsResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete all pod specifications",
+    description = "Removes all registered pod specifications"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "All pod specifications deleted successfully"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteAll() {
     podsService.deleteSpecs();
     return Response.noContent().build();

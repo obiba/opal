@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,10 @@ public class SubjectTokenResource {
   private SubjectTokenService subjectTokenService;
 
   @DELETE
+  @Operation(summary = "Delete subject token", description = "Deletes a specific token belonging to a subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Token deleted successfully")
+  })
   public Response delete() {
     subjectTokenService.deleteToken(principal, name);
     return Response.ok().build();

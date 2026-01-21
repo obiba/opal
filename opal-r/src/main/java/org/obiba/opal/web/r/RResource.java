@@ -10,6 +10,9 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.ROperationWithResult;
@@ -52,6 +55,16 @@ public class RResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Operation(
+    summary = "Execute R script (binary output)",
+    description = "Executes an R script and returns the result as binary data. The script can be provided as a query parameter or in the request body."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
+    @ApiResponse(responseCode = "404", description = "R server not found"),
+    @ApiResponse(responseCode = "500", description = "Script execution failed")
+  })
   public Response executeBinary(@QueryParam("script") String script, @QueryParam("profile") String profile, String body) throws RServerException {
     return execute(profile, script, body, RSerialize.RAW);
   }
@@ -59,6 +72,16 @@ public class RResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(
+    summary = "Execute R script (JSON output)",
+    description = "Executes an R script and returns the result as JSON. The script can be provided as a query parameter or in the request body."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
+    @ApiResponse(responseCode = "404", description = "R server not found"),
+    @ApiResponse(responseCode = "500", description = "Script execution failed")
+  })
   public Response executeJSON(@QueryParam("script") String script, @QueryParam("profile") String profile, String body) throws RServerException {
     return execute(profile, script, body, RSerialize.JSON);
   }
@@ -85,6 +108,14 @@ public class RResource {
   }
 
   @Path("/sessions")
+  @Operation(
+    summary = "Get R sessions resource",
+    description = "Returns a resource handler for managing R sessions."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved sessions resource"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public RSessionsResource getSessionsResource() {
     RSessionsResource resource = applicationContext
         .getBean("opalRSessionsResource", RSessionsResource.class);

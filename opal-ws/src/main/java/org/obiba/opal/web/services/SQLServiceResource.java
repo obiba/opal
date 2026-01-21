@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.services;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.sql.SQLExecution;
 import org.obiba.opal.core.service.SQLService;
@@ -37,6 +40,15 @@ public class SQLServiceResource {
 
   @GET
   @Path("/history")
+  @Operation(
+    summary = "Get SQL execution history",
+    description = "Retrieves the history of SQL executions with optional filtering by user and datasource"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "SQL execution history retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<SQL.SQLExecutionDto> getHistory(@QueryParam("user") String user, @QueryParam("datasource") String datasource,
                                               @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("100") int limit) {
     List<SQLExecution> execs = sqlService.getSQLExecutions(user, datasource);

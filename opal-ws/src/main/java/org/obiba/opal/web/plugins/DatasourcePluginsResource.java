@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.plugins;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -40,6 +43,15 @@ public class DatasourcePluginsResource {
 
   @GET
   @NoAuthorization
+  @Operation(
+    summary = "List datasource plugins",
+    description = "Retrieves a list of installed datasource plugins filtered by usage type"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Datasource plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid usage parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginPackagesDto list(@QueryParam("usage") @DefaultValue("import") String usage) {
     DatasourceUsage dsUsage = DatasourceUsage.valueOf(usage.toUpperCase());
     List<Plugins.PluginPackageDto> dsPackages = pluginsService.getInstalledPlugins().stream()
