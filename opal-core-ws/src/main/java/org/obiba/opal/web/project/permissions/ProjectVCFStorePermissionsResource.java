@@ -12,6 +12,9 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -61,6 +64,13 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @GET
+  @Operation(summary = "Get VCF store permissions", description = "Retrieves VCF store permissions for subjects. VCF store permissions control access to VCF (Variant Call Format) genomic data storage and operations within the project.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getVCFStorePermissions(@QueryParam("type") SubjectAcl.SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") VCFStorePermissionsConverter.Permission permission) {
@@ -83,6 +93,13 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @POST
+  @Operation(summary = "Set VCF store permission", description = "Grants VCF store permissions to subjects. VCF store permissions control access to VCF (Variant Call Format) genomic data storage and operations within the project.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "VCF store permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setVCFStorePermission(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") VCFStorePermissionsConverter.Permission permission) {
@@ -102,6 +119,13 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete VCF store permissions", description = "Removes all VCF store permissions from subjects. This revokes access to VCF (Variant Call Format) genomic data storage and operations within the project.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteVCFStorePermission(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
       @QueryParam("principal") List<String> principals) {
 
