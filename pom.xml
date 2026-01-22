@@ -78,7 +78,7 @@
     <liquibase.version>4.26.0</liquibase.version>
     <liquibase-slf4j.version>5.0.0</liquibase-slf4j.version>
     <lang-tag.version>1.4.4</lang-tag.version>
-    <logback.version>1.5.19</logback.version>
+    <logback.version>1.5.25</logback.version>
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
