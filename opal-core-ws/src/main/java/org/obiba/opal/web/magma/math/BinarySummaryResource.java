@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.magma.math;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.QueryParam;
@@ -17,6 +20,12 @@ import jakarta.ws.rs.core.Response;
 public interface BinarySummaryResource extends SummaryResource {
 
   @GET
+  @Operation(summary = "Get binary variable summary", description = "Generate statistical summary for binary variables")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error during summary generation")
+  })
   Response get(@QueryParam("offset") Integer offset, //
       @QueryParam("limit") Integer limit, //
       @QueryParam("fullIfCached") @DefaultValue("false") boolean fullIfCached, //

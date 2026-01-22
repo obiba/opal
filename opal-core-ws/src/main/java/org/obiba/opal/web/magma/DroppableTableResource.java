@@ -10,11 +10,20 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.core.Response;
 
 public interface DroppableTableResource extends TableResource {
 
   @DELETE
+  @Operation(summary = "Drop table", description = "Drop the entire table and all its data")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Table dropped successfully"),
+    @ApiResponse(responseCode = "404", description = "Table not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response drop();
 }

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
@@ -42,10 +45,23 @@ public interface TableResource {
   ValueTable getValueTable();
 
   @GET
+  @Operation(summary = "Get table", description = "Retrieve table definition and metadata")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Table retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Table not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Magma.TableDto get(@Context Request request, @Context UriInfo uriInfo,
       @QueryParam("counts") @DefaultValue("false") Boolean counts);
 
   @PUT
+  @Operation(summary = "Update table", description = "Update table definition and metadata")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Table updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid table data"),
+    @ApiResponse(responseCode = "404", description = "Table not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response update(Magma.TableDto table);
 
   @Path("/variables")
@@ -56,6 +72,11 @@ public interface TableResource {
    */
   @GET
   @Path("/entities")
+  @Operation(summary = "Get table entities", description = "Retrieve all entities in the table")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Entities retrieved successfully"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   List<Magma.VariableEntityDto> getEntities();
 
   /**
@@ -70,6 +91,12 @@ public interface TableResource {
    */
   @GET
   @Path("/valueSet/{identifier}/timestamps")
+  @Operation(summary = "Get value set timestamps", description = "Retrieve timestamps for a specific entity's value set")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Entity not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Magma.TimestampsDto getValueSetTimestamps(@Context Request request, @PathParam("identifier") String identifier);
 
   /**
@@ -94,6 +121,12 @@ public interface TableResource {
    */
   @POST
   @Path("/valueSet")
+  @Operation(summary = "Update value set", description = "Update value set by importing data with optional entity generation")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Value set updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid data or parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response updateValueSet(Magma.ValueSetsDto valueSetsDto, //
       @QueryParam("unit") String unitName, //
       @QueryParam("generateIds") @DefaultValue("false") boolean generateIds, //
@@ -133,6 +166,12 @@ public interface TableResource {
   @GET
   @POST
   @Path("/variable/_transient/_compile")
+  @Operation(summary = "Compile transient variable", description = "Compile derived variable script for validation")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Script compiled successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error during compilation")
+  })
   Response compileTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self,

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma.math;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -19,7 +22,13 @@ import jakarta.ws.rs.core.Response;
 public interface CategoricalSummaryResource extends SummaryResource {
 
   @GET
-  @POST // requires POST since the request body contains variable info (categories, script, etc)
+  @POST // requires POST since request body contains variable info (categories, script, etc)
+  @Operation(summary = "Get categorical variable summary", description = "Generate statistical summary for categorical variables")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error during summary generation")
+  })
   Response get(@QueryParam("distinct") boolean distinct, //
       @QueryParam("offset") Integer offset, //
       @QueryParam("limit") Integer limit, //

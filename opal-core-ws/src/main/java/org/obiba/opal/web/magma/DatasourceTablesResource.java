@@ -13,6 +13,9 @@ package org.obiba.opal.web.magma;
 import java.io.IOException;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -43,6 +46,12 @@ public interface DatasourceTablesResource {
    * @return
    */
   @GET
+  @Operation(summary = "Get tables", description = "Get tables from datasource with optional filtering and counting")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid filter parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   List<Magma.TableDto> getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") boolean counts,
       @Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexedOnly);
 
@@ -51,12 +60,31 @@ public interface DatasourceTablesResource {
   @Produces("application/vnd.ms-excel")
   @AuthorizeResource
   @AuthenticatedByCookie
+  @Operation(summary = "Get Excel dictionary", description = "Export table dictionaries as Excel file")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid table selection"),
+    @ApiResponse(responseCode = "500", description = "Server error during Excel generation")
+  })
   Response getExcelDictionary(@QueryParam("table") List<String> tables) throws MagmaRuntimeException, IOException;
 
   @POST
+  @Operation(summary = "Create table", description = "Create a new table in the datasource")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Table created successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid table definition"),
+    @ApiResponse(responseCode = "500", description = "Server error during table creation")
+  })
   Response createTable(Magma.TableDto table);
 
   @DELETE
+  @Operation(summary = "Delete tables", description = "Delete specified tables from the datasource")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Tables deleted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid table selection"),
+    @ApiResponse(responseCode = "404", description = "Tables not found"),
+    @ApiResponse(responseCode = "500", description = "Server error during deletion")
+  })
   Response deleteTables(@QueryParam("table") List<String> tables);
 
   void setDatasource(Datasource datasource);

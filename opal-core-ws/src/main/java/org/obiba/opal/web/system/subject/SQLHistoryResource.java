@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.obiba.opal.web.model.SQL;
 
 import jakarta.ws.rs.DefaultValue;
@@ -22,6 +25,12 @@ public interface SQLHistoryResource {
   void setSubject(String subject);
 
   @GET
+  @Operation(summary = "Get SQL history", description = "Retrieve SQL execution history for a subject with pagination")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "SQL history retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   List<SQL.SQLExecutionDto> getSQLHistory(@QueryParam("datasource") String datasource,
                                           @QueryParam("offset") @DefaultValue("0") int offset,
                                           @QueryParam("limit") @DefaultValue("100") int limit);

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
@@ -22,6 +25,13 @@ public interface VariablesViewResource extends VariablesResource {
 
   @POST
   @Path("/file")
+  @Operation(summary = "Add/update variables from file", description = "Add or update variables in view from file upload")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Variables updated successfully"),
+    @ApiResponse(responseCode = "201", description = "Variables added successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid file or view data"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response addOrUpdateVariablesFromFile(Magma.ViewDto viewDto, @Nullable String comment);
 
 }

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -40,6 +43,13 @@ public interface ValueSetResource {
    * @return
    */
   @GET
+  @Operation(summary = "Get value set", description = "Retrieve a value set with optional variable filtering")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Value set retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid filter parameters"),
+    @ApiResponse(responseCode = "404", description = "Value set not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response getValueSet(@Context UriInfo uriInfo, @QueryParam("select") String select,
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary);
 
@@ -49,6 +59,12 @@ public interface ValueSetResource {
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete value set", description = "Remove this value set from its table")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Value set deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Value set not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response drop();
 
   /**
@@ -56,5 +72,12 @@ public interface ValueSetResource {
    */
   @GET
   @Path("/value")
+  @Operation(summary = "Get value", description = "Get a specific value from the value set, optionally by position")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Value retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid position"),
+    @ApiResponse(responseCode = "404", description = "Value not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response getValue(@QueryParam("pos") Integer pos);
 }

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
@@ -27,6 +30,12 @@ public interface OpalRSymbolResource extends RSymbolResource {
    */
   @POST
   @Consumes("application/x-rdata")
+  @Operation(summary = "Push R data object", description = "Push a R data object into the R server with base64 encoded serialized form")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "R data object pushed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid R data content"),
+    @ApiResponse(responseCode = "500", description = "Server error during data push")
+  })
   Response putRData(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
 
   /**
@@ -38,5 +47,11 @@ public interface OpalRSymbolResource extends RSymbolResource {
    */
   @PUT
   @Path("/_save")
+  @Operation(summary = "Save R symbol to file", description = "Save the R symbol representing a tibble to a file with supported format (SPSS, SAS, Stata)")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "R symbol saved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid destination path"),
+    @ApiResponse(responseCode = "500", description = "Server error during save")
+  })
   Response saveRData(@QueryParam("destination") String destination);
 }

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma.math;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.obiba.magma.math.Distribution;
 
 import jakarta.ws.rs.DefaultValue;
@@ -23,7 +26,12 @@ public interface ContinuousSummaryResource extends SummaryResource {
 
   @GET
   @POST
-    // requires POST since the request body contains variable info (categories, script, etc)
+  @Operation(summary = "Get continuous variable summary", description = "Generate statistical summary for continuous variables with distribution analysis")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error during summary generation")
+  })
   Response get(@QueryParam("d") @DefaultValue("normal") Distribution distribution, //
                @QueryParam("p") List<Double> percentiles, //
                @QueryParam("intervals") @DefaultValue("10") int intervals, //

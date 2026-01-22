@@ -13,6 +13,9 @@ package org.obiba.opal.web.magma;
 import java.util.Locale;
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
@@ -26,5 +29,12 @@ public interface VariableViewResource extends VariableResource {
   void setLocales(Set<Locale> locales);
 
   @PUT
+  @Operation(summary = "Create or update view variable", description = "Create a new variable or update existing variable in view")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Variable updated successfully"),
+    @ApiResponse(responseCode = "201", description = "Variable created successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid variable data"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response createOrUpdateVariable(Magma.VariableDto variable, @Nullable @QueryParam("comment") String comment);
 }
