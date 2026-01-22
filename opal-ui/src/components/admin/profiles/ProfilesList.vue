@@ -206,7 +206,7 @@ function onProfilesDownload() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'subject-profiles.csv';
+  a.download = 'user-profiles.csv';
   a.click();
 }
 </script>
