@@ -10,6 +10,9 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.shiro.SecurityUtils;
@@ -58,11 +61,18 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Autowired
   private SubjectProfileService subjectProfileService;
 
-  @POST
-  @Path("/sessions")
-  @NotAuthenticated
-  public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
-                                @FormParam("username") String username, @FormParam("password") String password) {
+@POST
+@Path("/sessions")
+@NotAuthenticated
+@Operation(summary = "Create user session", description = "Authenticate user and create a new session. Supports username/password authentication and optional one-time password (OTP) for two-factor authentication.")
+@ApiResponses({
+  @ApiResponse(responseCode = "201", description = "Session successfully created"),
+  @ApiResponse(responseCode = "401", description = "Authentication failed or OTP required"),
+  @ApiResponse(responseCode = "403", description = "User banned or invalid credentials"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
+                              @FormParam("username") String username, @FormParam("password") String password) {
     if (isUserAuthenticated()) {
       invalidateSession();
     }
@@ -99,25 +109,42 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     }
   }
 
-  @HEAD
-  @Path("/session/{id}")
-  public Response checkSession(@PathParam("id") String sessionId) {
+@HEAD
+@Path("/session/{id}")
+@Operation(summary = "Check session validity", description = "Check if a session with the given ID is still valid")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Session is valid"),
+  @ApiResponse(responseCode = "404", description = "Session not found or expired"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response checkSession(@PathParam("id") String sessionId) {
     // Find the Shiro Session
     return isValidSessionId(sessionId) ? Response.ok().build() : Response.status(Status.NOT_FOUND).build();
   }
 
-  @DELETE
-  @Path("/session/{id}")
-  @NoAuthorization
-  public Response deleteSession(@PathParam("id") String sessionId) {
+@DELETE
+@Path("/session/{id}")
+@NoAuthorization
+@Operation(summary = "Delete session by ID", description = "Delete a specific user session by its ID (legacy endpoint)")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Session successfully deleted"),
+  @ApiResponse(responseCode = "404", description = "Session not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response deleteSession(@PathParam("id") String sessionId) {
     // legacy
     return deleteCurrentSession();
   }
 
-  @DELETE
-  @Path("/session/_current")
-  @NoAuthorization
-  public Response deleteCurrentSession() {
+@DELETE
+@Path("/session/_current")
+@NoAuthorization
+@Operation(summary = "Delete current session", description = "Delete the current user session and invalidate authentication")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Current session successfully deleted"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response deleteCurrentSession() {
     // Delete the Shiro session
     try {
       Session session = SecurityUtils.getSubject().getSession();
@@ -146,10 +173,15 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     return Response.ok().build();
   }
 
-  @GET
-  @Path("/session/_current/username")
-  @NoAuthorization
-  public Opal.Subject getCurrentSubject() {
+@GET
+@Path("/session/_current/username")
+@NoAuthorization
+@Operation(summary = "Get current user", description = "Retrieve information about the currently authenticated user")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Current user information successfully retrieved"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Opal.Subject getCurrentSubject() {
     // Find the Shiro username
     Subject subject = SecurityUtils.getSubject();
     String principal = subject.getPrincipal() == null ? "" : subject.getPrincipal().toString();
@@ -160,9 +192,15 @@ public class AuthenticationResource extends AbstractSecurityComponent {
         .build();
   }
 
-  @GET
-  @Path("/session/{id}/username")
-  public Opal.Subject getSubject(@PathParam("id") String sessionId) {
+@GET
+@Path("/session/{id}/username")
+@Operation(summary = "Get user by session ID", description = "Retrieve user information for a specific session ID")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "User information successfully retrieved"),
+  @ApiResponse(responseCode = "404", description = "Session not found or expired"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Opal.Subject getSubject(@PathParam("id") String sessionId) {
     // Find the Shiro username
     String principal = isValidSessionId(sessionId) ? SecurityUtils.getSubject().getPrincipal().toString() : null;
     return Opal.Subject.newBuilder()

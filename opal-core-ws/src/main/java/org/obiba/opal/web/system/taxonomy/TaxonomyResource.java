@@ -16,6 +16,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -56,18 +59,30 @@ public class TaxonomyResource {
   @PathParam("name")
   private String name;
 
-  @GET
-  @NoAuthorization
-  public Opal.TaxonomyDto getTaxonomy() {
+@GET
+@NoAuthorization
+@Operation(summary = "Get taxonomy", description = "Retrieve a specific taxonomy with all its vocabularies and terms")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully retrieved"),
+  @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Opal.TaxonomyDto getTaxonomy() {
     Taxonomy taxonomy = taxonomyService.getTaxonomy(name);
     if(taxonomy == null) throw new NoSuchTaxonomyException(name);
     return Dtos.asDto(taxonomy);
   }
 
-  @GET
-  @Produces(value = "text/plain")
-  @Path("_download")
-  public Response download() {
+@GET
+@Produces(value = "text/plain")
+@Path("_download")
+@Operation(summary = "Download taxonomy", description = "Download a taxonomy as a YAML file for backup or import")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Taxonomy file successfully generated"),
+  @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response download() {
     Taxonomy taxonomy = taxonomyService.getTaxonomy(name);
     if(taxonomy == null) throw new NoSuchTaxonomyException(name);
     TaxonomyYaml yaml = new TaxonomyYaml();
@@ -75,8 +90,16 @@ public class TaxonomyResource {
         .header("Content-Disposition", "attachment; filename=\"" + taxonomy.getName() + ".yml\"").build();
   }
 
-  @PUT
-  public Response updateTaxonomy(Opal.TaxonomyDto dto) {
+@PUT
+@Operation(summary = "Update taxonomy", description = "Update an existing taxonomy with new vocabulary and term definitions. Can also rename the taxonomy.")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully updated"),
+  @ApiResponse(responseCode = "400", description = "Invalid taxonomy data or name conflict"),
+  @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
+  @ApiResponse(responseCode = "409", description = "Taxonomy name already exists"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response updateTaxonomy(Opal.TaxonomyDto dto) {
     if (!name.equals(dto.getName())) {
       taxonomyService.ensureUniqueTaxonomy(dto.getName());
     }
@@ -84,37 +107,67 @@ public class TaxonomyResource {
     return Response.ok().build();
   }
 
-  @DELETE
-  public Response deleteTaxonomy() {
+@DELETE
+@Operation(summary = "Delete taxonomy", description = "Delete a taxonomy and all its associated vocabularies and terms")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully deleted"),
+  @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response deleteTaxonomy() {
     taxonomyService.deleteTaxonomy(name);
     return Response.ok().build();
   }
 
-  @GET
-  @Path("/commits")
-  public Response getCommitsInfo() {
+@GET
+@Path("/commits")
+@Operation(summary = "Get taxonomy commits", description = "Retrieve the version control history for a taxonomy, showing all commits and changes")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Commit history successfully retrieved"),
+  @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response getCommitsInfo() {
     Iterable<CommitInfo> commitInfos = taxonomyService.getCommitsInfo(name);
     return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfos)).build();
   }
 
-  @GET
-  @Path("/commit/{commitId}")
-  public Response getCommitInfo(@NotNull @PathParam("commitId") String commitId) {
+@GET
+@Path("/commit/{commitId}")
+@Operation(summary = "Get commit details", description = "Retrieve detailed information about a specific commit in the taxonomy version history")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Commit details successfully retrieved"),
+  @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response getCommitInfo(@NotNull @PathParam("commitId") String commitId) {
     CommitInfo commitInfo = getVariableDiffInternal(taxonomyService.getCommitInfo(name, commitId), commitId, null);
     return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfo)).build();
   }
 
-  @GET
-  @Path("/commit/head/{commitId}")
-  public Response getCommitInfoFromHead(@NotNull @PathParam("commitId") String commitId) {
+@GET
+@Path("/commit/head/{commitId}")
+@Operation(summary = "Get commit diff from HEAD", description = "Retrieve detailed information about a specific commit compared to the current HEAD (latest) version")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Commit diff successfully retrieved"),
+  @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response getCommitInfoFromHead(@NotNull @PathParam("commitId") String commitId) {
     CommitInfo commitInfo = getVariableDiffInternal(taxonomyService.getCommitInfo(name, commitId),
         OpalGitUtils.HEAD_COMMIT_ID, commitId);
     return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfo)).build();
   }
 
-  @PUT
-  @Path("/restore/{commitId}")
-  public Response restoreCommit(@NotNull @PathParam("commitId") String commitId) {
+@PUT
+@Path("/restore/{commitId}")
+@Operation(summary = "Restore taxonomy from commit", description = "Restore a taxonomy to a previous state by overwriting the current version with a specific commit")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully restored from commit"),
+  @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response restoreCommit(@NotNull @PathParam("commitId") String commitId) {
     String blob = taxonomyService.getBlob(name, commitId);
     taxonomyService.importInputStreamTaxonomy(new ByteArrayInputStream(blob.getBytes(StandardCharsets.UTF_8)), name, true);
     return Response.ok().build();

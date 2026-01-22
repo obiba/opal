@@ -14,6 +14,9 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.QueryParam;
 
@@ -38,6 +41,11 @@ public class LocalesResource {
   }
 
   @GET
+  @Operation(summary = "Get available locales", description = "Returns the list of available locales")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Successfully retrieved locales"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     Collection<LocaleDto> localeDtos = new ArrayList<>();
     for(Locale locale : locales) {

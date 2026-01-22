@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.system.database;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.web.model.Database;
 import org.springframework.stereotype.Component;
@@ -27,6 +30,14 @@ import java.util.Collection;
 public class JdbcDriversResource {
 
   @GET
+  @Operation(
+      summary = "Get JDBC drivers",
+      description = "Retrieves the list of supported JDBC drivers with connection URL templates and examples."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "JDBC drivers list retrieved successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Database.JdbcDriverDto> getJdbcDrivers() {
     Collection<Database.JdbcDriverDto> drivers = new ArrayList<>();
     drivers.add(Database.JdbcDriverDto.newBuilder() //

@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -47,9 +50,15 @@ public class VariableEntityResource {
     return getVariableEntityTablesResource();
   }
 
-  @GET
-  @NoAuthorization
-  public Response exists() {
+@GET
+@NoAuthorization
+@Operation(summary = "Check if entity exists", description = "Check if a variable entity with the specified ID and type exists in the system")
+@ApiResponses({
+  @ApiResponse(responseCode = "200", description = "Entity exists and information returned"),
+  @ApiResponse(responseCode = "404", description = "Entity not found"),
+  @ApiResponse(responseCode = "500", description = "Internal server error")
+})
+public Response exists() {
     VariableEntityTablesResource resource = getVariableEntityTablesResource();
     if(!resource.getTables(1).isEmpty()) {
       return Response.ok().entity(Dtos.asDto(getVariableEntity()).build()).build();

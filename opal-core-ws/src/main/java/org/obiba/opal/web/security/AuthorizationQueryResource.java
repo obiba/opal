@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -46,6 +49,15 @@ public class AuthorizationQueryResource {
   private SubjectAclService subjectAclService;
 
   @GET
+  @Operation(
+    summary = "Query authorization permissions",
+    description = "Queries authorization permissions across domains and subjects. Can retrieve all subjects for a domain/type combination or get specific ACLs for particular nodes, grouped by subject."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved"),
+    @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+    @ApiResponse(responseCode = "500", description = "Error querying authorization data")
+  })
   public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectType type,
       @QueryParam("node") List<String> nodes) {
     if(nodes == null || nodes.isEmpty()) return getSubjects(domain, type);

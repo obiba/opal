@@ -11,6 +11,9 @@
 package org.obiba.opal.web.project.resource;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
@@ -51,6 +54,15 @@ public class ProjectResourceReferenceResource implements BaseResource {
   }
 
   @GET
+  @Operation(
+    summary = "Get project resource reference",
+    description = "Retrieves a specific resource reference within a project, including details about the resource and whether it can be edited."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Resource reference details successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project"),
+    @ApiResponse(responseCode = "404", description = "Project or resource reference not found")
+  })
   public Projects.ResourceReferenceDto get(@PathParam("project") String project, @PathParam("name") String name) {
     checkProject(project);
     ResourceReference reference = resourceReferenceService.getResourceReference(project, name);
@@ -58,6 +70,16 @@ public class ProjectResourceReferenceResource implements BaseResource {
   }
 
   @PUT
+  @Operation(
+    summary = "Update project resource reference",
+    description = "Updates an existing resource reference within a project. The reference can be renamed, and the original creation timestamp is preserved. Resource assignment in R servers is automatically updated."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Resource reference successfully updated"),
+    @ApiResponse(responseCode = "400", description = "Invalid resource reference data or project mismatch"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to update resource references"),
+    @ApiResponse(responseCode = "404", description = "Project or resource reference not found")
+  })
   public Response update(@PathParam("project") String project, @PathParam("name") String name, Projects.ResourceReferenceDto referenceDto) {
     // check same project
     if (!project.equals(referenceDto.getProject()))
@@ -78,6 +100,16 @@ public class ProjectResourceReferenceResource implements BaseResource {
 
   @PUT
   @Path("_test")
+  @Operation(
+    summary = "Test project resource reference",
+    description = "Tests the connectivity and accessibility of a resource reference by attempting to assign it in an R server. Validates that the resource can be properly accessed and used."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Resource reference test completed successfully"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project or resource"),
+    @ApiResponse(responseCode = "404", description = "Project or resource reference not found"),
+    @ApiResponse(responseCode = "500", description = "R server error or resource not accessible")
+  })
   public Response test(@PathParam("project") String project, @PathParam("name") String name) throws RServerException {
     checkProject(project);
     ResourceAssignROperation rop = resourceReferenceService.asAssignOperation(project, name, "rsrc");
@@ -87,6 +119,15 @@ public class ProjectResourceReferenceResource implements BaseResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete project resource reference",
+    description = "Removes a resource reference from the project. This deletes the reference but does not affect the actual resource data, only the link to it within the project."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Resource reference successfully deleted"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete resource references"),
+    @ApiResponse(responseCode = "404", description = "Project or resource reference not found")
+  })
   public Response delete(@PathParam("project") String project, @PathParam("name") String name) {
     checkProject(project);
     resourceReferenceService.delete(project, name);

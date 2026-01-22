@@ -12,6 +12,9 @@ package org.obiba.opal.web.magma;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.protobuf.format.JsonFormat;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -118,11 +121,29 @@ public class DatasourceResource {
   }
 
   @GET
+  @Operation(
+    summary = "Get datasource information",
+    description = "Retrieves detailed information about a specific datasource including its metadata, tables, and available locales."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasource information"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Magma.DatasourceDto get(@Context Request request) {
     return Dtos.asDto(getDatasource()).build();
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete transient datasource",
+    description = "Removes a transient datasource from the system. Only transient datasources can be deleted, not persistent ones."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Datasource successfully deleted"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found or is not transient"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response removeDatasource() {
     Datasource ds;
     if (MagmaEngine.get().hasTransientDatasource(name)) {
@@ -169,14 +190,25 @@ public class DatasourceResource {
     return resource;
   }
 
-  @POST
+@POST
   @Path("/views")
+  @Operation(
+    summary = "Create datasource view",
+    description = "Creates a new view within the datasource. Views are virtual tables that can combine and filter data from existing tables."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "View successfully created"),
+    @ApiResponse(responseCode = "400", description = "Invalid view definition or table already exists"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response createView(ViewDto viewDto, @Context UriInfo uriInfo,
                              @Nullable @QueryParam("comment") String comment) {
 
     if (!viewDto.hasName()) {
       return Response.status(BAD_REQUEST).build();
     }
+
 
     if (datasourceHasTable(viewDto.getName())) {
       return Response.status(BAD_REQUEST)
@@ -199,6 +231,15 @@ public class DatasourceResource {
 
   @GET
   @Path("/views")
+  @Operation(
+    summary = "Backup datasource views",
+    description = "Creates a ZIP archive containing JSON definitions of all views or specified views from the datasource."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Views backup successfully created"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response backupViews(@QueryParam("views") List<String> viewNames) {
 
     List<ViewDto> views = getDatasource().getValueTables().stream()
@@ -232,6 +273,15 @@ public class DatasourceResource {
   @GET
   @Path("/locales")
   @NoAuthorization
+  @Operation(
+    summary = "Get datasource locales",
+    description = "Retrieves the list of locales supported by the datasource with optional display locale for localized names."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved locales"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     Collection<LocaleDto> localeDtos = new ArrayList<>();
     for (Locale locale : getLocales()) {
@@ -244,6 +294,16 @@ public class DatasourceResource {
   @Path("/_sql")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(
+    summary = "Execute SQL query and return JSON",
+    description = "Executes a SQL query against the datasource and returns results in JSON format."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(name, query, idName, SQLService.Output.JSON);
     StreamingOutput stream = os -> {
@@ -259,6 +319,16 @@ public class DatasourceResource {
   @Path("/_sql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/csv")
+  @Operation(
+    summary = "Execute SQL query and return CSV",
+    description = "Executes a SQL query against the datasource and returns results in CSV format."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(name, query, idName, SQLService.Output.CSV);
     StreamingOutput stream = os -> {
@@ -274,6 +344,16 @@ public class DatasourceResource {
   @Path("/_rsql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("application/x-rdata")
+  @Operation(
+    summary = "Execute SQL query and return RDS",
+    description = "Executes a SQL query against the datasource and returns results in R data format for use in R."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "404", description = "Datasource not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToRDS(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(name, query, idName, SQLService.Output.RDS);
     StreamingOutput stream = os -> {

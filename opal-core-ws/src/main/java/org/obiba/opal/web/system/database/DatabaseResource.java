@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.system.database;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -57,12 +60,30 @@ public class DatabaseResource {
   private String name;
 
   @GET
+  @Operation(
+    summary = "Get database configuration",
+    description = "Retrieves detailed information about a specific database including its configuration and datasource status."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved database information"),
+    @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public DatabaseDto get() {
     Database database = getDatabase();
     return Dtos.asDto(database, databaseRegistry.hasDatasource(database));
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete database",
+    description = "Removes a database from the system configuration."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Database successfully deleted"),
+    @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response delete() {
     Database database = getDatabase();
     databaseRegistry.delete(database);
@@ -70,6 +91,16 @@ public class DatabaseResource {
   }
 
   @PUT
+  @Operation(
+    summary = "Update database configuration",
+    description = "Updates database configuration. Database name cannot be changed, but other settings can be modified."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Database successfully updated"),
+    @ApiResponse(responseCode = "400", description = "Invalid database configuration"),
+    @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
     Database database = Dtos.fromDto(dto);
     try {
@@ -85,6 +116,16 @@ public class DatabaseResource {
   @POST
   @Path("/connections")
   @Transactional(readOnly = true)
+  @Operation(
+    summary = "Test database connection",
+    description = "Tests the connectivity to a database by attempting to establish a connection. Supports both SQL and MongoDB databases."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Database connection test successful"),
+    @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "503", description = "Database connection failed"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or unsupported database type")
+  })
   public Response testConnection() {
     Database database = getDatabase();
     if(database.hasSqlSettings()) {
@@ -98,6 +139,15 @@ public class DatabaseResource {
 
   @GET
   @Path("/hasEntities")
+  @Operation(
+    summary = "Check if database has entities",
+    description = "Returns whether the database contains any entity records, indicating if it has been used for data storage."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity status"),
+    @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getHasEntities() {
     Database database = databaseRegistry.getDatabase(name);
     return Response.ok().entity(String.valueOf(databaseRegistry.hasEntities(database))).build();

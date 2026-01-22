@@ -79,6 +79,16 @@ public class TaxonomiesResource implements BaseResource {
 
   @GET
   @Path("tags/_github")
+  @Operation(
+    summary = "Get GitHub taxonomy tags",
+    description = "Retrieves the available tags from a GitHub repository containing taxonomies. Useful for discovering available taxonomy versions from remote repositories."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "GitHub taxonomy tags successfully retrieved"),
+    @ApiResponse(responseCode = "400", description = "Invalid GitHub repository or access denied"),
+    @ApiResponse(responseCode = "404", description = "GitHub repository or tags not found"),
+    @ApiResponse(responseCode = "500", description = "Error accessing GitHub API")
+  })
   public Opal.VcsTagsInfoDto getTaxonomyGitHubTags(
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo) {
     
@@ -87,6 +97,16 @@ public class TaxonomiesResource implements BaseResource {
 
   @POST
   @Path("import/_github")
+  @Operation(
+    summary = "Import taxonomy from GitHub",
+    description = "Imports taxonomies from a GitHub repository. Can import all taxonomies from a repository or a specific taxonomy file. Supports version control through git references (branch, tag, commit)."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Taxonomy successfully imported from GitHub"),
+    @ApiResponse(responseCode = "400", description = "Invalid GitHub repository, file not found, or import conflict"),
+    @ApiResponse(responseCode = "404", description = "GitHub repository or file not found"),
+    @ApiResponse(responseCode = "500", description = "Error importing from GitHub or processing taxonomy file")
+  })
   public Response importTaxonomyFromGitHub(@Context UriInfo uriInfo,
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo,
       @QueryParam("ref") @DefaultValue("master") String ref,
@@ -108,6 +128,16 @@ public class TaxonomiesResource implements BaseResource {
 
   @POST
   @Path("import/_file")
+  @Operation(
+    summary = "Import taxonomy from file",
+    description = "Imports a taxonomy from a local file system path. Supports various taxonomy file formats. Can override existing taxonomy with the same name if explicitly requested."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Taxonomy successfully imported from file"),
+    @ApiResponse(responseCode = "400", description = "File path not provided, file not found, or invalid taxonomy format"),
+    @ApiResponse(responseCode = "409", description = "Taxonomy with same name already exists and override not specified"),
+    @ApiResponse(responseCode = "500", description = "Error reading or processing taxonomy file")
+  })
   public Response importTaxonomyFromFile(@Context UriInfo uriInfo, @QueryParam("file") String file,
                                          @QueryParam("override") @DefaultValue("false") boolean override) throws
       FileSystemException {
@@ -120,6 +150,16 @@ public class TaxonomiesResource implements BaseResource {
   }
 
   @POST
+  @Operation(
+    summary = "Create taxonomy",
+    description = "Creates a new taxonomy in the system. The taxonomy definition includes vocabulary and term structures. Taxonomy names must be unique within the system."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Taxonomy successfully created"),
+    @ApiResponse(responseCode = "400", description = "Invalid taxonomy data or missing required fields"),
+    @ApiResponse(responseCode = "409", description = "Taxonomy with same name already exists"),
+    @ApiResponse(responseCode = "500", description = "Error creating taxonomy")
+  })
   public Response addTaxonomy(@Context UriInfo uriInfo, TaxonomyDto dto) {
     taxonomyService.ensureUniqueTaxonomy(dto.getName());
     taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
