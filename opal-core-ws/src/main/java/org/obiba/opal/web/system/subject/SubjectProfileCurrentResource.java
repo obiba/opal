@@ -10,6 +10,9 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.oidc.OIDCConfiguration;
@@ -68,6 +71,10 @@ public class SubjectProfileCurrentResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject profile", description = "Retrieves the profile of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject profile retrieved successfully")
+  })
   public Response get() {
     SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
     String accountUrl = null;
@@ -94,6 +101,10 @@ public class SubjectProfileCurrentResource {
   @Path("/otp")
   @Produces("text/plain")
   @NoAuthorization
+  @Operation(summary = "Enable OTP for current subject", description = "Enables one-time password authentication for the current subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OTP enabled successfully")
+  })
   public Response enableOtp() {
     subjectProfileService.updateProfileSecret(getPrincipal(), true);
     SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
@@ -103,6 +114,10 @@ public class SubjectProfileCurrentResource {
   @DELETE
   @Path("/otp")
   @NoAuthorization
+  @Operation(summary = "Disable OTP for current subject", description = "Disables one-time password authentication for the current subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OTP disabled successfully")
+  })
   public Response disableOtp() {
     subjectProfileService.updateProfileSecret(getPrincipal(), false);
     return Response.ok().build();
@@ -111,6 +126,10 @@ public class SubjectProfileCurrentResource {
   @Path("/bookmarks")
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject bookmarks", description = "Retrieves bookmarks of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Bookmarks retrieved successfully")
+  })
   public List<BookmarkDto> getBookmarks() {
     BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(getPrincipal());
@@ -120,6 +139,10 @@ public class SubjectProfileCurrentResource {
   @Path("/bookmark/{path:.*}")
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject bookmark", description = "Retrieves a specific bookmark of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Bookmark retrieved successfully")
+  })
   public Response getBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
     log.debug("Getting configuration defaultCharSet");
     String defaultCharacterSet = opalGeneralConfigService.getConfig().getDefaultCharacterSet();
@@ -134,6 +157,10 @@ public class SubjectProfileCurrentResource {
   @Path("/bookmarks")
   @POST
   @NoAuthorization
+  @Operation(summary = "Add bookmarks for current subject", description = "Adds bookmarks for the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Bookmarks added successfully")
+  })
   public Response addBookmarks(@QueryParam("resource") List<String> resources) throws UnsupportedEncodingException {
     BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(getPrincipal());
@@ -143,6 +170,10 @@ public class SubjectProfileCurrentResource {
   @Path("/bookmark/{path:.*}")
   @DELETE
   @NoAuthorization
+  @Operation(summary = "Delete current subject bookmark", description = "Deletes a specific bookmark of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Bookmark deleted successfully")
+  })
   public Response deleteBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
     BookmarkResource resource = applicationContext.getBean(BookmarkResource.class);
     resource.setPrincipal(getPrincipal());
@@ -153,6 +184,10 @@ public class SubjectProfileCurrentResource {
   @Path("/sql-history")
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject SQL history", description = "Retrieves SQL execution history of the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "SQL history retrieved successfully")
+  })
   public List<SQL.SQLExecutionDto> getSQLHistory(@QueryParam("datasource") String datasource,
                                                  @QueryParam("offset") @DefaultValue("0") int offset,
                                                  @QueryParam("limit") @DefaultValue("100") int limit) {

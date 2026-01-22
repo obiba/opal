@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -41,6 +44,15 @@ public class ProjectCommandsReloadResource extends AbstractProjectCommandsResour
   }
 
   @POST
+  @Operation(
+    summary = "Reload project",
+    description = "Reloads a project to refresh its metadata and data. The project must not be currently busy with other operations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Reload command successfully launched"),
+    @ApiResponse(responseCode = "409", description = "Project is momentarily not reloadable"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response reloadProject() {
     if (checkCommandIsBlocked(name, true)) throw new ConflictingRequestException("ProjectMomentarilyNotReloadable", name);
 

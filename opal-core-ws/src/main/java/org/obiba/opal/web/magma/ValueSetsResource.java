@@ -12,6 +12,9 @@ package org.obiba.opal.web.magma;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -37,6 +40,12 @@ public interface ValueSetsResource extends BaseResource {
    * @return
    */
   @GET
+  @Operation(summary = "Get value sets", description = "Retrieve multiple value sets with pagination and filtering")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Value sets retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid filter or pagination parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response getValueSets(@Context UriInfo uriInfo, //
       @QueryParam("select") String select, //
       @QueryParam("offset") @DefaultValue("0") int offset, //
@@ -50,6 +59,12 @@ public interface ValueSetsResource extends BaseResource {
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete value sets", description = "Remove value sets from table by identifiers")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Value sets deleted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid identifiers"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response drop(@QueryParam("id") List<String> identifiers);
 
   /**
@@ -61,6 +76,12 @@ public interface ValueSetsResource extends BaseResource {
    */
   @GET
   @Path("/timestamps")
+  @Operation(summary = "Get value sets timestamps", description = "Retrieve value sets timestamps without actual values")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response getValueSetsTimestamps(@QueryParam("offset") @DefaultValue("0") int offset, //
       @QueryParam("limit") @DefaultValue("100") int limit);
 }

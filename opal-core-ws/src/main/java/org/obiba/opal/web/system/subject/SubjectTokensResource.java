@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.web.model.Opal;
@@ -38,6 +41,10 @@ public class SubjectTokensResource {
   private SubjectTokenService subjectTokenService;
 
   @GET
+  @Operation(summary = "Get subject tokens", description = "Retrieves all tokens belonging to a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject tokens retrieved successfully")
+  })
   public List<Opal.SubjectTokenDto> getAll() {
     return subjectTokenService.getTokens(principal).stream()
         .map(token -> Dtos.asDto(token, subjectTokenService.getTokenTimestamps(token)))
@@ -45,6 +52,10 @@ public class SubjectTokensResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete all subject tokens", description = "Deletes all tokens belonging to a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "All tokens deleted successfully")
+  })
   public Response deleteAll() {
     subjectTokenService.deleteTokens(principal);
     return Response.noContent().build();

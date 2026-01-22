@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.app;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.AppsService;
 import org.obiba.opal.web.model.Apps;
@@ -36,11 +39,29 @@ public class AppResource {
   private AppsService appsService;
 
   @GET
+  @Operation(
+    summary = "Get application details",
+    description = "Retrieves detailed information about a specific registered application"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Application details retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Application not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Apps.AppDto get() {
     return Dtos.asDto(appsService.getApp(id));
   }
 
   @DELETE
+  @Operation(
+    summary = "Unregister application",
+    description = "Removes a specific application from the registry"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Application unregistered successfully"),
+    @ApiResponse(responseCode = "404", description = "Application not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response unregister() {
     try {
       appsService.unregisterApp(appsService.getApp(id));

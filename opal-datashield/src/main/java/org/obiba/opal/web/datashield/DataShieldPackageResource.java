@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
@@ -46,6 +49,15 @@ public class DataShieldPackageResource {
   private OpalGeneralConfigService opalGeneralConfigService;
 
   @GET
+  @Operation(
+    summary = "Get DataSHIELD package",
+    description = "Retrieves information about a specific DataSHIELD package installed in the specified profile."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved package information"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RPackageDto> getPackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return dsPackageMethodeHelper.getPackage(getDataShieldProfile(profile), name);
   }
@@ -57,6 +69,15 @@ public class DataShieldPackageResource {
    */
   @GET
   @Path("methods")
+  @Operation(
+    summary = "Get DataSHIELD package methods",
+    description = "Retrieves all available methods for a specific DataSHIELD package in the specified profile."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved package methods"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public DataShield.DataShieldPackageMethodsDto getPackageMethods(@PathParam("name") String name, @QueryParam("profile") String profile) {
     return dsPackageMethodeHelper.getPackageMethods(getDataShieldProfile(profile), name);
   }
@@ -69,6 +90,15 @@ public class DataShieldPackageResource {
   @PUT
   @Path("methods")
   @Deprecated
+  @Operation(
+    summary = "Publish DataSHIELD package methods (deprecated)",
+    description = "Publishes all methods of a DataSHIELD package to the specified profiles. This endpoint is deprecated."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully published package methods"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public DataShield.DataShieldPackageMethodsDto publishPackageMethods(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
     DataShield.DataShieldPackageMethodsDto rval = DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).build();
     if (profiles != null)
@@ -85,6 +115,15 @@ public class DataShieldPackageResource {
    */
   @PUT
   @Path("_publish")
+  @Operation(
+    summary = "Publish DataSHIELD package settings",
+    description = "Appends DataSHIELD package settings to the specified profile configurations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully published package settings"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response publishPackageSettings(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
     if (profiles != null)
       dsPackageMethodeHelper.publish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
@@ -101,6 +140,15 @@ public class DataShieldPackageResource {
   @DELETE
   @Path("methods")
   @Deprecated
+  @Operation(
+    summary = "Delete DataSHIELD package methods (deprecated)",
+    description = "Removes all methods of a DataSHIELD package from the specified profiles. This endpoint is deprecated."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Successfully deleted package methods"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePackageMethods(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
     if (profiles != null)
       dsPackageMethodeHelper.unpublish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
@@ -116,6 +164,15 @@ public class DataShieldPackageResource {
    */
   @DELETE
   @Path("_publish")
+  @Operation(
+    summary = "Delete DataSHIELD package settings",
+    description = "Removes DataSHIELD package settings from each specified profile configuration."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Successfully deleted package settings"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePackageSettings(@PathParam("name") String name, @QueryParam("profile") List<String> profiles) {
     if (profiles != null)
       dsPackageMethodeHelper.unpublish(profiles.stream().map(this::getDataShieldProfile).collect(Collectors.toList()), name);
@@ -128,6 +185,16 @@ public class DataShieldPackageResource {
    * @return
    */
   @DELETE
+  @Operation(
+    summary = "Delete DataSHIELD package",
+    description = "Silently deletes a DataSHIELD package and all its methods from the specified profile."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully deleted package"),
+    @ApiResponse(responseCode = "403", description = "R package management not allowed"),
+    @ApiResponse(responseCode = "404", description = "Package not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePackage(@PathParam("name") String name, @QueryParam("profile") String profile) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();

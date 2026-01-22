@@ -12,6 +12,9 @@ package org.obiba.opal.web.system.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -51,6 +54,12 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
    * @return
    */
   @GET
+  @Operation(summary = "Get administration permissions", description = "Retrieves administration permissions for subjects. Administration permissions control access to system administration functions and Opal server management.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Administration permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid subject type provided"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getAdministrationPermissions(@QueryParam("type") SubjectType type) {
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -65,6 +74,13 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
    * @return
    */
   @POST
+  @Operation(summary = "Set administration permission", description = "Grants administration permissions to subjects. Administration permissions control access to system administration functions and Opal server management.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Administration permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setAdministrationPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") AdministrationPermissionConverter.Permission permission) {
@@ -80,6 +96,13 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete administration permissions", description = "Removes all administration permissions from subjects. This revokes access to system administration functions and Opal server management.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Administration permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteAdministrationPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     deletePermissions(principals, type);

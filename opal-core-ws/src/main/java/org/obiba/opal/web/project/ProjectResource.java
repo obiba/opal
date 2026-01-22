@@ -11,6 +11,9 @@ package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.*;
@@ -84,6 +87,12 @@ public class ProjectResource implements BaseResource {
   }
 
   @GET
+  @Operation(summary = "Get project details", description = "Retrieves detailed information about a specific project including its configuration and metadata.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project details retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to project")
+  })
   public Projects.ProjectDto get(@Context Request request, @PathParam("name") String name) {
     Project project = getProject(name);
     return Dtos.asDto(project, projectService);
@@ -91,6 +100,12 @@ public class ProjectResource implements BaseResource {
 
   @GET
   @Path("/summary")
+  @Operation(summary = "Get project summary", description = "Retrieves a summary view of the project with essential information.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project summary retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to project")
+  })
   public Projects.ProjectSummaryDto getSummary(@Context Request request, @PathParam("name") String name) {
     Project project = getProject(name);
     return Dtos.asSummaryDto(project, projectService);
@@ -98,11 +113,23 @@ public class ProjectResource implements BaseResource {
 
   @OPTIONS
   @Path("/summary")
+  @Operation(summary = "Get project summary options", description = "Returns the allowed HTTP methods for the project summary endpoint.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Options retrieved successfully")
+  })
   public Response getSummaryOptions() {
     return Response.ok().build();
   }
 
   @PUT
+  @Operation(summary = "Update project", description = "Updates an existing project's configuration and metadata.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid project data or name mismatch"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to update project"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response update(Projects.ProjectDto projectDto, @PathParam("name") String name) {
     // will throw a no such project exception
     getProject(name);
@@ -114,6 +141,13 @@ public class ProjectResource implements BaseResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete project", description = "Deletes a project and optionally archives it. Also cleans up associated datasources, VCF stores, mappings, and bookmarks.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to delete project"),
+    @ApiResponse(responseCode = "500", description = "Internal server error during deletion")
+  })
   public Response delete(@PathParam("name") String name, @QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
     try {
       Project project = getProject(name);
@@ -145,6 +179,12 @@ public class ProjectResource implements BaseResource {
 
   @GET
   @Path("/identifiers-mappings")
+  @Operation(summary = "Get project identifiers mappings", description = "Retrieves all identifiers mappings configured for the project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Identifiers mappings retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to project")
+  })
   public List<Projects.ProjectDto.IdentifiersMappingDto> getIdentifiersMappings(@PathParam("name") String name) {
     Project project = getProject(name);
 
@@ -157,6 +197,12 @@ public class ProjectResource implements BaseResource {
 
   @GET
   @Path("/identifiers-mapping")
+  @Operation(summary = "Get project identifiers mapping by entity type", description = "Retrieves identifiers mapping for a specific entity type within the project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Identifiers mapping retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to project")
+  })
   public Projects.ProjectDto.IdentifiersMappingDto getIdentifiersMapping(
     @PathParam("name") String name,
     @Nullable @QueryParam("entityType") @DefaultValue("Participant") String entityType) {
@@ -176,6 +222,12 @@ public class ProjectResource implements BaseResource {
 
   @GET
   @Path("/state")
+  @Operation(summary = "Get project state", description = "Retrieves the current state of the project including status and availability information.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project state retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "403", description = "Access denied to project")
+  })
   public Response getState(@PathParam("name") String name) {
     return  Response.ok().entity(projectService.getProjectState(getProject(name))).build();
   }

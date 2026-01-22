@@ -12,6 +12,9 @@ package org.obiba.opal.web.system.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -50,6 +53,12 @@ public class RPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @GET
+  @Operation(summary = "Get R service permissions", description = "Retrieves R service permissions for subjects. R service permissions control access to R scripting and analysis capabilities within Opal.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "R permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid subject type provided"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getRPermissions(@QueryParam("type") SubjectType type) {
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -64,6 +73,13 @@ public class RPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @POST
+  @Operation(summary = "Set R service permission", description = "Grants R service permissions to subjects. R service permissions control access to R scripting and analysis capabilities within Opal.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "R permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setRPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") RPermissionConverter.Permission permission) {
@@ -79,6 +95,13 @@ public class RPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete R service permissions", description = "Removes all R service permissions from subjects. This revokes access to R scripting and analysis capabilities within Opal.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "R permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteRPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     deletePermissions(principals, type);

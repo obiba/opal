@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -26,11 +29,23 @@ public interface DataShieldSessionResource extends RSessionResource {
   @POST
   @Path("/aggregate")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Operation(summary = "Aggregate DataShield expression as binary", description = "Execute DataShield aggregate expression and return binary results")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid DataShield expression"),
+    @ApiResponse(responseCode = "500", description = "Server error during aggregation")
+  })
   Response aggregateBinary(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException;
 
   @POST
   @Path("/aggregate")
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Aggregate DataShield expression as JSON", description = "Execute DataShield aggregate expression and return JSON results")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid DataShield expression"),
+    @ApiResponse(responseCode = "500", description = "Server error during aggregation")
+  })
   Response aggregateJSON(@QueryParam("async") @DefaultValue("false") boolean async, String body) throws ParseException;
 
 }

@@ -11,6 +11,9 @@
 package org.obiba.opal.web.project.resource;
 
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.security.ProjectResourceReferencePermissionConverter;
@@ -56,6 +59,13 @@ public class ProjectResourceReferencePermissionsResource extends AbstractPermiss
    * @return
    */
   @GET
+  @Operation(summary = "Get project resource permissions", description = "Retrieves permissions for a specific resource within a project. Resource permissions control access to individual project resources like files, reports, or other assets.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Resource permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or resource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getPermissions(@QueryParam("type") SubjectAcl.SubjectType type,
                                            @QueryParam("principal") List<String> principals,
                                            @QueryParam("permission") ProjectResourceReferencePermissionConverter.Permission permission) {
@@ -78,6 +88,13 @@ public class ProjectResourceReferencePermissionsResource extends AbstractPermiss
    * @return
    */
   @POST
+  @Operation(summary = "Set project resource permission", description = "Grants permissions to subjects for a specific resource within a project. Resource permissions control access to individual project resources like files, reports, or other assets.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Resource permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or resource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setPermission(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
                                 @QueryParam("principal") List<String> principals,
                                 @QueryParam("permission") ProjectResourceReferencePermissionConverter.Permission permission) {
@@ -97,6 +114,13 @@ public class ProjectResourceReferencePermissionsResource extends AbstractPermiss
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete project resource permissions", description = "Removes all permissions from subjects for a specific resource within a project. This revokes access to individual project resources like files, reports, or other assets.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Resource permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or resource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deletePermission(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
                                    @QueryParam("principal") List<String> principals) {
 

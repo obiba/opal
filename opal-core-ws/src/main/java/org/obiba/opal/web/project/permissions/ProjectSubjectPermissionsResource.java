@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.project.permissions;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -65,6 +68,13 @@ public class ProjectSubjectPermissionsResource {
    * @return
    */
   @GET
+  @Operation(summary = "Get subject project permissions", description = "Retrieves all permissions for a specific subject within a project. This includes project-level, datasource-level, table-level, and variable-level permissions.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getSubjectPermissions(
       @QueryParam("type") @DefaultValue("USER") SubjectType type) {
 
@@ -88,6 +98,13 @@ public class ProjectSubjectPermissionsResource {
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete subject project permissions", description = "Removes all permissions for a specific subject within a project. This includes project-level, datasource-level, table-level, and variable-level permissions.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or subject not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteSubjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type) {
 
     // make sure project exists

@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -46,11 +49,19 @@ public class SubjectProfileResource {
   private ApplicationContext applicationContext;
 
   @GET
+  @Operation(summary = "Get subject profile", description = "Retrieves the profile of a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject profile retrieved successfully")
+  })
   public Response get() {
     return Response.ok().entity(Dtos.asDto(subjectProfileService.getProfile(principal))).build();
   }
 
   @DELETE
+  @Operation(summary = "Delete subject profile", description = "Deletes the profile of a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject profile deleted successfully")
+  })
   public Response delete() {
     subjectProfileService.deleteProfile(principal);
     subjectAclService.deleteSubjectPermissions(USER.subjectFor(principal));
@@ -60,6 +71,10 @@ public class SubjectProfileResource {
   @DELETE
   @Path("/otp")
   @NoAuthorization
+  @Operation(summary = "Disable subject OTP", description = "Disables one-time password authentication for a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OTP disabled successfully")
+  })
   public Response disableOtp() {
     subjectProfileService.updateProfileSecret(principal, false);
     return Response.ok().build();

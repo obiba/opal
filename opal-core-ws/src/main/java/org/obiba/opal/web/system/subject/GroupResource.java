@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -39,6 +42,11 @@ public class GroupResource {
   }
 
   @GET
+  @Operation(summary = "Get group", description = "Retrieves a specific group.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Group retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Group not found")
+  })
   public Response getGroup() {
     Group group = subjectCredentialsService.getGroup(name);
     return group == null
@@ -47,6 +55,10 @@ public class GroupResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete group", description = "Deletes a specific group.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Group deleted successfully")
+  })
   public Response deleteGroup() {
     Group group = subjectCredentialsService.getGroup(name);
     subjectCredentialsService.delete(group);

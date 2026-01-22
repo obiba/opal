@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -33,6 +36,11 @@ public class SubjectCredentialResource {
   private SubjectCredentialsService subjectCredentialsService;
 
   @GET
+  @Operation(summary = "Get subject credentials", description = "Retrieves the credentials of a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully"),
+      @ApiResponse(responseCode = "404", description = "Subject credentials not found")
+  })
   public Response get() {
     SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
     return (subjectCredentials == null //
@@ -41,6 +49,12 @@ public class SubjectCredentialResource {
   }
 
   @PUT
+  @Operation(summary = "Update subject credentials", description = "Updates the credentials of a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid credentials data provided"),
+      @ApiResponse(responseCode = "404", description = "Subject credentials not found")
+  })
   public Response update(Opal.SubjectCredentialsDto dto) {
     if (!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -65,6 +79,11 @@ public class SubjectCredentialResource {
   }
 
   @DELETE
+  @Operation(summary = "Delete subject credentials", description = "Deletes the credentials of a specific subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials deleted successfully"),
+      @ApiResponse(responseCode = "404", description = "Subject credentials not found")
+  })
   public Response delete() {
     SubjectCredentials subjectCredentials = getSubjectCredentials();
     if (subjectCredentials == null) {

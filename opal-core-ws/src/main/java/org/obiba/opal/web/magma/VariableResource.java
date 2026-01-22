@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Request;
@@ -31,20 +34,52 @@ public interface VariableResource {
   void setVariableValueSource(VariableValueSource variableValueSource);
 
   @GET
+  @Operation(summary = "Get variable", description = "Retrieve variable details and metadata")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Variable retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Variable not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Magma.VariableDto get(@Context UriInfo uriInfo);
 
   @PUT
+  @Operation(summary = "Update variable", description = "Update variable definition and metadata")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Variable updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid variable data"),
+    @ApiResponse(responseCode = "404", description = "Variable not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response updateVariable(Magma.VariableDto variable);
 
   @DELETE
+  @Operation(summary = "Delete variable", description = "Delete variable from the table")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Variable deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Variable not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response deleteVariable();
 
   @PUT
   @Path("/attribute/{name}")
+  @Operation(summary = "Update variable attribute", description = "Update or add an attribute to the variable")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Attribute updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid attribute data"),
+    @ApiResponse(responseCode = "404", description = "Variable not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response updateVariableAttribute(@PathParam("name") String name, @QueryParam("namespace") String namespace, @QueryParam("locale") String locale, @QueryParam("value") String value);
 
   @DELETE
   @Path("/attribute/{name}")
+  @Operation(summary = "Delete variable attribute", description = "Delete an attribute from the variable")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Attribute deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Variable or attribute not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response deleteVariableAttribute(@PathParam("name") String name, @QueryParam("namespace") String namespace, @QueryParam("locale") String locale);
 
   @Path("/summary")

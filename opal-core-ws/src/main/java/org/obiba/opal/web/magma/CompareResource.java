@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -28,5 +31,12 @@ public interface CompareResource {
 
   @GET
   @Path("/{with}")
+  @Operation(summary = "Compare table", description = "Compare table with another table or view")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Comparison completed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid comparison parameters"),
+    @ApiResponse(responseCode = "404", description = "Table to compare with not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response compare(@PathParam("with") String with, @QueryParam("merge") @DefaultValue("false") boolean merge);
 }

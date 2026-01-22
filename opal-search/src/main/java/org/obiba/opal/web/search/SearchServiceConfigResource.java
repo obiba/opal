@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.search;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.PUT;
@@ -36,6 +39,10 @@ public class SearchServiceConfigResource {
   private ServiceConfigurationHandlerRegistry configHandler;
 
   @PUT
+  @Operation(summary = "Start and enable search service", description = "Enable and start the Elasticsearch search service, updating the configuration and starting the service.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Search service successfully started and enabled")
+  })
   public Response startEnable() {
 
     Service service = opalRuntime.getService("search");
@@ -50,6 +57,10 @@ public class SearchServiceConfigResource {
   }
 
   @DELETE
+  @Operation(summary = "Stop and disable search service", description = "Disable and stop the Elasticsearch search service, updating the configuration and stopping the service.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Search service successfully stopped and disabled")
+  })
   public Response stopDisable() {
 
     Service service = opalRuntime.getService("search");

@@ -13,6 +13,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -44,6 +47,10 @@ public class GroupsResource {
   }
 
   @GET
+  @Operation(summary = "Get all groups", description = "Retrieves all user groups.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Groups retrieved successfully")
+  })
   public List<Opal.GroupDto> getGroups() {
     return Lists
         .newArrayList(Iterables.transform(subjectCredentialsService.getGroups(), new Function<Group, Opal.GroupDto>() {
@@ -55,6 +62,12 @@ public class GroupsResource {
   }
 
   @POST
+  @Operation(summary = "Create group", description = "Creates a new user group.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Group created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid group data provided"),
+      @ApiResponse(responseCode = "409", description = "Group already exists")
+  })
   public Response createGroup(Opal.GroupDto dto) {
     Group group = new Group(dto.getName());
     if (group.getName().trim().isEmpty()) {

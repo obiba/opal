@@ -11,6 +11,9 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.r.service.RServerSession;
@@ -39,6 +42,14 @@ public class RServiceSessionsResource {
   private OpalRSessionManager opalRSessionManager;
 
   @GET
+  @Operation(
+    summary = "Get all R sessions",
+    description = "Retrieves a list of all active R sessions, sorted by timestamp in descending order (most recent first)."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R sessions"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RSessionDto> getRSessions() {
     return opalRSessionManager.getRSessions().stream()
         .sorted((rSession1, rSession2) -> {
@@ -52,6 +63,15 @@ public class RServiceSessionsResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Remove R sessions",
+    description = "Removes one or more R sessions by their IDs. If no IDs are provided, no action is taken."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Sessions successfully removed"),
+    @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response removeRSessions(@QueryParam("id") List<String> ids) {
     if (ids != null) {
       for (String id : ids) {

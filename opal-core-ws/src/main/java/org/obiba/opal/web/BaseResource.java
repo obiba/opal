@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.core.Response;
 
@@ -22,6 +25,11 @@ public interface BaseResource {
    * @return
    */
   @OPTIONS
+  @Operation(summary = "Get OPTIONS", description = "Get allowed HTTP methods for this resource")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "OPTIONS request processed successfully"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   default Response getOptions() {
     return Response.ok().build();
   }

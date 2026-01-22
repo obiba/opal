@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
 import jakarta.ws.rs.DELETE;
@@ -22,9 +25,21 @@ import org.obiba.opal.web.model.DataShield;
 public interface DataShieldROptionsResource {
 
   @GET
+  @Operation(summary = "Get DataShield R options", description = "Retrieve all DataShield R options for a specific profile")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "R options retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid profile"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   List<DataShield.DataShieldROptionDto> getDataShieldROptions(@QueryParam("profile") String profile);
 
   @DELETE
+  @Operation(summary = "Delete DataShield R options", description = "Delete specified DataShield R options for a specific profile")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "R options deleted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid profile or option names"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response deleteDataShieldROptions(@QueryParam("name") List<String> names, @QueryParam("profile") String profile);
 
 }

@@ -12,6 +12,9 @@ package org.obiba.opal.web.r;
 
 import org.apache.commons.vfs2.FileSystemException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -21,12 +24,24 @@ public interface OpalRSessionResource extends RSessionResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Operation(summary = "Execute R script", description = "Execute an R script in the Opal R session and return binary results")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid script"),
+    @ApiResponse(responseCode = "500", description = "Server error during execution")
+  })
   Response executeBinary(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
                    String body);
 
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Execute R script as JSON", description = "Execute an R script in the Opal R session and return JSON results")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid script"),
+    @ApiResponse(responseCode = "500", description = "Server error during execution")
+  })
   Response executeJSON(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
                          String body);
 
@@ -40,6 +55,13 @@ public interface OpalRSessionResource extends RSessionResource {
    */
   @PUT
   @Path("/file/_push")
+  @Operation(summary = "Push file to R session", description = "Push a file from the opal file system into the R session workspace")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "File pushed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid file path"),
+    @ApiResponse(responseCode = "404", description = "Source file not found"),
+    @ApiResponse(responseCode = "500", description = "Server error during file transfer")
+  })
   Response pushFile(@QueryParam("source") String source, @QueryParam("destination") String destination) throws FileSystemException;
 
   /**
@@ -51,6 +73,13 @@ public interface OpalRSessionResource extends RSessionResource {
    */
   @PUT
   @Path("/file/_pull")
+  @Operation(summary = "Pull file from R session", description = "Pull a file from the R session workspace to the opal file system")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "File pulled successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid file path"),
+    @ApiResponse(responseCode = "404", description = "Source file not found"),
+    @ApiResponse(responseCode = "500", description = "Server error during file transfer")
+  })
   Response pullFile(@QueryParam("source") String source, @QueryParam("destination") String destination) throws FileSystemException;
 
 }

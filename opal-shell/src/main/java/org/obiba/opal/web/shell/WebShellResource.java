@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -48,6 +51,14 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @GET
   @Path("/commands")
+  @Operation(
+    summary = "Get all commands",
+    description = "Retrieves the list of all command jobs in the system with their current status."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command list"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<CommandStateDto> getCommands() {
     List<CommandStateDto> commandDtoList = new ArrayList<>();
 
@@ -61,6 +72,15 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @GET
   @Path("/command/{id}")
+  @Operation(
+    summary = "Get command by ID",
+    description = "Retrieves detailed information about a specific command job by its ID."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getCommand(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
@@ -69,6 +89,16 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @DELETE
   @Path("/command/{id}")
+  @Operation(
+    summary = "Delete command",
+    description = "Deletes a specific command job by its ID. Only completed or failed commands can be deleted."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Command successfully deleted"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteCommand(@PathParam("id") Integer id) {
     try {
       commandJobService.deleteCommand(id);
@@ -82,6 +112,14 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @DELETE
   @Path("/commands/completed")
+  @Operation(
+    summary = "Delete completed commands",
+    description = "Deletes all completed command jobs from the system to clean up the command history."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "All completed commands successfully deleted"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteCompletedCommands() {
     commandJobService.deleteCompletedCommands();
     return Response.ok().build();
@@ -89,6 +127,15 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @GET
   @Path("/command/{id}/status")
+  @Operation(
+    summary = "Get command status",
+    description = "Retrieves the current status of a specific command job."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command status"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getCommandStatus(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
@@ -99,6 +146,16 @@ public class WebShellResource extends AbstractCommandsResource {
 
   @PUT
   @Path("/command/{id}/status")
+  @Operation(
+    summary = "Update command status",
+    description = "Updates the status of a specific command job. Currently only allows canceling running commands."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Command status successfully updated"),
+    @ApiResponse(responseCode = "404", description = "Command not found"),
+    @ApiResponse(responseCode = "400", description = "Invalid status or command cannot be canceled"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setCommandStatus(@PathParam("id") Integer id, String newStatus) {
     try {
       if(CommandStateDto.Status.CANCELED.toString().equals(newStatus)) {

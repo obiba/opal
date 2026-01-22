@@ -12,6 +12,9 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -61,6 +64,13 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
    * @return
    */
   @GET
+  @Operation(summary = "Get datasource permissions", description = "Retrieves datasource-level permissions for subjects. Datasource permissions control access to data operations, table management, and variable metadata within the project datasource.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("type") SubjectType type) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
@@ -80,6 +90,13 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
    * @return
    */
   @POST
+  @Operation(summary = "Set datasource permission", description = "Grants datasource-level permissions to subjects. Datasource permissions control access to data operations, table management, and variable metadata within the project datasource.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Datasource permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") DatasourcePermissionConverter.Permission permission) {
@@ -97,6 +114,13 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete datasource permissions", description = "Removes all datasource-level permissions from subjects. This revokes access to data operations, table management, and variable metadata within the project datasource.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteDatasourcePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource exists

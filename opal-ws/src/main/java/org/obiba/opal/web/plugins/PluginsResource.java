@@ -12,6 +12,9 @@ package org.obiba.opal.web.plugins;
 
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.web.model.Plugins;
@@ -36,6 +39,15 @@ public class PluginsResource {
 
   @GET
   @NoAuthorization
+  @Operation(
+    summary = "List installed plugins",
+    description = "Retrieves a list of installed plugins with optional filtering by type"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Installed plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginPackagesDto getInstalledPlugins(@QueryParam("type") String type) {
     return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired(),
         pluginsService.getInstalledPlugins().stream()
@@ -45,6 +57,15 @@ public class PluginsResource {
 
   @GET
   @Path("/_updates")
+  @Operation(
+    summary = "List updatable plugins",
+    description = "Retrieves a list of plugins that have available updates with optional filtering by type"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Updatable plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginPackagesDto getUpdatablePlugins(@QueryParam("type") String type) {
     return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired(),
         pluginsService.getUpdatablePlugins().stream()
@@ -54,6 +75,15 @@ public class PluginsResource {
 
   @GET
   @Path("/_available")
+  @Operation(
+    summary = "List available plugins",
+    description = "Retrieves a list of plugins available for installation with optional filtering by type"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Available plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Plugins.PluginPackagesDto getAvailablePlugins(@QueryParam("type") String type) {
     return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired(),
         pluginsService.getAvailablePlugins().stream()
@@ -62,6 +92,15 @@ public class PluginsResource {
   }
 
   @POST
+  @Operation(
+    summary = "Install plugin",
+    description = "Installs a plugin either by name and version or from a file"
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Plugin installation initiated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response installPlugin(@QueryParam("name") String name, @QueryParam("version") String version, @QueryParam("file") String file) {
     if (!Strings.isNullOrEmpty(name)) {
       pluginsService.installPlugin(name, version);

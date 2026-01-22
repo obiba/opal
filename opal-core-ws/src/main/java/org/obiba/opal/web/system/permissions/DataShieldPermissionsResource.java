@@ -11,6 +11,9 @@
 package org.obiba.opal.web.system.permissions;
 
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.security.DataShieldPermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -43,6 +46,14 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @GET
+  @Operation(
+    summary = "Get DataShield system permissions",
+    description = "Retrieves access control list (ACL) permissions for DataShield system, optionally filtered by subject type (USER or GROUP)."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getDataShieldPermissions(@QueryParam("type") SubjectType type) {
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -57,6 +68,15 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @POST
+  @Operation(
+    summary = "Set DataShield system permission",
+    description = "Sets access permissions for users or groups on the DataShield system."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully set permission"),
+    @ApiResponse(responseCode = "400", description = "Invalid permission data"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setDataShieldPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
                                           @QueryParam("principal") List<String> principals,
                                           @QueryParam("permission") DataShieldPermissionConverter.Permission permission) {
@@ -72,6 +92,14 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
    * @return
    */
   @DELETE
+  @Operation(
+    summary = "Delete DataShield system permissions",
+    description = "Removes access permissions for users or groups from the DataShield system."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully deleted permissions"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteDataShieldPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
                                               @QueryParam("principal") List<String> principals) {
     deletePermissions(principals, type);

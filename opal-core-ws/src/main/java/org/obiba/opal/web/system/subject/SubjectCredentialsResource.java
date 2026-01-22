@@ -12,6 +12,9 @@ package org.obiba.opal.web.system.subject;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -38,6 +41,10 @@ public class SubjectCredentialsResource implements BaseResource {
   private SubjectCredentialsService subjectCredentialsService;
 
   @GET
+  @Operation(summary = "Get all subject credentials", description = "Retrieves all subject credentials.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully")
+  })
   public List<Opal.SubjectCredentialsDto> getAll() {
     return Lists.newArrayList(Iterables.transform(subjectCredentialsService.getSubjectCredentials(),
         new Function<SubjectCredentials, Opal.SubjectCredentialsDto>() {
@@ -49,6 +56,12 @@ public class SubjectCredentialsResource implements BaseResource {
   }
 
   @POST
+  @Operation(summary = "Create subject credentials", description = "Creates new subject credentials.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject credentials created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid credentials data provided"),
+      @ApiResponse(responseCode = "409", description = "Subject already exists")
+  })
   public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if (subjectCredentials.getName().trim().isEmpty()) {

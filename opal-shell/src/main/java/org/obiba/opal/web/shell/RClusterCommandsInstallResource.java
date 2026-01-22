@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.shell;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -47,6 +50,15 @@ public class RClusterCommandsInstallResource extends AbstractCommandsResource {
   private CommandRegistry commandRegistry;
 
   @POST
+  @Operation(
+    summary = "Install R package",
+    description = "Installs a specific R package in the specified R cluster."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Package install command successfully launched"),
+    @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response installPackage(@PathParam("cname") String name, Commands.RPackageCommandOptionsDto optionsDto) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();

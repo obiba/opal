@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.service.SubjectTokenService;
@@ -35,6 +38,10 @@ public class SubjectTokenCurrentResource {
 
   @DELETE
   @NoAuthorization
+  @Operation(summary = "Delete current subject token", description = "Deletes a specific token belonging to the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Token deleted successfully")
+  })
   public Response delete() {
     checkSubjectNotToken();
     subjectTokenService.deleteToken(getPrincipal(), name);
@@ -44,6 +51,10 @@ public class SubjectTokenCurrentResource {
   @PUT
   @Path("/_renew")
   @NoAuthorization
+  @Operation(summary = "Renew current subject token", description = "Renews a specific token belonging to the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Token renewed successfully")
+  })
   public Response renew() {
     checkSubjectNotToken();
     subjectTokenService.renewToken(getPrincipal(), name);

@@ -12,6 +12,9 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.DELETE;
@@ -68,6 +71,13 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
    */
   @GET
   @Path("/_all")
+  @Operation(summary = "Get all project permissions", description = "Retrieves all permissions within a project, including project-level, datasource-level, table-level, and variable-level permissions.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "All permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") SubjectType type) {
 
@@ -84,6 +94,13 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
 
   @GET
   @Path("/subjects")
+  @Operation(summary = "Get project subjects", description = "Retrieves all subjects (users and groups) that have permissions within a project.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subjects successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Subject> getSubjects(@QueryParam("type") SubjectType type) {
 
     // make sure project exists
@@ -120,6 +137,13 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
    */
   @GET
   @Path("/project")
+  @Operation(summary = "Get project-level permissions", description = "Retrieves project-level permissions for subjects. Project permissions control access to project management functions like configuration, metadata, and administration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Project permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getProjectPermissions(@QueryParam("type") SubjectType type) {
 
     // make sure project exists
@@ -140,6 +164,13 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @SuppressWarnings("TypeMayBeWeakened")
   @POST
   @Path("/project")
+  @Operation(summary = "Set project-level permission", description = "Grants project-level permissions to subjects. Project permissions control access to project management functions like configuration, metadata, and administration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Project permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") ProjectPermissionConverter.Permission permission) {
@@ -159,6 +190,13 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @SuppressWarnings("TypeMayBeWeakened")
   @DELETE
   @Path("/project")
+  @Operation(summary = "Delete project-level permissions", description = "Removes all project-level permissions from subjects. This revokes access to project management functions like configuration, metadata, and administration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Project permissions successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure project exists

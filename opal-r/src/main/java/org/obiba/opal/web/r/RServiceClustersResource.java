@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.PathParam;
@@ -36,6 +39,14 @@ public class RServiceClustersResource {
   private RServerManagerService rServerManagerService;
 
   @GET
+  @Operation(
+    summary = "Get R server clusters",
+    description = "Retrieves a list of all configured R server clusters, sorted alphabetically by name."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server clusters"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RServerClusterDto> getClusters() {
     return rServerManagerService.getRServerClusters().stream()
         .map(Dtos::asDto)
@@ -45,6 +56,14 @@ public class RServiceClustersResource {
 
   @DELETE
   @Path("/cache")
+  @Operation(
+    summary = "Evict clusters cache",
+    description = "Clears the R server clusters cache to force refresh of cluster information."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Cache successfully evicted"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response evictCache() {
     rServerManagerService.evictCache();
     return Response.ok().build();

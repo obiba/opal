@@ -10,6 +10,9 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -53,6 +56,12 @@ public class ValueTableContingencyResource {
 
   @GET
   @Transactional(readOnly = true)
+  @Operation(summary = "Get contingency table for table variables", description = "Generate contingency table for two variables within a specific datasource table. Both variables must belong to the same table.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated"),
+      @ApiResponse(responseCode = "400", description = "Invalid or missing variable parameters"),
+      @ApiResponse(responseCode = "404", description = "Table not found")
+  })
   public Response getFacets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) {
     if (Strings.isNullOrEmpty(crossVar0) || Strings.isNullOrEmpty(crossVar1))
       return Response.status(Response.Status.BAD_REQUEST).build();

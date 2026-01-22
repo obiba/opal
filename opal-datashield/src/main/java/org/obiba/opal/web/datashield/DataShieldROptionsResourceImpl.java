@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.datashield.core.DSOption;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
@@ -20,6 +23,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -38,6 +43,16 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
   @Autowired
   private DataShieldProfileService datashieldProfileService;
 
+  @GET
+  @Operation(
+    summary = "Get DataSHIELD R options",
+    description = "Retrieves all R options configured for the specified DataSHIELD profile, including option names and values."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R options"),
+    @ApiResponse(responseCode = "404", description = "DataSHIELD profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   @Override
   public List<DataShield.DataShieldROptionDto> getDataShieldROptions(String profile) {
     List<DataShield.DataShieldROptionDto> options = new ArrayList<>();
@@ -53,6 +68,16 @@ public class DataShieldROptionsResourceImpl implements DataShieldROptionsResourc
     return options;
   }
 
+  @DELETE
+  @Operation(
+    summary = "Delete DataSHIELD R options",
+    description = "Removes specified R options from the DataSHIELD profile configuration. If no names are provided, all options are removed."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully deleted R options"),
+    @ApiResponse(responseCode = "404", description = "DataSHIELD profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   @Override
   public Response deleteDataShieldROptions(List<String> names, String profile) {
     DataShieldProfile config = getDataShieldProfile(profile);

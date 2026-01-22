@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.core.Response;
@@ -21,8 +24,20 @@ public interface BookmarkResource {
   void setPath(String path);
 
   @GET
+  @Operation(summary = "Get bookmark", description = "Retrieve a specific bookmark for the user")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Bookmark retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Bookmark not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response get();
 
   @DELETE
+  @Operation(summary = "Delete bookmark", description = "Delete a specific bookmark")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Bookmark deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Bookmark not found"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   Response delete();
 }

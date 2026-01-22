@@ -11,6 +11,9 @@
 package org.obiba.opal.web.project.resource;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
@@ -51,6 +54,15 @@ public class ProjectResourceReferencesResource implements BaseResource {
   }
 
   @GET
+  @Operation(
+    summary = "List project resource references",
+    description = "Retrieves all resource references within a project, sorted by name. In safe mode (default), edit permissions are not checked for better performance."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Resource references list successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project"),
+    @ApiResponse(responseCode = "404", description = "Project not found")
+  })
   public List<Projects.ResourceReferenceDto> list(@PathParam("name") String name, @QueryParam("safe") @DefaultValue("true") Boolean safe) {
     checkProject(name);
     return resourceReferenceService.getResourceReferences(name).stream()
@@ -60,6 +72,17 @@ public class ProjectResourceReferencesResource implements BaseResource {
   }
 
   @POST
+  @Operation(
+    summary = "Create project resource reference",
+    description = "Creates a new resource reference within a project. The reference defines a link to an external resource that can be used within the project, such as R packages, data files, or other computational resources."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Resource reference successfully created"),
+    @ApiResponse(responseCode = "400", description = "Invalid resource reference data or project mismatch"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to create resource references"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "409", description = "Resource reference with same name already exists")
+  })
   public Response createResourceReference(@Context UriInfo uriInfo, @PathParam("name") String name, Projects.ResourceReferenceDto referenceDto) {
     if (!name.equals(referenceDto.getProject()))
       throw new IllegalArgumentException("Expected project name: " + name);
@@ -72,6 +95,15 @@ public class ProjectResourceReferencesResource implements BaseResource {
   }
 
   @DELETE
+  @Operation(
+    summary = "Delete project resource references",
+    description = "Removes resource references from a project. Can delete specific references by name or all references if no names are specified. This only removes the references, not the actual resources."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Resource references successfully deleted"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete resource references"),
+    @ApiResponse(responseCode = "404", description = "Project not found")
+  })
   public Response deleteAll(@PathParam("name") String name, @QueryParam("names") List<String> names) {
     checkProject(name);
     if (names != null && !names.isEmpty())

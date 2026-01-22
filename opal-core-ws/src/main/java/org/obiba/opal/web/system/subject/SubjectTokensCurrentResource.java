@@ -10,6 +10,9 @@
 package org.obiba.opal.web.system.subject;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -40,6 +43,10 @@ public class SubjectTokensCurrentResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get current subject tokens", description = "Retrieves all tokens belonging to the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Subject tokens retrieved successfully")
+  })
   public List<Opal.SubjectTokenDto> getAll() {
     checkSubjectNotToken();
     return subjectTokenService.getTokens(getPrincipal()).stream()
@@ -49,6 +56,11 @@ public class SubjectTokensCurrentResource {
 
   @POST
   @NoAuthorization
+  @Operation(summary = "Create token for current subject", description = "Creates a new token for the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "Token created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid token data provided")
+  })
   public Response create(Opal.SubjectTokenDto token) {
     checkSubjectNotToken();
     if (Strings.isNullOrEmpty(token.getName()))
@@ -66,6 +78,10 @@ public class SubjectTokensCurrentResource {
 
   @DELETE
   @NoAuthorization
+  @Operation(summary = "Delete all current subject tokens", description = "Deletes all tokens belonging to the currently authenticated subject.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "All tokens deleted successfully")
+  })
   public Response deleteAll() {
     checkSubjectNotToken();
     subjectTokenService.deleteTokens(getPrincipal());

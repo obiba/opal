@@ -12,6 +12,9 @@ package org.obiba.opal.web.security;
 import java.util.Collection;
 import java.util.HashSet;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -43,6 +46,15 @@ public class SubjectCredentialsGroupAuthorizationResource {
   private String subject;
 
   @GET
+  @Operation(
+      summary = "Get authorization permissions for a subject",
+      description = "Retrieves authorization permissions for a given subject, filtered by domain."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
+      @ApiResponse(responseCode = "500", description = "Error querying authorization data")
+  })
   public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") SubjectType type) {
 

@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
 import jakarta.ws.rs.GET;
@@ -24,6 +27,11 @@ public interface VariableEntityTablesResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get variable entity tables", description = "Retrieve tables containing a specific variable entity")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully"),
+    @ApiResponse(responseCode = "500", description = "Server error")
+  })
   List<Magma.TableDto> getTables();
 
   List<Magma.TableDto> getTables(int limit);

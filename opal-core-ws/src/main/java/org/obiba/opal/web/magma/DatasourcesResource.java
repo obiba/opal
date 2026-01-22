@@ -11,6 +11,9 @@ package org.obiba.opal.web.magma;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -51,6 +54,14 @@ public class DatasourcesResource {
   private SQLService sqlService;
 
   @GET
+  @Operation(
+    summary = "Get all datasources",
+    description = "Retrieves a list of all available datasources with their metadata and access links."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources list"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Magma.DatasourceDto> getDatasources() {
     List<Magma.DatasourceDto> datasources = Lists.newArrayList();
     for (Datasource from : MagmaEngine.get().getDatasources()) {
@@ -64,6 +75,14 @@ public class DatasourcesResource {
 
   @GET
   @Path("/tables")
+  @Operation(
+    summary = "Get all tables from all datasources",
+    description = "Retrieves a consolidated list of all tables from all datasources, optionally filtered by entity type and indexed status."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved tables list"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexed) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     for (Datasource datasource : MagmaEngine.get().getDatasources()) {
@@ -76,6 +95,14 @@ public class DatasourcesResource {
 
   @GET
   @Path("/entity-types")
+  @Operation(
+    summary = "Get all entity types",
+    description = "Retrieves a summary of all entity types available across all datasources with their table counts."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity types summary"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<Magma.VariableEntitySummaryDto> getEntityTypes() {
     Map<String, Integer> entityTypes = Maps.newHashMap();
     MagmaEngine.get().getDatasources()
@@ -91,6 +118,14 @@ public class DatasourcesResource {
 
   @GET
   @Path("/count")
+  @Operation(
+    summary = "Get datasources count",
+    description = "Retrieves the total number of available datasources."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources count"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response getDatasourcesCount() {
     return Response.ok().entity(String.valueOf(MagmaEngine.get().getDatasources().size())).build();
 
@@ -100,6 +135,15 @@ public class DatasourcesResource {
   @Path("/_sql")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
+  @Operation(
+    summary = "Execute cross-datasource SQL and return JSON",
+    description = "Executes a SQL query across all datasources and returns results in JSON format."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToJSON(String query, @QueryParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(null, query, idName, SQLService.Output.JSON);
     StreamingOutput stream = os -> {
@@ -115,6 +159,15 @@ public class DatasourcesResource {
   @Path("/_sql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/csv")
+  @Operation(
+    summary = "Execute cross-datasource SQL and return CSV",
+    description = "Executes a SQL query across all datasources and returns results in CSV format."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToCSV(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(null, query, idName, SQLService.Output.CSV);
     StreamingOutput stream = os -> {
@@ -130,6 +183,15 @@ public class DatasourcesResource {
   @Path("/_rsql")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("application/x-rdata")
+  @Operation(
+    summary = "Execute cross-datasource SQL and return RDS",
+    description = "Executes a SQL query across all datasources and returns results in R data format for use in R."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response executeSQLToRDS(@FormParam("query") String query, @FormParam("id") @DefaultValue(SQLService.DEFAULT_ID_COLUMN) String idName) {
     final File output = sqlService.execute(null, query, idName, SQLService.Output.RDS);
     StreamingOutput stream = os -> {

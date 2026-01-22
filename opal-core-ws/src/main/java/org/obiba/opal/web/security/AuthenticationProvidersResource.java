@@ -11,9 +11,13 @@
 package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.oidc.OIDCConfigurationProvider;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +43,14 @@ public class AuthenticationProvidersResource {
 
   @GET
   @NotAuthenticated
+  @Operation(
+    summary = "List authentication providers",
+    description = "Retrieves all available authentication providers configured in the system. Filters providers based on the current request's entry point to ensure compatibility with the callback URLs."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Authentication providers successfully retrieved"),
+    @ApiResponse(responseCode = "500", description = "Error retrieving authentication provider configurations")
+  })
   public List<Opal.AuthProviderDto> list(@Context HttpServletRequest request) {
     String entryPoint = request.getScheme() + "://" + request.getHeader("Host");
     return authConfigurationProvider.getConfigurations().stream()

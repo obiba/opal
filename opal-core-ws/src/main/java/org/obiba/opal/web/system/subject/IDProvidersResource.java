@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.system.subject;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.obiba.opal.web.model.Opal;
@@ -43,6 +46,10 @@ public class IDProvidersResource {
   }
 
   @GET
+  @Operation(summary = "Get all ID providers", description = "Retrieves all identity provider configurations.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "ID providers retrieved successfully")
+  })
   public List<Opal.IDProviderDto> list() {
     return idProvidersService.getConfigurations().stream()
         .map(Dtos::asDto)
@@ -50,6 +57,11 @@ public class IDProvidersResource {
   }
 
   @POST
+  @Operation(summary = "Create ID provider", description = "Creates a new identity provider configuration.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "ID provider created successfully"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response createOrUpdate(@Context UriInfo uriInfo, Opal.IDProviderDto dto) {
     try {
       idProvidersService.ensureUniqueConfiguration(dto.getName());

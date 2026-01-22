@@ -36,6 +36,9 @@ import jakarta.ws.rs.core.Response;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.KeyStoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
@@ -65,6 +68,14 @@ public class KeyStoreResource implements BaseResource {
   private String publicUrl;
 
   @GET
+  @Operation(
+    summary = "Get keystore entries",
+    description = "Retrieves all key entries from the system keystore including their aliases, types, and certificates."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved keystore entries"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
+  })
   public List<Opal.KeyDto> getKeyEntries() throws KeyStoreException, IOException {
     List<Opal.KeyDto> keyEntries = Lists.newArrayList();
     if(keyStore != null) {
@@ -82,6 +93,15 @@ public class KeyStoreResource implements BaseResource {
   }
 
   @POST
+  @Operation(
+    summary = "Create keystore entry",
+    description = "Creates a new key entry in the system keystore. Supports both key pairs and certificate imports."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Key entry successfully created"),
+    @ApiResponse(responseCode = "400", description = "Key entry already exists or invalid key data"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore failure")
+  })
   public Response createKeyEntry(Opal.KeyForm keyForm) {
 
     if(keyStore.aliasExists(keyForm.getAlias())) {
@@ -101,6 +121,16 @@ public class KeyStoreResource implements BaseResource {
   }
 
   @PUT
+  @Operation(
+    summary = "Update keystore entry",
+    description = "Updates an existing key entry in the system keystore. Supports both key pairs and certificate updates."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Key entry successfully updated"),
+    @ApiResponse(responseCode = "400", description = "Invalid key data"),
+    @ApiResponse(responseCode = "404", description = "Key entry not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore failure")
+  })
   public Response updateKeyEntry(Opal.KeyForm keyForm) {
 
     ResponseBuilder responseBuilder = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
@@ -116,6 +146,15 @@ public class KeyStoreResource implements BaseResource {
 
   @GET
   @Path("/{alias}")
+  @Operation(
+    summary = "Get keystore entry",
+    description = "Retrieves a specific key entry from the system keystore by alias, including certificate details."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved key entry"),
+    @ApiResponse(responseCode = "404", description = "Key entry not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
+  })
   public Response getKeyEntry(@PathParam("alias") String alias) throws IOException, KeyStoreException {
     if(!keyStore.aliasExists(alias)) return Response.status(Status.NOT_FOUND).build();
 
@@ -129,6 +168,15 @@ public class KeyStoreResource implements BaseResource {
 
   @DELETE
   @Path("/{alias}")
+  @Operation(
+    summary = "Delete keystore entry",
+    description = "Removes a key entry from the system keystore by alias."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Key entry successfully deleted"),
+    @ApiResponse(responseCode = "404", description = "Key entry not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore failure")
+  })
   public Response deleteKeyEntry(@PathParam("alias") String alias) {
     if(!keyStore.aliasExists(alias)) {
       return Response.status(Status.NOT_FOUND).build();
@@ -141,6 +189,15 @@ public class KeyStoreResource implements BaseResource {
 
   @GET
   @Path("/{alias}/certificate")
+  @Operation(
+    summary = "Get keystore certificate",
+    description = "Downloads the PEM certificate for a specific key entry from the system keystore."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully downloaded certificate"),
+    @ApiResponse(responseCode = "404", description = "Key entry not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
+  })
   public Response getCertificate(@PathParam("alias") String alias) throws IOException, KeyStoreException {
     return Response.ok(getPEMCertificate(keyStore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition",
         "attachment; filename=\"" + keyStore.getName() + "-" + alias + "-certificate.pem\"").build();

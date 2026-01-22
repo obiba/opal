@@ -14,6 +14,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import org.apache.shiro.SecurityUtils;
@@ -88,6 +90,9 @@ public class SystemResource {
   @NoAuthorization
   @Path("/version")
   @Operation(summary = "Get the current Opal version", description = "Returns the current Opal version.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Opal version retrieved successfully")
+  })
   public String getVersion() {
     return opalVersionProvider.getVersion().toString();
   }

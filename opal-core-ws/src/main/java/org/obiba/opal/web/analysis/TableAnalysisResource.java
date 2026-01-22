@@ -11,6 +11,9 @@
 package org.obiba.opal.web.analysis;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.ws.rs.*;
@@ -60,12 +63,28 @@ public class TableAnalysisResource {
 
   @OPTIONS
   @Path("/analyses")
+  @Operation(
+    summary = "Get table analyses options",
+    description = "Returns the allowed HTTP methods for the table analyses endpoint, used for CORS and capability checking."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Options request completed successfully")
+  })
   public Response getAnalysesOptions() {
     return Response.ok().build();
   }
 
   @GET
   @Path("/analyses")
+  @Operation(
+    summary = "Get table analyses",
+    description = "Retrieves all analyses associated with a specific data table within a project. Includes analysis metadata, configuration, and the most recent result for each analysis."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Table analyses successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access table analyses"),
+    @ApiResponse(responseCode = "404", description = "Project or table not found")
+  })
   public Projects.OpalAnalysesDto getProjectTableAnalyses() {
     return Projects.OpalAnalysesDto.newBuilder()
       .addAllAnalyses(
@@ -82,6 +101,15 @@ public class TableAnalysisResource {
 
   @GET
   @Path("/analysis/{analysisName}")
+  @Operation(
+    summary = "Get table analysis",
+    description = "Retrieves a specific analysis within a table, including analysis configuration and optionally all historical results. Can limit results to only the most recent result."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis"),
+    @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
+  })
   public OpalAnalysisDto getAnalysis(@PathParam("analysisName") String analysisName,
                                      @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
 
@@ -99,6 +127,15 @@ public class TableAnalysisResource {
 
   @DELETE
   @Path("/analysis/{analysisName}")
+  @Operation(
+    summary = "Delete table analysis",
+    description = "Permanently removes a specific analysis and all its associated results from the table. This action cannot be undone."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis successfully deleted"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete analysis"),
+    @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
+  })
   public Response deleteAnalysis(@PathParam("analysisName") String analysisName) {
     analysisService.delete(getAnalysis(analysisName));
     return Response.ok().build();
@@ -106,6 +143,15 @@ public class TableAnalysisResource {
 
   @GET
   @Path("/analysis/{analysisName}/results")
+  @Operation(
+    summary = "Get analysis results",
+    description = "Retrieves all results for a specific analysis within a table. Can be limited to only the most recent result for improved performance."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis results successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis results"),
+    @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
+  })
   public OpalAnalysisResultsDto getAnalysisResults(@PathParam("analysisName") String analysisName,
                                                    @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
     return OpalAnalysisResultsDto.newBuilder()
@@ -118,12 +164,30 @@ public class TableAnalysisResource {
 
   @GET
   @Path("/analysis/{analysisName}/result/{rid}")
+  @Operation(
+    summary = "Get analysis result",
+    description = "Retrieves a specific analysis result by its unique identifier. Includes the complete result data, metadata, and execution information."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully retrieved"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis result"),
+    @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found")
+  })
   public OpalAnalysisResultDto getAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
     return Dtos.asDto(analysisResultService.getAnalysisResult(analysisName, rid)).build();
   }
 
   @DELETE
   @Path("/analysis/{analysisName}/result/{rid}")
+  @Operation(
+    summary = "Delete analysis result",
+    description = "Removes a specific analysis result from an analysis. Returns updated list of remaining results for the analysis."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully deleted, returns updated results list"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete analysis result"),
+    @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found")
+  })
   public OpalAnalysisResultsDto deleteAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
     analysisResultService.delete(analysisResultService.getAnalysisResult(analysisName, rid));
     return getAnalysisResults(analysisName, false);
@@ -131,6 +195,16 @@ public class TableAnalysisResource {
 
   @GET
   @Path("/analysis/{analysisName}/result/{rid}/_export")
+  @Operation(
+    summary = "Export analysis result",
+    description = "Exports a specific analysis result as a ZIP archive containing all result files, data, and metadata. Useful for archiving or sharing analysis results."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to export analysis result"),
+    @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found"),
+    @ApiResponse(responseCode = "500", description = "Error during export process")
+  })
   public Response exportAnalysisResult(@PathParam("analysisName") String analysisName, @PathParam("rid") String rid) {
     StreamingOutput outputStream =
         stream -> analysisExportService.exportProjectAnalysisResult(datasourceName, tableName, analysisName, rid, new BufferedOutputStream(stream));
@@ -141,6 +215,16 @@ public class TableAnalysisResource {
   @GET
   @Path("/analyses/_export")
   @Produces("application/zip")
+  @Operation(
+    summary = "Export all table analyses",
+    description = "Exports all analyses and their results from a specific table as a ZIP archive. Can include all historical results or only successful results based on the 'all' parameter."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "All table analyses successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to export table analyses"),
+    @ApiResponse(responseCode = "404", description = "Project or table not found"),
+    @ApiResponse(responseCode = "500", description = "Error during export process")
+  })
   public Response exportTableAnalysis(@QueryParam("all") @DefaultValue("false") boolean all) {
     StreamingOutput outputStream =
       stream -> analysisExportService.exportProjectTableAnalyses(
@@ -155,6 +239,16 @@ public class TableAnalysisResource {
   @GET
   @Path("/analysis/{analysisName}/_export")
   @Produces("application/zip")
+  @Operation(
+    summary = "Export table analysis",
+    description = "Exports a specific analysis and all its results from a table as a ZIP archive. Can include all historical results or only successful results based on the 'all' parameter."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Table analysis successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to export analysis"),
+    @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found"),
+    @ApiResponse(responseCode = "500", description = "Error during export process")
+  })
   public Response exportTableAnalysis(@PathParam("analysisName") String analysisName,
                                       @QueryParam("all") @DefaultValue("false") boolean all) {
     getAnalysis(analysisName);
@@ -168,6 +262,16 @@ public class TableAnalysisResource {
   @GET
   @Path("/analysis/{analysisName}/result/{resultId}/_report")
   @Produces("application/octet-stream")
+  @Operation(
+    summary = "Export analysis report",
+    description = "Exports the generated report for a specific analysis result. The report format depends on the analysis type and can be PDF, HTML, or other formats. Returns the report as a downloadable file."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Analysis report successfully exported"),
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis report"),
+    @ApiResponse(responseCode = "404", description = "Project, table, analysis, result, or report not found"),
+    @ApiResponse(responseCode = "500", description = "Error during report export")
+  })
   public Response exportReport(@PathParam("analysisName") String analysisName, @PathParam("resultId") String resultId) {
     StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysisResultReport(datasourceName, tableName, analysisName, resultId, new BufferedOutputStream(stream));
 

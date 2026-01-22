@@ -11,6 +11,9 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
@@ -44,6 +47,15 @@ public class RServiceActivityResource {
   }
 
   @GET
+  @Operation(
+    summary = "Get R session activities",
+    description = "Retrieves a list of R session activities filtered by context, user, profile, and date range."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session activities"),
+    @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RSessionActivityDto> getActivities(@QueryParam("context") String context,
                                                        @QueryParam("user") String user, @QueryParam("profile") String profile,
                                                        @QueryParam("from") String from, @QueryParam("to") String to) {
@@ -55,6 +67,15 @@ public class RServiceActivityResource {
 
   @GET
   @Path("_summary")
+  @Operation(
+    summary = "Get R activity summaries",
+    description = "Retrieves summarized R activity data filtered by context, user, profile, and date range."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R activity summaries"),
+    @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RActivitySummaryDto> getActivitySummaries(@QueryParam("context") String context,
                                                               @QueryParam("user") String user, @QueryParam("profile") String profile,
                                                               @QueryParam("from") String from, @QueryParam("to") String to) {

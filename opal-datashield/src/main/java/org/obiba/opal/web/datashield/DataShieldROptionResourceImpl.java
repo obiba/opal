@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.datashield;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -19,6 +22,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 
@@ -32,6 +38,16 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   @Autowired
   private DataShieldProfileService datashieldProfileService;
 
+  @DELETE
+  @Operation(
+    summary = "Delete DataSHIELD R option",
+    description = "Removes a specific R option from the DataSHIELD profile configuration by option name."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully deleted R option"),
+    @ApiResponse(responseCode = "404", description = "DataSHIELD profile not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   @Override
   public Response deleteDataShieldROption(String name, String profile) {
     DataShieldProfile config = getDataShieldProfile(profile);
@@ -40,6 +56,17 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
     return Response.ok().build();
   }
 
+  @PUT
+  @Operation(
+    summary = "Add or update DataSHIELD R option",
+    description = "Adds a new R option to the DataSHIELD profile or updates an existing one with the specified name and value."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully added or updated R option"),
+    @ApiResponse(responseCode = "404", description = "DataSHIELD profile not found"),
+    @ApiResponse(responseCode = "400", description = "Invalid option data provided"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   @Override
   public Response addOrUpdateDataShieldROption(String profile, final DataShield.DataShieldROptionDto dto) {
     DataShieldProfile config = getDataShieldProfile(profile);
@@ -48,6 +75,16 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
     return Response.ok().build();
   }
 
+  @GET
+  @Operation(
+    summary = "Get DataSHIELD R option",
+    description = "Retrieves a specific R option from the DataSHIELD profile configuration by option name."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R option"),
+    @ApiResponse(responseCode = "404", description = "DataSHIELD profile or option not found"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   @Override
   public Response getDataShieldROption(String name, String profile) {
     DataShieldProfile config = getDataShieldProfile(profile);

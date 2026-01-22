@@ -12,6 +12,9 @@ package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -66,6 +69,13 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @GET
+  @Operation(summary = "Get variable permission", description = "Retrieves variable-level permissions for a specific variable within a table. Variable permissions control access to individual variable metadata and data.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectType type) {
 
     // make sure datasource, table and variable exists
@@ -87,6 +97,13 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @POST
+  @Operation(summary = "Set variable permission", description = "Grants variable-level permissions to subjects for a specific variable within a table. Variable permissions control access to individual variable metadata and data.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully set"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermissionConverter.Permission permission) {
 
@@ -104,6 +121,13 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
    * @return
    */
   @DELETE
+  @Operation(summary = "Delete variable permission", description = "Removes all variable-level permissions from subjects for a specific variable within a table. This revokes access to individual variable metadata and data.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
+      @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response deleteTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource, table and variable exists

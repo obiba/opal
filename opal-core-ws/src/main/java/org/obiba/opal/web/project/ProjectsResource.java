@@ -10,6 +10,9 @@
 package org.obiba.opal.web.project;
 
 import com.google.common.collect.Lists;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -49,6 +52,11 @@ public class ProjectsResource implements BaseResource {
 
   @GET
   @NoAuthorization
+  @Operation(summary = "Get all projects", description = "Retrieves a list of all accessible projects. Can return full details or digest format.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+    @ApiResponse(responseCode = "403", description = "Access denied to some or all projects")
+  })
   public List<Projects.ProjectDto> getProjects(@QueryParam("digest") @DefaultValue("false") boolean digest) {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for (Project project : projectService.getProjects()) {
@@ -65,6 +73,13 @@ public class ProjectsResource implements BaseResource {
   }
 
   @POST
+  @Operation(summary = "Create project", description = "Creates a new project with the specified configuration and metadata.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Project created successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid project data or project already exists"),
+    @ApiResponse(responseCode = "403", description = "Access denied to create projects"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
     Project project = Dtos.fromDto(projectFactoryDto);
     // verify project does not exists

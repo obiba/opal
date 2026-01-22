@@ -18,6 +18,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.magma.*;
 import org.obiba.magma.support.Disposables;
@@ -80,6 +83,14 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   }
 
   @GET
+  @Operation(
+    summary = "List identifiers mappings",
+    description = "Retrieves all identifiers mappings in the system, with optional filtering by entity types. Returns mapping names and the entity types they support."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Identifiers mappings successfully retrieved"),
+    @ApiResponse(responseCode = "500", description = "Error accessing identifiers database")
+  })
   public List<IdentifiersMappingDto> getIdentifiersMappings(final @QueryParam("type") List<String> entityTypes) {
     Map<String, List<String>> idsMappings = getIdentifiersMappings();
     List<IdentifiersMappingDto> dtos = Lists.newArrayList();
@@ -112,6 +123,15 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   @POST
   @Consumes("text/plain")
   @Path("/entities/_import")
+  @Operation(
+    summary = "Import system identifiers",
+    description = "Imports system identifiers from plain text (one per line) into the corresponding identifiers table. New private identifiers will be automatically generated for imported system identifiers."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "System identifiers successfully imported"),
+    @ApiResponse(responseCode = "400", description = "Missing entity type, no identifiers, or identifiers table not found"),
+    @ApiResponse(responseCode = "500", description = "Error during import process")
+  })
   public Response importIdentifiers(@QueryParam("type") String entityType, String identifiers) {
     if (entityType == null || !identifiersTableService.hasIdentifiersTable(entityType))
       throw new InvalidRequestException("No such identifiers table for entity type: " + entityType);
@@ -143,6 +163,15 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
    */
   @POST
   @Path("/entities/_import")
+  @Operation(
+    summary = "Import identifiers from datasource",
+    description = "Creates a temporary datasource from the provided configuration and imports all identifiers into the corresponding identifiers tables. Supports various datasource types and configurations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported from datasource"),
+    @ApiResponse(responseCode = "400", description = "Invalid datasource configuration or no identifiers database defined"),
+    @ApiResponse(responseCode = "500", description = "Error during datasource creation or import process")
+  })
   public Response importIdentifiers(@NotNull Magma.DatasourceFactoryDto datasourceFactoryDto) {
     if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     if (datasourceFactoryDto == null) throw new NoSuchDatasourceException("");
@@ -168,6 +197,16 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
    */
   @POST
   @Path("/entities/_sync")
+  @Operation(
+    summary = "Sync identifiers from datasources",
+    description = "Synchronizes identifiers from existing datasources into the identifiers database. Can sync from a specific datasource, specific tables, or all datasources. Only processes entity types supported by the identifiers datasource."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully synchronized from datasources"),
+    @ApiResponse(responseCode = "400", description = "No identifiers database defined or invalid datasource/table specified"),
+    @ApiResponse(responseCode = "404", description = "Specified datasource or table not found"),
+    @ApiResponse(responseCode = "500", description = "Error during synchronization process")
+  })
   public Response importIdentifiers(@QueryParam("datasource") String datasource,
                                     @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
     if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
@@ -202,6 +241,16 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
    */
   @GET
   @Path("/entities/_sync")
+  @Operation(
+    summary = "Get identifiers sync status",
+    description = "Reports the number of entities that can be synchronized from data datasources but are not yet in the identifiers database. Returns sync status for each table including total entity count and count of entities needing import."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Sync status successfully retrieved"),
+    @ApiResponse(responseCode = "400", description = "No identifiers database defined or missing datasource parameter"),
+    @ApiResponse(responseCode = "404", description = "Specified datasource or table not found"),
+    @ApiResponse(responseCode = "500", description = "Error during sync status calculation")
+  })
   public List<Magma.TableIdentifiersSync> getIdentifiersToBeImported(
       @NotNull @QueryParam("datasource") String datasource,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
@@ -243,6 +292,17 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   @Path("/_export")
   @Produces("text/csv")
   @AuthenticatedByCookie
+  @Operation(
+    summary = "Export all identifiers as CSV",
+    description = "Exports all identifier mappings for a specific entity type as a CSV file. Includes system identifiers and all corresponding private identifier mappings for the specified entity type."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "All identifiers successfully exported as CSV file"),
+    @ApiResponse(responseCode = "400", description = "No identifiers database defined or missing entity type"),
+    @ApiResponse(responseCode = "401", description = "Authentication required"),
+    @ApiResponse(responseCode = "404", description = "Entity type not found in identifiers database"),
+    @ApiResponse(responseCode = "500", description = "Error during export process")
+  })
   public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
     if (!getIdentifiersTableService().hasDatasource()) throw new InvalidRequestException("No identifiers database is defined");
     ensureEntityType(entityType);

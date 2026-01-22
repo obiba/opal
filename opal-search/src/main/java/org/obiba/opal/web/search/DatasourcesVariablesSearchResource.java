@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -46,6 +49,12 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @GET
   @Path("_search")
   @Transactional(readOnly = true)
+  @Operation(summary = "Search variables across datasources", description = "Search for variables across all datasources in the system. Supports complex queries, pagination, sorting, field selection, and faceted search.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Search results successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid search query or parameters"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response search(@QueryParam("query") String query, @QueryParam("limit") @DefaultValue("10") int limit,
                          @QueryParam("lastDoc") String lastDoc, @QueryParam("sort") List<String> sorts, @QueryParam("order") String order,
                          @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields,
@@ -77,6 +86,12 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @GET
   @Path("_count")
   @Transactional(readOnly = true)
+  @Operation(summary = "Count variables across datasources", description = "Count variables matching search criteria across all datasources.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Variable count successfully retrieved"),
+      @ApiResponse(responseCode = "400", description = "Invalid search query or parameters"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response count(@QueryParam("query") String query) {
 
     try {

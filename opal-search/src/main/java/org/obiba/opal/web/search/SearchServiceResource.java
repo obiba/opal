@@ -16,6 +16,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -46,6 +49,10 @@ public class SearchServiceResource extends IndexResource {
 
   @GET
   @Transactional(readOnly = true)
+  @Operation(summary = "Get search indices status", description = "Retrieve the indexation status of all tables across all datasources. Returns information about whether tables are indexed and up-to-date.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Indices status successfully retrieved")
+  })
   public List<Opal.TableIndexStatusDto> getIndices() {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
@@ -68,6 +75,11 @@ public class SearchServiceResource extends IndexResource {
   }
 
   @DELETE
+  @Operation(summary = "Drop search indices", description = "Delete search indices for values and/or variables. Use 'type' parameter to specify which indices to drop (values, variables, or both).")
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Indices successfully deleted"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response dropIndices(@QueryParam("type") String type) {
     if (opalSearchService.isRunning()) {
       if (Strings.isNullOrEmpty(type) || "values".equalsIgnoreCase(type))
@@ -80,6 +92,10 @@ public class SearchServiceResource extends IndexResource {
 
   @PUT
   @Path("/cfg/enabled")
+  @Operation(summary = "Enable search indexing", description = "Enable the search service indexing functionality.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Indexing successfully enabled")
+  })
   public Response enableIndexing() {
     indexManagerConfigurationService.setEnabled(true);
     return Response.ok().build();
@@ -87,6 +103,11 @@ public class SearchServiceResource extends IndexResource {
 
   @GET
   @Path("/cfg/enabled")
+  @Operation(summary = "Check if indexing is enabled", description = "Check whether search indexing is currently enabled and available.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Indexing status retrieved"),
+      @ApiResponse(responseCode = "503", description = "Search service unavailable")
+  })
   public Response isEnableIndexing() {
     return opalSearchService.isRunning() && opalSearchService.getValuesIndexManager().isEnabled()
         ? Response.ok().build()
@@ -95,6 +116,10 @@ public class SearchServiceResource extends IndexResource {
 
   @DELETE
   @Path("/cfg/enabled")
+  @Operation(summary = "Disable search indexing", description = "Disable the search service indexing functionality.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Indexing successfully disabled")
+  })
   public Response disableIndexing() {
     indexManagerConfigurationService.setEnabled(false);
     return Response.ok().build();

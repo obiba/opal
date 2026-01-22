@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.r;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.web.model.OpalR;
@@ -33,6 +36,14 @@ public class RProfilesResource {
   private RServerManagerService rServerManagerService;
 
   @GET
+  @Operation(
+    summary = "Get R profiles",
+    description = "Retrieves a list of R profiles, optionally filtered by enabled status. Profiles represent R server configurations."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R profiles"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
   public List<OpalR.RProfileDto> getProfiles(@QueryParam("enabled") Boolean enabled) {
     return rServerManagerService.getRServerClusters().stream()
         .map(Dtos::asProfileDto)
