@@ -19,3 +19,4 @@ opal-gwt-client/war/org.obiba.opal.web.gwt.*
 opal_home
 opal_home.*/
 .settings
+.serena/
