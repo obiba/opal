@@ -804,7 +804,7 @@ export default {
     export_id_mappings_hint: "Sélectionnez une correspondance des identifiants des participants à utiliser lors de l'exportation de la correspondance des ID des échantillons.",
   },
   stats: {
-    min: 'Minimun',
+    min: 'Minimum',
     max: 'Maximum',
     mean: 'Moyenne',
     stdDeviation: 'Déviation standard',

@@ -804,7 +804,7 @@ export default {
     export_id_mappings_hint: 'Select a mapping of participant identifiers to be used when exporting sample participant ID correspondence.',
   },
   stats: {
-    min: 'Minimun',
+    min: 'Minimum',
     max: 'Maximum',
     mean: 'Mean',
     stdDeviation: 'Standard deviation',
