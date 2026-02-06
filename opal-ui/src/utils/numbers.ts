@@ -5,8 +5,8 @@ export function toMaxDecimals(x: number | null, n: number): number | null {
   return +x.toFixed(n);
 }
 
-export function formatNumber(x: number | null, locale: string | undefined = undefined): string {
-  if (x === null) {
+export function formatNumber(x: number | null | undefined, locale: string | undefined = undefined): string {
+  if (x === null || x === undefined) {
     return '';
   }
   if (Number.isInteger(x)) {
