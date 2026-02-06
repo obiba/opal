@@ -1,8 +1,6 @@
 package org.obiba.opal.r.service.tasks;
 
-import com.google.common.base.Strings;
 import org.obiba.opal.r.service.RServerSession;
-import org.obiba.opal.web.r.RSessionsResourceImpl;
 
 public class RSessionStateWaiter implements Runnable {
 
