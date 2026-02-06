@@ -21,6 +21,7 @@ import org.obiba.opal.r.rock.RockStringMatrix;
 import org.obiba.opal.r.service.*;
 import org.obiba.opal.r.service.event.RServerServiceStartedEvent;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
+import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.spi.r.RNamedList;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerException;
@@ -193,6 +194,9 @@ public class RockSpawnerService implements RServerPodService {
     Object principal = SecurityUtils.getSubject().getPrincipal();
     RServerSession rSession = newRServerSession(principal == null ? "opal/system" : principal.toString());
     try {
+      // wait for R session pod to be ready
+      RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
+      waiter.run();
       rSession.execute(rop);
     } finally {
       rSession.close();
