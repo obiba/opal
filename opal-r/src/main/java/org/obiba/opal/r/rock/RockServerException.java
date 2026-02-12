@@ -32,7 +32,7 @@ public class RockServerException extends RServerException {
     super(message);
     if (e instanceof RestClientResponseException) {
       RestClientResponseException re = (RestClientResponseException) e;
-      this.clientError = re.getRawStatusCode()<500;
+      this.clientError = re.getStatusCode().value()<500;
       try {
         JSONObject error = new JSONObject(re.getResponseBodyAsString());
         this.causeMessage = error.getString("message");

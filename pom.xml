@@ -82,17 +82,17 @@
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.1.0</magma.version>
+    <magma.version>5.2.0</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
-    <mongodb-driver.version>5.3.1</mongodb-driver.version>
+    <mongodb-driver.version>5.6.3</mongodb-driver.version>
     <mssql.version>12.10.2.jre11</mssql.version>
     <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
-    <obiba-commons.version>4.4.0</obiba-commons.version>
+    <obiba-commons.version>5.0.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.45</orientdb.version>
@@ -109,7 +109,7 @@
     <shiro-extras.version>1.1.0</shiro-extras.version>
     <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
-    <spring.version>6.2.13</spring.version>
+    <spring.version>7.0.3</spring.version>
     <spring-batch.version>4.3.9</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
@@ -744,6 +744,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
 
