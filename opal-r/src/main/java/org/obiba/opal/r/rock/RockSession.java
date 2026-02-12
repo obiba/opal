@@ -254,7 +254,7 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
     long start = System.currentTimeMillis();
     try {
       HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-      factory.setConnectTimeout(30000);
+      factory.setConnectionRequestTimeout(30000);
       factory.setReadTimeout(30000);
       RestTemplate restTemplate = new RestTemplate(factory);
       ResponseEntity<RockSessionInfo> response = restTemplate.exchange(getRSessionsResourceUrl(), HttpMethod.POST, new HttpEntity<>(createHeaders()), RockSessionInfo.class);
