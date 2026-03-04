@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import { type SubjectProfileDto } from 'src/models/Opal';
 
@@ -74,7 +74,7 @@ const items = computed<FieldItem[]>(() => {
       if (['image', 'avatar', 'photo', 'picture'].includes(key.toLowerCase())) {
         item.html = () => `<img src="${sanitizedValue}" alt="${DOMPurify.sanitize(key)}" style="max-width: 100px; max-height: 100px;" />`;
       } else {
-        item.html = () => `<a href="${sanitizedValue}" target="_blank">${sanitizedValue}</a>`;
+        item.html = () => `<a href="${sanitizedValue}" target="_blank" rel="noopener noreferrer">${sanitizedValue}</a>`;
       }
     } else if (typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       // if value is an email make it a mailto link

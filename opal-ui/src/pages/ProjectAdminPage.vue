@@ -202,6 +202,7 @@ import RestoreProjectDialog from 'src/components/project/RestoreProjectDialog.vu
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
 import IdMappingsList from 'src/components/project/IdMappingsList.vue';
 import KeyPairsList from 'src/components/project/KeyPairsList.vue';
+import { escapeHtml } from 'src/utils/strings';
 
 const route = useRoute();
 const router = useRouter();
@@ -248,7 +249,7 @@ const properties: FieldItem[] = [
   {
     field: 'tags',
     label: 'tags',
-    html: (val) => (val.tags || []).join(', '),
+    html: (val) => (val.tags || []).map((tag: string) => escapeHtml(tag)).join(', '),
   },
 ];
 

@@ -108,6 +108,7 @@ import DatashieldOptions from 'src/components/admin/datashield/DatashieldOptions
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import DatashieldProfileInitDialog from 'src/components/admin/datashield/DatashieldProfileInitDialog.vue';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface Props {
   profile: DataShieldProfileDto;
@@ -144,7 +145,7 @@ const items: FieldItem[] = [
   {
     field: 'cluster',
     label: 'r.cluster',
-    html: (val: DataShieldProfileDto) => (val ? `<code>${val.cluster}</code>` : ''),
+    html: (val: DataShieldProfileDto) => (val ? DOMPurify.sanitize(`<code>${val.cluster}</code>`, { ALLOWED_TAGS: ['code'], ALLOWED_ATTR: [] }) : ''),
   },
 ];
 

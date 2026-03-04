@@ -113,6 +113,7 @@ import { getDateLabel } from 'src/utils/dates';
 import { analysisColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface Props {
   projectName: string;
@@ -171,12 +172,15 @@ const properties = computed<FieldItem[]>(() => [
     field: 'report',
     label: 'report',
     html: (val) =>
-      `<a class="" href="${projectsStore.getAnalysisReportUrl(
+      DOMPurify.sanitize(`<a class="" href="${projectsStore.getAnalysisReportUrl(
         props.projectName,
         props.tableName,
         props.analysisName,
         val.id,
-      )}" target="_blank" >${t('view')}</a>`,
+      )}" target="_blank" rel="noopener noreferrer">${t('view')}</a>`, {
+        ALLOWED_TAGS: ['a'],
+        ALLOWED_ATTR: ['href', 'target', 'rel'],
+      }),
   },
 ]);
 

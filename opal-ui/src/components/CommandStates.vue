@@ -139,7 +139,7 @@
               </q-item-section>
               <q-item-section>
                 <q-item-label>
-                  <div v-html="message.msg.replace('\n', '<br/>')"></div>
+                  <div v-html="DOMPurify.sanitize(message.msg).replace('\n', '<br/>')"></div>
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -155,6 +155,7 @@ import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Command
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
 import { DefaultAlignment } from 'src/components/models';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface Props {
   commands: CommandStateDto[];

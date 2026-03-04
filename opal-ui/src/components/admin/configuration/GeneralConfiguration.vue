@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import DOMPurify from 'isomorphic-dompurify';
 
 const { t } = useI18n();
 
@@ -101,13 +102,13 @@ const items1: FieldItem[] = [
     field: 'publicURL',
     label: 'public_url',
     hint: 'app_configuration.public_url_hint',
-    html: (val) => (val.publicURL ? `<a href="${val.publicURL}" target="_blank">${val.publicURL}</a>` : '-'),
+    html: (val) => (val.publicURL ? DOMPurify.sanitize(`<a href="${val.publicURL}" target="_blank" rel="noopener noreferrer">${DOMPurify.sanitize(val.publicURL)}</a>`, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['href', 'target', 'rel'] }) : '-'),
   },
   {
     field: 'logoutURL',
     label: 'logout_url',
     hint: 'app_configuration.logout_url_hint',
-    html: (val) => (val.logoutURL ? `<a href="${val.logoutURL}" target="_blank">${val.logoutURL}</a>` : '-'),
+    html: (val) => (val.logoutURL ? DOMPurify.sanitize(`<a href="${val.logoutURL}" target="_blank" rel="noopener noreferrer">${DOMPurify.sanitize(val.logoutURL)}</a>`, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['href', 'target', 'rel'] }) : '-'),
   },
   {
     field: 'languages',
