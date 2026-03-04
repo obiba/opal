@@ -43,9 +43,9 @@
           class="text-help q-mb-md"
           v-html="
             t('user_profile.2fa_info', {
-              androidOtp: androidOtpUrl,
-              androidOnlyOtp: androidOnlyOtpUrl,
-              iosOtp: iosOtpUrl,
+              androidOtp: DOMPurify.sanitize(androidOtpUrl),
+              androidOnlyOtp: DOMPurify.sanitize(androidOnlyOtpUrl),
+              iosOtp: DOMPurify.sanitize(iosOtpUrl),
             })
           "
         ></div>
@@ -254,6 +254,7 @@ import UpdatePasswordDialog from 'src/components/profile/UpdatePasswordDialog.vu
 import AddTokenDialog from 'src/components/profile/AddTokenDialog.vue';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
 import { DefaultAlignment } from 'src/components/models';
+import DOMPurify from 'isomorphic-dompurify';
 
 const loading = ref(false);
 const authStore = useAuthStore();

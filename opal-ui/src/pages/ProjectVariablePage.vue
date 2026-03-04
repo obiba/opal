@@ -180,6 +180,7 @@ import TableValues from 'src/components/datasource/TableValues.vue';
 import AttributesBundlePanel from 'src/components/datasource/AttributesBundlePanel.vue';
 import type { VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
+import { escapeHtml } from 'src/utils/strings';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -217,7 +218,7 @@ const items1: FieldItem[] = [
   {
     field: 'name',
     label: 'full_name',
-    html: (val) => (val ? `<code>${dsName.value}.${tName.value}:${val.name}</code>` : ''),
+    html: (val) => (val ? `<code>${escapeHtml(dsName.value)}.${escapeHtml(tName.value)}:${escapeHtml(val.name)}</code>` : ''),
   },
   {
     field: 'entityType',

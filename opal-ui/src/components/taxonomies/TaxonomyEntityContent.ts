@@ -1,6 +1,7 @@
 import type { VocabularyDto, TermDto, LocaleTextDto } from 'src/models/Opal';
 import { locales } from 'boot/i18n';
-import { flattenObjectToString } from 'src/utils/strings';
+import { escapeHtml, flattenObjectToString } from 'src/utils/strings';
+
 /**
  * Composable to handle common variables and functions for taxonomy contents
  *
@@ -52,7 +53,7 @@ export default function useTaxonomyEntityContent<TYPE extends VocabularyDto | Te
             `
             <div class="row no-wrap q-py-xs">
               <div class="col-auto"><span class="q-badge bg-grey-6 flex inline items-center no-wrap" >${locale}</span></div>
-              <div class="col q-ml-sm">${taxonomiesStore.getLabel(val, locale)}</div>
+              <div class="col q-ml-sm">${escapeHtml(taxonomiesStore.getLabel(val, locale))}</div>
             </div>
             `,
         )

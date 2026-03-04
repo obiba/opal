@@ -37,3 +37,9 @@ export const includesToken = (source: string, token: string, ignoreCase = true) 
   if (!source || !token) return true;
   return ignoreCase ? source.toLowerCase().includes(token.toLowerCase()) : source.includes(token);
 };
+
+export function escapeHtml(str: string | null | undefined): string {
+  const div = document.createElement("div");
+  div.appendChild(document.createTextNode(str || ''));
+  return div.innerHTML;
+}

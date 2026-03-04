@@ -289,6 +289,7 @@ import type { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
+import { escapeHtml } from 'src/utils/strings';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -336,7 +337,7 @@ const items1 = computed(() => {
     {
       field: 'name',
       label: 'full_name',
-      html: (val: TableDto) => (val ? `<code>${val.datasourceName}.${val.name}</code>` : ''),
+      html: (val: TableDto) => (val ? `<code>${escapeHtml(val.datasourceName)}.${escapeHtml(val.name)}</code>` : ''),
     },
     {
       field: 'entityType',

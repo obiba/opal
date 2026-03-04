@@ -183,7 +183,7 @@
                   <template v-slot:default>
                     <span
                       class="text-secondary"
-                      v-html="t('identity_provider.use_nonce', { url: useNonceDefinition })"
+                      v-html="t('identity_provider.use_nonce', { url: DOMPurify.sanitize(useNonceDefinition) })"
                       @click.stop="openWindow('https://openid.net/specs/openid-connect-core-1_0.html#IDToken')"
                     ></span>
                   </template>
@@ -192,7 +192,7 @@
                   <template v-slot:default>
                     <span
                       class="text-secondary"
-                      v-html="t('identity_provider.use_logout', { url: useLogoutDefinition })"
+                      v-html="t('identity_provider.use_logout', { url: DOMPurify.sanitize(useLogoutDefinition) })"
                       @click.stop="openWindow('https://openid.net/specs/openid-connect-session-1_0-17.html#RPLogout')"
                     ></span>
                   </template>
@@ -248,6 +248,7 @@
 import type { IDProviderDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import HtmlAnchorHint from 'src/components/HtmlAnchorHint.vue';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface DialogProps {
   modelValue: boolean;

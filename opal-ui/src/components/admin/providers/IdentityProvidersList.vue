@@ -5,7 +5,7 @@
     </div>
     <div
       class="text-help q-mb-md"
-      v-html="t('identity_providers_info', { idProvider: idProviderDefinition, openId: openIdDefinition })"
+      v-html="t('identity_providers_info', { idProvider: DOMPurify.sanitize(idProviderDefinition), openId: DOMPurify.sanitize(openIdDefinition) })"
     ></div>
     <q-table
       flat
@@ -123,6 +123,7 @@ import type { IDProviderDto } from 'src/models/Opal';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddIdentityProviderDialog from './AddIdentityProviderDialog.vue';
 import { DefaultAlignment } from 'src/components/models';
+import DOMPurify from 'isomorphic-dompurify';
 
 const identityProvidersStore = useIdentityProvidersStore();
 const { t } = useI18n();
