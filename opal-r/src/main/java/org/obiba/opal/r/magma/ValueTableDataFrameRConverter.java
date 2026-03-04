@@ -55,6 +55,8 @@ class ValueTableDataFrameRConverter extends ValueTableTibbleRConverter {
   @Override
   public void doAssign(String symbol, String path) {
     super.doAssign(symbol, path);
+    String escapedSymbol = getSymbol().replace("'", "\\'");
+    String escapedSymbolBack = symbol.replace("`", "``");
 
     if (withFactors) {
       try (InputStream is = new ClassPathResource(WITH_FACTORS_SCRIPT).getInputStream();) {
@@ -64,7 +66,7 @@ class ValueTableDataFrameRConverter extends ValueTableTibbleRConverter {
       }
       magmaAssignROperation.doEval(String.format("base::source('%s')", WITH_FACTORS_SCRIPT));
       magmaAssignROperation.doEval(String.format("base::is.null(base::assign('%s', %s(`%s`, as.data.frame=%s)))",
-          getSymbol(), WITH_FACTORS_FUNC, getSymbol(), useTibble ? "FALSE" : "TRUE"));
+          escapedSymbol, WITH_FACTORS_FUNC, escapedSymbolBack, useTibble ? "FALSE" : "TRUE"));
       // cleaning
       magmaAssignROperation.doEval(String.format("base::rm(%s)", WITH_FACTORS_FUNC));
       magmaAssignROperation.doEval(String.format("base::unlink('%s')", WITH_FACTORS_SCRIPT));
@@ -76,14 +78,15 @@ class ValueTableDataFrameRConverter extends ValueTableTibbleRConverter {
       }
       magmaAssignROperation.doEval(String.format("base::source('%s')", AS_DF_NO_FACTORS_SCRIPT));
       magmaAssignROperation.doEval(String.format("base::is.null(base::assign('%s', %s(`%s`)))",
-          getSymbol(), AS_DF_NO_FACTORS_FUNC, getSymbol()));
+          escapedSymbol, AS_DF_NO_FACTORS_FUNC, escapedSymbolBack));
       // cleaning
       magmaAssignROperation.doEval(String.format("base::rm(%s)", AS_DF_NO_FACTORS_FUNC));
       magmaAssignROperation.doEval(String.format("base::unlink('%s')", AS_DF_NO_FACTORS_SCRIPT));
     }
     if (!useTibble && !withIdColumn()) {
-      magmaAssignROperation.doEval(String.format("rownames(`%s`) <- `%s`[['%s']]", getSymbol(), getSymbol(), getIdColumnName()));
-      magmaAssignROperation.doEval(String.format("`%s`['%s'] <- NULL", getSymbol(), getIdColumnName()));
+      String escapedIdColumnName = getIdColumnName().replace("'", "\\'");
+      magmaAssignROperation.doEval(String.format("rownames(`%s`) <- `%s`[['%s']]", escapedSymbolBack, escapedSymbolBack, escapedIdColumnName));
+      magmaAssignROperation.doEval(String.format("`%s`['%s'] <- NULL", escapedSymbolBack, escapedIdColumnName));
     }
   }
 

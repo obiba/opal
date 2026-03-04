@@ -89,7 +89,9 @@ class RResourceFactory implements ResourceProvidersService.ResourceFactory {
       try (Context context = Context.create()) {
         context.eval("js", script);
         String varName = provider.replaceAll("\\.", "_");
-        Value rsrc = context.eval("js", String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), name,
+        // escape single quotes in resName
+        String resName = name.replaceAll("'", "\\\\'");
+        Value rsrc = context.eval("js", String.format("JSON.stringify(%s.asResource('%s', '%s', %s, %s))", varName, getName(), resName,
             parameters == null ? "undefined" : parameters.toString(),
             credentials == null ? "undefined" : credentials.toString()));
         if (rsrc != null)

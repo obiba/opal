@@ -126,7 +126,8 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
     if (destination.startsWith("/")) destination = destination.substring(1);
     if (destination.contains("/")) {
       // make sure destination directory exists
-      String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
+      String escapedDestination = destination.substring(0, destination.lastIndexOf("/")).replace("'", "\\'");
+      String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", escapedDestination);
       RScriptROperation rop = new RScriptROperation(rscript, false);
       getRServerSession().execute(rop);
     }

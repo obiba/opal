@@ -335,14 +335,16 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
     private void assignIds(Iterable<VariableEntity> entities, String idsSymbol) {
       String idsVector = StreamSupport.stream(entities.spliterator(), false)
           .map(e -> (RVariableEntity) e)
-          .map(e -> e.isNumeric() ? e.getRIdentifier() : String.format("\"%s\"", e.getRIdentifier()))
+          .map(e -> e.isNumeric() ? e.getRIdentifier() : String.format("'%s'", e.getRIdentifier().replace("'", "\\'")))
           .collect(Collectors.joining(","));
       idsVector = String.format("c(%s)", idsVector);
-      execute(String.format("base::assign(\"%s\", %s)", idsSymbol, idsVector));
+      String escapedIdsSymbol = idsSymbol.replace("'", "\\'");
+      execute(String.format("base::assign('%s', %s)", escapedIdsSymbol, idsVector));
     }
 
     private void rmIds(String idsSymbol) {
-      execute(String.format("base::rm(\"%s\")", idsSymbol));
+      String escapedIdsSymbol = idsSymbol.replace("'", "\\'");
+      execute(String.format("base::rm('%s')", escapedIdsSymbol));
     }
 
   }

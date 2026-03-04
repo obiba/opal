@@ -61,7 +61,8 @@ class ValueTableTibbleRConverter extends AbstractMagmaRConverter {
       log.info("Assign table '{}' from R cache: {}", table.getName(), cacheKey);
       try (InputStream is = rCacheHelper.newRDSInputStream(cacheKey)) {
         magmaAssignROperation.doWriteFile(rdsFileName, is);
-        magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', readRDS('%s')))", getSymbol(), rdsFileName));
+        String escapedSymbol = getSymbol().replace("'", "\\'");
+        magmaAssignROperation.doEval(String.format("is.null(base::assign('%s', readRDS('%s')))", escapedSymbol, rdsFileName));
         magmaAssignROperation.doEval(String.format("base::unlink('%s')", rdsFileName));
         assigned = true;
       } catch (IOException e) {

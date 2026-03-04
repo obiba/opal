@@ -52,10 +52,11 @@ public final class ROperations {
 
       @Override
       protected void doWithConnection() {
+        String escapedSymbol = name.replace("'", "\\'");
         String format = env == null ? "is.null(base::assign('%s', value={%s}))" : "is.null(base::assign('%s', value={%s}, envir=%s))";
-        eval(String.format(format, name, script, env));
+        eval(String.format(format, escapedSymbol, script, env));
         if (lock) {
-          eval(String.format("base::lockBinding('%s', %s)", name, env));
+          eval(String.format("base::lockBinding('%s', %s)", escapedSymbol, env));
         }
       }
     };

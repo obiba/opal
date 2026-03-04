@@ -36,7 +36,8 @@ public class ResourceTibbleAssignROperation extends AbstractROperation {
       ensurePackage("dplyr");
       ensurePackage("moments"); // needed for descriptive stats
       String script = String.format("resourcer::as.resource.tbl(%s)", clientSymbol);
-      eval(String.format("is.null(base::assign('%s', %s))", symbol, script), RSerialize.NATIVE);
+      String escapedSymbol = symbol.replace("'", "\\'");
+      eval(String.format("is.null(base::assign('%s', %s))", escapedSymbol, script), RSerialize.NATIVE);
     } catch (Exception e) {
       throw new RRuntimeException(e);
     }

@@ -41,8 +41,9 @@ public class FolderReadROperation extends AbstractROperation {
   public void doWithConnection() {
     try {
       // note: hidden files won't be read, folders are excluded, no recursion
-      String[] fileNames = eval(String.format("base::list.files(path='%s')", folderName), false).asStrings();
-      Set<String> dirNames = Sets.newHashSet(eval(String.format("list.dirs(path='%s', recursive = FALSE, full.names = FALSE)", folderName), false).asStrings());
+      String escapedFolderName = folderName.replace("'", "\\'");
+      String[] fileNames = eval(String.format("base::list.files(path='%s')", escapedFolderName), false).asStrings();
+      Set<String> dirNames = Sets.newHashSet(eval(String.format("list.dirs(path='%s', recursive = FALSE, full.names = FALSE)", escapedFolderName), false).asStrings());
       for (String fileName : fileNames) {
         if (!dirNames.contains(fileName))
           readFile(fileName, new File(destination, fileName));

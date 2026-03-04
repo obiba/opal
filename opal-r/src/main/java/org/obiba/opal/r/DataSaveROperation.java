@@ -106,7 +106,8 @@ public class DataSaveROperation extends AbstractROperation {
     if (path.startsWith("/")) path = destination.substring(1);
     if (path.contains("/")) {
       // make sure destination directory exists
-      String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", path.substring(0, path.lastIndexOf("/")));
+      String escapedPath = path.substring(0, path.lastIndexOf("/")).replace("'", "\\'");
+      String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", escapedPath);
       eval(rscript, false);
     }
     return path;

@@ -106,7 +106,8 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) throws Exception {
-    RScriptROperation rop = new RScriptROperation(String.format("is.null(base::assign('%s', %s))", name, script));
+    String escapedSymbol = name.replace("'", "\\'");
+    RScriptROperation rop = new RScriptROperation(String.format("is.null(base::assign('%s', %s))", escapedSymbol, script));
     rop.setIgnoreResult(true);
     return assignSymbol(uri, rop, async);
   }
@@ -136,7 +137,8 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public Response rm() {
     try {
-      rSession.execute(new RScriptROperation("base::rm(`" + name + "`)"));
+      String escapedName = name.replace("`", "``");
+      rSession.execute(new RScriptROperation("base::rm(`" + escapedName + "`)"));
       rSession.execute(new RScriptROperation("base::gc()"));
     } catch (Exception e) {
       // ignore

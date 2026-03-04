@@ -161,7 +161,8 @@ public final class SubjectRSessions implements Iterable<RServerSession> {
       if (!R_IMAGE_FILE_ENC.equals(destination) && !R_IMAGE_FILE.equals(destination)) {
         if (destination.contains("/")) {
           // make sure destination directory exists
-          String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
+          String escapedDestination = destination.substring(0, destination.lastIndexOf("/")).replace("'", "\\'");
+          String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", escapedDestination);
           RScriptROperation rop = new RScriptROperation(rscript, false);
           rSession.execute(rop);
         }

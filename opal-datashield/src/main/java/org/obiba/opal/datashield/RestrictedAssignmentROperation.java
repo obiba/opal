@@ -34,7 +34,8 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     beforeLog(script);
     DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
     try {
-      setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", symbol, script)));
+      String escapedSymbol = symbol.replace("'", "\\'");
+      setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", escapedSymbol, script)));
       beforeLog(script);
       DataShieldLog.userLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
     } catch (Throwable e) {
