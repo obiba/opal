@@ -227,7 +227,8 @@ public class RAssignDatasource extends CsvDatasource {
         ensurePackage("readr");
         ensurePackage("labelled");
         eval(String.format("base::source('%s')", COLS_FILE_NAME));
-        eval(String.format("base::is.null(base::assign('%s', readr::read_csv('%s', col_types = .cols)))", getSymbol(tableName), DATA_FILE_NAME));
+        String escapedSymbol = getSymbol(tableName).replace("'", "\\'");
+        eval(String.format("base::is.null(base::assign('%s', readr::read_csv('%s', col_types = .cols)))", escapedSymbol, DATA_FILE_NAME));
         eval("base::rm(.cols)");
         eval(String.format("base::source('%s')", ATTR_FILE_NAME));
         log.debug("Symbol {} assigned", getSymbol(tableName));

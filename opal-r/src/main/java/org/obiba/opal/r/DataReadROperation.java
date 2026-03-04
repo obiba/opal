@@ -84,7 +84,8 @@ public class DataReadROperation extends AbstractROperation {
     eval("library(haven)", false);
     ensurePackage("tibble");
     eval("library(tibble)", false);
-    eval(String.format("is.null(base::assign('%s', %s))", symbol, readCmd.getCommand(this)), false);
+    String escapedSymbol = symbol.replace("'", "\\'");
+    eval(String.format("is.null(base::assign('%s', %s))", escapedSymbol, readCmd.getCommand(this)), false);
   }
 
   @Override
