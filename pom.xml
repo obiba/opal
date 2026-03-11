@@ -97,7 +97,7 @@
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.45</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
-    <postgresql.version>42.7.2</postgresql.version>
+    <postgresql.version>42.7.10</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>3.25.5</protobuf.version>
     <REngine.version>0.6-8.1</REngine.version>
