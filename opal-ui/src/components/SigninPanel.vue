@@ -42,6 +42,11 @@
           <img :src="qr" />
         </div>
       </q-card-section>
+      <q-card-section v-show="email" class="q-pb-none">
+        <div class="col text-subtitle">
+          {{ t('auth.totp_email_help') }}
+        </div>
+      </q-card-section>
       <q-card-section v-if="withToken">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <q-input
@@ -97,6 +102,7 @@ import { notifyError } from 'src/utils/notify';
 interface AuthResponse {
   image?: string;
   status?: string;
+  email?: boolean | undefined;
 }
 
 const emits = defineEmits<{
@@ -117,6 +123,7 @@ const username = ref('');
 const password = ref('');
 const token = ref('');
 const qr = ref('');
+const email = ref(false);
 const authMethod = ref('');
 const withToken = ref(false);
 const authProviders = ref<AuthProviderDto[]>([]);
@@ -163,6 +170,7 @@ async function onSubmit() {
       if (data?.image) {
         qr.value = data.image;
       }
+      email.value = data?.email || false;
     } else if (error.response?.status === 403 && data?.status === undefined) {
       notifyError('error.InvalidCredentials');
     } else {
@@ -178,6 +186,7 @@ function onSigninProvider(provider: AuthProviderDto) {
 function onCancelToken() {
   withToken.value = false;
   qr.value = '';
+  email.value = false;
   token.value = '';
   authMethod.value = '';
 }

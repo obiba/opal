@@ -49,6 +49,7 @@ export default {
     signout: 'Sign out',
     username: 'User name',
     totp_help: 'Open the authenticator mobile app and scan this QR code to initialise your PIN code generator.',
+    totp_email_help: 'Or enter the code received by email, if you do not want to use an authenticator mobile app.',
     code: 'Code',
     code_hint: 'Enter the 6-digits PIN code.',
     validate: 'Validate',

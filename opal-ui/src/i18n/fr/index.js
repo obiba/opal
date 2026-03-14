@@ -49,6 +49,7 @@ export default {
     signout: 'Se déconnecter',
     username: "Nom d'utilisateur",
     totp_help: "Ouvrir l'application mobile d'authentification et scanner ce code QR pour initialiser votre générateur de code NIP.",
+    totp_email_help: "Ou entrer le code reçu par courriel, si vous ne souhaitez pas utiliser une application mobile d'authentification.",
     code: 'Code',
     code_hint: 'Entrer le code à 6 chiffres.',
     validate: 'Valider',
