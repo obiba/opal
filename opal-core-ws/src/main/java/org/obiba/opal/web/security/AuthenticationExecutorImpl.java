@@ -127,7 +127,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
           }
         } else if (profile.hasTmpSecret()) {
           if (Strings.isNullOrEmpty(code)) {
-            throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()));
+            throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()), false);
           }
           if (!totpService.validateCode(code, profile.getTmpSecret())) {
             throw new AuthenticationException("Wrong TOTP");
@@ -138,7 +138,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
           // make a temporary secret
           subjectProfileService.updateProfileTmpSecret(profile.getPrincipal(), true);
           profile = subjectProfileService.getProfile(username);
-          throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()));
+          throw new NoSuchOtpException("X-Opal-" + strategy, totpService.getQrImageDataUri(profile.getPrincipal(), profile.getTmpSecret()), false);
         }
         // else 2FA not activated
       }
