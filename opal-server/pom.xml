@@ -93,6 +93,18 @@
       <groupId>org.apache.shiro.tools</groupId>
       <artifactId>shiro-tools-hasher</artifactId>
       <classifier>cli</classifier>
+      <exclusions>
+        <!-- log4j-slf4j2-impl conflicts with log4j-to-slf4j (brought in transitively by magma-datasource-excel);
+             the project uses SLF4J+Logback, so log4j-to-slf4j is the correct bridge -->
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-slf4j2-impl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>

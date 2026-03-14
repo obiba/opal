@@ -64,6 +64,7 @@ public abstract class AbstractOrientDbTestConfig {
   public OpalConfigurationService opalConfigurationService() {
     OpalConfiguration configuration = new OpalConfiguration();
     configuration.setDatabasePassword("admin");
+    configuration.setSecretKey("testsecretkey1234");
     OpalConfigurationService mock = EasyMock.createMock(OpalConfigurationService.class);
     mock.afterPropertiesSet();
     EasyMock.expect(mock.getOpalConfiguration()).andReturn(configuration).anyTimes();

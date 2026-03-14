@@ -10,11 +10,12 @@
 package org.obiba.opal.core.cfg;
 
 import com.google.common.base.Strings;
-import org.apache.shiro.codec.CodecSupport;
-import org.apache.shiro.codec.Hex;
-import org.apache.shiro.crypto.AesCipherService;
+import org.apache.shiro.crypto.cipher.AesCipherService;
+import org.apache.shiro.lang.codec.CodecSupport;
+import org.apache.shiro.lang.codec.Hex;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.crypto.cipher.ByteSourceBroker;
+import org.apache.shiro.lang.util.ByteSource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.GlobalMethodProvider;
 import org.obiba.magma.js.MagmaContextFactory;
@@ -158,7 +159,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   @Override
   public String decrypt(String encrypted) {
-    ByteSource decrypted;
+    ByteSourceBroker decrypted;
     try {
       decrypted = cipherService.decrypt(Hex.decode(encrypted), getSecretKey());
     } catch (Exception e) {
@@ -167,7 +168,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
       }
       decrypted = legacyCipherService.decrypt(Hex.decode(encrypted), getSecretKey());
     }
-    return CodecSupport.toString(decrypted.getBytes());
+    return CodecSupport.toString(decrypted.getClonedBytes());
   }
 
   @Override
