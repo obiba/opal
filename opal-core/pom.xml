@@ -215,8 +215,12 @@
       <classifier>jakarta</classifier>
     </dependency>
     <dependency>
-      <groupId>org.ehcache.integrations.shiro</groupId>
-      <artifactId>shiro-ehcache3</artifactId>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-jcache</artifactId>
     </dependency>
     <dependency>
       <groupId>eu.flatwhite.shiro</groupId>

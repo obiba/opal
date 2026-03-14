@@ -18,14 +18,14 @@ import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.ehcache.integrations.shiro.EhcacheShiroManager;
+import org.apache.shiro.cache.jcache.JCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
-import org.apache.shiro.util.LifecycleUtils;
+import org.apache.shiro.lang.util.LifecycleUtils;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.obiba.oidc.OIDCConfiguration;
@@ -34,9 +34,10 @@ import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
-import org.obiba.shiro.EhCache3ShiroManager;
 import org.obiba.shiro.NoSuchOtpException;
 import org.obiba.shiro.realm.ObibaRealm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +45,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
 import javax.validation.constraints.NotNull;
-
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityManager>, DisposableBean {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalSecurityManagerFactory.class);
 
   private static final long SESSION_VALIDATION_INTERVAL = 300000l; // 5 minutes
 
@@ -160,9 +166,22 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
 
   private void initializeCacheManager(DefaultSecurityManager dsm) {
     if (dsm.getCacheManager() == null) {
-      EhcacheShiroManager ehCacheManager = new EhCache3ShiroManager();
-      ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
-      dsm.setCacheManager(ehCacheManager);
+      URL configUrl = getClass().getResource("/ehcache-shiro.xml");
+      if (configUrl == null) {
+        log.error("Unable to initialize cache manager for security manager: resource '/ehcache-shiro.xml' not found on classpath");
+        return;
+      }
+      CachingProvider provider = Caching.getCachingProvider(); // picks up Ehcache 3
+      try {
+        javax.cache.CacheManager  jCacheManager = provider.getCacheManager(
+            configUrl.toURI(), getClass().getClassLoader()
+        );
+        JCacheManager shiroManager = new JCacheManager();
+        shiroManager.setCacheManager(jCacheManager);
+        dsm.setCacheManager(shiroManager);
+      } catch (URISyntaxException e) {
+        log.error("Unable to initialize cache manager for security manager", e);
+      }
     }
   }
 

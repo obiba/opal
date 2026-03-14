@@ -13,7 +13,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.crypto.hash.Sha512Hash;
-import org.apache.shiro.util.SimpleByteSource;
+import org.apache.shiro.lang.util.SimpleByteSource;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.springframework.beans.factory.InitializingBean;
