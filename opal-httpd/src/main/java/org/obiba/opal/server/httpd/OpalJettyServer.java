@@ -14,10 +14,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintAware;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
 import org.eclipse.jetty.http.HttpVersion;
@@ -108,7 +106,7 @@ public class OpalJettyServer {
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
 
     contextPath = properties.getProperty("org.obiba.opal.server.context-path", "");
-    if (!Strings.isNullOrEmpty(contextPath) && !contextPath.startsWith("/") || contextPath.endsWith("/")) {
+    if (!Strings.isNullOrEmpty(contextPath) && (!contextPath.startsWith("/") || contextPath.endsWith("/"))) {
       throw new IllegalArgumentException("ContextPath must start with '/' and not end with '/'");
     }
     if (Strings.isNullOrEmpty(contextPath)) contextPath = "/";
@@ -129,7 +127,7 @@ public class OpalJettyServer {
     jettyServer.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", maxFormContentSize);
 
     PathMappingsHandler pathMappingsHandler = new PathMappingsHandler();
-    Handler servletHandler = createServletHandler(properties);
+    ServletContextHandler servletHandler = createServletHandler(properties);
     String prefix = contextPath.equals("/") ? "" : contextPath;
     pathMappingsHandler.addMapping(PathSpec.from(prefix + "/ws/*"), servletHandler);
     pathMappingsHandler.addMapping(PathSpec.from(prefix + "/auth/*"), servletHandler);
@@ -137,7 +135,7 @@ public class OpalJettyServer {
 
     //pathMappingsHandler.dumpStdErr();
 
-    jettyServer.setHandler(pathMappingsHandler);
+    jettyServer.setHandler(createRootHandler(pathMappingsHandler, properties));
   }
 
   private Properties loadProperties() throws IOException {
@@ -213,7 +211,7 @@ public class OpalJettyServer {
     return jettySsl;
   }
 
-  private Handler createServletHandler(Properties properties) throws IOException, URISyntaxException {
+  private ServletContextHandler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS | ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath(contextPath);
     servletContextHandler.getSessionHandler().setSessionCookie("JSESSIONID_" + ("-1".equals(httpPort) ? httpsPort : httpPort));
@@ -232,9 +230,11 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
 
-    GzipHandler gzipHandler = makeGzipHandler();
-    gzipHandler.setHandler(servletContextHandler);
-    Handler rootHandler = gzipHandler;
+    return servletContextHandler;
+  }
+
+  private Handler createRootHandler(Handler mappingsHandler, Properties properties) {
+    Handler rootHandler = mappingsHandler;
 
     String corsAllowed = properties.getProperty("cors.allowed");
     if (!Strings.isNullOrEmpty(corsAllowed)) {
@@ -243,7 +243,9 @@ public class OpalJettyServer {
       rootHandler = corsHandler;
     }
 
-    return rootHandler;
+    GzipHandler gzipHandler = makeGzipHandler();
+    gzipHandler.setHandler(rootHandler);
+    return gzipHandler;
   }
 
   private CrossOriginHandler makeCrossOriginHandler(Set<String> origins) {
@@ -330,11 +332,8 @@ public class OpalJettyServer {
     resourceHandler.setDirAllowed(true);
     resourceHandler.setWelcomeFiles(List.of("index.html"));
 
-    GzipHandler gzipHandler = makeGzipHandler();
-    gzipHandler.setHandler(resourceHandler);
-
     ContextHandler ctxHandler = new ContextHandler(contextPath);
-    ctxHandler.setHandler(gzipHandler);
+    ctxHandler.setHandler(resourceHandler);
 
     return ctxHandler;
   }
