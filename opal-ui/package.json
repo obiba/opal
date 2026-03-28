@@ -53,7 +53,7 @@
     "vue-tsc": "^2.0.29"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.4"
+    "serialize-javascript": "^7.0.5"
   },
   "engines": {
     "node": "^24 || ^22 || ^20",
