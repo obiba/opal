@@ -11,6 +11,7 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
+import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -120,12 +121,30 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
 
   @Override
   public void stop() {
+    // Signal waiting threads first so they can wake up and fail gracefully
+    lock.lock();
+    try {
+      started = false;
+      condition.signalAll();
+    } finally {
+      lock.unlock();
+    }
+    if (poolFactory != null) {
+      log.info("Close OrientDB connection pool ({})", url);
+      poolFactory.close();
+      poolFactory = null;
+    }
     if (server != null) {
       log.info("Stop OrientDB server ({})", url);
       server.shutdown();
       server = null;
     }
-    started = false;
+    // OServer()'s default shutdownEngineOnExit=false means server.shutdown() does NOT
+    // call Orient.instance().shutdown(), so OLocalPaginatedStorage.close() is never
+    // reached, the WAL is not checkpointed, and dirty.fl files are left behind.
+    // Calling it explicitly here guarantees every registered storage is properly closed.
+    log.info("Shutdown OrientDB engine");
+    Orient.instance().shutdown();
   }
 
   @NotNull
@@ -143,9 +162,14 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
     try {
       waitForCondition();
     } catch (InterruptedException e) {
-      // ignore
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException("OrientDB server is not available (interrupted while waiting)", e);
     }
-    return poolFactory.get(url, USERNAME, PASSWORD).acquire();
+    OPartitionedDatabasePoolFactory factory = poolFactory;
+    if (factory == null) {
+      throw new IllegalStateException("OrientDB server is not available (pool has been closed)");
+    }
+    return factory.get(url, USERNAME, PASSWORD).acquire();
   }
 
   private void ensureSecurityConfig() throws IOException {
@@ -172,14 +196,17 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory, Initia
   }
 
   public void waitForCondition() throws InterruptedException {
-    lock.lock(); // Acquire the lock
+    lock.lock();
     try {
-      // Wait until the condition is met
       while (!started) {
-        condition.await(); // Release the lock and wait
+        condition.await();
+        // If we were woken by stop(), started is still false — treat as interrupted
+        if (!started) {
+          throw new InterruptedException("OrientDB server was stopped while waiting for it to start");
+        }
       }
     } finally {
-      lock.unlock(); // Release the lock
+      lock.unlock();
     }
   }
 
