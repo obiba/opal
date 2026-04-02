@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.service.security.realm;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.realm.text.IniRealm;
@@ -72,30 +73,22 @@ public class OpalIniRealm extends IniRealm {
    * Wraps a {@code $shiro2$} hashed password in double quotes to protect internal commas
    * from being interpreted as role delimiters.
    * <p>
-   * The Shiro 2 Argon2 crypt string has exactly 6 {@code $} delimiters:
-   * {@code $shiro2$algorithm$version$params$salt$hashdata}. After the hash data,
-   * a comma starts the role definitions.
+   * Rather than assuming a fixed number of {@code $}-delimited sections, this locates the
+   * password/roles boundary by searching for a comma only after the last {@code $} in the
+   * crypt value. This preserves the current Argon2 behavior while avoiding brittle parsing
+   * if the {@code $shiro2$} crypt format changes.
    * </p>
    */
-  private String quoteShiro2CryptPassword(String value) {
+  @VisibleForTesting
+  static String quoteShiro2CryptPassword(String value) {
     if (value == null || !value.startsWith(SHIRO2_PREFIX)) {
       return value;
     }
-    // Count 6 '$' delimiters to find the start of the hash data section
-    int dollarCount = 0;
-    int idx = 0;
-    while (idx < value.length() && dollarCount < 6) {
-      if (value.charAt(idx) == '$') {
-        dollarCount++;
-      }
-      idx++;
-    }
-    if (dollarCount < 6) {
+    int lastDollarIdx = value.lastIndexOf('$');
+    if (lastDollarIdx == -1 || lastDollarIdx == value.length() - 1) {
       return value;
     }
-    // idx now points to the first character of the base64 hash data.
-    // Base64 (without padding) uses [A-Za-z0-9+/], so a comma signals the role separator.
-    int commaIdx = value.indexOf(',', idx);
+    int commaIdx = value.indexOf(',', lastDollarIdx + 1);
     if (commaIdx == -1) {
       // No roles after the hash, no quoting needed
       return value;
