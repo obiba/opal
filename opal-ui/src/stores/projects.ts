@@ -125,11 +125,6 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.vcfstore = new Perms(response);
           return response;
         }),
-
-        api.options(`/project/${project.value.name}`).then((response) => {
-          perms.value.project = new Perms(response);
-          return response;
-        }),
       ]);
     });
   }
