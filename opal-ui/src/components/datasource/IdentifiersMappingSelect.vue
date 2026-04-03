@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-select
+      v-if="mappingNames?.length"
       v-model="idConfig.name"
       dense
       :options="mappingNames"
@@ -99,7 +100,10 @@ onMounted(() => {
         '';
     })
     .catch((err) => {
-      notifyError(err);
+      // if error 403 (no access to identifiers), just ignore and show empty list, otherwise show error
+      if (err.response?.status !== 403) {
+        notifyError(err);
+      }
     });
 });
 </script>
