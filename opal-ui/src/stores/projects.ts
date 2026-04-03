@@ -223,8 +223,8 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   function cancelCommandState(command: CommandStateDto) {
-    return api.put(`/project/${project.value.name}/command/${command.id}/status`, {
-      status: CommandStateDto_Status.CANCELED,
+    return api.put(`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 
