@@ -22,7 +22,7 @@ public interface BinarySummaryResource extends SummaryResource {
   @GET
   @Operation(summary = "Get binary variable summary", description = "Generate statistical summary for binary variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during summary generation")
   })

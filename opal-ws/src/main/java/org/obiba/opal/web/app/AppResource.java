@@ -44,7 +44,7 @@ public class AppResource {
     description = "Retrieves detailed information about a specific registered application"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Application details retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Application details retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Application not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

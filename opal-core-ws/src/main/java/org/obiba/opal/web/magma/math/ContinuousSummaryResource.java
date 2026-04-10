@@ -28,7 +28,7 @@ public interface ContinuousSummaryResource extends SummaryResource {
   @POST
   @Operation(summary = "Get continuous variable summary", description = "Generate statistical summary for continuous variables with distribution analysis")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during summary generation")
   })

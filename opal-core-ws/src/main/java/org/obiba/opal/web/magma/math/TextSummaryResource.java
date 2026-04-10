@@ -24,7 +24,7 @@ public interface TextSummaryResource extends SummaryResource {
   @POST
   @Operation(summary = "Get text variable summary", description = "Generate statistical summary for text variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during summary generation")
   })

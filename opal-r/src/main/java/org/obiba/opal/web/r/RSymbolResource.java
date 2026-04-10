@@ -45,7 +45,7 @@ public interface RSymbolResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Operation(summary = "Get R symbol as binary", description = "Retrieve the R symbol value in binary format")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Symbol retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Symbol retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Symbol not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -55,7 +55,7 @@ public interface RSymbolResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get R symbol as JSON", description = "Retrieve the R symbol value in JSON format")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Symbol retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Symbol retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Symbol not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -65,7 +65,7 @@ public interface RSymbolResource {
   @Consumes(MediaType.TEXT_PLAIN)
   @Operation(summary = "Assign string to R symbol", description = "Assign a string value to the R symbol")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "String assigned successfully"),
+    @ApiResponse(responseCode = "200", description = "String assigned successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid content"),
     @ApiResponse(responseCode = "500", description = "Server error during assignment")
   })
@@ -75,7 +75,7 @@ public interface RSymbolResource {
   @Consumes("application/x-rscript")
   @Operation(summary = "Execute R script for symbol", description = "Execute an R script and assign the result to the symbol")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Script executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid script"),
     @ApiResponse(responseCode = "500", description = "Server error during execution")
   })
@@ -98,7 +98,7 @@ public interface RSymbolResource {
   @Consumes("application/x-opal")
   @Operation(summary = "Assign data table to R symbol", description = "Assign value table variables to a R data.frame symbol")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Data assigned successfully"),
+    @ApiResponse(responseCode = "200", description = "Data assigned successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters or data"),
     @ApiResponse(responseCode = "404", description = "Data table not found"),
     @ApiResponse(responseCode = "500", description = "Server error during assignment")
@@ -113,7 +113,7 @@ public interface RSymbolResource {
   @Path("/table/{path}")
   @Operation(summary = "Assign table to R symbol", description = "Assign a specific table's variables to a R data.frame symbol")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table assigned successfully"),
+    @ApiResponse(responseCode = "200", description = "Table assigned successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "404", description = "Table not found"),
     @ApiResponse(responseCode = "500", description = "Server error during assignment")
@@ -128,7 +128,7 @@ public interface RSymbolResource {
   @Path("/resource/{path}")
   @Operation(summary = "Assign resource to R symbol", description = "Assign a resource to the R symbol")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Resource assigned successfully"),
+    @ApiResponse(responseCode = "200", description = "Resource assigned successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Resource not found"),
     @ApiResponse(responseCode = "500", description = "Server error during assignment")
   })

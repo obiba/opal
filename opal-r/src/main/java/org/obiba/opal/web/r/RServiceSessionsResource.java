@@ -47,7 +47,7 @@ public class RServiceSessionsResource {
     description = "Retrieves a list of all active R sessions, sorted by timestamp in descending order (most recent first)."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R sessions"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R sessions", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<OpalR.RSessionDto> getRSessions() {
@@ -68,7 +68,7 @@ public class RServiceSessionsResource {
     description = "Removes one or more R sessions by their IDs. If no IDs are provided, no action is taken."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Sessions successfully removed"),
+    @ApiResponse(responseCode = "200", description = "Sessions successfully removed", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

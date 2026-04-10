@@ -37,7 +37,7 @@ public class CryptoResource {
     description = "Encrypts the provided plain text using the system's configured encryption service. Returns the encrypted text that can be safely stored or transmitted."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Text successfully encrypted"),
+    @ApiResponse(responseCode = "200", description = "Text successfully encrypted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid input text"),
     @ApiResponse(responseCode = "500", description = "Encryption service error")
   })
@@ -52,7 +52,7 @@ public class CryptoResource {
     description = "Decrypts the provided encrypted text using the system's configured encryption service. Returns the original plain text."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Text successfully decrypted"),
+    @ApiResponse(responseCode = "200", description = "Text successfully decrypted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid encrypted text format"),
     @ApiResponse(responseCode = "500", description = "Decryption service error")
   })

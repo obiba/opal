@@ -42,7 +42,7 @@ public class DataShieldProfileResource {
     description = "Retrieves detailed information about a specific DataSHIELD profile including configuration, methods, and options. Access restricted for profiles with restricted access."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved profile"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved profile", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "403", description = "Access to profile forbidden"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -58,7 +58,7 @@ public class DataShieldProfileResource {
     description = "Enables a DataSHIELD profile, making it available for use in DataSHIELD operations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully enabled profile"),
+    @ApiResponse(responseCode = "200", description = "Successfully enabled profile", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -74,7 +74,7 @@ public class DataShieldProfileResource {
     description = "Disables a DataSHIELD profile, making it unavailable for use in DataSHIELD operations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully disabled profile"),
+    @ApiResponse(responseCode = "200", description = "Successfully disabled profile", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -90,7 +90,7 @@ public class DataShieldProfileResource {
     description = "Enables restricted access mode on a DataSHIELD profile, requiring explicit permissions for access."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully set restricted access"),
+    @ApiResponse(responseCode = "200", description = "Successfully set restricted access", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -106,7 +106,7 @@ public class DataShieldProfileResource {
     description = "Disables restricted access mode on a DataSHIELD profile, making it accessible to all users."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully removed restricted access"),
+    @ApiResponse(responseCode = "200", description = "Successfully removed restricted access", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -122,7 +122,7 @@ public class DataShieldProfileResource {
     description = "Configures the R parser version to be used for parsing R expressions in the DataSHIELD profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully set R parser version"),
+    @ApiResponse(responseCode = "200", description = "Successfully set R parser version", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -138,7 +138,7 @@ public class DataShieldProfileResource {
     description = "Removes the custom R parser version configuration from the DataSHIELD profile, reverting to default."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully removed R parser version"),
+    @ApiResponse(responseCode = "200", description = "Successfully removed R parser version", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

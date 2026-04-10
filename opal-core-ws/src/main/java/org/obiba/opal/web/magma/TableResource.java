@@ -47,7 +47,7 @@ public interface TableResource {
   @GET
   @Operation(summary = "Get table", description = "Retrieve table definition and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Table retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Table not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -57,7 +57,7 @@ public interface TableResource {
   @PUT
   @Operation(summary = "Update table", description = "Update table definition and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Table updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid table data"),
     @ApiResponse(responseCode = "404", description = "Table not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -74,7 +74,7 @@ public interface TableResource {
   @Path("/entities")
   @Operation(summary = "Get table entities", description = "Retrieve all entities in the table")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Entities retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Entities retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   List<Magma.VariableEntityDto> getEntities();
@@ -93,7 +93,7 @@ public interface TableResource {
   @Path("/valueSet/{identifier}/timestamps")
   @Operation(summary = "Get value set timestamps", description = "Retrieve timestamps for a specific entity's value set")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Entity not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -123,7 +123,7 @@ public interface TableResource {
   @Path("/valueSet")
   @Operation(summary = "Update value set", description = "Update value set by importing data with optional entity generation")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Value set updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Value set updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid data or parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -168,7 +168,7 @@ public interface TableResource {
   @Path("/variable/_transient/_compile")
   @Operation(summary = "Compile transient variable", description = "Compile derived variable script for validation")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Script compiled successfully"),
+    @ApiResponse(responseCode = "200", description = "Script compiled successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during compilation")
   })

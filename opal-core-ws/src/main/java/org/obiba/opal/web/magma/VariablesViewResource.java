@@ -27,7 +27,7 @@ public interface VariablesViewResource extends VariablesResource {
   @Path("/file")
   @Operation(summary = "Add/update variables from file", description = "Add or update variables in view from file upload")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variables updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Variables updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "201", description = "Variables added successfully"),
     @ApiResponse(responseCode = "400", description = "Invalid file or view data"),
     @ApiResponse(responseCode = "500", description = "Server error")

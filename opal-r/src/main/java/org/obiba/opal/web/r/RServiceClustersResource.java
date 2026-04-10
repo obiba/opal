@@ -44,7 +44,7 @@ public class RServiceClustersResource {
     description = "Retrieves a list of all configured R server clusters, sorted alphabetically by name."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server clusters"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server clusters", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<OpalR.RServerClusterDto> getClusters() {
@@ -61,7 +61,7 @@ public class RServiceClustersResource {
     description = "Clears the R server clusters cache to force refresh of cluster information."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Cache successfully evicted"),
+    @ApiResponse(responseCode = "200", description = "Cache successfully evicted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response evictCache() {

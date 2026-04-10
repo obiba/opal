@@ -54,7 +54,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @Operation(summary = "Get table index status", description = "Retrieve detailed indexation status for a specific datasource table, including progress, timestamps, and configuration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Table index status successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Table index status successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
   public Response getTableStatus() {
@@ -94,7 +94,7 @@ public class ValueTableIndexResource extends IndexResource {
   @PUT
   @Operation(summary = "Update table index", description = "Trigger re-indexing of variables and values for a specific table. Synchronizes both variable and value indices.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Index update successfully triggered"),
+      @ApiResponse(responseCode = "200", description = "Index update successfully triggered", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
   public Response updateIndex() {
@@ -114,7 +114,7 @@ public class ValueTableIndexResource extends IndexResource {
   @DELETE
   @Operation(summary = "Delete table index", description = "Delete the search index for a specific table. Cancels any ongoing indexation and removes both variable and value indices.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Index successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Index successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
   public Response deleteIndex() {
@@ -184,7 +184,7 @@ public class ValueTableIndexResource extends IndexResource {
   @Path("_schema")
   @Operation(summary = "Get table index schema", description = "Retrieve the search index schema mapping for a specific table, showing variable names and their corresponding field names in the index.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Index schema successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Index schema successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
   public Response search() {

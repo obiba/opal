@@ -54,7 +54,7 @@ public class ServicesResource {
     description = "Retrieves a comprehensive list of all available services including their status and links"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Services list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Services list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<Opal.ServiceDto> services() {

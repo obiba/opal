@@ -81,7 +81,7 @@ public class TableAnalysisResource {
     description = "Retrieves all analyses associated with a specific data table within a project. Includes analysis metadata, configuration, and the most recent result for each analysis."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table analyses successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Table analyses successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access table analyses"),
     @ApiResponse(responseCode = "404", description = "Project or table not found")
   })
@@ -106,7 +106,7 @@ public class TableAnalysisResource {
     description = "Retrieves a specific analysis within a table, including analysis configuration and optionally all historical results. Can limit results to only the most recent result."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Analysis successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis"),
     @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
   })
@@ -132,7 +132,7 @@ public class TableAnalysisResource {
     description = "Permanently removes a specific analysis and all its associated results from the table. This action cannot be undone."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Analysis successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete analysis"),
     @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
   })
@@ -148,7 +148,7 @@ public class TableAnalysisResource {
     description = "Retrieves all results for a specific analysis within a table. Can be limited to only the most recent result for improved performance."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis results successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Analysis results successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis results"),
     @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found")
   })
@@ -169,7 +169,7 @@ public class TableAnalysisResource {
     description = "Retrieves a specific analysis result by its unique identifier. Includes the complete result data, metadata, and execution information."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis result successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis result"),
     @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found")
   })
@@ -184,7 +184,7 @@ public class TableAnalysisResource {
     description = "Removes a specific analysis result from an analysis. Returns updated list of remaining results for the analysis."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis result successfully deleted, returns updated results list"),
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully deleted, returns updated results list", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to delete analysis result"),
     @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found")
   })
@@ -200,7 +200,7 @@ public class TableAnalysisResource {
     description = "Exports a specific analysis result as a ZIP archive containing all result files, data, and metadata. Useful for archiving or sharing analysis results."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis result successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "200", description = "Analysis result successfully exported as ZIP file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to export analysis result"),
     @ApiResponse(responseCode = "404", description = "Project, table, analysis, or result not found"),
     @ApiResponse(responseCode = "500", description = "Error during export process")
@@ -220,7 +220,7 @@ public class TableAnalysisResource {
     description = "Exports all analyses and their results from a specific table as a ZIP archive. Can include all historical results or only successful results based on the 'all' parameter."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "All table analyses successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "200", description = "All table analyses successfully exported as ZIP file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to export table analyses"),
     @ApiResponse(responseCode = "404", description = "Project or table not found"),
     @ApiResponse(responseCode = "500", description = "Error during export process")
@@ -244,7 +244,7 @@ public class TableAnalysisResource {
     description = "Exports a specific analysis and all its results from a table as a ZIP archive. Can include all historical results or only successful results based on the 'all' parameter."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table analysis successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "200", description = "Table analysis successfully exported as ZIP file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to export analysis"),
     @ApiResponse(responseCode = "404", description = "Project, table, or analysis not found"),
     @ApiResponse(responseCode = "500", description = "Error during export process")
@@ -267,7 +267,7 @@ public class TableAnalysisResource {
     description = "Exports the generated report for a specific analysis result. The report format depends on the analysis type and can be PDF, HTML, or other formats. Returns the report as a downloadable file."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis report successfully exported"),
+    @ApiResponse(responseCode = "200", description = "Analysis report successfully exported", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access analysis report"),
     @ApiResponse(responseCode = "404", description = "Project, table, analysis, result, or report not found"),
     @ApiResponse(responseCode = "500", description = "Error during report export")

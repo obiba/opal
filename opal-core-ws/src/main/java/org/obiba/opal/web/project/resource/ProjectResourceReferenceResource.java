@@ -59,7 +59,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
     description = "Retrieves a specific resource reference within a project, including details about the resource and whether it can be edited."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Resource reference details successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Resource reference details successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project"),
     @ApiResponse(responseCode = "404", description = "Project or resource reference not found")
   })
@@ -75,7 +75,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
     description = "Updates an existing resource reference within a project. The reference can be renamed, and the original creation timestamp is preserved. Resource assignment in R servers is automatically updated."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Resource reference successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Resource reference successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid resource reference data or project mismatch"),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to update resource references"),
     @ApiResponse(responseCode = "404", description = "Project or resource reference not found")
@@ -105,7 +105,7 @@ public class ProjectResourceReferenceResource implements BaseResource {
     description = "Tests the connectivity and accessibility of a resource reference by attempting to assign it in an R server. Validates that the resource can be properly accessed and used."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Resource reference test completed successfully"),
+    @ApiResponse(responseCode = "200", description = "Resource reference test completed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project or resource"),
     @ApiResponse(responseCode = "404", description = "Project or resource reference not found"),
     @ApiResponse(responseCode = "500", description = "R server error or resource not accessible")

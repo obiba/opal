@@ -49,7 +49,7 @@ public class ProjectCommandResource {
     description = "Retrieves detailed information about a specific command job within a project."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -67,7 +67,7 @@ public class ProjectCommandResource {
     description = "Deletes a specific command job within a project. Only completed or failed commands can be deleted."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Command successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Command successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

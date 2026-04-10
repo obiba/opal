@@ -47,7 +47,7 @@ public class AuthorizationResource {
 @GET
 @Operation(summary = "Get ACLs for resource", description = "Retrieve access control list (ACL) entries for a specific resource with optional filtering by domain and subject type")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "ACL entries successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "ACL entries successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -60,7 +60,7 @@ public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String
 @POST
 @Operation(summary = "Add permission to ACL", description = "Add a new permission entry to the access control list for a specific subject on a resource")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Permission successfully added to ACL"),
+  @ApiResponse(responseCode = "200", description = "Permission successfully added to ACL", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -74,7 +74,7 @@ public Opal.Acl add(@QueryParam("domain") @DefaultValue("opal") String domain, @
 @DELETE
 @Operation(summary = "Delete permission from ACL", description = "Remove a specific permission or all permissions for a subject from the access control list. If permission parameter is not provided, all permissions for the subject will be removed.")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Permission successfully deleted from ACL"),
+  @ApiResponse(responseCode = "200", description = "Permission successfully deleted from ACL", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
   @ApiResponse(responseCode = "404", description = "Subject or permission not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")

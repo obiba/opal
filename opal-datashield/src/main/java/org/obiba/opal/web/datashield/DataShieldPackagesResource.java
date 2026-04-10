@@ -54,7 +54,7 @@ public class DataShieldPackagesResource {
     description = "Retrieves all installed DataSHIELD packages in the specified profile, including package metadata and version information."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved packages"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved packages", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -107,7 +107,7 @@ public class DataShieldPackagesResource {
     description = "Bulk operation to append DataSHIELD package settings to profile configuration. If no names provided, publishes all installed packages."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully published packages settings"),
+    @ApiResponse(responseCode = "200", description = "Successfully published packages settings", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -157,7 +157,7 @@ public class DataShieldPackagesResource {
     description = "Deletes all installed DataSHIELD packages from the specified profile. This is a destructive operation that removes packages and their methods."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully deleted packages"),
+    @ApiResponse(responseCode = "200", description = "Successfully deleted packages", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "R package management not allowed"),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

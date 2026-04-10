@@ -27,7 +27,7 @@ public interface DataShieldROptionsResource {
   @GET
   @Operation(summary = "Get DataShield R options", description = "Retrieve all DataShield R options for a specific profile")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R options retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "R options retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid profile"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

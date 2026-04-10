@@ -46,7 +46,7 @@ public class OpalRSessionParentResource {
     description = "Returns a resource handler for a specific R session identified by its ID."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session resource"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session resource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R session not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

@@ -60,7 +60,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   @GET
   @Operation(summary = "Get table permissions", description = "Retrieves table-level permissions for a specific table within a project. Table permissions control access to data operations like read, write, and aggregate on the table.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Table permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Table permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or table not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -87,7 +87,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   @POST
   @Operation(summary = "Set table permission", description = "Grants table-level permissions to subjects for a specific table within a project. Table permissions control access to data operations like read, write, and aggregate on the table.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Table permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Table permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or table not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -111,7 +111,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   @DELETE
   @Operation(summary = "Delete table permissions", description = "Removes all table-level permissions from subjects for a specific table within a project. This revokes access to data operations like read, write, and aggregate on the table.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Table permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Table permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or table not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -139,7 +139,7 @@ public class ProjectTablePermissionsResource extends AbstractPermissionsResource
   @Path("/variables")
   @Operation(summary = "Get table variables permissions", description = "Retrieves variable-level permissions for all variables within a specific table. Variable permissions control access to individual variable metadata and data within the table.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Variables permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Variables permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or table not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

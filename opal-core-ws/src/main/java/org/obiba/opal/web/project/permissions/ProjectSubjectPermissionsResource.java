@@ -70,7 +70,7 @@ public class ProjectSubjectPermissionsResource {
   @GET
   @Operation(summary = "Get subject project permissions", description = "Retrieves all permissions for a specific subject within a project. This includes project-level, datasource-level, table-level, and variable-level permissions.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Subject permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -100,7 +100,7 @@ public class ProjectSubjectPermissionsResource {
   @DELETE
   @Operation(summary = "Delete subject project permissions", description = "Removes all permissions for a specific subject within a project. This includes project-level, datasource-level, table-level, and variable-level permissions.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Subject permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

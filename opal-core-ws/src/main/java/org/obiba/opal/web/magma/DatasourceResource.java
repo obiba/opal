@@ -126,7 +126,7 @@ public class DatasourceResource {
     description = "Retrieves detailed information about a specific datasource including its metadata, tables, and available locales."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasource information"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasource information", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -140,7 +140,7 @@ public class DatasourceResource {
     description = "Removes a transient datasource from the system. Only transient datasources can be deleted, not persistent ones."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Datasource successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Datasource successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Datasource not found or is not transient"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -236,7 +236,7 @@ public class DatasourceResource {
     description = "Creates a ZIP archive containing JSON definitions of all views or specified views from the datasource."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Views backup successfully created"),
+    @ApiResponse(responseCode = "200", description = "Views backup successfully created", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -278,7 +278,7 @@ public class DatasourceResource {
     description = "Retrieves the list of locales supported by the datasource with optional display locale for localized names."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved locales"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved locales", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -299,7 +299,7 @@ public class DatasourceResource {
     description = "Executes a SQL query against the datasource and returns results in JSON format."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -324,7 +324,7 @@ public class DatasourceResource {
     description = "Executes a SQL query against the datasource and returns results in CSV format."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -349,7 +349,7 @@ public class DatasourceResource {
     description = "Executes a SQL query against the datasource and returns results in R data format for use in R."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "404", description = "Datasource not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

@@ -50,7 +50,7 @@ public class ServiceResource {
   @GET
   @Operation(summary = "Get service information", description = "Returns detailed information about a specific service including its status and configuration link.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Service information successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Service information successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Service not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -70,7 +70,7 @@ public class ServiceResource {
   @PUT
   @Operation(summary = "Start service", description = "Starts a specific service that is currently stopped.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Service successfully started"),
+      @ApiResponse(responseCode = "200", description = "Service successfully started", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Service not found"),
       @ApiResponse(responseCode = "409", description = "Service is already running"),
       @ApiResponse(responseCode = "500", description = "Internal server error or failed to start service")
@@ -86,7 +86,7 @@ public class ServiceResource {
   @DELETE
   @Operation(summary = "Stop service", description = "Stops a specific service that is currently running.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Service successfully stopped"),
+      @ApiResponse(responseCode = "200", description = "Service successfully stopped", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Service not found"),
       @ApiResponse(responseCode = "409", description = "Service is already stopped"),
       @ApiResponse(responseCode = "500", description = "Internal server error or failed to stop service")
@@ -103,7 +103,7 @@ public class ServiceResource {
   @Path("/cfg")
   @Operation(summary = "Get service configuration", description = "Returns the configuration details of a specific service.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Service configuration successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Service configuration successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Service not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -119,7 +119,7 @@ public class ServiceResource {
   @Path("/cfg")
   @Operation(summary = "Save service configuration", description = "Updates and saves the configuration for a specific service.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Service configuration successfully saved"),
+      @ApiResponse(responseCode = "200", description = "Service configuration successfully saved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid configuration data"),
       @ApiResponse(responseCode = "404", description = "Service not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error or failed to save configuration")

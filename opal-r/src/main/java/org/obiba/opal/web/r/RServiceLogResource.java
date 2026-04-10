@@ -47,7 +47,7 @@ public class RServiceLogResource {
     description = "Retrieves the R server log file content, optionally limited to a specific number of lines from the end of the file."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server log"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server log", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
     @ApiResponse(responseCode = "404", description = "R server or profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

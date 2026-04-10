@@ -44,7 +44,7 @@ public class RServiceSessionResource {
     description = "Retrieves detailed information about a specific R session identified by its ID."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R session not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -58,7 +58,7 @@ public class RServiceSessionResource {
     description = "Removes a specific R session identified by its ID."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R session successfully removed"),
+    @ApiResponse(responseCode = "200", description = "R session successfully removed", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R session not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

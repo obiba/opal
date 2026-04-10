@@ -32,7 +32,7 @@ public interface VocabularyResource {
   @GET
   @Operation(summary = "Get vocabulary", description = "Retrieve a specific vocabulary from a taxonomy")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Vocabulary retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Vocabulary retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Vocabulary not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -41,7 +41,7 @@ public interface VocabularyResource {
   @PUT
   @Operation(summary = "Save vocabulary", description = "Save/update a vocabulary in a taxonomy")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Vocabulary saved successfully"),
+    @ApiResponse(responseCode = "200", description = "Vocabulary saved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid vocabulary data"),
     @ApiResponse(responseCode = "404", description = "Vocabulary not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -71,7 +71,7 @@ public interface VocabularyResource {
   @Path("term/{term}")
   @Operation(summary = "Save term", description = "Save/update a term within a vocabulary")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Term saved successfully"),
+    @ApiResponse(responseCode = "200", description = "Term saved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid term data"),
     @ApiResponse(responseCode = "404", description = "Term not found"),
     @ApiResponse(responseCode = "500", description = "Server error")

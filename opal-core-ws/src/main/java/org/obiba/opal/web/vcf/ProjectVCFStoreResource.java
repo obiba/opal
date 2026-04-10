@@ -86,7 +86,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Retrieves detailed information about the VCF store associated with the project, including general summary statistics and sample information."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF store details successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "VCF store details successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access VCF store"),
     @ApiResponse(responseCode = "404", description = "Project not found or project has no VCF store"),
     @ApiResponse(responseCode = "500", description = "VCF store service not available or error accessing store")
@@ -131,7 +131,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Retrieves the samples mapping configuration for the VCF store, which defines how sample identifiers are mapped between VCF files and Opal entities."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF samples mapping successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "VCF samples mapping successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access samples mapping"),
     @ApiResponse(responseCode = "404", description = "Project not found or samples mapping does not exist"),
     @ApiResponse(responseCode = "500", description = "VCF store service not available")
@@ -167,7 +167,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Updates or creates the samples mapping configuration for the VCF store. This defines how sample identifiers in VCF files are mapped to Opal entity identifiers."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF samples mapping successfully updated"),
+    @ApiResponse(responseCode = "200", description = "VCF samples mapping successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid samples mapping data"),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to update samples mapping"),
     @ApiResponse(responseCode = "404", description = "Project not found"),
@@ -215,7 +215,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Exports detailed statistics for a specific VCF file as a text file. Includes variant counts, sample coverage, genotype frequencies, and other genomic statistics."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF statistics successfully exported as text file"),
+    @ApiResponse(responseCode = "200", description = "VCF statistics successfully exported as text file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access VCF statistics"),
     @ApiResponse(responseCode = "404", description = "Project, VCF store, or VCF file not found"),
     @ApiResponse(responseCode = "500", description="VCF store service not available or error reading statistics")
@@ -239,7 +239,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Retrieves a list of all VCF files stored in the VCF store, including summary information such as file name, sample count, variant count, and other metadata for each VCF file."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF files list successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "VCF files list successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access VCF files"),
     @ApiResponse(responseCode = "404", description = "Project not found or VCF store does not exist"),
     @ApiResponse(responseCode = "500", description = "VCF store service not available")
@@ -326,7 +326,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     description = "Retrieves detailed information about a specific VCF file, including summary statistics such as sample count, variant count, file size, and other metadata."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "VCF file details successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "VCF file details successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access VCF file"),
     @ApiResponse(responseCode = "404", description = "Project, VCF store, or VCF file not found"),
     @ApiResponse(responseCode = "500", description = "VCF store service not available")

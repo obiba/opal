@@ -48,7 +48,7 @@ public class AuthenticationProvidersResource {
     description = "Retrieves all available authentication providers configured in the system. Filters providers based on the current request's entry point to ensure compatibility with the callback URLs."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Authentication providers successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Authentication providers successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Error retrieving authentication provider configurations")
   })
   public List<Opal.AuthProviderDto> list(@Context HttpServletRequest request) {

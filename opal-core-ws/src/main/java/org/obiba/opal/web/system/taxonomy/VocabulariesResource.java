@@ -28,7 +28,7 @@ public interface VocabulariesResource {
   @GET
   @Operation(summary = "Get vocabularies", description = "Retrieve all vocabularies within a taxonomy")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Vocabularies retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Vocabularies retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   List<Opal.VocabularyDto> getVocabularies();

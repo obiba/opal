@@ -56,7 +56,7 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
   @GET
   @Operation(summary = "Get administration permissions", description = "Retrieves administration permissions for subjects. Administration permissions control access to system administration functions and Opal server management.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Administration permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Administration permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid subject type provided"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -76,7 +76,7 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
   @POST
   @Operation(summary = "Set administration permission", description = "Grants administration permissions to subjects. Administration permissions control access to system administration functions and Opal server management.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Administration permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Administration permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -98,7 +98,7 @@ public class AdministrationPermissionsResource extends AbstractPermissionsResour
   @DELETE
   @Operation(summary = "Delete administration permissions", description = "Removes all administration permissions from subjects. This revokes access to system administration functions and Opal server management.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Administration permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Administration permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

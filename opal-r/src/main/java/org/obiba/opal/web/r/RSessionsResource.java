@@ -28,7 +28,7 @@ public interface RSessionsResource {
   @GET
   @Operation(summary = "Get R sessions", description = "Retrieve all active R sessions")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R sessions retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "R sessions retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   List<OpalR.RSessionDto> getRSessions();
@@ -63,7 +63,7 @@ public interface RSessionsResource {
   @Path("/_test")
   @Operation(summary = "Test R session creation", description = "Test the creation of a new R session with specified profile")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R session test successful"),
+    @ApiResponse(responseCode = "200", description = "R session test successful", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid profile"),
     @ApiResponse(responseCode = "500", description = "Server error during test")
   })

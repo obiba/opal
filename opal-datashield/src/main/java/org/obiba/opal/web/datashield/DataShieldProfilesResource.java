@@ -46,7 +46,7 @@ public class DataShieldProfilesResource {
     description = "Retrieves all DataSHIELD profiles, optionally filtered by enabled status. Access to profiles is restricted based on user permissions."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved profiles"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved profiles", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Access to profile forbidden"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

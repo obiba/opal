@@ -58,7 +58,7 @@ public class ValueTableContingencyResource {
   @Transactional(readOnly = true)
   @Operation(summary = "Get contingency table for table variables", description = "Generate contingency table for two variables within a specific datasource table. Both variables must belong to the same table.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated"),
+      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid or missing variable parameters"),
       @ApiResponse(responseCode = "404", description = "Table not found")
   })

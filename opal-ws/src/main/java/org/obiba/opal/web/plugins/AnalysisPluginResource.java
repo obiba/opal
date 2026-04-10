@@ -46,7 +46,7 @@ public class AnalysisPluginResource {
     description = "Retrieves detailed information about a specific analysis plugin"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis plugin details retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Analysis plugin details retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Plugin not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

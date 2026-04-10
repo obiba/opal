@@ -31,7 +31,7 @@ public interface DataShieldEnvironmentResource {
   @Path("/methods")
   @Operation(summary = "Get DataShield methods", description = "Retrieve all DataShield methods for a specific profile")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Methods retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Methods retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid profile"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -61,7 +61,7 @@ public interface DataShieldEnvironmentResource {
   @Path("/method/{name}")
   @Operation(summary = "Get DataShield method", description = "Retrieve a specific DataShield method")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Method retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Method retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Method not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -71,7 +71,7 @@ public interface DataShieldEnvironmentResource {
   @Path("/method/{name}")
   @Operation(summary = "Update DataShield method", description = "Update an existing DataShield method")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Method updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Method updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid method data"),
     @ApiResponse(responseCode = "404", description = "Method not found"),
     @ApiResponse(responseCode = "500", description = "Server error")

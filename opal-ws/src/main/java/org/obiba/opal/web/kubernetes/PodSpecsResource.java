@@ -35,7 +35,7 @@ public class PodSpecsResource {
     description = "Retrieves a list of all registered pod specifications"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Pod specifications list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Pod specifications list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<K8S.PodSpecDto> list() {
@@ -48,7 +48,7 @@ public class PodSpecsResource {
     description = "Creates a new pod specification or updates an existing one"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Pod specification created or updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Pod specification created or updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid pod specification provided"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

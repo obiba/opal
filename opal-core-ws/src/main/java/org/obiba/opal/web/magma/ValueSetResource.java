@@ -45,7 +45,7 @@ public interface ValueSetResource {
   @GET
   @Operation(summary = "Get value set", description = "Retrieve a value set with optional variable filtering")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Value set retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Value set retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid filter parameters"),
     @ApiResponse(responseCode = "404", description = "Value set not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -74,7 +74,7 @@ public interface ValueSetResource {
   @Path("/value")
   @Operation(summary = "Get value", description = "Get a specific value from the value set, optionally by position")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Value retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Value retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid position"),
     @ApiResponse(responseCode = "404", description = "Value not found"),
     @ApiResponse(responseCode = "500", description = "Server error")

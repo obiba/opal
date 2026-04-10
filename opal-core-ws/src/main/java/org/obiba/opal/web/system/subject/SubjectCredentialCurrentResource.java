@@ -42,7 +42,7 @@ public class SubjectCredentialCurrentResource {
   @NoAuthorization
   @Operation(summary = "Get current subject credentials", description = "Retrieves the credentials of the currently authenticated subject.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Subject credentials not found")
   })
   public Response get() {
@@ -57,7 +57,7 @@ public class SubjectCredentialCurrentResource {
   @NoAuthorization
   @Operation(summary = "Update current subject password", description = "Updates the password of the currently authenticated subject.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Password updated successfully"),
+      @ApiResponse(responseCode = "200", description = "Password updated successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid password data provided")
   })
   public Response updatePassword(@NotNull Opal.PasswordDto passwordDto) {

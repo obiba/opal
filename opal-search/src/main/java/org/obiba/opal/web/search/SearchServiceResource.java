@@ -105,7 +105,7 @@ public class SearchServiceResource extends IndexResource {
   @Path("/cfg/enabled")
   @Operation(summary = "Check if indexing is enabled", description = "Check whether search indexing is currently enabled and available.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Indexing status retrieved"),
+      @ApiResponse(responseCode = "200", description = "Indexing status retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
   public Response isEnableIndexing() {

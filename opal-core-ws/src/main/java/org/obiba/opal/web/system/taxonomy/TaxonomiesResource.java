@@ -84,7 +84,7 @@ public class TaxonomiesResource implements BaseResource {
     description = "Retrieves the available tags from a GitHub repository containing taxonomies. Useful for discovering available taxonomy versions from remote repositories."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "GitHub taxonomy tags successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "GitHub taxonomy tags successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid GitHub repository or access denied"),
     @ApiResponse(responseCode = "404", description = "GitHub repository or tags not found"),
     @ApiResponse(responseCode = "500", description = "Error accessing GitHub API")

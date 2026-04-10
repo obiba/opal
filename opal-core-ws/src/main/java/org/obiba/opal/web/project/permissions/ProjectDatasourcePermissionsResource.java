@@ -66,7 +66,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
   @GET
   @Operation(summary = "Get datasource permissions", description = "Retrieves datasource-level permissions for subjects. Datasource permissions control access to data operations, table management, and variable metadata within the project datasource.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -92,7 +92,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
   @POST
   @Operation(summary = "Set datasource permission", description = "Grants datasource-level permissions to subjects. Datasource permissions control access to data operations, table management, and variable metadata within the project datasource.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Datasource permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Datasource permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -116,7 +116,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
   @DELETE
   @Operation(summary = "Delete datasource permissions", description = "Removes all datasource-level permissions from subjects. This revokes access to data operations, table management, and variable metadata within the project datasource.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Datasource permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project or datasource not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

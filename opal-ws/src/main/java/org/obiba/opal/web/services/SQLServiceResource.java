@@ -45,7 +45,7 @@ public class SQLServiceResource {
     description = "Retrieves the history of SQL executions with optional filtering by user and datasource"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "SQL execution history retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "SQL execution history retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

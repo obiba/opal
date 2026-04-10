@@ -33,7 +33,7 @@ public interface CompareResource {
   @Path("/{with}")
   @Operation(summary = "Compare table", description = "Compare table with another table or view")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Comparison completed successfully"),
+    @ApiResponse(responseCode = "200", description = "Comparison completed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid comparison parameters"),
     @ApiResponse(responseCode = "404", description = "Table to compare with not found"),
     @ApiResponse(responseCode = "500", description = "Server error")

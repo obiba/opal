@@ -88,7 +88,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Retrieves all identifiers mappings in the system, with optional filtering by entity types. Returns mapping names and the entity types they support."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mappings successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mappings successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Error accessing identifiers database")
   })
   public List<IdentifiersMappingDto> getIdentifiersMappings(final @QueryParam("type") List<String> entityTypes) {
@@ -128,7 +128,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Imports system identifiers from plain text (one per line) into the corresponding identifiers table. New private identifiers will be automatically generated for imported system identifiers."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "System identifiers successfully imported"),
+    @ApiResponse(responseCode = "200", description = "System identifiers successfully imported", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing entity type, no identifiers, or identifiers table not found"),
     @ApiResponse(responseCode = "500", description = "Error during import process")
   })
@@ -168,7 +168,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Creates a temporary datasource from the provided configuration and imports all identifiers into the corresponding identifiers tables. Supports various datasource types and configurations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported from datasource"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported from datasource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid datasource configuration or no identifiers database defined"),
     @ApiResponse(responseCode = "500", description = "Error during datasource creation or import process")
   })
@@ -202,7 +202,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Synchronizes identifiers from existing datasources into the identifiers database. Can sync from a specific datasource, specific tables, or all datasources. Only processes entity types supported by the identifiers datasource."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully synchronized from datasources"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully synchronized from datasources", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "No identifiers database defined or invalid datasource/table specified"),
     @ApiResponse(responseCode = "404", description = "Specified datasource or table not found"),
     @ApiResponse(responseCode = "500", description = "Error during synchronization process")
@@ -246,7 +246,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Reports the number of entities that can be synchronized from data datasources but are not yet in the identifiers database. Returns sync status for each table including total entity count and count of entities needing import."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Sync status successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Sync status successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "No identifiers database defined or missing datasource parameter"),
     @ApiResponse(responseCode = "404", description = "Specified datasource or table not found"),
     @ApiResponse(responseCode = "500", description = "Error during sync status calculation")
@@ -297,7 +297,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     description = "Exports all identifier mappings for a specific entity type as a CSV file. Includes system identifiers and all corresponding private identifier mappings for the specified entity type."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "All identifiers successfully exported as CSV file"),
+    @ApiResponse(responseCode = "200", description = "All identifiers successfully exported as CSV file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "No identifiers database defined or missing entity type"),
     @ApiResponse(responseCode = "401", description = "Authentication required"),
     @ApiResponse(responseCode = "404", description = "Entity type not found in identifiers database"),

@@ -58,7 +58,7 @@ public class ProjectResourceReferencesPermissionsResource extends AbstractPermis
   @GET
   @Operation(summary = "Get project resources permissions", description = "Retrieves permissions for all resources within a project. Resources permissions control access to project-wide resources including files, reports, and other assets.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Resources permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Resources permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -87,7 +87,7 @@ public class ProjectResourceReferencesPermissionsResource extends AbstractPermis
   @POST
   @Operation(summary = "Set project resources permission", description = "Grants permissions to subjects for all resources within a project. Resources permissions control access to project-wide resources including files, reports, and other assets.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Resources permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Resources permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -113,7 +113,7 @@ public class ProjectResourceReferencesPermissionsResource extends AbstractPermis
   @DELETE
   @Operation(summary = "Delete project resources permissions", description = "Removes all permissions from subjects for resources within a project. This revokes access to project-wide resources including files, reports, and other assets.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Resources permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Resources permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

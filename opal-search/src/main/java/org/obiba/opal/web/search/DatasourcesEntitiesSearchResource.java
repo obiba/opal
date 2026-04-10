@@ -59,7 +59,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Path("_suggest")
   @Operation(summary = "Suggest entity identifiers", description = "Get suggestions for entity identifiers based on partial match. Returns matching identifiers from the identifiers table for the specified entity type.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Identifier suggestions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Identifier suggestions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Identifiers table not found for entity type")
   })
   public Identifiers.IdentifierSuggestions search(@QueryParam("query") String query,
@@ -123,7 +123,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Path("_contingency")
   @Operation(summary = "Get contingency table", description = "Generate contingency table for two variables across all datasources.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated"),
+      @ApiResponse(responseCode = "200", description = "Contingency table successfully generated", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid variables or search parameters")
   })
   public Response facets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) throws SearchException {

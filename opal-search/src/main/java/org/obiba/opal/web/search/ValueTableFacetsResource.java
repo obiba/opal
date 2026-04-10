@@ -68,7 +68,7 @@ public class ValueTableFacetsResource {
   @Transactional(readOnly = true)
   @Operation(summary = "Search table facets", description = "Perform faceted search within a specific datasource table using query terms. Supports contingency table generation and complex filtering.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Faceted search results successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Faceted search results successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid query terms or missing required parameters"),
       @ApiResponse(responseCode = "404", description = "Table not found")
   })

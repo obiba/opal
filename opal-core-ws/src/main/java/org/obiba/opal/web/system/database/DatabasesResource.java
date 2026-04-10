@@ -49,7 +49,7 @@ public class DatabasesResource {
 @NoAuthorization
 @Operation(summary = "Get all databases", description = "Retrieve list of all configured databases with optional filtering by usage type and inclusion of settings")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "List of databases successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "List of databases successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid database usage parameter"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -66,7 +66,7 @@ public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage, @QueryP
 @Path("/sql")
 @Operation(summary = "Get SQL databases", description = "Retrieve list of all SQL databases with settings included")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "List of SQL databases successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "List of SQL databases successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public List<DatabaseDto> getSqlDatabases() {
@@ -77,7 +77,7 @@ public List<DatabaseDto> getSqlDatabases() {
 @Path("/mongodb")
 @Operation(summary = "Get MongoDB databases", description = "Retrieve list of all MongoDB databases with settings included")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "List of MongoDB databases successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "List of MongoDB databases successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public List<DatabaseDto> getMongoDbDatabases() {
@@ -88,7 +88,7 @@ public List<DatabaseDto> getMongoDbDatabases() {
 @Path("/identifiers")
 @Operation(summary = "Get identifiers database", description = "Retrieve the database used for storing entity identifiers")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Identifiers database successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Identifiers database successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "No identifiers database configured"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -108,7 +108,7 @@ public DatabaseDto getIdentifiersDatabase() {
 @POST
 @Operation(summary = "Add or update database", description = "Create a new database configuration or update an existing one. If a database with the same name exists, it will be updated; otherwise a new database will be created.")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Database successfully added or updated"),
+  @ApiResponse(responseCode = "200", description = "Database successfully added or updated", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid database configuration"),
   @ApiResponse(responseCode = "409", description = "Multiple identifiers database conflict"),
   @ApiResponse(responseCode = "500", description = "Internal server error")

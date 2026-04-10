@@ -75,7 +75,7 @@ public class ProjectAnalysisResource {
     description = "Retrieves all analyses associated with the project, including analysis metadata, status, and results from all data tables within the project."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project analyses successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Project analyses successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access project analyses"),
     @ApiResponse(responseCode = "404", description = "Project not found")
   })
@@ -95,7 +95,7 @@ public class ProjectAnalysisResource {
     description = "Exports all project analyses as a ZIP archive. Can include all analyses or only successful ones based on the 'all' parameter. The archive contains analysis results and metadata."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project analyses successfully exported as ZIP file"),
+    @ApiResponse(responseCode = "200", description = "Project analyses successfully exported as ZIP file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to export project analyses"),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "500", description = "Error during export process")
@@ -119,7 +119,7 @@ public class ProjectAnalysisResource {
     description = "Provides access to analyses for a specific data table within the project. Returns a sub-resource for managing table-specific analyses, variables, and statistical computations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Table analyses resource successfully accessed"),
+    @ApiResponse(responseCode = "200", description = "Table analyses resource successfully accessed", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access table analyses"),
     @ApiResponse(responseCode = "404", description = "Project or table not found")
   })

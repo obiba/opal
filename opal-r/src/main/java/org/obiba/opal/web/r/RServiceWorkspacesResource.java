@@ -52,7 +52,7 @@ public class RServiceWorkspacesResource {
     description = "Retrieves a list of R workspaces, optionally filtered by context and user. Only workspaces the user has permission to access are returned."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R workspaces"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R workspaces", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<OpalR.RWorkspaceDto> getRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user) {
@@ -86,7 +86,7 @@ public class RServiceWorkspacesResource {
     description = "Removes R workspaces, optionally filtered by context, user, and name. Only workspaces the user has permission to access are removed."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Workspaces successfully removed"),
+    @ApiResponse(responseCode = "200", description = "Workspaces successfully removed", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response removeRWorkspaces(@QueryParam("context") String context, @QueryParam("user") String user, @QueryParam("name") String name) {

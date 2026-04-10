@@ -42,7 +42,7 @@ public class ResourceProvidersResource {
 @NoAuthorization
 @Operation(summary = "List resource providers", description = "Retrieve a comprehensive list of all available R resource providers and their categories")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Resource providers list successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Resource providers list successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public Resources.ResourceProvidersDto list() {
@@ -70,7 +70,7 @@ public Response init() {
 @NoAuthorization
 @Operation(summary = "Get resource providers status", description = "Retrieve the current status of all resource providers including provider count and R server availability")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Resource providers status successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Resource providers status successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public Resources.ResourceProvidersStatusDto status() {

@@ -66,7 +66,7 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
   @GET
   @Operation(summary = "Get VCF store permissions", description = "Retrieves VCF store permissions for subjects. VCF store permissions control access to VCF (Variant Call Format) genomic data storage and operations within the project.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -95,7 +95,7 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
   @POST
   @Operation(summary = "Set VCF store permission", description = "Grants VCF store permissions to subjects. VCF store permissions control access to VCF (Variant Call Format) genomic data storage and operations within the project.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "VCF store permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "VCF store permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -121,7 +121,7 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
   @DELETE
   @Operation(summary = "Delete VCF store permissions", description = "Removes all VCF store permissions from subjects. This revokes access to VCF (Variant Call Format) genomic data storage and operations within the project.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "VCF store permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

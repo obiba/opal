@@ -56,7 +56,7 @@ public class RServicePackagesResource {
     description = "Retrieves a list of all R packages installed in the default R server."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R packages"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R packages", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<OpalR.RPackageDto> getPackages(@QueryParam("profile") String profile) {
@@ -69,7 +69,7 @@ public class RServicePackagesResource {
     description = "Updates all installed R packages to their latest versions from CRAN."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Packages successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Packages successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
     @ApiResponse(responseCode = "500", description = "Failed to update packages")
   })

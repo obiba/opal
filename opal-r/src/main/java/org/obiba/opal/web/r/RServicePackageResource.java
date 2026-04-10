@@ -48,7 +48,7 @@ public class RServicePackageResource {
     description = "Retrieves detailed information about a specific R package installed in the default R server."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R package"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R package", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

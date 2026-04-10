@@ -48,7 +48,7 @@ public class DatasourcePluginsResource {
     description = "Retrieves a list of installed datasource plugins filtered by usage type"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Datasource plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Datasource plugins list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid usage parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

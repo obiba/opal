@@ -65,7 +65,7 @@ public class DatabaseResource {
     description = "Retrieves detailed information about a specific database including its configuration and datasource status."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved database information"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved database information", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Database not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -80,7 +80,7 @@ public class DatabaseResource {
     description = "Removes a database from the system configuration."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Database successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Database successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Database not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -96,7 +96,7 @@ public class DatabaseResource {
     description = "Updates database configuration. Database name cannot be changed, but other settings can be modified."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Database successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Database successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid database configuration"),
     @ApiResponse(responseCode = "404", description = "Database not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -121,7 +121,7 @@ public class DatabaseResource {
     description = "Tests the connectivity to a database by attempting to establish a connection. Supports both SQL and MongoDB databases."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Database connection test successful"),
+    @ApiResponse(responseCode = "200", description = "Database connection test successful", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Database not found"),
     @ApiResponse(responseCode = "503", description = "Database connection failed"),
     @ApiResponse(responseCode = "500", description = "Internal server error or unsupported database type")
@@ -144,7 +144,7 @@ public class DatabaseResource {
     description = "Returns whether the database contains any entity records, indicating if it has been used for data storage."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity status"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity status", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Database not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

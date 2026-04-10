@@ -42,7 +42,7 @@ public interface ValueSetsResource extends BaseResource {
   @GET
   @Operation(summary = "Get value sets", description = "Retrieve multiple value sets with pagination and filtering")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Value sets retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Value sets retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid filter or pagination parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -78,7 +78,7 @@ public interface ValueSetsResource extends BaseResource {
   @Path("/timestamps")
   @Operation(summary = "Get value sets timestamps", description = "Retrieve value sets timestamps without actual values")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Timestamps retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

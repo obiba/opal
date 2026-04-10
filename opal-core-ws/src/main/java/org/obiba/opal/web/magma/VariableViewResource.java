@@ -31,7 +31,7 @@ public interface VariableViewResource extends VariableResource {
   @PUT
   @Operation(summary = "Create or update view variable", description = "Create a new variable or update existing variable in view")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variable updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Variable updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "201", description = "Variable created successfully"),
     @ApiResponse(responseCode = "400", description = "Invalid variable data"),
     @ApiResponse(responseCode = "500", description = "Server error")

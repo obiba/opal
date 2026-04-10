@@ -27,7 +27,7 @@ public interface BaseResource {
   @OPTIONS
   @Operation(summary = "Get OPTIONS", description = "Get allowed HTTP methods for this resource")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "OPTIONS request processed successfully"),
+    @ApiResponse(responseCode = "200", description = "OPTIONS request processed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   default Response getOptions() {

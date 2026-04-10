@@ -46,7 +46,7 @@ public class PluginResource {
     description = "Retrieves detailed information about a specific installed plugin"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Plugin details retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Plugin details retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Plugin not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -99,7 +99,7 @@ public class PluginResource {
     description = "Saves configuration properties for a specific plugin"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Plugin configuration saved successfully"),
+    @ApiResponse(responseCode = "200", description = "Plugin configuration saved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid configuration properties"),
     @ApiResponse(responseCode = "404", description = "Plugin not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

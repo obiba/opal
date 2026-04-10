@@ -89,7 +89,7 @@ public class ProjectResource implements BaseResource {
   @GET
   @Operation(summary = "Get project details", description = "Retrieves detailed information about a specific project including its configuration and metadata.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project details retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Project details retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to project")
   })
@@ -102,7 +102,7 @@ public class ProjectResource implements BaseResource {
   @Path("/summary")
   @Operation(summary = "Get project summary", description = "Retrieves a summary view of the project with essential information.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project summary retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Project summary retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to project")
   })
@@ -124,7 +124,7 @@ public class ProjectResource implements BaseResource {
   @PUT
   @Operation(summary = "Update project", description = "Updates an existing project's configuration and metadata.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Project updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid project data or name mismatch"),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to update project"),
@@ -143,7 +143,7 @@ public class ProjectResource implements BaseResource {
   @DELETE
   @Operation(summary = "Delete project", description = "Deletes a project and optionally archives it. Also cleans up associated datasources, VCF stores, mappings, and bookmarks.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project deleted successfully"),
+    @ApiResponse(responseCode = "200", description = "Project deleted successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to delete project"),
     @ApiResponse(responseCode = "500", description = "Internal server error during deletion")
@@ -181,7 +181,7 @@ public class ProjectResource implements BaseResource {
   @Path("/identifiers-mappings")
   @Operation(summary = "Get project identifiers mappings", description = "Retrieves all identifiers mappings configured for the project.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mappings retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mappings retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to project")
   })
@@ -199,7 +199,7 @@ public class ProjectResource implements BaseResource {
   @Path("/identifiers-mapping")
   @Operation(summary = "Get project identifiers mapping by entity type", description = "Retrieves identifiers mapping for a specific entity type within the project.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mapping retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mapping retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to project")
   })
@@ -224,7 +224,7 @@ public class ProjectResource implements BaseResource {
   @Path("/state")
   @Operation(summary = "Get project state", description = "Retrieves the current state of the project including status and availability information.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Project state retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Project state retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Project not found"),
     @ApiResponse(responseCode = "403", description = "Access denied to project")
   })
