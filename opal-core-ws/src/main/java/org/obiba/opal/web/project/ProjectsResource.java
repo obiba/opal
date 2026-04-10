@@ -54,7 +54,7 @@ public class ProjectsResource implements BaseResource {
   @NoAuthorization
   @Operation(summary = "Get all projects", description = "Retrieves a list of all accessible projects. Can return full details or digest format.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Access denied to some or all projects")
   })
   public List<Projects.ProjectDto> getProjects(@QueryParam("digest") @DefaultValue("false") boolean digest) {

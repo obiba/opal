@@ -114,7 +114,7 @@ public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context Ht
 @Path("/session/{id}")
 @Operation(summary = "Check session validity", description = "Check if a session with the given ID is still valid")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Session is valid"),
+  @ApiResponse(responseCode = "200", description = "Session is valid", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Session not found or expired"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -128,7 +128,7 @@ public Response checkSession(@PathParam("id") String sessionId) {
 @NoAuthorization
 @Operation(summary = "Delete session by ID", description = "Delete a specific user session by its ID (legacy endpoint)")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Session successfully deleted"),
+  @ApiResponse(responseCode = "200", description = "Session successfully deleted", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Session not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -142,7 +142,7 @@ public Response deleteSession(@PathParam("id") String sessionId) {
 @NoAuthorization
 @Operation(summary = "Delete current session", description = "Delete the current user session and invalidate authentication")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Current session successfully deleted"),
+  @ApiResponse(responseCode = "200", description = "Current session successfully deleted", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public Response deleteCurrentSession() {
@@ -179,7 +179,7 @@ public Response deleteCurrentSession() {
 @NoAuthorization
 @Operation(summary = "Get current user", description = "Retrieve information about the currently authenticated user")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Current user information successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Current user information successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
 public Opal.Subject getCurrentSubject() {
@@ -197,7 +197,7 @@ public Opal.Subject getCurrentSubject() {
 @Path("/session/{id}/username")
 @Operation(summary = "Get user by session ID", description = "Retrieve user information for a specific session ID")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "User information successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "User information successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Session not found or expired"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })

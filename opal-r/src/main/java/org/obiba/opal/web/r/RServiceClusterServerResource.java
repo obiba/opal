@@ -53,7 +53,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Retrieves detailed information about a specific R server within a cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -67,7 +67,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Starts a specific R server within a cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Server successfully started"),
+    @ApiResponse(responseCode = "200", description = "Server successfully started", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Failed to start server")
   })
@@ -82,7 +82,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Stops a specific R server within a cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Server successfully stopped"),
+    @ApiResponse(responseCode = "200", description = "Server successfully stopped", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Failed to stop server")
   })
@@ -98,7 +98,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Retrieves a list of all R packages installed on a specific R server within a cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R packages"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R packages", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -113,7 +113,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Updates all installed R packages on a specific R server within a cluster to their latest versions from CRAN."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Packages successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Packages successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Failed to update packages")
@@ -184,7 +184,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Retrieves detailed information about a specific R package installed on a server within a cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R package"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R package", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "R server cluster, server, or package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -226,7 +226,7 @@ public class RServiceClusterServerResource extends AbstractRServiceResource {
     description = "Retrieves the R server log content for a specific server within a cluster, optionally limited to a specific number of lines."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server log"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R server log", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
     @ApiResponse(responseCode = "404", description = "R server cluster or server not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

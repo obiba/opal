@@ -38,7 +38,7 @@ public class PodSpecResource {
     description = "Retrieves detailed information about a specific pod specification"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Pod specification retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Pod specification retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Pod specification not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -68,7 +68,7 @@ public class PodSpecResource {
     description = "Retrieves a list of pods associated with a specific pod specification"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Pods list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Pods list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Pod specification not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

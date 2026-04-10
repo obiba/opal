@@ -38,7 +38,7 @@ public interface DataShieldROptionResource {
   @PUT
   @Operation(summary = "Add or update DataShield R option", description = "Create or update a DataShield R option")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R option updated successfully"),
+    @ApiResponse(responseCode = "200", description = "R option updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "201", description = "R option created successfully"),
     @ApiResponse(responseCode = "400", description = "Invalid option data"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -48,7 +48,7 @@ public interface DataShieldROptionResource {
   @GET
   @Operation(summary = "Get DataShield R option", description = "Retrieve a specific DataShield R option")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R option retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "R option retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Option not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

@@ -59,7 +59,7 @@ public class ProjectResourceReferencesResource implements BaseResource {
     description = "Retrieves all resource references within a project, sorted by name. In safe mode (default), edit permissions are not checked for better performance."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Resource references list successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Resource references list successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "Insufficient permissions to access the project"),
     @ApiResponse(responseCode = "404", description = "Project not found")
   })

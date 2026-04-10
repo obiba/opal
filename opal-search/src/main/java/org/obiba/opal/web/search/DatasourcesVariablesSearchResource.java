@@ -51,7 +51,7 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Operation(summary = "Search variables across datasources", description = "Search for variables across all datasources in the system. Supports complex queries, pagination, sorting, field selection, and faceted search.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Search results successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Search results successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid search query or parameters"),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })
@@ -88,7 +88,7 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Operation(summary = "Count variables across datasources", description = "Count variables matching search criteria across all datasources.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Variable count successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Variable count successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid search query or parameters"),
       @ApiResponse(responseCode = "503", description = "Search service unavailable")
   })

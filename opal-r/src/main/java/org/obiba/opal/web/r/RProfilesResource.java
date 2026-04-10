@@ -41,7 +41,7 @@ public class RProfilesResource {
     description = "Retrieves a list of R profiles, optionally filtered by enabled status. Profiles represent R server configurations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R profiles"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R profiles", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<OpalR.RProfileDto> getProfiles(@QueryParam("enabled") Boolean enabled) {

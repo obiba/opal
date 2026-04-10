@@ -52,7 +52,7 @@ public class RServiceActivityResource {
     description = "Retrieves a list of R session activities filtered by context, user, profile, and date range."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session activities"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session activities", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -72,7 +72,7 @@ public class RServiceActivityResource {
     description = "Retrieves summarized R activity data filtered by context, user, profile, and date range."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R activity summaries"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R activity summaries", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

@@ -38,7 +38,7 @@ public class SubjectCredentialResource {
   @GET
   @Operation(summary = "Get subject credentials", description = "Retrieves the credentials of a specific subject.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Subject credentials retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Subject credentials not found")
   })
   public Response get() {
@@ -51,7 +51,7 @@ public class SubjectCredentialResource {
   @PUT
   @Operation(summary = "Update subject credentials", description = "Updates the credentials of a specific subject.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject credentials updated successfully"),
+      @ApiResponse(responseCode = "200", description = "Subject credentials updated successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid credentials data provided"),
       @ApiResponse(responseCode = "404", description = "Subject credentials not found")
   })
@@ -81,7 +81,7 @@ public class SubjectCredentialResource {
   @DELETE
   @Operation(summary = "Delete subject credentials", description = "Deletes the credentials of a specific subject.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject credentials deleted successfully"),
+      @ApiResponse(responseCode = "200", description = "Subject credentials deleted successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Subject credentials not found")
   })
   public Response delete() {

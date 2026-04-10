@@ -36,7 +36,7 @@ public interface VariableResource {
   @GET
   @Operation(summary = "Get variable", description = "Retrieve variable details and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variable retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Variable retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Variable not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -45,7 +45,7 @@ public interface VariableResource {
   @PUT
   @Operation(summary = "Update variable", description = "Update variable definition and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variable updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Variable updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid variable data"),
     @ApiResponse(responseCode = "404", description = "Variable not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -65,7 +65,7 @@ public interface VariableResource {
   @Path("/attribute/{name}")
   @Operation(summary = "Update variable attribute", description = "Update or add an attribute to the variable")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Attribute updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Attribute updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid attribute data"),
     @ApiResponse(responseCode = "404", description = "Variable not found"),
     @ApiResponse(responseCode = "500", description = "Server error")

@@ -58,7 +58,7 @@ public class IDProviderResource {
   @PUT
   @Operation(summary = "Update ID provider", description = "Updates a specific identity provider configuration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "ID provider updated successfully"),
+      @ApiResponse(responseCode = "200", description = "ID provider updated successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid provider data provided"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -79,7 +79,7 @@ public class IDProviderResource {
   @Path("/_enable")
   @Operation(summary = "Enable ID provider", description = "Enables a specific identity provider.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "ID provider enabled successfully"),
+      @ApiResponse(responseCode = "200", description = "ID provider enabled successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response enable() {
@@ -90,7 +90,7 @@ public class IDProviderResource {
   @Path("/_enable")
   @Operation(summary = "Disable ID provider", description = "Disables a specific identity provider.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "ID provider disabled successfully"),
+      @ApiResponse(responseCode = "200", description = "ID provider disabled successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response disable() {

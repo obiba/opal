@@ -54,7 +54,7 @@ public class DataShieldPackageResource {
     description = "Retrieves information about a specific DataSHIELD package installed in the specified profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved package information"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved package information", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -74,7 +74,7 @@ public class DataShieldPackageResource {
     description = "Retrieves all available methods for a specific DataSHIELD package in the specified profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved package methods"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved package methods", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -95,7 +95,7 @@ public class DataShieldPackageResource {
     description = "Publishes all methods of a DataSHIELD package to the specified profiles. This endpoint is deprecated."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully published package methods"),
+    @ApiResponse(responseCode = "200", description = "Successfully published package methods", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -120,7 +120,7 @@ public class DataShieldPackageResource {
     description = "Appends DataSHIELD package settings to the specified profile configurations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully published package settings"),
+    @ApiResponse(responseCode = "200", description = "Successfully published package settings", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -190,7 +190,7 @@ public class DataShieldPackageResource {
     description = "Silently deletes a DataSHIELD package and all its methods from the specified profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully deleted package"),
+    @ApiResponse(responseCode = "200", description = "Successfully deleted package", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "403", description = "R package management not allowed"),
     @ApiResponse(responseCode = "404", description = "Package not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

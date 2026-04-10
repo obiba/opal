@@ -54,7 +54,7 @@ public class VariableEntityResource {
 @NoAuthorization
 @Operation(summary = "Check if entity exists", description = "Check if a variable entity with the specified ID and type exists in the system")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Entity exists and information returned"),
+  @ApiResponse(responseCode = "200", description = "Entity exists and information returned", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Entity not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })

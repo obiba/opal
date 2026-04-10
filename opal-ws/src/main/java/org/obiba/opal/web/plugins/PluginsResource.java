@@ -44,7 +44,7 @@ public class PluginsResource {
     description = "Retrieves a list of installed plugins with optional filtering by type"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Installed plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Installed plugins list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -62,7 +62,7 @@ public class PluginsResource {
     description = "Retrieves a list of plugins that have available updates with optional filtering by type"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Updatable plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Updatable plugins list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -80,7 +80,7 @@ public class PluginsResource {
     description = "Retrieves a list of plugins available for installation with optional filtering by type"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Available plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Available plugins list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid type parameter"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -97,7 +97,7 @@ public class PluginsResource {
     description = "Installs a plugin either by name and version or from a file"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Plugin installation initiated successfully"),
+    @ApiResponse(responseCode = "200", description = "Plugin installation initiated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

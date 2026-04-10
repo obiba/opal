@@ -26,7 +26,7 @@ public interface BookmarkResource {
   @GET
   @Operation(summary = "Get bookmark", description = "Retrieve a specific bookmark for the user")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Bookmark retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Bookmark retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Bookmark not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

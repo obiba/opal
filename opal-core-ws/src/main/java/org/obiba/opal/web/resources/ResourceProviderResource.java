@@ -42,7 +42,7 @@ public class ResourceProviderResource {
 @NoAuthorization
 @Operation(summary = "Get resource provider", description = "Retrieve detailed information about a specific R resource provider including its configuration and capabilities")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Resource provider information successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Resource provider information successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Resource provider not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -55,7 +55,7 @@ public Resources.ResourceProviderDto getResourceProvider() {
 @Path("/factory/{type}")
 @Operation(summary = "Get resource factory", description = "Retrieve information about a specific resource factory type within a resource provider, including its configuration schema and parameters")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Resource factory information successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Resource factory information successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Resource provider or factory type not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })

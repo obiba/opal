@@ -73,7 +73,7 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @Path("/_all")
   @Operation(summary = "Get all project permissions", description = "Retrieves all permissions within a project, including project-level, datasource-level, table-level, and variable-level permissions.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "All permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "All permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -96,7 +96,7 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @Path("/subjects")
   @Operation(summary = "Get project subjects", description = "Retrieves all subjects (users and groups) that have permissions within a project.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subjects successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Subjects successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -139,7 +139,7 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @Path("/project")
   @Operation(summary = "Get project-level permissions", description = "Retrieves project-level permissions for subjects. Project permissions control access to project management functions like configuration, metadata, and administration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Project permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Project permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -166,7 +166,7 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @Path("/project")
   @Operation(summary = "Set project-level permission", description = "Grants project-level permissions to subjects. Project permissions control access to project management functions like configuration, metadata, and administration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Project permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Project permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -192,7 +192,7 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   @Path("/project")
   @Operation(summary = "Delete project-level permissions", description = "Removes all project-level permissions from subjects. This revokes access to project management functions like configuration, metadata, and administration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Project permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Project permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

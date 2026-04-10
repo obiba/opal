@@ -53,7 +53,7 @@ public class DataShieldProfilePermissionsResource extends AbstractPermissionsRes
     description = "Retrieves the access control list (ACL) permissions for a DataSHIELD profile, optionally filtered by subject type (USER or GROUP)."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -68,7 +68,7 @@ public class DataShieldProfilePermissionsResource extends AbstractPermissionsRes
     description = "Sets access permissions for users or groups on a DataSHIELD profile. Automatically enables restricted access mode on the profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully set permission"),
+    @ApiResponse(responseCode = "200", description = "Successfully set permission", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "400", description = "Invalid permission data"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -91,7 +91,7 @@ public class DataShieldProfilePermissionsResource extends AbstractPermissionsRes
     description = "Removes access permissions for users or groups from a DataSHIELD profile."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully deleted permissions"),
+    @ApiResponse(responseCode = "200", description = "Successfully deleted permissions", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Profile not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

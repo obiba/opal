@@ -58,7 +58,7 @@ public class SubjectCredentialsResource implements BaseResource {
   @POST
   @Operation(summary = "Create subject credentials", description = "Creates new subject credentials.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Subject credentials created successfully"),
+      @ApiResponse(responseCode = "200", description = "Subject credentials created successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid credentials data provided"),
       @ApiResponse(responseCode = "409", description = "Subject already exists")
   })

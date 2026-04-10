@@ -43,7 +43,7 @@ public class DataShieldResource {
     description = "Provides access to DataSHIELD R sessions management."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully accessed sessions resource"),
+    @ApiResponse(responseCode = "200", description = "Successfully accessed sessions resource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public RSessionsResource getSessions() {
@@ -58,7 +58,7 @@ public class DataShieldResource {
     description = "Provides access to a specific DataSHIELD R session by ID for session management and operations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully accessed session resource"),
+    @ApiResponse(responseCode = "200", description = "Successfully accessed session resource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Session not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -82,17 +82,17 @@ public class DataShieldResource {
     throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 
-  @Path("/env/{name}")
+  @Path("/env/{env}")
   @Operation(
     summary = "Get DataSHIELD environment",
     description = "Provides access to DataSHIELD environment resources (AGGREGATE, ASSIGN) for method management and operations."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully accessed environment resource"),
+    @ApiResponse(responseCode = "200", description = "Successfully accessed environment resource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid environment name"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public DataShieldEnvironmentResource getEnvironment(@PathParam("name") String env) {
+  public DataShieldEnvironmentResource getEnvironment(@PathParam("env") String env) {
     DataShieldEnvironmentResource resource = applicationContext.getBean(DataShieldEnvironmentResource.class);
     resource.setMethodType(DSMethodType.valueOf(env.toUpperCase()));
     return resource;

@@ -64,7 +64,7 @@ public class GroupsResource {
   @POST
   @Operation(summary = "Create group", description = "Creates a new user group.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Group created successfully"),
+      @ApiResponse(responseCode = "200", description = "Group created successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid group data provided"),
       @ApiResponse(responseCode = "409", description = "Group already exists")
   })

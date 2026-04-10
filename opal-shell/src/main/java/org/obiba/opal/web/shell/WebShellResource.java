@@ -56,7 +56,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Retrieves the list of all command jobs in the system with their current status."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved command list"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command list", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<CommandStateDto> getCommands() {
@@ -77,7 +77,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Retrieves detailed information about a specific command job by its ID."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command details", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -94,7 +94,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Deletes a specific command job by its ID. Only completed or failed commands can be deleted."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Command successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Command successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -117,7 +117,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Deletes all completed command jobs from the system to clean up the command history."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "All completed commands successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "All completed commands successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response deleteCompletedCommands() {
@@ -132,7 +132,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Retrieves the current status of a specific command job."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved command status"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved command status", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -151,7 +151,7 @@ public class WebShellResource extends AbstractCommandsResource {
     description = "Updates the status of a specific command job. Currently only allows canceling running commands."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Command status successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Command status successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "400", description = "Invalid status or command cannot be canceled"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

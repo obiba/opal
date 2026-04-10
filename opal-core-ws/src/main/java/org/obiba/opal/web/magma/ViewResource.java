@@ -32,7 +32,7 @@ public interface ViewResource extends TableResource {
   @GET
   @Operation(summary = "Get view", description = "Retrieve view definition and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "View retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "View retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "View not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -41,7 +41,7 @@ public interface ViewResource extends TableResource {
   @PUT
   @Operation(summary = "Update view", description = "Update view definition and metadata")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "View updated successfully"),
+    @ApiResponse(responseCode = "200", description = "View updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid view data"),
     @ApiResponse(responseCode = "404", description = "View not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
@@ -61,7 +61,7 @@ public interface ViewResource extends TableResource {
   @Path("/_init")
   @Operation(summary = "Initialize view", description = "Initialize the view structure")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "View initialized successfully"),
+    @ApiResponse(responseCode = "200", description = "View initialized successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   Response initView();
@@ -71,7 +71,7 @@ public interface ViewResource extends TableResource {
   @Produces("application/xml")
   @Operation(summary = "Download view definition", description = "Download view definition as XML file")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "XML definition downloaded successfully"),
+    @ApiResponse(responseCode = "200", description = "XML definition downloaded successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "View not found"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

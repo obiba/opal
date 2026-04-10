@@ -25,7 +25,7 @@ public interface DefaultSummaryResource extends SummaryResource {
   @POST // requires POST since request body contains variable info (categories, script, etc)
   @Operation(summary = "Get variable summary", description = "Generate default statistical summary for variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during summary generation")
   })

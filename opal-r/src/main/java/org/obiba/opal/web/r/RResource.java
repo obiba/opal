@@ -60,7 +60,7 @@ public class RResource {
     description = "Executes an R script and returns the result as binary data. The script can be provided as a query parameter or in the request body."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Script executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
     @ApiResponse(responseCode = "404", description = "R server not found"),
     @ApiResponse(responseCode = "500", description = "Script execution failed")
@@ -77,7 +77,7 @@ public class RResource {
     description = "Executes an R script and returns the result as JSON. The script can be provided as a query parameter or in the request body."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Script executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Script executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
     @ApiResponse(responseCode = "404", description = "R server not found"),
     @ApiResponse(responseCode = "500", description = "Script execution failed")
@@ -113,7 +113,7 @@ public class RResource {
     description = "Returns a resource handler for managing R sessions."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved sessions resource"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved sessions resource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public RSessionsResource getSessionsResource() {

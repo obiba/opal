@@ -35,7 +35,7 @@ public class JdbcDriversResource {
       description = "Retrieves the list of supported JDBC drivers with connection URL templates and examples."
   )
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "JDBC drivers list retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "JDBC drivers list retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Iterable<Database.JdbcDriverDto> getJdbcDrivers() {

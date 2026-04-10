@@ -29,7 +29,7 @@ public interface VariableEntityTablesResource {
   @NoAuthorization
   @Operation(summary = "Get variable entity tables", description = "Retrieve tables containing a specific variable entity")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   List<Magma.TableDto> getTables();

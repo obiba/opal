@@ -25,7 +25,7 @@ public interface CategoricalSummaryResource extends SummaryResource {
   @POST // requires POST since request body contains variable info (categories, script, etc)
   @Operation(summary = "Get categorical variable summary", description = "Generate statistical summary for categorical variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Summary generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Summary generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid parameters"),
     @ApiResponse(responseCode = "500", description = "Server error during summary generation")
   })

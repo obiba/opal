@@ -32,7 +32,7 @@ public interface OpalRSymbolResource extends RSymbolResource {
   @Consumes("application/x-rdata")
   @Operation(summary = "Push R data object", description = "Push a R data object into the R server with base64 encoded serialized form")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R data object pushed successfully"),
+    @ApiResponse(responseCode = "200", description = "R data object pushed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid R data content"),
     @ApiResponse(responseCode = "500", description = "Server error during data push")
   })
@@ -49,7 +49,7 @@ public interface OpalRSymbolResource extends RSymbolResource {
   @Path("/_save")
   @Operation(summary = "Save R symbol to file", description = "Save the R symbol representing a tibble to a file with supported format (SPSS, SAS, Stata)")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "R symbol saved successfully"),
+    @ApiResponse(responseCode = "200", description = "R symbol saved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid destination path"),
     @ApiResponse(responseCode = "500", description = "Server error during save")
   })

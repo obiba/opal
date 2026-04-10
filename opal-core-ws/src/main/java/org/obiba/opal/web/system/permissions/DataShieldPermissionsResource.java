@@ -51,7 +51,7 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
     description = "Retrieves access control list (ACL) permissions for DataShield system, optionally filtered by subject type (USER or GROUP)."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved permissions", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Iterable<Opal.Acl> getDataShieldPermissions(@QueryParam("type") SubjectType type) {
@@ -73,7 +73,7 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
     description = "Sets access permissions for users or groups on the DataShield system."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully set permission"),
+    @ApiResponse(responseCode = "200", description = "Successfully set permission", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid permission data"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -97,7 +97,7 @@ public class DataShieldPermissionsResource extends AbstractPermissionsResource {
     description = "Removes access permissions for users or groups from the DataShield system."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully deleted permissions"),
+    @ApiResponse(responseCode = "200", description = "Successfully deleted permissions", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response deleteDataShieldPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,

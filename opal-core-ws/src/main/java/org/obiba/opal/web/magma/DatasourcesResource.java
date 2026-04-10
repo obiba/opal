@@ -59,7 +59,7 @@ public class DatasourcesResource {
     description = "Retrieves a list of all available datasources with their metadata and access links."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources list"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources list", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<Magma.DatasourceDto> getDatasources() {
@@ -80,7 +80,7 @@ public class DatasourcesResource {
     description = "Retrieves a consolidated list of all tables from all datasources, optionally filtered by entity type and indexed status."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved tables list"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved tables list", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexed) {
@@ -100,7 +100,7 @@ public class DatasourcesResource {
     description = "Retrieves a summary of all entity types available across all datasources with their table counts."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity types summary"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved entity types summary", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<Magma.VariableEntitySummaryDto> getEntityTypes() {
@@ -123,7 +123,7 @@ public class DatasourcesResource {
     description = "Retrieves the total number of available datasources."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources count"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved datasources count", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getDatasourcesCount() {
@@ -140,7 +140,7 @@ public class DatasourcesResource {
     description = "Executes a SQL query across all datasources and returns results in JSON format."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -164,7 +164,7 @@ public class DatasourcesResource {
     description = "Executes a SQL query across all datasources and returns results in CSV format."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -188,7 +188,7 @@ public class DatasourcesResource {
     description = "Executes a SQL query across all datasources and returns results in R data format for use in R."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Query executed successfully"),
+    @ApiResponse(responseCode = "200", description = "Query executed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid SQL query"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })

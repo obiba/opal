@@ -48,7 +48,7 @@ public class RClusterCommandsResource implements BaseResource {
     description = "Retrieves the list of command jobs associated with a specific R cluster."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved R cluster command list"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R cluster command list", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public List<Commands.CommandStateDto> getCommands(@PathParam("cname") String name) {

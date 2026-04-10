@@ -83,7 +83,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Retrieves the variable definition for a specific identifiers mapping, including data type, attributes, and metadata about the identifier mapping configuration."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mapping variable successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mapping variable successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found")
   })
@@ -101,7 +101,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Removes an identifiers mapping variable from the identifiers table. This deletes the mapping configuration and all associated identifier mappings for the specified entity type."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mapping successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mapping successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),
     @ApiResponse(responseCode = "500", description = "Error deleting identifiers mapping")
@@ -126,7 +126,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Retrieves all entities that have identifier mappings for the specified mapping name. Returns the list of entities with their system and private identifier information."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Mapped entities successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Mapped entities successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found")
   })
@@ -144,7 +144,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Returns the number of entities that have identifier mappings for the specified mapping name and entity type."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Entity count successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Entity count successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found")
   })
@@ -170,7 +170,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Imports identifier mappings from plain text format. The input should contain pairs of system and private identifiers separated by the specified separator. Existing mappings will be overridden."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing entity type or invalid identifiers format"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),
     @ApiResponse(responseCode = "500", description = "Error processing import")
@@ -210,7 +210,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Imports identifier mappings from a datasource configuration. The datasource is created temporarily and used to import mappings into the identifiers table. Existing mappings will be overridden."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported from datasource"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully imported from datasource", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid datasource configuration or missing entity type"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),
     @ApiResponse(responseCode = "500", description = "Error processing datasource import")
@@ -237,7 +237,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Generates and imports new identifier mappings using configurable parameters. Creates unique private identifiers for entities based on specified size, prefix, zero-padding, and checksum options."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully generated, returns count of generated identifiers"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully generated, returns count of generated identifiers", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing entity type or invalid generation parameters"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),
     @ApiResponse(responseCode = "500", description = "Error during identifier generation")
@@ -277,7 +277,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Exports the identifier mappings as a CSV file containing system identifiers and their corresponding private identifiers. Only non-null mappings are included."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers mapping successfully exported as CSV file"),
+    @ApiResponse(responseCode = "200", description = "Identifiers mapping successfully exported as CSV file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "401", description = "Authentication required"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),
@@ -317,7 +317,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     description = "Exports the private identifiers only as a plain text file, one identifier per line. Useful for creating simple identifier lists."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Identifiers successfully exported as plain text file"),
+    @ApiResponse(responseCode = "200", description = "Identifiers successfully exported as plain text file", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Missing or invalid entity type parameter"),
     @ApiResponse(responseCode = "401", description = "Authentication required"),
     @ApiResponse(responseCode = "404", description = "Identifiers mapping or entity type not found"),

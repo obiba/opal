@@ -41,7 +41,7 @@ public class AppsResource {
   @GET
   @Operation(summary = "List applications", description = "Returns a list of registered applications, optionally filtered by type.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Applications successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Applications successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -54,7 +54,7 @@ public class AppsResource {
   @Path("/config")
   @Operation(summary = "Get applications configuration", description = "Returns the current applications configuration.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Configuration successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Configuration successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Apps.AppsConfigDto getConfig() {
@@ -65,7 +65,7 @@ public class AppsResource {
   @Path("/config")
   @Operation(summary = "Update applications configuration", description = "Updates the applications configuration with the provided settings.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Configuration successfully updated"),
+      @ApiResponse(responseCode = "200", description = "Configuration successfully updated", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid request body"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -78,7 +78,7 @@ public class AppsResource {
   @Path("/config")
   @Operation(summary = "Reset applications configuration", description = "Resets the applications configuration to default values.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Configuration successfully reset"),
+      @ApiResponse(responseCode = "200", description = "Configuration successfully reset", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response resetConfig() {
@@ -97,7 +97,7 @@ public class AppsResource {
   @NotAuthenticated
   @Operation(summary = "Register application", description = "Registers a new application with self-registration using authentication token.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Application successfully registered"),
+      @ApiResponse(responseCode = "200", description = "Application successfully registered", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid request body or authentication token"),
       @ApiResponse(responseCode = "403", description = "Self-registration not allowed or token invalid"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -120,7 +120,7 @@ public class AppsResource {
   @NotAuthenticated
   @Operation(summary = "Unregister application", description = "Unregisters an application with self-unregistration using authentication token.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Application successfully unregistered"),
+      @ApiResponse(responseCode = "200", description = "Application successfully unregistered", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid request body or authentication token"),
       @ApiResponse(responseCode = "403", description = "Token invalid or application not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

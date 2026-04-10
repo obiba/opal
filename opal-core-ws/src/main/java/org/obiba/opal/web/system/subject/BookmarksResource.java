@@ -29,7 +29,7 @@ public interface BookmarksResource {
   @GET
   @Operation(summary = "Get bookmarks", description = "Retrieve all bookmarks for the user")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Bookmarks retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Bookmarks retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   List<Opal.BookmarkDto> getBookmarks();

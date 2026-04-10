@@ -73,7 +73,7 @@ public class KeyStoreResource implements BaseResource {
     description = "Retrieves all key entries from the system keystore including their aliases, types, and certificates."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved keystore entries"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved keystore entries", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
   })
   public List<Opal.KeyDto> getKeyEntries() throws KeyStoreException, IOException {
@@ -126,7 +126,7 @@ public class KeyStoreResource implements BaseResource {
     description = "Updates an existing key entry in the system keystore. Supports both key pairs and certificate updates."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Key entry successfully updated"),
+    @ApiResponse(responseCode = "200", description = "Key entry successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid key data"),
     @ApiResponse(responseCode = "404", description = "Key entry not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error or keystore failure")
@@ -151,7 +151,7 @@ public class KeyStoreResource implements BaseResource {
     description = "Retrieves a specific key entry from the system keystore by alias, including certificate details."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved key entry"),
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved key entry", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Key entry not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
   })
@@ -173,7 +173,7 @@ public class KeyStoreResource implements BaseResource {
     description = "Removes a key entry from the system keystore by alias."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Key entry successfully deleted"),
+    @ApiResponse(responseCode = "200", description = "Key entry successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Key entry not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error or keystore failure")
   })
@@ -194,7 +194,7 @@ public class KeyStoreResource implements BaseResource {
     description = "Downloads the PEM certificate for a specific key entry from the system keystore."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Successfully downloaded certificate"),
+    @ApiResponse(responseCode = "200", description = "Successfully downloaded certificate", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Key entry not found"),
     @ApiResponse(responseCode = "500", description = "Internal server error or keystore access failure")
   })

@@ -43,7 +43,7 @@ public class SystemLogResource {
   @AuthenticatedByCookie
   @Operation(summary = "Get Opal log files", description = "Retrieves Opal log files. By default, all log files are returned.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getOpalLog(@QueryParam("all") @DefaultValue("true") boolean all) {
@@ -55,7 +55,7 @@ public class SystemLogResource {
   @AuthenticatedByCookie
   @Operation(summary = "Get DataSHIELD log files", description = "Retrieves DataSHIELD log files. By default, all log files are returned.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getDatashieldLog(@QueryParam("all") @DefaultValue("true") boolean all) {
@@ -67,7 +67,7 @@ public class SystemLogResource {
   @AuthenticatedByCookie
   @Operation(summary = "Get REST log files", description = "Retrieves REST log files. By default, all log files are returned.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getRestLog(@QueryParam("all") @DefaultValue("true") boolean all) {
@@ -79,7 +79,7 @@ public class SystemLogResource {
   @AuthenticatedByCookie
   @Operation(summary = "Get SQL log files", description = "Retrieves SQL log files. By default, all log files are returned.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Log files retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getSQLLog(@QueryParam("all") @DefaultValue("true") boolean all) {

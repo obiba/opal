@@ -71,7 +71,7 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
   @GET
   @Operation(summary = "Get variable permission", description = "Retrieves variable-level permissions for a specific variable within a table. Variable permissions control access to individual variable metadata and data.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Variable permission successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -99,7 +99,7 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
   @POST
   @Operation(summary = "Set variable permission", description = "Grants variable-level permissions to subjects for a specific variable within a table. Variable permissions control access to individual variable metadata and data.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Variable permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -123,7 +123,7 @@ public class ProjectVariablePermissionsResource extends AbstractPermissionsResou
   @DELETE
   @Operation(summary = "Delete variable permission", description = "Removes all variable-level permissions from subjects for a specific variable within a table. This revokes access to individual variable metadata and data.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Variable permission successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "Variable permission successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Project, table, or variable not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

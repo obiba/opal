@@ -43,7 +43,7 @@ public class LocalesResource {
   @GET
   @Operation(summary = "Get available locales", description = "Returns the list of available locales")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Successfully retrieved locales"),
+      @ApiResponse(responseCode = "200", description = "Successfully retrieved locales", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {

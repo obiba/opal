@@ -27,7 +27,7 @@ public interface SQLHistoryResource {
   @GET
   @Operation(summary = "Get SQL history", description = "Retrieve SQL execution history for a subject with pagination")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "SQL history retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "SQL history retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid pagination parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })

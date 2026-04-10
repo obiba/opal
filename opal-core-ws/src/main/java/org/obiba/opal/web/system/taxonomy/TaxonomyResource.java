@@ -63,7 +63,7 @@ public class TaxonomyResource {
 @NoAuthorization
 @Operation(summary = "Get taxonomy", description = "Retrieve a specific taxonomy with all its vocabularies and terms")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Taxonomy successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -78,7 +78,7 @@ public Opal.TaxonomyDto getTaxonomy() {
 @Path("_download")
 @Operation(summary = "Download taxonomy", description = "Download a taxonomy as a YAML file for backup or import")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Taxonomy file successfully generated"),
+  @ApiResponse(responseCode = "200", description = "Taxonomy file successfully generated", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -93,7 +93,7 @@ public Response download() {
 @PUT
 @Operation(summary = "Update taxonomy", description = "Update an existing taxonomy with new vocabulary and term definitions. Can also rename the taxonomy.")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Taxonomy successfully updated"),
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully updated", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "400", description = "Invalid taxonomy data or name conflict"),
   @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
   @ApiResponse(responseCode = "409", description = "Taxonomy name already exists"),
@@ -110,7 +110,7 @@ public Response updateTaxonomy(Opal.TaxonomyDto dto) {
 @DELETE
 @Operation(summary = "Delete taxonomy", description = "Delete a taxonomy and all its associated vocabularies and terms")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Taxonomy successfully deleted"),
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully deleted", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -123,7 +123,7 @@ public Response deleteTaxonomy() {
 @Path("/commits")
 @Operation(summary = "Get taxonomy commits", description = "Retrieve the version control history for a taxonomy, showing all commits and changes")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Commit history successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Commit history successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -136,7 +136,7 @@ public Response getCommitsInfo() {
 @Path("/commit/{commitId}")
 @Operation(summary = "Get commit details", description = "Retrieve detailed information about a specific commit in the taxonomy version history")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Commit details successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Commit details successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -149,7 +149,7 @@ public Response getCommitInfo(@NotNull @PathParam("commitId") String commitId) {
 @Path("/commit/head/{commitId}")
 @Operation(summary = "Get commit diff from HEAD", description = "Retrieve detailed information about a specific commit compared to the current HEAD (latest) version")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Commit diff successfully retrieved"),
+  @ApiResponse(responseCode = "200", description = "Commit diff successfully retrieved", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })
@@ -163,7 +163,7 @@ public Response getCommitInfoFromHead(@NotNull @PathParam("commitId") String com
 @Path("/restore/{commitId}")
 @Operation(summary = "Restore taxonomy from commit", description = "Restore a taxonomy to a previous state by overwriting the current version with a specific commit")
 @ApiResponses({
-  @ApiResponse(responseCode = "200", description = "Taxonomy successfully restored from commit"),
+  @ApiResponse(responseCode = "200", description = "Taxonomy successfully restored from commit", useReturnTypeSchema = true),
   @ApiResponse(responseCode = "404", description = "Commit or taxonomy not found"),
   @ApiResponse(responseCode = "500", description = "Internal server error")
 })

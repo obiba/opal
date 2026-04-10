@@ -51,7 +51,7 @@ public class SubjectCredentialsGroupAuthorizationResource {
       description = "Retrieves authorization permissions for a given subject, filtered by domain."
   )
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
       @ApiResponse(responseCode = "500", description = "Error querying authorization data")
   })

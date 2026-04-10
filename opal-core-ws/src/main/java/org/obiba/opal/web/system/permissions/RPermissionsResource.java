@@ -55,7 +55,7 @@ public class RPermissionsResource extends AbstractPermissionsResource {
   @GET
   @Operation(summary = "Get R service permissions", description = "Retrieves R service permissions for subjects. R service permissions control access to R scripting and analysis capabilities within Opal.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "R permissions successfully retrieved"),
+      @ApiResponse(responseCode = "200", description = "R permissions successfully retrieved", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid subject type provided"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
@@ -75,7 +75,7 @@ public class RPermissionsResource extends AbstractPermissionsResource {
   @POST
   @Operation(summary = "Set R service permission", description = "Grants R service permissions to subjects. R service permissions control access to R scripting and analysis capabilities within Opal.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "R permission successfully set"),
+      @ApiResponse(responseCode = "200", description = "R permission successfully set", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -97,7 +97,7 @@ public class RPermissionsResource extends AbstractPermissionsResource {
   @DELETE
   @Operation(summary = "Delete R service permissions", description = "Removes all R service permissions from subjects. This revokes access to R scripting and analysis capabilities within Opal.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "R permissions successfully deleted"),
+      @ApiResponse(responseCode = "200", description = "R permissions successfully deleted", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid parameters provided"),
       @ApiResponse(responseCode = "404", description = "Subject not found"),
       @ApiResponse(responseCode = "500", description = "Internal server error")

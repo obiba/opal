@@ -48,7 +48,7 @@ public interface DatasourceTablesResource {
   @GET
   @Operation(summary = "Get tables", description = "Get tables from datasource with optional filtering and counting")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Tables retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid filter parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -62,7 +62,7 @@ public interface DatasourceTablesResource {
   @AuthenticatedByCookie
   @Operation(summary = "Get Excel dictionary", description = "Export table dictionaries as Excel file")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Excel file generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid table selection"),
     @ApiResponse(responseCode = "500", description = "Server error during Excel generation")
   })

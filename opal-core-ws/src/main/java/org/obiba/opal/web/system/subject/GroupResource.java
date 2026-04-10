@@ -44,7 +44,7 @@ public class GroupResource {
   @GET
   @Operation(summary = "Get group", description = "Retrieves a specific group.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Group retrieved successfully"),
+      @ApiResponse(responseCode = "200", description = "Group retrieved successfully", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "Group not found")
   })
   public Response getGroup() {

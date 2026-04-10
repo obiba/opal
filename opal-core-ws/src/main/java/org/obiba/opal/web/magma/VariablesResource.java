@@ -48,7 +48,7 @@ public interface VariablesResource {
   @GET
   @Operation(summary = "Get variables", description = "Retrieve variables from table with optional filtering and pagination")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variables retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Variables retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid filter or pagination parameters"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -62,7 +62,7 @@ public interface VariablesResource {
   @AuthorizeResource
   @Operation(summary = "Get Excel dictionary", description = "Export variables dictionary as Excel file")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Excel file generated successfully"),
+    @ApiResponse(responseCode = "200", description = "Excel file generated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Server error during Excel generation")
   })
   Response getExcelDictionary(@Context Request request) throws MagmaRuntimeException, IOException;
@@ -71,7 +71,7 @@ public interface VariablesResource {
   @Path("/_order")
   @Operation(summary = "Set variable order", description = "Set the display order of variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variable order updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Variable order updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid variable list"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -92,7 +92,7 @@ public interface VariablesResource {
   @Path("/_attribute")
   @Operation(summary = "Update variable attributes", description = "Batch update attributes in specified variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Attributes updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Attributes updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid attribute data"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
@@ -122,7 +122,7 @@ public interface VariablesResource {
   @POST
   @Operation(summary = "Add or update variables", description = "Batch create or update multiple variables")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Variables updated successfully"),
+    @ApiResponse(responseCode = "200", description = "Variables updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "201", description = "Variables created successfully"),
     @ApiResponse(responseCode = "400", description = "Invalid variable data"),
     @ApiResponse(responseCode = "500", description = "Server error")

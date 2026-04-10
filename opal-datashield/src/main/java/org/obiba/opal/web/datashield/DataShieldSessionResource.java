@@ -31,7 +31,7 @@ public interface DataShieldSessionResource extends RSessionResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Operation(summary = "Aggregate DataShield expression as binary", description = "Execute DataShield aggregate expression and return binary results")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully"),
+    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid DataShield expression"),
     @ApiResponse(responseCode = "500", description = "Server error during aggregation")
   })
@@ -42,7 +42,7 @@ public interface DataShieldSessionResource extends RSessionResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Aggregate DataShield expression as JSON", description = "Execute DataShield aggregate expression and return JSON results")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully"),
+    @ApiResponse(responseCode = "200", description = "Aggregation completed successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid DataShield expression"),
     @ApiResponse(responseCode = "500", description = "Server error during aggregation")
   })

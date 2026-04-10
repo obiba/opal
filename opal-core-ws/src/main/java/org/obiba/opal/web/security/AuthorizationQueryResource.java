@@ -54,7 +54,7 @@ public class AuthorizationQueryResource {
     description = "Queries authorization permissions across domains and subjects. Can retrieve all subjects for a domain/type combination or get specific ACLs for particular nodes, grouped by subject."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved"),
+    @ApiResponse(responseCode = "200", description = "Authorization permissions successfully retrieved", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
     @ApiResponse(responseCode = "500", description = "Error querying authorization data")
   })

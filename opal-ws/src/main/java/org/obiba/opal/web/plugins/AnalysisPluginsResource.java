@@ -54,7 +54,7 @@ public class AnalysisPluginsResource {
     description = "Retrieves a list of installed analysis plugins including R analysis services"
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Analysis plugins list retrieved successfully"),
+    @ApiResponse(responseCode = "200", description = "Analysis plugins list retrieved successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Plugins.PluginPackagesDto list() {
