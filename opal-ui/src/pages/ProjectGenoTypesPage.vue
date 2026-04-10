@@ -23,7 +23,7 @@
         align="justify"
       >
         <q-tab name="vcf" :label="t('vcf')" />
-        <q-tab name="permissions" :label="t('permissions')" />
+        <q-tab name="permissions" :label="t('permissions')" v-if="projectsStore.perms.permissions_vcfstore?.canRead()" />
       </q-tabs>
 
       <q-separator />
@@ -155,11 +155,12 @@
           </q-card>
         </q-tab-panel>
 
-        <q-tab-panel name="permissions">
+        <q-tab-panel name="permissions" v-if="projectsStore.perms.permissions_vcfstore?.canRead()">
           <div class="text-h6 q-mb-md">{{ t('permissions') }}</div>
           <access-control-list
             :resource="`/project/${name}/permissions/vcf-store`"
             :options="['VCF_STORE_VIEW', 'VCF_STORE_VALUES', 'VCF_STORE_ALL']"
+            :read-only="!projectsStore.perms.permissions_vcfstore?.canCreate()"
           />
         </q-tab-panel>
       </q-tab-panels>

@@ -36,6 +36,7 @@ interface ProjectPerms {
   import_vcf: Perms | undefined;
   export_vcf: Perms | undefined;
 
+  analyse: Perms | undefined;
   analyses: Perms | undefined;
   anayses_export: Perms | undefined;
 }
@@ -115,6 +116,10 @@ export const useProjectsStore = defineStore('projects', () => {
         }),
         api.options(`/project/${project.value.name}/commands/_reload`).then((response) => {
           perms.value.reload = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/commands/_analyse`).then((response) => {
+          perms.value.analyse = new Perms(response);
           return response;
         }),
         api.options(`/project/${project.value.name}/keystore`).then((response) => {

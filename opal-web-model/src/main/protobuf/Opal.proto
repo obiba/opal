@@ -122,6 +122,7 @@ enum AclAction {
   RESOURCE_ALL = 32;
   RESOURCE_VIEW = 33;
   DATASHIELD_PROFILE_USE = 34;
+  AUDIT_ALL = 35;
 }
 
 message OpalMap {

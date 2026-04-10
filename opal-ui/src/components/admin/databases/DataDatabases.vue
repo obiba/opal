@@ -2,7 +2,7 @@
   <div>
     <q-table :rows="databases" flat row-key="name" :columns="columns" :pagination="initialPagination">
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :label="t('register')" icon="add" size="sm">
+        <q-btn-dropdown v-if="authStore.isAdministrator" color="primary" :label="t('register')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onShowAddSQLDB">
               <q-item-section>
@@ -31,6 +31,7 @@
             />
             <div class="float-right">
               <q-btn
+                v-if="authStore.isAdministrator"
                 rounded
                 dense
                 flat
@@ -42,6 +43,7 @@
                 @click="onTest(props.row)"
               />
               <q-btn
+                v-if="authStore.isAdministrator"
                 rounded
                 dense
                 flat
@@ -53,7 +55,7 @@
                 @click="onShowEdit(props.row)"
               />
               <q-btn
-                v-if="!props.row.hasDatasource"
+                v-if="authStore.isAdministrator && !props.row.hasDatasource"
                 rounded
                 dense
                 flat
@@ -100,6 +102,7 @@ import { notifyError, notifySuccess } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
 
 const systemStore = useSystemStore();
+const authStore = useAuthStore();
 const { t } = useI18n();
 
 const databases = ref<DatabaseDto[]>([]);

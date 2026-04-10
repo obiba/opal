@@ -305,6 +305,10 @@ export default {
       label: 'Administrer le project',
       description: 'Accès complet au projet',
     },
+    AUDIT_ALL: {
+      label: 'Auditer le système',
+      description: 'Accès en lecture seule à toutes les ressources du système (utilisateurs de confiance uniquement !).',
+    },
     SYSTEM_ALL: {
       label: 'Administrer le système',
       description: 'Accès complet à toutes les ressources du système (utilisateurs de confiance uniquement !).',

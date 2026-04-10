@@ -100,6 +100,7 @@
           <access-control-list
             :resource="`/project/${pName}/permissions/resource/${rName}`"
             :options="['RESOURCE_VIEW', 'RESOURCE_ALL']"
+            :read-only="!resourcesStore.perms.resourcePermissions?.canCreate()"
           />
         </q-tab-panel>
       </q-tab-panels>

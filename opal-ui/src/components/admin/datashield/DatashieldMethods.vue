@@ -12,11 +12,12 @@
       :pagination="initialPagination"
       :filter="filter"
       :filter-method="onFilter"
-      selection="multiple"
+      :selection="authStore.isAdministrator ? 'multiple' : undefined"
       v-model:selected="selected"
     >
       <template v-slot:top-left>
         <q-btn
+          v-if="authStore.isAdministrator"
           color="primary"
           text-color="white"
           icon="add"
@@ -34,6 +35,7 @@
           @click="updateMethods"
         />
         <q-btn
+          v-if="authStore.isAdministrator"
           outline
           color="red"
           icon="delete"
@@ -66,6 +68,7 @@
               @click="onShowEdit(props.row)"
             />
             <q-btn
+              v-if="authStore.isAdministrator"
               rounded
               dense
               flat
@@ -126,6 +129,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const authStore = useAuthStore();
 const datashieldStore = useDatashieldStore();
 const { t } = useI18n();
 

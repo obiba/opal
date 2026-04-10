@@ -13,8 +13,8 @@
   >
     <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn no-caps color="primary" icon="add" size="sm" :label="t('analyse_validate.add')" @click="onAddAnalysis" />
-        <q-btn no-caps color="secondary" icon="refresh" size="sm" :label="t('refresh')" @click="onRefresh" />
+        <q-btn v-if="projectsStore.perms.analyse?.canCreate()" no-caps color="primary" icon="add" size="sm" :label="t('analyse_validate.add')" @click="onAddAnalysis" />
+        <q-btn no-caps color="secondary" icon="refresh" outline size="sm" :title="t('refresh')" @click="onRefresh" />
       </div>
     </template>
     <template v-slot:top-right>
@@ -29,6 +29,7 @@
         {{ props.value }}
         <div class="float-right">
           <q-btn
+            v-if="projectsStore.perms.analyse?.canCreate()"
             rounded
             dense
             flat
@@ -62,6 +63,7 @@
             @click="onDuplicateAnalysis(props.row)"
           />
           <q-btn
+            v-if="projectsStore.perms.analyse?.canCreate()"
             rounded
             dense
             flat

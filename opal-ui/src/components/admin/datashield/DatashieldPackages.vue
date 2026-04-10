@@ -20,7 +20,7 @@
     >
       <template v-slot:top-left>
         <q-btn-dropdown
-          v-if="!hasPods"
+          v-if="!hasPods && authStore.isAdministrator"
           color="primary"
           icon="add"
           :label="t('install')"
@@ -61,7 +61,7 @@
                 @click="onShowViewPackage(props.row)"
               />
               <q-btn
-                v-if="systemStore.generalConf.allowRPackageManagement"
+                v-if="systemStore.generalConf.allowRPackageManagement && authStore.isAdministrator"
                 rounded
                 dense
                 flat
@@ -123,6 +123,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const authStore = useAuthStore();
 const systemStore = useSystemStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();

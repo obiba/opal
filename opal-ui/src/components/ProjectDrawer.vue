@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
+const authStore = useAuthStore();
 const projectsStore = useProjectsStore();
 const pluginsStore = usePluginsStore();
 const hasAdminPermission = ref(false);
@@ -96,6 +97,8 @@ const hasVcfPlugins = ref(false);
 
 watchEffect(() => {
   hasAdminPermission.value =
+    authStore.isAdministrator ||
+    authStore.isAuditor ||
     projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||
     projectsStore.perms.project?.canDelete() ||

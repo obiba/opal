@@ -43,7 +43,7 @@
             v-model="selectedAcls"
             :acls="acls"
             :on-delete-acls="onDeleteAcls"
-            :hide-delete="false"
+            :read-only="!projectsStore.perms.project?.canDelete()"
             :loading="loading"
           />
         </div>

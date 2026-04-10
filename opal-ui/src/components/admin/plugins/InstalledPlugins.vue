@@ -41,7 +41,7 @@
               <span :title="`Opal: ${pkg.opalVersion}`">{{ pkg.version }}</span>
             </q-item-label>
           </q-item-section>
-          <q-item-section side>
+          <q-item-section v-if="authStore.isAdministrator" side>
             <div v-if="!pkg.uninstalled" class="row">
               <q-btn round flat size="sm" icon="refresh" :title="t('plugin.restart')" @click="onRestart(pkg)" />
               <q-btn round flat size="sm" icon="edit" :title="t('plugin.configure')" @click="onConfigure(pkg)" />
@@ -77,6 +77,7 @@ import PluginConfigurationDialog from 'src/components/admin/plugins/PluginConfig
 import type { PluginPackageDto } from 'src/models/Plugins';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
+const authStore = useAuthStore();
 const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 

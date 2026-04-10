@@ -146,6 +146,7 @@
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
               :options="['VARIABLE_READ']"
+              :read-only="!datasourceStore.perms.variablePermissions?.canCreate()"
             />
           </q-tab-panel>
         </q-tab-panels>

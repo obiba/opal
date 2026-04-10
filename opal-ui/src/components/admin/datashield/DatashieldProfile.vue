@@ -3,7 +3,7 @@
     <div class="text-h6 q-mb-sm">
       {{ profile.name }}
       <q-btn
-        v-if="missingCluster || !builtinProfile"
+        v-if="authStore.isAdministrator && (missingCluster || !builtinProfile)"
         outline
         color="red"
         icon="delete"
@@ -26,6 +26,7 @@
             v-model="enabled"
             :label="t('datashield.profile_status_toggle')"
             left-label
+            :disable="!authStore.isAdministrator"
             @update:model-value="datashieldStore.updateProfileStatus(enabled)"
           />
         </div>
@@ -37,6 +38,7 @@
           v-model="restricted"
           :label="t('datashield.profile_access_toggle')"
           left-label
+          :disable="!authStore.isAdministrator"
           @update:model-value="datashieldStore.applyProfileAccess(!profile.restrictedAccess)"
         />
         <div v-if="profile?.restrictedAccess">
@@ -46,6 +48,7 @@
           <access-control-list
             :resource="`/datashield/profile/${profile.name}/permissions`"
             :options="['DATASHIELD_PROFILE_USE']"
+            :read-only="authStore.isAuditor"
           />
         </div>
         <div v-else>
@@ -67,6 +70,7 @@
         :label="t('initialize')"
         :title="t('datashield.settings_init')"
         size="sm"
+        :disable="!authStore.isAdministrator"
         @click="onShowInitSettings"
       />
     </div>
@@ -123,6 +127,7 @@ onMounted(() => {
 });
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 

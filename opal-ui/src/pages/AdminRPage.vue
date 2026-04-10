@@ -18,7 +18,12 @@
       <div class="text-help q-mb-md">{{ t('r.workspaces_info') }}</div>
       <r-workspaces class="q-mb-md" />
       <div class="text-h5 q-mb-md">{{ t('permissions') }}</div>
-      <access-control-list resource="/system/permissions/r" :options="['R_USE']" class="q-mb-lg" />
+      <access-control-list
+        resource="/system/permissions/r"
+        :options="['R_USE']"
+        :read-only="authStore.isAuditor"
+        class="q-mb-lg"
+      />
     </q-page>
   </div>
 </template>
@@ -30,6 +35,7 @@ import RWorkspaces from 'src/components/admin/r/RWorkspaces.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const rStore = useRStore();
 
 onMounted(() => {

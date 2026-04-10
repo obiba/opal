@@ -34,7 +34,7 @@
             </q-item-section>
             <q-item-section side>
               <div class="row">
-                <q-btn round flat size="sm" icon="download" :title="t('install')" @click="onUpdate(pkg)" />
+                <q-btn v-if="authStore.isAdministrator" round flat size="sm" icon="download" :title="t('install')" @click="onUpdate(pkg)" />
               </div>
             </q-item-section>
           </q-item>
@@ -56,6 +56,7 @@
 import type { PluginPackageDto } from 'src/models/Plugins';
 import { notifySuccess, notifyError } from 'src/utils/notify';
 
+const authStore = useAuthStore();
 const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 

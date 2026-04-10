@@ -44,6 +44,7 @@
           <access-control-list
             :resource="`/project/${name}/permissions/datasource`"
             :options="['DATASOURCE_VIEW', 'TABLE_ADD', 'DATASOURCE_ALL']"
+            :read-only="!datasourceStore.perms.datasourcePermissions?.canCreate()"
           />
         </q-tab-panel>
       </q-tab-panels>

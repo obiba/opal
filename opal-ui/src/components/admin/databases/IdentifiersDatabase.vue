@@ -2,8 +2,9 @@
   <div>
     <div v-if="hasDatabase">
       <div class="row">
-        <q-btn :label="t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
+        <q-btn v-if="authStore.isAdministrator" :label="t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
         <q-btn
+          v-if="authStore.isAdministrator"
           outline
           :label="t('test')"
           icon="settings_ethernet"
@@ -12,7 +13,7 @@
           class="on-left"
           @click="onTest"
         />
-        <q-btn outline color="red" icon="delete" size="sm" :disable="database?.hasDatasource" @click="onShowDelete" />
+        <q-btn v-if="authStore.isAdministrator" outline color="red" icon="delete" size="sm" :disable="database?.hasDatasource" @click="onShowDelete" />
       </div>
       <div class="row q-mt-md">
         <div class="col-6">
@@ -33,7 +34,7 @@
       </div>
     </div>
     <div v-else>
-      <q-btn-dropdown color="primary" :label="t('register')" icon="add" size="sm">
+      <q-btn-dropdown v-if="authStore.isAdministrator" color="primary" :label="t('register')" icon="add" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click.prevent="onShowAddSQLDB">
             <q-item-section>
@@ -67,6 +68,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 
 const systemStore = useSystemStore();
+const authStore = useAuthStore();
 const { t } = useI18n();
 
 const database = ref<DatabaseDto>();

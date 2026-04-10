@@ -1,30 +1,32 @@
 <template>
   <div>
-    <div class="text-h6">{{ t('apps.self_register') }}</div>
-    <html-anchor-hint
-      class="text-help"
-      trKey="apps.self_register_info"
-      :text="t('apps.apps_admin')"
-      url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
-    />
+    <div v-if="authStore.isAdministrator">
+      <div class="text-h6">{{ t('apps.self_register') }}</div>
+      <html-anchor-hint
+        class="text-help"
+        trKey="apps.self_register_info"
+        :text="t('apps.apps_admin')"
+        url="https://opaldoc.obiba.org/en/latest/web-user-guide/administration/apps.html"
+      />
 
-    <div class="q-mt-sm q-gutter-sm row items-center">
-      <q-btn size="sm" icon="edit" color="primary" :title="t('edit')" @click="onEditToken"></q-btn>
-      <q-btn size="sm" icon="delete" color="negative" outline :title="t('delete')" @click="onClearToken"></q-btn>
+      <div class="q-mt-sm q-gutter-sm row items-center">
+        <q-btn size="sm" icon="edit" color="primary" :title="t('edit')" @click="onEditToken"></q-btn>
+        <q-btn size="sm" icon="delete" color="negative" outline :title="t('delete')" @click="onClearToken"></q-btn>
 
-      <span v-if="config.token" class="on-right">
-        <code>{{ config.token }}</code>
-        <q-btn
-          flat
-          dense
-          size="sm"
-          icon="content_copy"
-          :title="t('clipboard.copy')"
-          @click="onCopyToClipboard"
-          aria-label="Copy to clipboard"
-          class="on-right"
-        />
-      </span>
+        <span v-if="config.token" class="on-right">
+          <code>{{ config.token }}</code>
+          <q-btn
+            flat
+            dense
+            size="sm"
+            icon="content_copy"
+            :title="t('clipboard.copy')"
+            @click="onCopyToClipboard"
+            aria-label="Copy to clipboard"
+            class="on-right"
+          />
+        </span>
+      </div>
     </div>
 
     <div class="text-h6 q-mt-lg">{{ t('discovery') }}</div>
@@ -47,13 +49,14 @@
       :loading="loading"
     >
       <template v-slot:top-left>
-        <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
+        <q-btn v-if="authStore.isAdministrator" size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
       </template>
       <template v-slot:body-cell-host="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <a :href="props.value" target="_blank" class="text-primary">{{ props.value }}</a>
           <div class="float-right">
             <q-btn
+              v-if="authStore.isAdministrator"
               rounded
               dense
               flat
@@ -65,6 +68,7 @@
               @click="onEdit(props.row)"
             />
             <q-btn
+              v-if="authStore.isAdministrator"
               rounded
               dense
               flat
@@ -110,6 +114,7 @@ import { notifyError, notifySuccess } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const appsStore = useAppsStore();
 const loading = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});

@@ -17,6 +17,7 @@
           <access-control-list
             resource="/system/permissions/datashield"
             :options="['DATASHIELD_USE', 'DATASHIELD_ALL']"
+            :read-only="authStore.isAuditor"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -53,6 +54,7 @@ import DatashieldProfiles from 'src/components/admin/datashield/DatashieldProfil
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const rStore = useRStore();
 const datashieldStore = useDatashieldStore();
 

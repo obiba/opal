@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="q-mb-md">
-      <q-btn :title="t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
+      <q-btn v-if="authStore.isAdministrator" :title="t('edit')" icon="edit" color="primary" size="sm" @click="onShowEdit" />
     </div>
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6">
@@ -95,6 +95,7 @@ import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import DOMPurify from 'isomorphic-dompurify';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
 const items1: FieldItem[] = [
   { field: 'name', label: 'name', hint: 'app_configuration.name_hint' },

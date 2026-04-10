@@ -44,6 +44,13 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
     },
 
+    AUDIT_ALL {
+      @Override
+      public Iterable<String> convert(String node) {
+        return Lists.newArrayList(toRest("/", "GET:GET/GET"));
+      }
+    },
+
     PROJECT_ADD {
       @Override
       public Iterable<String> convert(String node) {

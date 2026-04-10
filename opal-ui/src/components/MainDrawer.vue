@@ -61,7 +61,7 @@
           <q-item-label>{{ t('search') }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item v-if="authStore.isAdministrator" to="/admin">
+      <q-item v-if="authStore.isAdministrator || authStore.isAuditor" to="/admin">
         <q-item-section avatar>
           <q-icon name="admin_panel_settings" />
         </q-item-section>
