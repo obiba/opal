@@ -66,13 +66,13 @@ import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 @Component
 @Transactional
 @Scope("request")
-@Path("/datasource/{name}")
+@Path("/datasource/{datasource}")
 @Tag(name = "Datasources", description = "Operations on datasources")
 public class DatasourceResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
-  @PathParam("name")
+  @PathParam("datasource")
   private String name;
 
   private OpalGeneralConfigService serverService;

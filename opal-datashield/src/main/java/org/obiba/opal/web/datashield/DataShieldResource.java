@@ -82,7 +82,7 @@ public class DataShieldResource {
     throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 
-  @Path("/env/{name}")
+  @Path("/env/{env}")
   @Operation(
     summary = "Get DataSHIELD environment",
     description = "Provides access to DataSHIELD environment resources (AGGREGATE, ASSIGN) for method management and operations."
@@ -92,7 +92,7 @@ public class DataShieldResource {
     @ApiResponse(responseCode = "400", description = "Invalid environment name"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public DataShieldEnvironmentResource getEnvironment(@PathParam("name") String env) {
+  public DataShieldEnvironmentResource getEnvironment(@PathParam("env") String env) {
     DataShieldEnvironmentResource resource = applicationContext.getBean(DataShieldEnvironmentResource.class);
     resource.setMethodType(DSMethodType.valueOf(env.toUpperCase()));
     return resource;
