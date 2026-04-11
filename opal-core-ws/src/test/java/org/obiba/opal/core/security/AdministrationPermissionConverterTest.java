@@ -26,7 +26,25 @@ public class AdministrationPermissionConverterTest
   @Test
   public void testAuditAll() {
     testConversion("", AdministrationPermissionConverter.Permission.AUDIT_ALL,
-        "rest:/:GET:GET/GET");
+        "rest:/project/*:GET:GET",
+        "rest:/datasource/*:GET",
+        "rest:/datasource/*/tables:GET",
+        "rest:/datasource/*/table/*:GET",
+        "rest:/datasource/*/table/*/variables:GET",
+        "rest:/datasource/*/table/*/variable/*:GET",
+        "rest:/project/*/resources:GET",
+        "rest:/project/*/resource/*:GET",
+        "rest:/project/*/permissions/project:GET",
+        "rest:/project/*/permissions/tables:GET",
+        "rest:/project/*/permissions/table/*:GET",
+        "rest:/project/*/permissions/resources:GET",
+        "rest:/project/*/permissions/resource/*:GET",
+        "rest:/system/subject-profile:GET:GET/GET",
+        "rest:/system/log/datashield.log:GET",
+        "rest:/datashield/profile:GET:GET/GET",
+        "rest:/datashield/env:GET:GET/GET",
+        "rest:/datashield/options:GET:GET/GET",
+        "rest:/datashield/packages:GET:GET/GET");
   }
 
   @Test

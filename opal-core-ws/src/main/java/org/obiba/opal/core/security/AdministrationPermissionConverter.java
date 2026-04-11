@@ -47,7 +47,27 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
     AUDIT_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/", "GET:GET/GET"));
+        return Lists.newArrayList(
+            toRest("/project/*", "GET:GET"),
+            toRest("/datasource/*", "GET"),
+            toRest("/datasource/*/tables", "GET"),
+            toRest("/datasource/*/table/*", "GET"),
+            toRest("/datasource/*/table/*/variables", "GET"),
+            toRest("/datasource/*/table/*/variable/*", "GET"),
+            toRest("/project/*/resources", "GET"),
+            toRest("/project/*/resource/*", "GET"),
+            toRest("/project/*/permissions/project", "GET"),
+            toRest("/project/*/permissions/tables", "GET"),
+            toRest("/project/*/permissions/table/*", "GET"),
+            toRest("/project/*/permissions/resources", "GET"),
+            toRest("/project/*/permissions/resource/*", "GET"),
+            toRest("/system/subject-profile", "GET:GET/GET"),
+            toRest("/system/log/datashield.log", "GET"),
+            toRest("/datashield/profile", "GET:GET/GET"),
+            toRest("/datashield/env", "GET:GET/GET"),
+            toRest("/datashield/options", "GET:GET/GET"),
+            toRest("/datashield/packages", "GET:GET/GET")
+        );
       }
     },
 
