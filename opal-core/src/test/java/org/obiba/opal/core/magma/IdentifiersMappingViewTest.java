@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import org.obiba.opal.core.service.IdentifiersTableService;
 
 import jakarta.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

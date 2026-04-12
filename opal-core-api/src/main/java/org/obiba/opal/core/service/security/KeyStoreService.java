@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.service.security;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.SystemService;

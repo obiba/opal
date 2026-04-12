@@ -12,7 +12,7 @@ package org.obiba.opal.spi.analysis;
 
 import org.json.JSONObject;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;

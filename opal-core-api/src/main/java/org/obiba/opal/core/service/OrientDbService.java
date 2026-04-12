@@ -16,7 +16,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import java.io.File;

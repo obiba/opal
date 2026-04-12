@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import java.beans.Transient;
 import java.util.List;
 import jakarta.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.springframework.util.Assert;

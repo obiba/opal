@@ -10,8 +10,8 @@
 
 package org.obiba.opal.core.domain.database;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;

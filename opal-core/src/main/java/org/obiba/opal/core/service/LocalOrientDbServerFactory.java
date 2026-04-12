@@ -15,7 +15,7 @@ import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.json.JSONObject;
 import org.obiba.core.util.FileUtil;
 import org.slf4j.Logger;

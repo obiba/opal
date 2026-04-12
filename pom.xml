@@ -60,7 +60,7 @@
     <jackson.version>2.17.2</jackson.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.20.0-GA</javassist.version>
-    <javax-el.version>2.2.5</javax-el.version>
+    <jakarta-el.version>5.0.0</jakarta-el.version>
     <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
     <jettison.version>1.5.4</jettison.version>
     <jetty.version>12.1.6</jetty.version>
@@ -73,7 +73,6 @@
     <json.version>20231013</json.version>
     <json-smart.version>2.4.10</json-smart.version>
     <jsr305.version>3.0.0</jsr305.version>
-    <jta.version>1.1</jta.version>
     <junit.version>4.13.2</junit.version>
     <kubernetes.version>7.2.0</kubernetes.version>
     <liquibase.version>4.26.0</liquibase.version>
@@ -83,7 +82,7 @@
     <logstash-logback.version>7.4</logstash-logback.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.3.0</magma.version>
+    <magma.version>5.3.1</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.0.7</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
@@ -93,7 +92,7 @@
     <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.12</oauth-oidc-sdk.version>
-    <obiba-commons.version>5.1.2</obiba-commons.version>
+    <obiba-commons.version>5.1.4</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.45</orientdb.version>
@@ -106,11 +105,11 @@
     <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
     <rhino-js.version>1.7.14.1</rhino-js.version>
     <shiro.version>2.1.0</shiro.version>
-    <shiro-extras.version>1.1.0</shiro-extras.version>
+    <shiro-extras.version>2.0.0</shiro-extras.version>
     <slf4j.version>2.0.12</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
     <spring.version>7.0.6</spring.version>
-    <spring-batch.version>4.3.9</spring-batch.version>
+    <spring-batch.version>5.2.2</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
     <xmlunit.version>1.6</xmlunit.version>
@@ -541,12 +540,12 @@
       </dependency>
 
       <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
-        <version>2.0.1.Final</version>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+        <version>3.1.0</version>
       </dependency>
 
-      <!-- Spring batch has a different release cycle than Spring itself -->
+      <!-- Spring Batch 5.x (jakarta namespace) has a different release cycle than Spring itself -->
       <dependency>
         <groupId>org.springframework.batch</groupId>
         <artifactId>spring-batch-core</artifactId>
@@ -1257,9 +1256,9 @@
         <version>4.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.web</groupId>
-        <artifactId>javax.el</artifactId>
-        <version>${javax-el.version}</version>
+        <groupId>org.glassfish.expressly</groupId>
+        <artifactId>expressly</artifactId>
+        <version>${jakarta-el.version}</version>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jaxb</groupId>

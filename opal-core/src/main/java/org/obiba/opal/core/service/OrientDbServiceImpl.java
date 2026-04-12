@@ -38,7 +38,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.tx.OTransaction;
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

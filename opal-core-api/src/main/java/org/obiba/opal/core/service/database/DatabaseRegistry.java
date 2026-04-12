@@ -12,7 +12,7 @@ package org.obiba.opal.core.service.database;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.service.SystemService;

@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 
 import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;

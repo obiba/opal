@@ -18,7 +18,7 @@ import com.google.common.collect.*;
 import com.google.common.eventbus.Subscribe;
 import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;

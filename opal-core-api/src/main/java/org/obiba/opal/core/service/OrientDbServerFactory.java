@@ -13,7 +13,7 @@ package org.obiba.opal.core.service;
 import com.google.common.annotations.VisibleForTesting;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.server.OServer;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public interface OrientDbServerFactory {
 

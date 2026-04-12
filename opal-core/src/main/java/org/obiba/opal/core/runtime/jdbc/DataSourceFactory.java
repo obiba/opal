@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;

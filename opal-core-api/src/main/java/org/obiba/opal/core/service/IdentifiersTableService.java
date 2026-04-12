@@ -10,7 +10,7 @@
 package org.obiba.opal.core.service;
 
 import jakarta.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchValueTableException;

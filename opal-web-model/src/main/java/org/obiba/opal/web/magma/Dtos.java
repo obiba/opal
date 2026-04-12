@@ -24,7 +24,7 @@ import org.obiba.opal.web.model.Magma.*;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
