@@ -307,7 +307,7 @@ export default {
     },
     AUDIT_ALL: {
       label: 'Auditer le système',
-      description: 'Accès en lecture seule à certaines ressources à des fins d\'audit, sans accès aux données individuelles (utilisateurs de confiance uniquement !).',
+      description: 'Accès en lecture seule à certaines ressources (projets, permissions, profiles utilisateurs, configurations DataSHIELD et logs) à des fins d\'audit, sans accès aux données individuelles.',
     },
     SYSTEM_ALL: {
       label: 'Administrer le système',

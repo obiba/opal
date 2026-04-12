@@ -307,7 +307,7 @@ export default {
     },
     AUDIT_ALL: {
       label: 'Audit system',
-      description: 'Read-only access to some system resources for audit purpose, no access to individual-level data (trusted users only!).',
+      description: 'Read-only access to some system resources (projects, permissions, user profiles, DataSHIELD settings and logs) for audit purpose, no access to individual-level data.',
     },
     SYSTEM_ALL: {
       label: 'Administrate system',
