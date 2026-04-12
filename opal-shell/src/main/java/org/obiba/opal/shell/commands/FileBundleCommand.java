@@ -2,6 +2,7 @@ package org.obiba.opal.shell.commands;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.ZipBuilder;
 import org.obiba.opal.shell.commands.options.FileBundleCommandOptions;
 import org.slf4j.Logger;
@@ -96,6 +97,12 @@ public class FileBundleCommand extends AbstractOpalRuntimeDependentCommand<FileB
       int totalFiles = localFiles.size();
       int currentFile = 0;
       for (File localFile : localFiles) {
+        if (getShell().isCancelled()) {
+          log.info("File bundle command cancelled.");
+          FileUtil.delete(outputFile);
+          getShell().printf("File bundle creation cancelled.%n");
+          return 1;
+        }
         currentFile++;
         String fsPath = localFile.getAbsolutePath().replace(localRoot.getAbsolutePath(), "");
 

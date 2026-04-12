@@ -64,6 +64,16 @@ public interface OpalShell extends Runnable {
   void exit();
 
   /**
+   * Returns {@code true} if the job has been requested to cancel.
+   * Commands should check this at natural checkpoints and stop processing early when {@code true}.
+   *
+   * @return whether cancellation has been requested
+   */
+  default boolean isCancelled() {
+    return false;
+  }
+
+  /**
    * Adds a callback instance to be notified when the shell exists.
    *
    * @param callback

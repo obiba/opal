@@ -200,7 +200,7 @@
     <upload-file-dialog v-model="showUpload" :file="props.file" :extensions="[]" />
 
     <q-dialog v-model="showDownload">
-      <q-card>
+      <q-card class="dialog-sm">
         <q-card-section>
           <div class="text-h6">{{ t('download') }}</div>
         </q-card-section>
@@ -217,36 +217,43 @@
               />
             </div>
             <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
-              <div class="row q-col-gutter-md">
-                <div class="col-8">
-                  <q-input
-                    v-model="encryptPassword"
-                    dense
-                    :disable="encryptContent === false"
-                    :type="showPwd ? 'text' : 'password'"
-                    :label="t('encrypt_password')"
-                    :hint="t('encrypt_password_hint')"
-                    lazy-rules
-                    :rules="[validatePassword]"
-                  >
-                    <template v-slot:append>
-                      <q-icon
-                        :name="showPwd ? 'visibility_off' : 'visibility'"
-                        class="cursor-pointer"
-                        @click="showPwd = !showPwd"
-                      />
-                    </template>
-                  </q-input>
-                </div>
-                <div class="col-2">
+              <q-input
+                v-model="encryptPassword"
+                dense
+                :disable="encryptContent === false"
+                :type="showPwd ? 'text' : 'password'"
+                :label="t('encrypt_password')"
+                :hint="t('encrypt_password_hint')"
+                lazy-rules
+                :rules="[validatePassword]"
+              >
+                <template v-slot:after>
+                  <q-icon
+                    :name="showPwd ? 'visibility_off' : 'visibility'"
+                    size="sm"
+                    class="cursor-pointer"
+                    @click="showPwd = !showPwd"
+                  />
                   <q-btn
+                    round
+                    dense
+                    size="sm"
                     flat
-                    :label="t('generate')"
+                    icon="content_copy"
+                    @click="copyPasswordToClipboard"
+                  />
+                  <q-btn
+                    round
+                    dense
+                    flat
+                    size="sm"
+                    icon="lock_reset"
+                    :title="t('generate')"
                     :disable="encryptContent === false"
                     @click="onGenerateDownloadPwd"
                   ></q-btn>
-                </div>
-              </div>
+                </template>
+              </q-input>
             </div>
           </q-form>
         </q-card-section>
@@ -274,7 +281,8 @@ import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
 import { DefaultAlignment } from 'src/components/models';
-import { notifyError } from 'src/utils/notify';
+import { notifyError, notifySuccess, notifyInfo } from 'src/utils/notify';
+import { copyToClipboard } from 'quasar';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
@@ -476,18 +484,25 @@ function startDownloadPolling(commandId: number) {
           stopDownloadPolling();
           filesStore
             .downloadCommandResult(commandId)
+            .then(() => {
+              notifySuccess(t('file_bundle_ready'));
+            })
             .catch(notifyError)
             .finally(() => {
               filesStore.deleteCommand(commandId).catch(() => undefined);
               downloadLoading.value = false;
             });
         } else if (
-          command.status === CommandStateDto_Status.FAILED ||
-          command.status === CommandStateDto_Status.CANCELED
+          command.status === CommandStateDto_Status.FAILED
         ) {
           stopDownloadPolling();
           downloadLoading.value = false;
           notifyError(t('file_bundle_failed'));
+        } else if (command.status === CommandStateDto_Status.CANCEL_PENDING ||
+          command.status === CommandStateDto_Status.CANCELED) {
+          stopDownloadPolling();
+          downloadLoading.value = false;
+          notifyError(t('file_bundle_cancelled'));
         }
       })
       .catch((err) => {
@@ -522,6 +537,14 @@ function onGenerateDownloadPwd() {
     retVal += charset.charAt(Math.floor(Math.random() * n));
   }
   encryptPassword.value = retVal;
+}
+
+function copyPasswordToClipboard() {
+  if (encryptPassword.value) {
+    copyToClipboard(encryptPassword.value).then(() => {
+      notifyInfo(t('password_copied'));
+    });
+  }
 }
 
 function onShowDeleteSingle(file: FileDto) {

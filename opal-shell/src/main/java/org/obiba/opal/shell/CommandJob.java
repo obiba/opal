@@ -135,6 +135,11 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   @Override
+  public boolean isCancelled() {
+    return status == Status.CANCEL_PENDING;
+  }
+
+  @Override
   public void addExitCallback(OpalShellExitCallback callback) {
     // nothing to do
   }
