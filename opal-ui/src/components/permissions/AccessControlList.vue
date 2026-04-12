@@ -166,7 +166,7 @@ import { DefaultAlignment } from 'src/components/models';
 interface Props {
   resource: string;
   options: string[];
-  readOnly: boolean | undefined;
+  readOnly?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

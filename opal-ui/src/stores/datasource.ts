@@ -9,12 +9,14 @@ import type { ScheduleDto, TableIndexStatusDto } from 'src/models/Opal';
 interface DatasourcePerms {
   datasource: Perms | undefined;
   datasourcePermissions: Perms | undefined;
+  datasourceSql: Perms | undefined;
   tables: Perms | undefined;
   table: Perms | undefined;
   tablePermissions: Perms | undefined;
   tableValueSets: Perms | undefined;
   variables: Perms | undefined;
   variable: Perms | undefined;
+  variableSummary: Perms | undefined;
   variablePermissions: Perms | undefined;
 }
 
@@ -115,9 +117,13 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function loadDatasourcePermissions(name: string) {
-    return api.options(`/project/${name}/permissions/datasource`).then((response) => {
-      perms.value.datasourcePermissions = new Perms(response);
-      return response;
+    return Promise.all([
+      api.options(`/project/${name}/permissions/datasource`),
+      api.options(`/datasource/${name}/_sql`),
+    ]).then(([datasourcePermissions, datasourceSql]) => {
+      perms.value.datasourcePermissions = new Perms(datasourcePermissions);
+      perms.value.datasourceSql = new Perms(datasourceSql);
+      return Promise.all([datasourcePermissions, datasourceSql]);
     });
   }
 
@@ -191,12 +197,20 @@ export const useDatasourceStore = defineStore('datasource', () => {
       .then((response) => {
         perms.value.variable = new Perms(response);
         variable.value = response.data;
-        return api
-          .options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`)
-          .then((response) => {
-            perms.value.variablePermissions = new Perms(response);
-            return response;
-          });
+        return Promise.all([
+          api
+            .options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`)
+            .then((response) => {
+              perms.value.variablePermissions = new Perms(response);
+              return response;
+            }),
+          api
+            .options(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
+            .then((response) => {
+              perms.value.variableSummary = new Perms(response);
+              return response;
+            })
+        ]);
       });
   }
 

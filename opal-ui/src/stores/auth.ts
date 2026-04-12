@@ -27,10 +27,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function checkIsAdministrator() {
     return api
-      .options('/system/subject-credentials')
+      .options('/system/subject-profiles')
       .then((response) => {
-        const headers = response.headers['allow'] || [];
-        isAdministrator.value = headers.includes('POST');
+        const headers = response.headers['allow'] || '';
+        isAdministrator.value = headers.includes('DELETE');
         isAuditor.value = headers.includes('GET') && !isAdministrator.value;
       })
       .catch(() => {

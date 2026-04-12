@@ -21,6 +21,8 @@ import type { VCFSamplesMappingDto } from 'src/models/Plugins';
 
 interface ProjectPerms {
   summary: Perms | undefined;
+  files: Perms | undefined;
+  commands: Perms | undefined;
   export: Perms | undefined;
   copy: Perms | undefined;
   import: Perms | undefined;
@@ -28,7 +30,7 @@ interface ProjectPerms {
   project: Perms | undefined;
   keystore: Perms | undefined;
   reload: Perms | undefined;
-
+  
   vcfstore: Perms | undefined;
   samples: Perms | undefined;
   vcfs: Perms | undefined;
@@ -38,7 +40,7 @@ interface ProjectPerms {
 
   analyse: Perms | undefined;
   analyses: Perms | undefined;
-  anayses_export: Perms | undefined;
+  analyses_export: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -100,6 +102,14 @@ export const useProjectsStore = defineStore('projects', () => {
         }),
         api.options(`/project/${project.value.name}/summary`).then((response) => {
           perms.value.summary = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/files`).then((response) => {
+          perms.value.files = new Perms(response);
+          return response;
+        }),
+        api.options(`/project/${project.value.name}/commands`).then((response) => {
+          perms.value.commands = new Perms(response);
           return response;
         }),
         api.options(`/project/${project.value.name}/commands/_export`).then((response) => {

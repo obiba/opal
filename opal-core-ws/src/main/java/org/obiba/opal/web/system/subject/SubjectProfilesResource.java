@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.web.BaseResource;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 @Component
 @Path("/system/subject-profiles")
 @Tag(name = "Subjects", description = "Operations on subjects")
-public class SubjectProfilesResource {
+public class SubjectProfilesResource implements BaseResource {
 
   @Autowired
   private SubjectProfileService subjectProfileService;

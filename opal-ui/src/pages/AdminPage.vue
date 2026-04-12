@@ -11,10 +11,10 @@
         {{ t('administration') }}
       </div>
       <div class="row q-col-gutter-lg q-mb-lg">
-        <div class="col-6 col-sm-6 col-xs-12">
+        <div v-if="authStore.isAdministrator || authStore.isAuditor" class="col-6 col-sm-6 col-xs-12">
           <q-list separator>
             <q-item-label header class="text-uppercase">{{ t('data_access') }}</q-item-label>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/users">{{ t('users_and_groups') }}</router-link></q-item-label
@@ -30,7 +30,7 @@
                 <q-item-label caption lines="2">{{ t('user_profiles_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/idproviders">{{ t('identity_providers') }}</router-link></q-item-label
@@ -43,7 +43,7 @@
         <div class="col-6 col-sm-6 col-xs-12">
           <q-list separator>
             <q-item-label header class="text-uppercase">{{ t('data_analysis') }}</q-item-label>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/rservers">{{ t('rservers') }}</router-link></q-item-label
@@ -57,7 +57,7 @@
                 <q-item-label caption lines="2">{{ t('datashield.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/search">{{ t('search') }}</router-link></q-item-label
@@ -80,7 +80,7 @@
                 <q-item-label caption lines="2">{{ t('files_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="commandsStore.perms.commands?.canRead()">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/tasks">{{ t('tasks') }}</router-link></q-item-label
@@ -88,7 +88,7 @@
                 <q-item-label caption lines="2">{{ t('tasks_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/identifiers">{{ t('id_mappings.title') }}</router-link></q-item-label
@@ -101,7 +101,7 @@
         <div class="col-6 col-sm-6 col-xs-12">
           <q-list separator>
             <q-item-label header class="text-uppercase">{{ t('system') }}</q-item-label>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/settings">{{ t('general_settings') }}</router-link></q-item-label
@@ -117,7 +117,7 @@
                 <q-item-label caption lines="2">{{ t('taxonomies_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/databases">{{ t('databases') }}</router-link></q-item-label
@@ -125,7 +125,7 @@
                 <q-item-label caption lines="2">{{ t('databases_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/plugins">{{ t('plugins') }}</router-link></q-item-label
@@ -133,7 +133,7 @@
                 <q-item-label caption lines="2">{{ t('plugins_caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/apps">{{ t('apps.title') }}</router-link></q-item-label
@@ -141,7 +141,7 @@
                 <q-item-label caption lines="2">{{ t('apps.caption') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="authStore.isAdministrator">
               <q-item-section>
                 <q-item-label
                   ><router-link to="/admin/kubernetes">{{ t('kubernetes.title') }}</router-link
@@ -172,4 +172,6 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
+const authStore = useAuthStore();
+const commandsStore = useCommandsStore();
 </script>

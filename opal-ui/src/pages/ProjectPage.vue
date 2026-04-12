@@ -110,7 +110,7 @@
             ></q-btn>
           </q-card-actions>
         </q-card>
-        <q-card flat bordered class="q-mb-md card bg-amber-9">
+        <q-card v-if="projectsStore.perms.files?.canRead()" flat bordered class="q-mb-md card bg-amber-9">
           <q-card-section @click="router.push(`/project/${name}/files`)">
             <q-item class="q-pb-none">
               <q-item-section>

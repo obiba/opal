@@ -43,7 +43,7 @@
                 <q-btn flat rounded dense icon="arrow_forward" size="xs" color="primary" :to="`/files`" />
               </q-card-section>
             </q-card>
-            <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
+            <q-card v-if="commandsStore.perms.commands?.canRead()" flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
               <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4">
                 <router-link to="/tasks">{{ t('tasks') }}</router-link>
               </q-card-section>
@@ -104,4 +104,5 @@ import BookmarksList from 'src/components/BookmarksList.vue';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
+const commandsStore = useCommandsStore();
 </script>
