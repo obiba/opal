@@ -45,7 +45,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item v-show="hasFilesPermission" :to="`/project/${projectsStore.project.name}/files`">
+      <q-item :to="`/project/${projectsStore.project.name}/files`">
         <q-item-section avatar>
           <q-icon name="folder" />
         </q-item-section>
@@ -94,7 +94,6 @@ const pluginsStore = usePluginsStore();
 const hasAdminPermission = ref(false);
 const hasVcfStorePermission = ref(false);
 const hasVcfPlugins = ref(false);
-const hasFilesPermission = ref(false);
 const hasTasksPermission = ref(false);
 
 watchEffect(() => {
@@ -108,9 +107,6 @@ watchEffect(() => {
 
   hasVcfStorePermission.value =
     projectsStore.perms.vcfstore?.canRead() && projectsStore.project.vcfStoreService ? true : false;
-
-  hasFilesPermission.value =
-    projectsStore.perms.files?.canRead() || false;
 
   hasTasksPermission.value =
     projectsStore.perms.commands?.canRead() || false;
