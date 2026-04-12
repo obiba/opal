@@ -46,7 +46,9 @@ export const useCommandsStore = defineStore('commands', () => {
   }
 
   function cancel(command: CommandStateDto) {
-    return api.put(`/shell/command/${command.id}/status`, { status: CommandStateDto_Status.CANCELED });
+    return api.put(`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
+      headers: { 'Content-Type': 'text/plain' },
+    });
   }
 
   return {

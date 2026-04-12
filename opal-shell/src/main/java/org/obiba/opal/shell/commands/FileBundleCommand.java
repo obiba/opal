@@ -84,22 +84,32 @@ public class FileBundleCommand extends AbstractOpalRuntimeDependentCommand<FileB
       // paths are preserved inside the archive (avoiding name collisions).
       boolean singlePath = localFiles.size() == 1;
       String zipName = singlePath
-          ? localFiles.get(0).getName() + ".zip"
+          ? localFiles.getFirst().getName() + ".zip"
           : "bundle_" + timestamp + ".zip";
       File outputFile = new File(outDir, zipName);
 
-      File zipBase = singlePath ? localFiles.get(0).getParentFile() : localRoot;
+      File zipBase = singlePath ? localFiles.getFirst().getParentFile() : localRoot;
       ZipBuilder builder = ZipBuilder.newBuilder(outputFile)
           .base(zipBase)
           .password(password)
           .compressed();
+      int totalFiles = localFiles.size();
+      int currentFile = 0;
       for (File localFile : localFiles) {
+        currentFile++;
+        String fsPath = localFile.getAbsolutePath().replace(localRoot.getAbsolutePath(), "");
+
+        getShell().progress(String.format("Adding to bundle: %s", fsPath), currentFile, totalFiles, (currentFile - 1) * 100 / totalFiles);
         builder.put(localFile, aclFilter);
+        getShell().progress(String.format("Added to bundle: %s", fsPath), currentFile, totalFiles, currentFile * 100 / totalFiles);
       }
       builder.build();
+      getShell().progress("Bundle creation complete", totalFiles, 0, 100);
 
       log.info("File bundle created: {}", outputFile.getAbsolutePath());
-      getShell().printf("File bundle created: %s%n", outputFile.getAbsolutePath());
+      // Output the path to the created bundle, replacing WORK_DIR
+      String outputPath = outputFile.getAbsolutePath().replace(WORK_DIR + File.separator, "");
+      getShell().printf("File bundle created: %s%n", outputPath);
       result = new FileCommandResult(outputFile, "application/zip");
       return 0;
     } catch (Exception e) {
