@@ -24,6 +24,7 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.FileBundleCommandOptions;
 import org.obiba.opal.shell.web.FileBundleCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -48,7 +49,10 @@ public class FileBundleCommandResource extends AbstractCommandsResource {
       @ApiResponse(responseCode = "201", description = "File bundle command successfully launched"),
       @ApiResponse(responseCode = "500", description = "Internal server error")
   })
+  @NoAuthorization
   public Response createFileBundle(Commands.FileBundleCommandOptionsDto options) {
+    // No authorization since every user has a home folder
+    // bundle operation will filter only readable files
     Command<FileBundleCommandOptions> cmd = commandRegistry.newCommand("file-bundle");
     cmd.setOptions(new FileBundleCommandOptionsDtoImpl(options));
     return launchCommand(cmd);

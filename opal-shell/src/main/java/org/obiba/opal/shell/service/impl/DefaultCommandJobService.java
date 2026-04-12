@@ -307,10 +307,17 @@ public class DefaultCommandJobService implements CommandJobService {
       if (subject.isPermitted("rest:/project/" + job.getProject() + ":POST")) return true;
       // project regular user can only see own jobs
       return subject.getPrincipal().toString().equals(job.getOwner());
+    } else if (job.getCommand().getName().equals("file-bundle")) {
+      // own file bundle commands are visible, and admin can see them all
+      return subject.getPrincipal().toString().equals(job.getOwner()) || isAdmin(subject);
     } else {
       // no project context, only for admins
       return subject.isPermitted("rest:/" + ":POST");
     }
+  }
+
+  private boolean isAdmin(Subject subject) {
+    return subject.isPermitted("rest:/" + ":POST");
   }
 
   BlockingQueue<Runnable> getNotStartedJobs() {
