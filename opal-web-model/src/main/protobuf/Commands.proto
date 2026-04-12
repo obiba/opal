@@ -140,6 +140,6 @@ message RPackageCommandOptionsDto {
 }
 
 message FileBundleCommandOptionsDto {
-  required string path = 1;
+  repeated string paths = 1;
   optional string password = 2;
 }

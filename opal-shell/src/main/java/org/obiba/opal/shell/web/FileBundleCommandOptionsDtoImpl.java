@@ -12,6 +12,8 @@ package org.obiba.opal.shell.web;
 import org.obiba.opal.shell.commands.options.FileBundleCommandOptions;
 import org.obiba.opal.web.model.Commands;
 
+import java.util.List;
+
 public class FileBundleCommandOptionsDtoImpl implements FileBundleCommandOptions {
 
   private final Commands.FileBundleCommandOptionsDto dto;
@@ -21,8 +23,13 @@ public class FileBundleCommandOptionsDtoImpl implements FileBundleCommandOptions
   }
 
   @Override
-  public String getPath() {
-    return dto.getPath();
+  public List<String> getPaths() {
+    return dto.getPathsList();
+  }
+
+  @Override
+  public boolean isPaths() {
+    return dto.getPathsCount() > 0;
   }
 
   @Override
@@ -40,4 +47,3 @@ public class FileBundleCommandOptionsDtoImpl implements FileBundleCommandOptions
     return false;
   }
 }
-

@@ -94,6 +94,10 @@
             </q-btn-group>
             <q-btn outline color="red" icon="delete" size="sm" @click="onShowDelete" :disable="writables.length === 0">
             </q-btn>
+            <div v-if="downloadLoading">
+              <span class="text-hint q-mr-sm">{{ t('downloading') }}</span>
+              <q-spinner-dots size="lg" />
+            </div>
           </div>
         </template>
         <template v-slot:top-right>
@@ -265,10 +269,12 @@ import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
+import { CommandStateDto_Status } from 'src/models/Commands';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
 import { DefaultAlignment } from 'src/components/models';
+import { notifyError } from 'src/utils/notify';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
@@ -302,6 +308,8 @@ const showUpload = ref(false);
 const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+const downloadLoading = ref(false);
+const downloadPollTimer = ref<ReturnType<typeof setInterval> | null>(null);
 
 // Validators
 const validatePassword = (val: string) =>
@@ -436,15 +444,70 @@ function onShowDownload() {
 
 async function onDownload() {
   const valid = await formRef.value.validate();
-  if (valid) {
-    filesStore.downloadFiles(
-      props.file.path,
-      readables.value,
-      encryptContent.value ? encryptPassword.value : undefined,
-    );
-    showDownload.value = false;
+  if (!valid) return;
+
+  // Collect the paths of all readable selected items, falling back to the current file/folder.
+  const bundlePaths =
+    readables.value.length > 0
+      ? readables.value.map((f) => f.path)
+      : [props.file.path];
+  const password = encryptContent.value ? encryptPassword.value : undefined;
+
+  showDownload.value = false;
+  downloadLoading.value = true;
+
+  filesStore
+    .createFileBundle(bundlePaths, password)
+    .then((command) => {
+      startDownloadPolling(command.id);
+    })
+    .catch((err) => {
+      downloadLoading.value = false;
+      notifyError(err);
+    });
+}
+
+function startDownloadPolling(commandId: number) {
+  downloadPollTimer.value = setInterval(() => {
+    filesStore
+      .getCommand(commandId)
+      .then((command) => {
+        if (command.status === CommandStateDto_Status.SUCCEEDED) {
+          stopDownloadPolling();
+          filesStore
+            .downloadCommandResult(commandId)
+            .catch(notifyError)
+            .finally(() => {
+              filesStore.deleteCommand(commandId).catch(() => undefined);
+              downloadLoading.value = false;
+            });
+        } else if (
+          command.status === CommandStateDto_Status.FAILED ||
+          command.status === CommandStateDto_Status.CANCELED
+        ) {
+          stopDownloadPolling();
+          downloadLoading.value = false;
+          notifyError(t('file_bundle_failed'));
+        }
+      })
+      .catch((err) => {
+        stopDownloadPolling();
+        downloadLoading.value = false;
+        notifyError(err);
+      });
+  }, 2000);
+}
+
+function stopDownloadPolling() {
+  if (downloadPollTimer.value !== null) {
+    clearInterval(downloadPollTimer.value);
+    downloadPollTimer.value = null;
   }
 }
+
+onUnmounted(() => {
+  stopDownloadPolling();
+})
 
 function onEncryptContentUpdated() {
   encryptPassword.value = '';

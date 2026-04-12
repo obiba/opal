@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import type { FileObject } from 'src/components/models';
+import { type CommandStateDto } from 'src/models/Commands';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);
@@ -80,6 +81,36 @@ export const useFilesStore = defineStore('files', () => {
       }
       window.open(uri, '_self');
     }
+  }
+
+  async function createFileBundle(paths: string[], password: string | undefined): Promise<CommandStateDto> {
+    const payload: Record<string, unknown> = { paths };
+    if (password) payload['password'] = password;
+    return api.post('/shell/commands/_file-bundle', payload).then((r) => r.data as CommandStateDto);
+  }
+
+  async function getCommand(id: number): Promise<CommandStateDto> {
+    return api.get(`/shell/command/${id}`).then((r) => r.data as CommandStateDto);
+  }
+
+  async function downloadCommandResult(id: number): Promise<void> {
+    return api.get(`/shell/command/${id}/_result`, { responseType: 'blob' }).then((response) => {
+      const disposition: string = response.headers['content-disposition'] ?? '';
+      const match = disposition.match(/filename="?([^"]+)"?/);
+      const fileName = match ? match[1] || 'download.zip' : 'download.zip';
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  function deleteCommand(id: number): Promise<void> {
+    return api.delete(`/shell/command/${id}`).then(() => undefined);
   }
 
   function addFolder(path: string, folderName: string) {
@@ -212,6 +243,10 @@ export const useFilesStore = defineStore('files', () => {
     loadFiles,
     downloadFile,
     downloadFiles,
+    createFileBundle,
+    getCommand,
+    downloadCommandResult,
+    deleteCommand,
     addFolder,
     extractArchive,
     uploadFiles,
