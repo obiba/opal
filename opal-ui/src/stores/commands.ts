@@ -1,9 +1,22 @@
 import { defineStore } from 'pinia';
 import { api } from 'src/boot/api';
+import { Perms } from 'src/utils/authz';
 import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+
+interface CommandsPerms {
+  commands?: Perms;
+}
 
 export const useCommandsStore = defineStore('commands', () => {
   const commandStates = ref([] as CommandStateDto[]);
+  const perms = ref<CommandsPerms>({});
+
+  function init() {
+    perms.value = {};
+    api.options('/shell/commands').then((response) => {
+      perms.value.commands = new Perms(response);
+    });
+  }
 
   function reset() {
     commandStates.value = [];
@@ -38,6 +51,8 @@ export const useCommandsStore = defineStore('commands', () => {
 
   return {
     commandStates,
+    perms,
+    init,
     reset,
     refresh,
     clear,

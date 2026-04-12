@@ -37,7 +37,7 @@
           <q-item-label>{{ t('files') }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item :to="`/tasks`">
+      <q-item v-if="commandsStore.perms.commands?.canRead()" :to="`/tasks`">
         <q-item-section avatar>
           <q-icon name="splitscreen" />
         </q-item-section>
@@ -61,7 +61,7 @@
           <q-item-label>{{ t('search') }}</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item v-if="authStore.isAdministrator" to="/admin">
+      <q-item v-if="authStore.isAdministrator || authStore.isAuditor" to="/admin">
         <q-item-section avatar>
           <q-icon name="admin_panel_settings" />
         </q-item-section>
@@ -89,6 +89,7 @@ const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const systemStore = useSystemStore();
+const commandsStore = useCommandsStore();
 
 const username = computed(() => (authStore.profile.principal ? authStore.profile.principal : '?'));
 
@@ -106,6 +107,12 @@ const essentialLinks: EssentialLinkProps[] = [
     link: 'https://github.com/obiba/opal',
   },
 ];
+
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    commandsStore.init();
+  }
+});
 
 function onSignout() {
   const logoutURL = systemStore.generalConf.logoutURL;

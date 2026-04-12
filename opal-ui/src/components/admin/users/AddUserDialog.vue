@@ -168,7 +168,7 @@ function filterGroups(val: string, update: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addGroup(val: string, done: any) {
-  if (val.trim().length > 0) {
+  if (val.trim().length > 0 && val.trim() !== '*') {
     const modelValue = (newUser.value.groups || []).slice();
     if (groupFilterOptions.includes(val) === false) {
       groupFilterOptions.push(val);

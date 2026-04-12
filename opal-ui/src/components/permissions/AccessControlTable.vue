@@ -14,10 +14,10 @@
       :pagination="initialPagination"
       :hide-pagination="rows.length <= initialPagination.rowsPerPage"
       :loading="loading"
-      selection="multiple"
+      :selection="readOnly ? 'none' : 'multiple'"
       v-model:selected="selectedAcls"
     >
-      <template v-slot:top v-if="!hideDelete">
+      <template v-slot:top v-if="!readOnly">
         <q-btn
           outline
           color="red"
@@ -59,11 +59,13 @@ interface Props {
   principal?: string;
   type?: Subject_SubjectType;
   loading: boolean;
-  hideDelete?: boolean;
+  readOnly?: boolean;
   onDeleteAcls: () => void;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  readOnly: false
+});
 const emit = defineEmits(['update:modelValue']);
 const { t } = useI18n();
 

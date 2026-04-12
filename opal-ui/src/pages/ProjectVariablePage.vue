@@ -96,7 +96,7 @@
         <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="t('dictionary')" />
           <q-tab name="script" :label="t('script')" v-if="withScript" />
-          <q-tab name="summary" :label="t('summary')" />
+          <q-tab name="summary" :label="t('summary')" v-if="datasourceStore.perms.variableSummary?.canRead()" />
           <q-tab name="values" :label="t('values')" v-if="datasourceStore.perms.tableValueSets?.canRead()" />
           <q-tab
             name="permissions"
@@ -134,7 +134,7 @@
             <variable-script :variable="datasourceStore.variable" />
           </q-tab-panel>
 
-          <q-tab-panel name="summary">
+          <q-tab-panel name="summary" v-if="datasourceStore.perms.variableSummary?.canRead()">
             <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount || 0" />
           </q-tab-panel>
 
@@ -146,6 +146,7 @@
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}/variable/${vName}`"
               :options="['VARIABLE_READ']"
+              :read-only="!datasourceStore.perms.variablePermissions?.canCreate()"
             />
           </q-tab-panel>
         </q-tab-panels>

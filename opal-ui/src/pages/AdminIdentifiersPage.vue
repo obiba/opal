@@ -20,7 +20,7 @@
       <q-banner v-if="!hasIdsDatabase" inline-actions rounded class="bg-warning">
         {{ t('id_mappings.no_database_warning') }}
 
-        <template v-slot:action>
+        <template v-if="authStore.isAdministrator" v-slot:action>
           <q-btn flat :label="t('configure')" to="/admin/databases" />
         </template>
       </q-banner>
@@ -28,9 +28,9 @@
         <div class="col">
           <div class="text-h6 q-mb-md row q-gutter-sm items-center">
             <span>{{ t('id_mappings.ids_list_title') }}</span>
-            <q-btn size="sm" icon="add" color="primary" outline :title="t('add')" @click="onAddIdentifierTable"></q-btn>
+            <q-btn v-if="authStore.isAdministrator" size="sm" icon="add" color="primary" outline :title="t('add')" @click="onAddIdentifierTable"></q-btn>
             <q-btn
-              v-if="hasIdentifiersTables"
+              v-if="hasIdentifiersTables && authStore.isAdministrator"
               size="sm"
               icon="delete"
               color="negative"
@@ -56,8 +56,8 @@
         <div v-if="hasIdentifiersTables" class="col-9">
           <div class="text-h6">
             {{ selectedIdentifierTable?.entityType }}
-            <q-btn :label="t('export')" color="secondary" icon="output" @click="onExportIdentifiers" size="sm" />
-            <q-btn-dropdown class="q-ml-sm" color="secondary" :label="t('import')" icon="input" size="sm">
+            <q-btn v-if="authStore.isAdministrator" :label="t('export')" color="secondary" icon="output" @click="onExportIdentifiers" size="sm" />
+            <q-btn-dropdown v-if="authStore.isAdministrator" class="q-ml-sm" color="secondary" :label="t('import')" icon="input" size="sm">
               <q-list>
                 <q-item clickable v-close-popup @click.prevent="onImportSystemIdentifiersList">
                   <q-item-section>
@@ -153,6 +153,7 @@ const { t } = useI18n();
 const loading = ref(false);
 
 const tab = ref('mappings');
+const authStore = useAuthStore();
 const systemStore = useSystemStore();
 const identifiersStore = useIdentifiersStore();
 const selectedIdentifierTable = ref({} as TableDto);

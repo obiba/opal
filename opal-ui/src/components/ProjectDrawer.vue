@@ -45,7 +45,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="`/project/${projectsStore.project.name}/files`">
+      <q-item v-show="hasFilesPermission" :to="`/project/${projectsStore.project.name}/files`">
         <q-item-section avatar>
           <q-icon name="folder" />
         </q-item-section>
@@ -56,7 +56,7 @@
 
       <q-item-label header class="text-weight-bolder">{{ t('administration') }}</q-item-label>
 
-      <q-item :to="`/project/${projectsStore.project.name}/tasks`">
+      <q-item v-show="hasTasksPermission" :to="`/project/${projectsStore.project.name}/tasks`">
         <q-item-section avatar>
           <q-icon name="splitscreen" />
         </q-item-section>
@@ -88,14 +88,19 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
+const authStore = useAuthStore();
 const projectsStore = useProjectsStore();
 const pluginsStore = usePluginsStore();
 const hasAdminPermission = ref(false);
 const hasVcfStorePermission = ref(false);
 const hasVcfPlugins = ref(false);
+const hasFilesPermission = ref(false);
+const hasTasksPermission = ref(false);
 
 watchEffect(() => {
   hasAdminPermission.value =
+    authStore.isAdministrator ||
+    authStore.isAuditor ||
     projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||
     projectsStore.perms.project?.canDelete() ||
@@ -103,6 +108,12 @@ watchEffect(() => {
 
   hasVcfStorePermission.value =
     projectsStore.perms.vcfstore?.canRead() && projectsStore.project.vcfStoreService ? true : false;
+
+  hasFilesPermission.value =
+    projectsStore.perms.files?.canRead() || false;
+
+  hasTasksPermission.value =
+    projectsStore.perms.commands?.canRead() || false;
 });
 
 onMounted(() => {

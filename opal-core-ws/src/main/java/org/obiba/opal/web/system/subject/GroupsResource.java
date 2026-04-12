@@ -73,6 +73,9 @@ public class GroupsResource {
     if (group.getName().trim().isEmpty()) {
       throw new BadRequestException("Group name cannot be empty");
     }
+    if (group.getName().trim().equals("*")) {
+      throw new BadRequestException("Group name not allowed");
+    }
 
     if(subjectCredentialsService.getGroup(dto.getName()) != null) {
       throw new ConflictingRequestException("Group name must be unique");

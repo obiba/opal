@@ -70,6 +70,17 @@ public class WebShellResource extends AbstractCommandsResource {
     return commandDtoList;
   }
 
+  @OPTIONS
+  @Path("/commands")
+  @Operation(summary = "Get OPTIONS", description = "Get allowed HTTP methods for commands resource")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OPTIONS request processed successfully", useReturnTypeSchema = true),
+      @ApiResponse(responseCode = "500", description = "Server error")
+  })
+  public Response getCommandsOptions() {
+    return Response.ok().build();
+  }
+
   @GET
   @Path("/command/{id}")
   @Operation(

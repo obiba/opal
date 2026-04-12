@@ -149,7 +149,7 @@ const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]
 
 onMounted(() => {
   router.beforeEach((to, from, next) => {
-    if (to.path.startsWith('/admin') && !authStore.isAdministrator) {
+    if (to.path.startsWith('/admin') && !authStore.isAdministrator && !authStore.isAuditor) {
       next('/');
     } else {
       next();

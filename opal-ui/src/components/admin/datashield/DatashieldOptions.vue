@@ -12,11 +12,12 @@
       :pagination="initialPagination"
       :filter="filter"
       :filter-method="onFilter"
-      selection="multiple"
+      :selection="authStore.isAdministrator ? 'multiple' : undefined"
       v-model:selected="selected"
     >
       <template v-slot:top-left>
         <q-btn
+          v-if="authStore.isAdministrator"
           color="primary"
           text-color="white"
           icon="add"
@@ -34,6 +35,7 @@
           @click="updateOptions"
         />
         <q-btn
+          v-if="authStore.isAdministrator"
           outline
           color="red"
           icon="delete"
@@ -55,6 +57,7 @@
           <span class="text-primary">{{ props.row.name }}</span>
           <div class="float-right">
             <q-btn
+              v-if="authStore.isAdministrator"
               rounded
               dense
               flat
@@ -65,6 +68,7 @@
               @click="onShowEdit(props.row)"
             />
             <q-btn
+              v-if="authStore.isAdministrator"
               rounded
               dense
               flat
@@ -100,6 +104,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditDatashieldOptionDialog from 'src/components/admin/datashield/EditDatashieldOptionDialog.vue';
 import { DefaultAlignment } from 'src/components/models';
 
+const authStore = useAuthStore();
 const datashieldStore = useDatashieldStore();
 const { t } = useI18n();
 

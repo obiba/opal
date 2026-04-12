@@ -19,6 +19,7 @@
         >
         <div class="float-right">
           <q-btn
+            v-if="authStore.isAdministrator"
             rounded
             dense
             flat
@@ -71,6 +72,7 @@ import { notifyError } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const appsStore = useAppsStore();
 const loading = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});

@@ -25,6 +25,7 @@
           :label="t('name')"
           :hint="t('resource_ref.name_hint')"
           :disable="editMode"
+          :rules="[(val: string) => val !== '*' || t('resource_ref.name_reserved')]"
           dense
           class="q-mb-md"
         />
@@ -225,6 +226,9 @@ function compareTitles(a: { title: string }, b: { title: string }) {
 
 function onSave() {
   if (!props.provider || !sfParameters.value.validate() || !sfCredentials.value.validate()) {
+    return;
+  }
+  if (name.value === '*') {
     return;
   }
   const resourceRef: ResourceReferenceDto = {

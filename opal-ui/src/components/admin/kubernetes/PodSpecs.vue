@@ -12,12 +12,12 @@
     />
     <q-table flat :rows="rockPodSpecs" :columns="columns" row-key="id" :pagination="initialPagination">
       <template v-slot:top-left>
-        <q-btn size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
+        <q-btn v-if="authStore.isAdministrator" size="sm" icon="add" color="primary" :title="t('add')" @click="onAdd"></q-btn>
       </template>
       <template v-slot:body-cell-id="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <code :title="props.row.id">{{ props.value }}</code>
-          <div class="float-right">
+          <div v-if="authStore.isAdministrator" class="float-right">
             <q-btn
               rounded
               dense
@@ -30,6 +30,7 @@
               @click="onEdit(props.row)"
             />
             <q-btn
+
               rounded
               dense
               flat
@@ -115,6 +116,7 @@ import { DefaultAlignment } from 'src/components/models';
 import type { PodSpecDto } from 'src/models/K8s';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 const podsStore = usePodsStore();
 
 const initialPagination = ref({

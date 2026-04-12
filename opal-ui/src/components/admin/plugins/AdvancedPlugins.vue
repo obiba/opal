@@ -1,21 +1,23 @@
 <template>
   <div>
-    <div class="text-h6">
-      {{ t('plugin.archive_installation') }}
+    <div v-if="authStore.isAdministrator">
+      <div class="text-h6">
+        {{ t('plugin.archive_installation') }}
+      </div>
+      <div class="text-help q-mb-md">
+        {{ t('plugin.archive_info') }}
+      </div>
+      <file-select
+        v-model="file"
+        :label="t('plugin.archive_file')"
+        :folder="filesStore.current"
+        selection="single"
+        :extensions="['-dist.zip']"
+        @select="onFileSelect"
+        class="q-mb-md"
+      />
+      <q-spinner-dots v-if="loading" class="q-mb-md" />
     </div>
-    <div class="text-help q-mb-md">
-      {{ t('plugin.archive_info') }}
-    </div>
-    <file-select
-      v-model="file"
-      :label="t('plugin.archive_file')"
-      :folder="filesStore.current"
-      selection="single"
-      :extensions="['-dist.zip']"
-      @select="onFileSelect"
-      class="q-mb-md"
-    />
-    <q-spinner-dots v-if="loading" class="q-mb-md" />
     <div class="text-h6">
       {{ t('plugin.update_site') }}
     </div>
@@ -39,6 +41,7 @@ import type { FileDto } from 'src/models/Opal';
 import { notifyError, notifySuccess } from 'src/utils/notify';
 import { getDateLabel, getDateDistanceLabel } from 'src/utils/dates';
 
+const authStore = useAuthStore();
 const filesStore = useFilesStore();
 const pluginsStore = usePluginsStore();
 const { t } = useI18n();

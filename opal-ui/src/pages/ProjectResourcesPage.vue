@@ -42,6 +42,7 @@
           <access-control-list
             :resource="`/project/${pName}/permissions/resources`"
             :options="['RESOURCES_VIEW', 'RESOURCES_ALL']"
+            :read-only="!resourcesStore.perms.resourcesPermissions?.canCreate()"
           />
         </q-tab-panel>
       </q-tab-panels>

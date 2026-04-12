@@ -305,6 +305,10 @@ export default {
       label: 'Administrer le project',
       description: 'Accès complet au projet',
     },
+    AUDIT_ALL: {
+      label: 'Auditer le système',
+      description: 'Accès en lecture seule à certaines ressources (projets, permissions, profiles utilisateurs, configurations DataSHIELD et logs) à des fins d\'audit, sans accès aux données individuelles.',
+    },
     SYSTEM_ALL: {
       label: 'Administrer le système',
       description: 'Accès complet à toutes les ressources du système (utilisateurs de confiance uniquement !).',
@@ -609,6 +613,9 @@ export default {
       copy_password: 'Copier le mot de passe',
       generate_password: 'Générer un mot de passe',
     },
+    group: {
+      name_not_allowed: 'Nom de groupe non autorisé',
+    },
     identity_provider: {
       clientId_required: "L'ID client est requis",
       secret_required: 'Le secret est requis',
@@ -697,6 +704,7 @@ export default {
     test_error: "L'assignation de la resource a échoué.",
     add_from_provider: 'Ajouter à partir de {provider}',
     name_hint: 'Le nom de la ressource, unique dans le projet.',
+    name_reserved: "Le nom '*' est réservé et ne peut pas être utilisé.",
     description_hint: 'Une courte description de la ressource, optionelle.',
     category: 'Categorie',
     category_hint: 'Le type de ressource.',

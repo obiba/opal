@@ -120,6 +120,10 @@ function init() {
     .then((data) => {
       summary.value = data;
     })
+    .catch((error) => {
+      summary.value = {};
+      console.error('Failed to load variable summary', error);
+    })
     .finally(() => {
       loading.value = false;
     });

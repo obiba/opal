@@ -17,6 +17,7 @@
           ></q-btn>
         </div>
         <q-btn
+          v-if="authStore.isAdministrator"
           color="primary"
           text-color="white"
           icon="add"
@@ -51,6 +52,7 @@ import AddDatashieldProfileDialog from 'src/components/admin/datashield/AddDatas
 
 const { t } = useI18n();
 
+const authStore = useAuthStore();
 const datashieldStore = useDatashieldStore();
 
 const tab = ref<string>(

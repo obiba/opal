@@ -305,6 +305,10 @@ export default {
       label: 'Administrate projects',
       description: 'Full access to project.',
     },
+    AUDIT_ALL: {
+      label: 'Audit system',
+      description: 'Read-only access to some system resources (projects, permissions, user profiles, DataSHIELD settings and logs) for audit purpose, no access to individual-level data.',
+    },
     SYSTEM_ALL: {
       label: 'Administrate system',
       description: 'Access to all resources and actions in the system (trusted users only!).',
@@ -609,6 +613,9 @@ export default {
       copy_password: 'Copy password',
       generate_password: 'Generate password',
     },
+    group: {
+      name_not_allowed: 'Group name not allowed',
+    },
     identity_provider: {
       clientId_required: 'Client ID is required',
       secret_required: 'Secret is required',
@@ -697,6 +704,7 @@ export default {
     test_error: 'Resource assignment failed.',
     add_from_provider: 'Add from {provider}',
     name_hint: 'The name of the resource, unique in the project.',
+    name_reserved: "The name '*' is reserved and cannot be used.",
     description_hint: 'A short description of the resource, optional.',
     category: 'Category',
     category_hint: 'The type of resource.',

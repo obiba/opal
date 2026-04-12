@@ -61,6 +61,10 @@ public class SubjectCredentialResource {
     }
     if (getSubjectCredentials() == null) return Response.status(Response.Status.NOT_FOUND).build();
 
+    if (dto.getGroupsList().stream().anyMatch(g -> g.trim().equals("*"))) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     switch (subjectCredentials.getAuthenticationType()) {
       case PASSWORD:

@@ -78,14 +78,14 @@
         </q-card>
       </template>
 
-      <!-- FIXME use /project/PROJ/permissions/project when fixed -->
-      <template v-if="hasAdminPermission">
+      <template v-if="projectsStore.perms.project?.canRead()">
         <q-card flat>
           <q-card-section class="q-px-none">
             <span class="text-h6 q-mb-md">{{ t('permissions') }}</span>
             <access-control-list
               :resource="`/project/${name}/permissions/project`"
               :options="[AclAction.PROJECT_ALL]"
+              :read-only="!projectsStore.perms.project?.canCreate()"
             />
           </q-card-section>
         </q-card>

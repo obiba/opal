@@ -22,6 +22,7 @@ import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.web.BaseResource;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,9 @@ public class ProjectResourceReferencesResource implements BaseResource {
     checkProject(referenceDto.getProject());
 
     ResourceReference reference = Dtos.fromDto(referenceDto);
+    if ("*".equals(reference.getName()))
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ReservedResourceName").build()).build();
     resourceReferenceService.save(reference);
     URI uri = uriInfo.getBaseUriBuilder().path("project").path(name).path("resource").path(reference.getName()).build();
     return Response.created(uri).build();

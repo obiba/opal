@@ -21,7 +21,8 @@
         align="justify"
       >
         <q-tab name="dictionary" :label="t('dictionary')" />
-        <q-tab name="sql" :label="t('sql')" />
+        <q-tab name="sql" :label="t('sql')" 
+          v-if="datasourceStore.perms.datasourceSql?.canCreate()"/>
         <q-tab
           name="permissions"
           :label="t('permissions')"
@@ -36,7 +37,7 @@
           <datasource-tables />
         </q-tab-panel>
 
-        <q-tab-panel name="sql">
+        <q-tab-panel name="sql" v-if="datasourceStore.perms.datasourceSql?.canCreate()">
           <sql-panel />
         </q-tab-panel>
 
@@ -44,6 +45,7 @@
           <access-control-list
             :resource="`/project/${name}/permissions/datasource`"
             :options="['DATASOURCE_VIEW', 'TABLE_ADD', 'DATASOURCE_ALL']"
+            :read-only="!datasourceStore.perms.datasourcePermissions?.canCreate()"
           />
         </q-tab-panel>
       </q-tab-panels>

@@ -89,12 +89,12 @@
           class="on-right"
         >
           <q-list>
-            <q-item clickable v-close-popup @click="onShowCopyData">
+            <q-item v-if="canCopy" clickable v-close-popup @click="onShowCopyData">
               <q-item-section>
                 <q-item-label>{{ t('copy_data') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item v-if="isView" clickable v-close-popup @click="onShowCopyView">
+            <q-item clickable v-close-popup @click="onShowCopyView">
               <q-item-section>
                 <q-item-label>{{ t('copy_view') }}</q-item-label>
               </q-item-section>
@@ -238,6 +238,7 @@
             <access-control-list
               :resource="`/project/${dsName}/permissions/table/${tName}`"
               :options="['TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL']"
+              :read-only="readOnlyPermissions"
             />
           </q-tab-panel>
         </q-tab-panels>
@@ -318,6 +319,7 @@ const canUpdate = computed(() => datasourceStore.perms.table?.canUpdate());
 const canDelete = computed(() => datasourceStore.perms.table?.canDelete());
 const canReadValues = computed(() => datasourceStore.perms.tableValueSets?.canRead());
 const canReadPermissions = computed(() => datasourceStore.perms.tablePermissions?.canRead());
+const readOnlyPermissions = computed(() => !datasourceStore.perms.tablePermissions?.canCreate());
 
 const previousTable = computed(() => {
   const idx = datasourceStore.tables.findIndex((t) => t.name === tName.value);

@@ -10,13 +10,13 @@
   >
     <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn no-caps color="primary" icon="add" size="sm" :label="t('add')" @click="onAddMapping" />
+        <q-btn v-if="authStore.isAdministrator" no-caps color="primary" icon="add" size="sm" :label="t('add')" @click="onAddMapping" />
       </div>
     </template>
     <template v-slot:body-cell-name="props">
       <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
         {{ props.value }}
-        <div class="float-right">
+        <div v-if="authStore.isAdministrator" class="float-right">
           <q-btn
             rounded
             dense
@@ -107,6 +107,7 @@ interface Props {
 const props = defineProps<Props>();
 const emits = defineEmits(['update']);
 const { t } = useI18n();
+const authStore = useAuthStore();
 const identifiersStore = useIdentifiersStore();
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const selectedMapping = ref({} as VariableDto);

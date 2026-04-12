@@ -159,6 +159,10 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   private Response createTableInternal(TableDto table) {
+    if("*".equals(table.getName())) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "ReservedTableName").build()).build();
+    }
     if(datasource.hasValueTable(table.getName())) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();

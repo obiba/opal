@@ -44,6 +44,41 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
 
     },
 
+    AUDIT_ALL {
+      @Override
+      public Iterable<String> convert(String node) {
+        return Lists.newArrayList(
+            toRest("/project/*", "GET"),
+            toRest("/project/*/summary", "GET"),
+            toRest("/datasource/*", "GET"),
+            toRest("/datasource/*/tables", "GET"),
+            toRest("/datasource/*/table/*", "GET"),
+            toRest("/datasource/*/view/*", "GET"),
+            toRest("/datasource/*/table/*/variables", "GET"),
+            toRest("/datasource/*/table/*/variable/*", "GET"),
+            toRest("/project/*/resources", "GET"),
+            toRest("/project/*/resource/*", "GET"),
+            toRest("/project/*/permissions/project", "GET"),
+            toRest("/project/*/permissions/subjects", "GET"),
+            toRest("/project/*/permissions/subject/*", "GET"),
+            toRest("/project/*/permissions/datasource", "GET"),
+            toRest("/project/*/permissions/table/*", "GET"),
+            toRest("/project/*/permissions/resources", "GET"),
+            toRest("/project/*/permissions/resource/*", "GET"),
+            toRest("/authz-subject/*", "GET"),
+            toRest("/service/r/clusters", "GET"),
+            toRest("/service/r/activity/_summary", "GET"),
+            toRest("/system/subject-profile", "GET:GET/GET"),
+            toRest("/system/permissions/datashield", "GET"),
+            toRest("/system/log/datashield.log", "GET"),
+            toRest("/datashield/profile", "GET:GET/GET"),
+            toRest("/datashield/env", "GET:GET/GET"),
+            toRest("/datashield/options", "GET:GET/GET"),
+            toRest("/datashield/packages", "GET:GET/GET")
+        );
+      }
+    },
+
     PROJECT_ADD {
       @Override
       public Iterable<String> convert(String node) {

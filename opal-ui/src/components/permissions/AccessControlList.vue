@@ -11,7 +11,7 @@
       :filter-method="onFilter"
     >
       <template v-slot:top-left>
-        <q-btn-dropdown color="primary" :title="t('add')" icon="add" size="sm">
+        <q-btn-dropdown v-if="!readOnly" color="primary" :title="t('add')" icon="add" size="sm">
           <q-list>
             <q-item clickable v-close-popup @click.prevent="onShowAddUser">
               <q-item-section>
@@ -38,7 +38,7 @@
         <q-tr :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <q-td key="name" :props="props">
             <span class="text-primary">{{ props.row.subject.principal }}</span>
-            <div class="float-right">
+            <div v-if="!readOnly" class="float-right">
               <q-btn
                 rounded
                 dense
@@ -74,7 +74,7 @@
       </template>
     </q-table>
     <div v-else class="q-mt-sm">
-      <q-btn-dropdown color="primary" :label="t('add')" icon="add" size="sm">
+      <q-btn-dropdown v-if="!readOnly" color="primary" :label="t('add')" icon="add" size="sm">
         <q-list>
           <q-item clickable v-close-popup @click.prevent="onShowAddUser">
             <q-item-section>
@@ -166,9 +166,12 @@ import { DefaultAlignment } from 'src/components/models';
 interface Props {
   resource: string;
   options: string[];
+  readOnly?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  readOnly: false
+});
 
 const authzStore = useAuthzStore();
 const { t } = useI18n();

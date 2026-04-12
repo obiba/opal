@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const profile = ref<SubjectProfileDto>({} as SubjectProfileDto);
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
+  const isAuditor = ref(false);
   const reAuthRequired = ref(false);
 
   const otpMessage = computed(
@@ -26,9 +27,16 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function checkIsAdministrator() {
     return api
-      .options('/system/subject-credentials')
-      .then((response) => (isAdministrator.value = response.headers['allow'].includes('POST')))
-      .catch(() => (isAdministrator.value = false));
+      .options('/system/subject-profiles')
+      .then((response) => {
+        const headers = response.headers['allow'] || '';
+        isAdministrator.value = headers.includes('DELETE');
+        isAuditor.value = headers.includes('GET') && !isAdministrator.value;
+      })
+      .catch(() => {
+        isAdministrator.value = false;
+        isAuditor.value = false;
+      });
   }
 
   async function signin(username: string, password: string, authMethod: string, token: string) {
@@ -106,6 +114,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     bookmarks,
     isAdministrator,
+    isAuditor,
     otpMessage,
     reAuthRequired,
     signin,

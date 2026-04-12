@@ -11,7 +11,11 @@
       <div class="text-h5 q-mb-md">{{ t('configuration') }}</div>
       <general-configuration />
       <div class="text-h5 q-mb-md q-mt-lg">{{ t('permissions') }}</div>
-      <access-control-list resource="/system/permissions/administration" :options="['PROJECT_ADD', 'SYSTEM_ALL']" />
+      <access-control-list
+        resource="/system/permissions/administration"
+        :options="['PROJECT_ADD', 'AUDIT_ALL', 'SYSTEM_ALL']"
+        :read-only="authStore.isAuditor"
+      />
     </q-page>
   </div>
 </template>
@@ -21,4 +25,5 @@ import GeneralConfiguration from 'src/components/admin/configuration/GeneralConf
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 </script>
