@@ -74,6 +74,9 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
     if (valueTable.getName().equals(table.getName())) return Response.ok().build();
 
+    if ("*".equals(table.getName())) return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ReservedTableName").build()).build();
+
     if (!getDatasource().canRenameTable(valueTable.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableRenamingNotSupported").build()).build();
 

@@ -161,10 +161,17 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFromTables(@Nullable FileObject file) {
     int errorCode = CRITICAL_ERROR;
+    List<String> tables = options.getTables().stream()
+        .filter(t -> !"*".equals(t.substring(t.indexOf('.') + 1)))
+        .collect(java.util.stream.Collectors.toList());
+    if (tables.isEmpty()) {
+      getShell().printf("No valid tables to import (table name '*' is not allowed).\n");
+      return CRITICAL_ERROR;
+    }
     getShell().printf("  Importing tables [%s] in %s ...\n", getTableNames(), options.getDestination());
     try {
-      dataImportService.importData(options.getTables(), options.getDestination(), options.getUnit(), options.isForce(), options.isIgnore(),
-          new ImportProgressListener(options.getTables().size()));
+      dataImportService.importData(tables, options.getDestination(), options.getUnit(), options.isForce(), options.isIgnore(),
+          new ImportProgressListener(tables.size()));
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {

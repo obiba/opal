@@ -25,6 +25,7 @@ import org.obiba.opal.r.service.RServerManagerService;
 import org.obiba.opal.spi.r.RServerException;
 import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.web.BaseResource;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,10 @@ public class ProjectResourceReferenceResource implements BaseResource {
     if (!project.equals(referenceDto.getProject()))
       throw new IllegalArgumentException("Expecting a resource of project: " + project);
     checkProject(project);
+    // reject reserved name
+    if ("*".equals(referenceDto.getName()))
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ReservedResourceName").build()).build();
     // check it is not a creation
     ResourceReference originalReference = resourceReferenceService.getResourceReference(project, name);
     ResourceReference updatedReference = Dtos.fromDto(referenceDto);

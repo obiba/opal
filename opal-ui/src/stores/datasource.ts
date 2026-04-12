@@ -215,7 +215,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function isNewTableNameValid(name: string) {
-    return name && name.trim() !== '' && !tables.value.map((t) => t.name).includes(name.trim());
+    return name && name.trim() !== '' && name.trim() !== '*' && !tables.value.map((t) => t.name).includes(name.trim());
   }
 
   async function addTable(name: string, entityType: string) {

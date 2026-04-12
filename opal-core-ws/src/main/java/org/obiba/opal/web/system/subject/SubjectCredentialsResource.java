@@ -67,6 +67,13 @@ public class SubjectCredentialsResource implements BaseResource {
     if (subjectCredentials.getName().trim().isEmpty()) {
       throw new BadRequestException("Subject name cannot be empty");
     }
+    if (subjectCredentials.getName().trim().equals("*")) {
+      throw new BadRequestException("Subject name not allowed");
+    }
+
+    if (subjectCredentials.getGroups().stream().anyMatch(g -> g.trim().equals("*"))) {
+      throw new BadRequestException("Group name not allowed");
+    }
 
     if (subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
       throw new ConflictingRequestException("Subject name must be unique");

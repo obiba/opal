@@ -613,6 +613,9 @@ export default {
       copy_password: 'Copy password',
       generate_password: 'Generate password',
     },
+    group: {
+      name_not_allowed: 'Group name not allowed',
+    },
     identity_provider: {
       clientId_required: 'Client ID is required',
       secret_required: 'Secret is required',
@@ -701,6 +704,7 @@ export default {
     test_error: 'Resource assignment failed.',
     add_from_provider: 'Add from {provider}',
     name_hint: 'The name of the resource, unique in the project.',
+    name_reserved: "The name '*' is reserved and cannot be used.",
     description_hint: 'A short description of the resource, optional.',
     category: 'Category',
     category_hint: 'The type of resource.',
