@@ -286,6 +286,7 @@ import { copyToClipboard } from 'quasar';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
+const authStore = useAuthStore();
 
 interface Props {
   file: FileDto;
@@ -317,7 +318,8 @@ const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
 const downloadLoading = ref(false);
-const downloadPollTimer = ref<ReturnType<typeof setInterval> | null>(null);
+const downloadPollTimers = ref<Map<number, ReturnType<typeof setInterval>>>(new Map());
+const pendingDownloadsRestored = ref(false);
 
 // Validators
 const validatePassword = (val: string) =>
@@ -476,12 +478,17 @@ async function onDownload() {
 }
 
 function startDownloadPolling(commandId: number) {
-  downloadPollTimer.value = setInterval(() => {
+  // Prevent duplicate polling for the same command
+  if (downloadPollTimers.value.has(commandId)) {
+    return;
+  }
+
+  const timer = setInterval(() => {
     filesStore
       .getCommand(commandId)
       .then((command) => {
         if (command.status === CommandStateDto_Status.SUCCEEDED) {
-          stopDownloadPolling();
+          stopDownloadPolling(commandId);
           filesStore
             .downloadCommandResult(commandId)
             .then(() => {
@@ -490,39 +497,88 @@ function startDownloadPolling(commandId: number) {
             .catch(notifyError)
             .finally(() => {
               filesStore.deleteCommand(commandId).catch(() => undefined);
-              downloadLoading.value = false;
+              // Only clear downloadLoading if no other polls are active
+              if (downloadPollTimers.value.size === 0) {
+                downloadLoading.value = false;
+              }
             });
         } else if (
           command.status === CommandStateDto_Status.FAILED
         ) {
-          stopDownloadPolling();
-          downloadLoading.value = false;
+          stopDownloadPolling(commandId);
+          if (downloadPollTimers.value.size === 0) {
+            downloadLoading.value = false;
+          }
           notifyError(t('file_bundle_failed'));
         } else if (command.status === CommandStateDto_Status.CANCEL_PENDING ||
           command.status === CommandStateDto_Status.CANCELED) {
-          stopDownloadPolling();
-          downloadLoading.value = false;
+          stopDownloadPolling(commandId);
+          if (downloadPollTimers.value.size === 0) {
+            downloadLoading.value = false;
+          }
           notifyError(t('file_bundle_cancelled'));
         }
       })
       .catch((err) => {
-        stopDownloadPolling();
-        downloadLoading.value = false;
+        stopDownloadPolling(commandId);
+        if (downloadPollTimers.value.size === 0) {
+          downloadLoading.value = false;
+        }
         notifyError(err);
       });
   }, 2000);
+
+  downloadPollTimers.value.set(commandId, timer);
 }
 
-function stopDownloadPolling() {
-  if (downloadPollTimer.value !== null) {
-    clearInterval(downloadPollTimer.value);
-    downloadPollTimer.value = null;
+function stopDownloadPolling(commandId: number) {
+  const timer = downloadPollTimers.value.get(commandId);
+  if (timer !== undefined) {
+    clearInterval(timer);
+    downloadPollTimers.value.delete(commandId);
   }
 }
 
+async function restorePendingDownloadPolling() {
+  if (!authStore.profile.principal || pendingDownloadsRestored.value) {
+    return;
+  }
+
+  pendingDownloadsRestored.value = true;
+  const pendingCommands = await filesStore.getPendingFileDownloadCommands();
+  if (pendingCommands.length > 0) {
+    downloadLoading.value = true;
+    pendingCommands.forEach((command) => {
+      startDownloadPolling(command.id);
+    });
+  }
+}
+
+watch(
+  () => authStore.profile.principal,
+  () => {
+    restorePendingDownloadPolling().catch((err) => {
+      pendingDownloadsRestored.value = false;
+      notifyError(err);
+    });
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  restorePendingDownloadPolling().catch((err) => {
+    pendingDownloadsRestored.value = false;
+    notifyError(err);
+  });
+});
+
 onUnmounted(() => {
-  stopDownloadPolling();
-})
+  // Clear all active polling timers
+  downloadPollTimers.value.forEach((timer) => {
+    clearInterval(timer);
+  });
+  downloadPollTimers.value.clear();
+});
 
 function onEncryptContentUpdated() {
   encryptPassword.value = '';

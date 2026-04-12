@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import type { FileObject } from 'src/components/models';
-import { type CommandStateDto } from 'src/models/Commands';
+import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import { useAuthStore } from 'src/stores/auth';
 
 export const useFilesStore = defineStore('files', () => {
   const current = ref({} as FileDto);
@@ -111,6 +112,34 @@ export const useFilesStore = defineStore('files', () => {
 
   function deleteCommand(id: number): Promise<void> {
     return api.delete(`/shell/command/${id}`).then(() => undefined);
+  }
+
+  async function getPendingFileDownloadCommands(): Promise<CommandStateDto[]> {
+    try {
+      const authStore = useAuthStore();
+      const currentUser = authStore.profile?.principal;
+      if (!currentUser) {
+        return [];
+      }
+
+      const response = await api.get('/shell/commands');
+      const allCommands = response.data as CommandStateDto[];
+
+      // Filter for pending file-bundle commands owned by the current user
+      const pendingFileCommands = allCommands.filter((cmd) => {
+        return (
+          cmd.command?.includes('file-bundle') &&
+          (cmd.status === CommandStateDto_Status.NOT_STARTED || cmd.status === CommandStateDto_Status.IN_PROGRESS || cmd.status === CommandStateDto_Status.SUCCEEDED) &&
+          cmd.owner === currentUser
+        );
+      });
+
+      return pendingFileCommands;
+    } catch (err) {
+      // Log warning but don't throw - let component handle absence of pending commands gracefully
+      console.warn('Failed to fetch pending file download commands:', err);
+      return [];
+    }
   }
 
   function addFolder(path: string, folderName: string) {
@@ -247,6 +276,7 @@ export const useFilesStore = defineStore('files', () => {
     getCommand,
     downloadCommandResult,
     deleteCommand,
+    getPendingFileDownloadCommands,
     addFolder,
     extractArchive,
     uploadFiles,
