@@ -104,6 +104,18 @@ public class DefaultCommandJobService implements CommandJobService {
   @Override
   public void stop() {
     isRunning = false;
+    // Clean up result files from all queues so temp files are not orphaned across restarts
+    List<FutureCommandJob> all = new ArrayList<>();
+    synchronized (this) {
+      for (Runnable r : jobsNotStarted) all.add((FutureCommandJob) r);
+      for (BlockingQueue<Runnable> q : projectJobsNotStarted.values())
+        for (Runnable r : q) all.add((FutureCommandJob) r);
+      all.addAll(jobsStarted);
+      all.addAll(jobsTerminated);
+    }
+    for (FutureCommandJob fcj : all) {
+      cleanupResult(fcj.getCommandJob());
+    }
   }
 
   @Override
@@ -203,6 +215,7 @@ public class DefaultCommandJobService implements CommandJobService {
           throw new IllegalStateException("commandJob not deletable");
         }
         getTerminatedJobs().remove(futureCommandJob);
+        cleanupResult(job);
         return;
       }
     }
@@ -215,6 +228,7 @@ public class DefaultCommandJobService implements CommandJobService {
       CommandJob job = futureCommandJob.getCommandJob();
       if(isDeletable(job)) {
         getTerminatedJobs().remove(futureCommandJob);
+        cleanupResult(job);
       }
     }
   }
@@ -309,6 +323,20 @@ public class DefaultCommandJobService implements CommandJobService {
 
   List<FutureCommandJob> getTerminatedJobs() {
     return jobsTerminated;
+  }
+
+  /**
+   * Cleans up any result resources (e.g. temp files) held by the given job.
+   * Called whenever a job is removed from the history or the service stops.
+   */
+  private void cleanupResult(CommandJob job) {
+    if (job.hasResult()) {
+      try {
+        job.getResult().cleanup();
+      } catch (Exception e) {
+        log.warn("Failed to clean up result for CommandJob {}: {}", job.getId(), e.getMessage());
+      }
+    }
   }
 
   public boolean isDeletable(CommandJob commandJob) {

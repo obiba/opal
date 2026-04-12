@@ -16,10 +16,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.UriBuilder;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
+import org.obiba.opal.shell.commands.FileCommandResult;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.slf4j.Logger;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,12 +194,87 @@ public class WebShellResource extends AbstractCommandsResource {
   // Methods
   //
 
+  /**
+   * Download the result produced by a command job.
+   * <p>
+   * Access is restricted to the command owner or a system administrator
+   * (i.e. a subject that holds {@code rest:/:POST} permission).
+   */
+  @GET
+  @Path("/command/{id}/_result")
+  @Operation(
+      summary = "Download command result",
+      description = "Downloads the result file produced by a completed command job. " +
+          "Only the command owner or a system administrator may access this endpoint."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Result file streamed successfully"),
+      @ApiResponse(responseCode = "403", description = "Access denied – caller is neither the owner nor an admin"),
+      @ApiResponse(responseCode = "404", description = "Command not found or no result available"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public Response getCommandResult(@PathParam("id") Integer id) {
+    CommandJob commandJob = commandJobService.getCommand(id);
+    if (commandJob == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    if (!isAccessAllowed(commandJob)) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
+
+    if (!commandJob.hasResult()) {
+      return Response.status(Status.NOT_FOUND).entity("Command has no result").build();
+    }
+
+    // Dispatch on concrete result type
+    if (commandJob.getResult() instanceof FileCommandResult) {
+      FileCommandResult fileResult = (FileCommandResult) commandJob.getResult();
+      if (!fileResult.getFile().exists()) {
+        return Response.status(Status.NOT_FOUND).entity("Result file no longer exists").build();
+      }
+      StreamingOutput stream = output -> {
+        try (FileInputStream fis = new FileInputStream(fileResult.getFile())) {
+          byte[] buf = new byte[8192];
+          int read;
+          while ((read = fis.read(buf)) != -1) {
+            output.write(buf, 0, read);
+          }
+        }
+      };
+      return Response.ok(stream, fileResult.getMimeType())
+          .header("Content-Disposition",
+              "attachment; filename=\"" + fileResult.getLabel() + "\"")
+          .build();
+    }
+
+    // Future result types handled here
+    return Response.status(Status.NOT_FOUND).entity("Unsupported result type").build();
+  }
+
   @Override
   protected Response buildLaunchCommandResponse(CommandJob commandJob) {
     return Response.created(
         UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(commandJob.getId()))
         .entity(Dtos.asDto(commandJob))
         .build();
+  }
+
+  /**
+   * Access control: owner or system admin only
+   * @param commandJob
+   * @return
+   */
+  private boolean isAccessAllowed(CommandJob commandJob) {
+    Subject subject = SecurityUtils.getSubject();
+    boolean isOwner = subject.getPrincipal() != null &&
+        subject.getPrincipal().toString().equals(commandJob.getOwner());
+    if (isOwner) return true;
+    return isAdministrator(subject);
+  }
+
+  private boolean isAdministrator(Subject subject) {
+    return subject.isPermitted("rest:/system/conf/general:PUT");
   }
 
 }
