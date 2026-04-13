@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 public class WebShellCommandRegistry extends AbstractCommandRegistry {
 
   public WebShellCommandRegistry() {
-
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand("export", CopyCommand.class, CopyCommandOptions.class);
@@ -35,5 +34,6 @@ public class WebShellCommandRegistry extends AbstractCommandRegistry {
     addAvailableCommand(ExportVCFCommand.class, ExportVCFCommandOptions.class);
     addAvailableCommand("r-packages", RPackagesCommand.class, RPackagesCommandOptions.class);
     addAvailableCommand("r-package", RPackageCommand.class, RPackageCommandOptions.class);
+    addAvailableCommand("file-bundle", FileBundleCommand.class, FileBundleCommandOptions.class);
   }
 }

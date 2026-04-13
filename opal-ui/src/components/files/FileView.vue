@@ -34,6 +34,10 @@
           @click="onShowDeleteSingle(props.file)"
         />
       </q-breadcrumbs>
+      <div v-if="downloadLoading" class="on-right">
+        <span class="text-hint q-mr-sm">{{ t('downloading_files', { count: downloadPollTimersCount }) }}</span>
+        <q-spinner-dots size="lg" />
+      </div>
     </q-toolbar>
     <div v-if="props.file.type === 'FOLDER'">
       <q-table
@@ -196,7 +200,7 @@
     <upload-file-dialog v-model="showUpload" :file="props.file" :extensions="[]" />
 
     <q-dialog v-model="showDownload">
-      <q-card>
+      <q-card class="dialog-sm">
         <q-card-section>
           <div class="text-h6">{{ t('download') }}</div>
         </q-card-section>
@@ -212,37 +216,42 @@
                 @update:model-value="onEncryptContentUpdated"
               />
             </div>
-            <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
-              <div class="row q-col-gutter-md">
-                <div class="col-8">
-                  <q-input
-                    v-model="encryptPassword"
-                    dense
-                    :disable="encryptContent === false"
-                    :type="showPwd ? 'text' : 'password'"
-                    :label="t('encrypt_password')"
-                    :hint="t('encrypt_password_hint')"
-                    lazy-rules
-                    :rules="[validatePassword]"
-                  >
-                    <template v-slot:append>
-                      <q-icon
-                        :name="showPwd ? 'visibility_off' : 'visibility'"
-                        class="cursor-pointer"
-                        @click="showPwd = !showPwd"
-                      />
-                    </template>
-                  </q-input>
-                </div>
-                <div class="col-2">
+            <div v-if="encryptContent" class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
+              <q-input
+                v-model="encryptPassword"
+                dense
+                :type="showPwd ? 'text' : 'password'"
+                :label="t('encrypt_password')"
+                :hint="t('encrypt_password_hint')"
+                lazy-rules
+                :rules="[validatePassword]"
+              >
+                <template v-slot:after>
+                  <q-icon
+                    :name="showPwd ? 'visibility_off' : 'visibility'"
+                    size="sm"
+                    class="cursor-pointer"
+                    @click="showPwd = !showPwd"
+                  />
                   <q-btn
+                    round
+                    dense
+                    size="sm"
                     flat
-                    :label="t('generate')"
-                    :disable="encryptContent === false"
+                    icon="content_copy"
+                    @click="copyPasswordToClipboard"
+                  />
+                  <q-btn
+                    round
+                    dense
+                    flat
+                    size="sm"
+                    icon="lock_reset"
+                    :title="t('generate')"
                     @click="onGenerateDownloadPwd"
                   ></q-btn>
-                </div>
-              </div>
+                </template>
+              </q-input>
             </div>
           </q-form>
         </q-card-section>
@@ -265,13 +274,17 @@ import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
+import { CommandStateDto_Status } from 'src/models/Commands';
 import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
 import { DefaultAlignment } from 'src/components/models';
+import { notifyError, notifyInfo } from 'src/utils/notify';
+import { copyToClipboard } from 'quasar';
 
 const { t } = useI18n();
 const filesStore = useFilesStore();
+const authStore = useAuthStore();
 
 interface Props {
   file: FileDto;
@@ -302,6 +315,11 @@ const showUpload = ref(false);
 const showDelete = ref(false);
 const showEditName = ref(false);
 const toolsVisible = ref<{ [key: string]: boolean }>({});
+const downloadLoading = ref(false);
+const downloadPollTimers = ref<Map<number, ReturnType<typeof setInterval>>>(new Map());
+const pendingDownloadsRestored = ref(false);
+
+const downloadPollTimersCount = computed(() => downloadPollTimers.value.size);
 
 // Validators
 const validatePassword = (val: string) =>
@@ -436,19 +454,139 @@ function onShowDownload() {
 
 async function onDownload() {
   const valid = await formRef.value.validate();
-  if (valid) {
-    filesStore.downloadFiles(
-      props.file.path,
-      readables.value,
-      encryptContent.value ? encryptPassword.value : undefined,
-    );
+  if (!valid || readables.value.length === 0) return;
+  const password = encryptContent.value ? encryptPassword.value : undefined;
+
+  // If only one file and no need to zip or encrypt, download directly without creating a bundle
+  // Check the file is not a folder, as direct download of folders would require zipping
+  if (readables.value.length === 1 && readables.value[0] && readables.value[0].type === FileDto_FileType.FILE && password === undefined) {
+    filesStore.downloadFiles(props.file.path, readables.value, undefined);
     showDownload.value = false;
+    return;
+  }
+
+  // Collect the paths of all readable selected items, falling back to the current file/folder.
+  const bundlePaths = readables.value.map((f) => f.path);
+  downloadLoading.value = true;
+
+  filesStore
+    .createFileBundle(bundlePaths, password)
+    .then((command) => {
+      startDownloadPolling(command.id);
+    })
+    .catch((err) => {
+      downloadLoading.value = false;
+      notifyError(err);
+    });
+  showDownload.value = false;
+}
+
+function startDownloadPolling(commandId: number) {
+  // Prevent duplicate polling for the same command
+  if (downloadPollTimers.value.has(commandId)) {
+    return;
+  }
+
+  const timer = setInterval(() => {
+    filesStore
+      .getCommand(commandId)
+      .then((command) => {
+        if (command.status === CommandStateDto_Status.SUCCEEDED) {
+          stopDownloadPolling(commandId);
+          filesStore
+            .downloadCommandResult(commandId)
+            .then(() => {
+              filesStore.deleteCommand(commandId).catch(() => undefined);
+            })
+            .catch(notifyError)
+            .finally(() => {
+              // Only clear downloadLoading if no other polls are active
+              if (downloadPollTimers.value.size === 0) {
+                downloadLoading.value = false;
+              }
+            });
+        } else if (
+          command.status === CommandStateDto_Status.FAILED
+        ) {
+          stopDownloadPolling(commandId);
+          if (downloadPollTimers.value.size === 0) {
+            downloadLoading.value = false;
+          }
+          notifyError(t('file_bundle_failed'));
+        } else if (command.status === CommandStateDto_Status.CANCEL_PENDING ||
+          command.status === CommandStateDto_Status.CANCELED) {
+          stopDownloadPolling(commandId);
+          if (downloadPollTimers.value.size === 0) {
+            downloadLoading.value = false;
+          }
+          notifyError(t('file_bundle_cancelled'));
+        }
+      })
+      .catch((err) => {
+        stopDownloadPolling(commandId);
+        if (downloadPollTimers.value.size === 0) {
+          downloadLoading.value = false;
+        }
+        notifyError(err);
+      });
+  }, 2000);
+
+  downloadPollTimers.value.set(commandId, timer);
+}
+
+function stopDownloadPolling(commandId: number) {
+  const timer = downloadPollTimers.value.get(commandId);
+  if (timer !== undefined) {
+    clearInterval(timer);
+    downloadPollTimers.value.delete(commandId);
   }
 }
+
+async function restorePendingDownloadPolling() {
+  if (!authStore.profile.principal || pendingDownloadsRestored.value) {
+    return;
+  }
+
+  pendingDownloadsRestored.value = true;
+  const pendingCommands = await filesStore.getPendingFileDownloadCommands();
+  if (pendingCommands.length > 0) {
+    downloadLoading.value = true;
+    pendingCommands.forEach((command) => {
+      startDownloadPolling(command.id);
+    });
+  }
+}
+
+watch(
+  () => authStore.profile.principal,
+  () => {
+    restorePendingDownloadPolling().catch((err) => {
+      pendingDownloadsRestored.value = false;
+      notifyError(err);
+    });
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  restorePendingDownloadPolling().catch((err) => {
+    pendingDownloadsRestored.value = false;
+    notifyError(err);
+  });
+});
+
+onUnmounted(() => {
+  // Clear all active polling timers
+  downloadPollTimers.value.forEach((timer) => {
+    clearInterval(timer);
+  });
+  downloadPollTimers.value.clear();
+});
 
 function onEncryptContentUpdated() {
   encryptPassword.value = '';
   if (!encryptContent.value) formRef.value.resetValidation();
+  else onGenerateDownloadPwd();
 }
 
 function onGenerateDownloadPwd() {
@@ -459,6 +597,14 @@ function onGenerateDownloadPwd() {
     retVal += charset.charAt(Math.floor(Math.random() * n));
   }
   encryptPassword.value = retVal;
+}
+
+function copyPasswordToClipboard() {
+  if (encryptPassword.value) {
+    copyToClipboard(encryptPassword.value).then(() => {
+      notifyInfo(t('password_copied'));
+    });
+  }
 }
 
 function onShowDeleteSingle(file: FileDto) {

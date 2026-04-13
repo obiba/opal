@@ -42,6 +42,10 @@ public final class Dtos {
       dtoBuilder.setProgress(progressAsDto(commandJob));
     }
 
+    if (commandJob.hasResult()) {
+      dtoBuilder.setResult(commandJob.getResult().getLabel());
+    }
+
     return dtoBuilder.build();
   }
 

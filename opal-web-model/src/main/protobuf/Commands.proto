@@ -39,6 +39,9 @@ message CommandStateDto {
   optional string project = 9;
   required string name = 10;
   optional ProgressDto progress = 11;
+  // Display-friendly label for the command result (e.g. zip filename).
+  // Present only when the command produced a result after successful execution.
+  optional string result = 12;
 }
 
 message ImportCommandOptionsDto {
@@ -134,4 +137,9 @@ message RPackageCommandOptionsDto {
   required string name = 2;
   required string manager = 3;
   optional string ref = 4;
+}
+
+message FileBundleCommandOptionsDto {
+  repeated string paths = 1;
+  optional string password = 2;
 }

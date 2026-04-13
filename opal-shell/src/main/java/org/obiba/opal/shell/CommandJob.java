@@ -14,6 +14,8 @@ import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.CommandResult;
+import org.obiba.opal.shell.commands.ResultCapable;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.Message;
 import org.slf4j.Logger;
@@ -133,6 +135,11 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   @Override
+  public boolean isCancelled() {
+    return status == Status.CANCEL_PENDING;
+  }
+
+  @Override
   public void addExitCallback(OpalShellExitCallback callback) {
     // nothing to do
   }
@@ -241,6 +248,26 @@ public class CommandJob implements OpalShell, Runnable {
 
   public List<Message> getMessages() {
     return Lists.newArrayList(messages);
+  }
+
+  /**
+   * Returns {@code true} if the wrapped command implements {@link ResultCapable} and a result
+   * is available (i.e. the command executed successfully and stored a result).
+   *
+   * @return whether a result is available
+   */
+  public boolean hasResult() {
+    return command instanceof ResultCapable && ((ResultCapable<?>) command).hasResult();
+  }
+
+  /**
+   * Returns the command result, or {@code null} when {@link #hasResult()} is {@code false}.
+   *
+   * @return command result
+   */
+  public CommandResult getResult() {
+    if (!hasResult()) return null;
+    return ((ResultCapable<?>) command).getResult();
   }
 
   public String getMessageProgress() {
