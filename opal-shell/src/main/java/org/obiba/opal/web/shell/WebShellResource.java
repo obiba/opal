@@ -274,7 +274,7 @@ public class WebShellResource extends AbstractCommandsResource {
   }
 
   private boolean isAdministrator(Subject subject) {
-    return subject.isPermitted("rest:/system/conf/general:PUT");
+    return subject.isPermitted("rest:/" + ":POST");
   }
 
 }

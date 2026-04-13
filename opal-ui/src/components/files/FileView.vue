@@ -34,6 +34,10 @@
           @click="onShowDeleteSingle(props.file)"
         />
       </q-breadcrumbs>
+      <div v-if="downloadLoading" class="on-right">
+        <span class="text-hint q-mr-sm">{{ t('downloading_files', { count: downloadPollTimersCount }) }}</span>
+        <q-spinner-dots size="lg" />
+      </div>
     </q-toolbar>
     <div v-if="props.file.type === 'FOLDER'">
       <q-table
@@ -94,10 +98,6 @@
             </q-btn-group>
             <q-btn outline color="red" icon="delete" size="sm" @click="onShowDelete" :disable="writables.length === 0">
             </q-btn>
-            <div v-if="downloadLoading">
-              <span class="text-hint q-mr-sm">{{ t('downloading') }}</span>
-              <q-spinner-dots size="lg" />
-            </div>
           </div>
         </template>
         <template v-slot:top-right>
@@ -216,11 +216,10 @@
                 @update:model-value="onEncryptContentUpdated"
               />
             </div>
-            <div class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
+            <div v-if="encryptContent" class="q-ml-sm q-mr-sm q-mb-md q-mt-md">
               <q-input
                 v-model="encryptPassword"
                 dense
-                :disable="encryptContent === false"
                 :type="showPwd ? 'text' : 'password'"
                 :label="t('encrypt_password')"
                 :hint="t('encrypt_password_hint')"
@@ -249,7 +248,6 @@
                     size="sm"
                     icon="lock_reset"
                     :title="t('generate')"
-                    :disable="encryptContent === false"
                     @click="onGenerateDownloadPwd"
                   ></q-btn>
                 </template>
@@ -281,7 +279,7 @@ import { getSizeLabel, getIconName } from 'src/utils/files';
 import { getDateLabel } from 'src/utils/dates';
 import { includesToken } from 'src/utils/strings';
 import { DefaultAlignment } from 'src/components/models';
-import { notifyError, notifySuccess, notifyInfo } from 'src/utils/notify';
+import { notifyError, notifyInfo } from 'src/utils/notify';
 import { copyToClipboard } from 'quasar';
 
 const { t } = useI18n();
@@ -320,6 +318,8 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 const downloadLoading = ref(false);
 const downloadPollTimers = ref<Map<number, ReturnType<typeof setInterval>>>(new Map());
 const pendingDownloadsRestored = ref(false);
+
+const downloadPollTimersCount = computed(() => downloadPollTimers.value.size);
 
 // Validators
 const validatePassword = (val: string) =>
@@ -454,16 +454,19 @@ function onShowDownload() {
 
 async function onDownload() {
   const valid = await formRef.value.validate();
-  if (!valid) return;
-
-  // Collect the paths of all readable selected items, falling back to the current file/folder.
-  const bundlePaths =
-    readables.value.length > 0
-      ? readables.value.map((f) => f.path)
-      : [props.file.path];
+  if (!valid || readables.value.length === 0) return;
   const password = encryptContent.value ? encryptPassword.value : undefined;
 
-  showDownload.value = false;
+  // If only one file and no need to zip or encrypt, download directly without creating a bundle
+  // Check the file is not a folder, as direct download of folders would require zipping
+  if (readables.value.length === 1 && readables.value[0] && readables.value[0].type === FileDto_FileType.FILE && password === undefined) {
+    filesStore.downloadFiles(props.file.path, readables.value, undefined);
+    showDownload.value = false;
+    return;
+  }
+
+  // Collect the paths of all readable selected items, falling back to the current file/folder.
+  const bundlePaths = readables.value.map((f) => f.path);
   downloadLoading.value = true;
 
   filesStore
@@ -475,6 +478,7 @@ async function onDownload() {
       downloadLoading.value = false;
       notifyError(err);
     });
+  showDownload.value = false;
 }
 
 function startDownloadPolling(commandId: number) {
@@ -492,11 +496,10 @@ function startDownloadPolling(commandId: number) {
           filesStore
             .downloadCommandResult(commandId)
             .then(() => {
-              notifySuccess(t('file_bundle_ready'));
+              filesStore.deleteCommand(commandId).catch(() => undefined);
             })
             .catch(notifyError)
             .finally(() => {
-              filesStore.deleteCommand(commandId).catch(() => undefined);
               // Only clear downloadLoading if no other polls are active
               if (downloadPollTimers.value.size === 0) {
                 downloadLoading.value = false;
@@ -583,6 +586,7 @@ onUnmounted(() => {
 function onEncryptContentUpdated() {
   encryptPassword.value = '';
   if (!encryptContent.value) formRef.value.resetValidation();
+  else onGenerateDownloadPwd();
 }
 
 function onGenerateDownloadPwd() {

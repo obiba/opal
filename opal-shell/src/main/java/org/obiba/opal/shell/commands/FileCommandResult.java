@@ -55,9 +55,14 @@ public class FileCommandResult implements CommandResult {
     return mimeType;
   }
 
+  /**
+   * Returns the result file name with characters that are unsafe inside an HTTP
+   * {@code Content-Disposition} header stripped: CR ({@code \r}), LF ({@code \n}),
+   * double-quote ({@code "}) and backslash ({@code \}).
+   */
   @Override
   public String getLabel() {
-    return file.getName();
+    return file.getName().replaceAll("[\\r\\n\"\\\\]", "");
   }
 
   /**

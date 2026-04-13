@@ -16,13 +16,13 @@ import java.util.Date;
 import java.util.List;
 
 @CommandUsage(description = "Prepare a file bundle.",
-    syntax = "Syntax: file-bundle --path PATH[,PATH,...] [--password PASSWORD]")
+    syntax = "Syntax: file-bundle --paths PATH[,PATH,...] [--password PASSWORD]")
 public class FileBundleCommand extends AbstractOpalRuntimeDependentCommand<FileBundleCommandOptions>
     implements ResultCapable<FileCommandResult> {
 
   private static final Logger log = LoggerFactory.getLogger(FileBundleCommand.class);
 
-  private final String WORK_DIR = System.getProperty("OPAL_HOME") + File.separator + "work" + File.separator + "fs";
+  private static final String WORK_DIR = System.getProperty("OPAL_HOME") + File.separator + "work" + File.separator + "fs";
 
   /** Set after a successful execution; {@code null} until then. */
   private FileCommandResult result;
@@ -111,7 +111,7 @@ public class FileBundleCommand extends AbstractOpalRuntimeDependentCommand<FileB
         getShell().progress(String.format("Added to bundle: %s", fsPath), currentFile, totalFiles, currentFile * 100 / totalFiles);
       }
       builder.build();
-      getShell().progress("Bundle creation complete", totalFiles, 0, 100);
+      getShell().progress("Bundle creation complete", totalFiles, totalFiles, 100);
 
       log.info("File bundle created: {}", outputFile.getAbsolutePath());
       // Output the path to the created bundle, replacing WORK_DIR
@@ -131,7 +131,7 @@ public class FileBundleCommand extends AbstractOpalRuntimeDependentCommand<FileB
     StringBuilder sb = new StringBuilder();
     sb.append("file-bundle");
     if (options.isPaths()) {
-      options.getPaths().forEach(p -> sb.append(" --path ").append(p));
+      options.getPaths().forEach(p -> sb.append(" --paths ").append(p));
     }
     if (options.isPassword()) {
       sb.append(" --password *****");
