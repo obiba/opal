@@ -73,6 +73,11 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
       return 1;
     }
 
+    if (getShell().isCancelled()) {
+      log.info("Import VCF/BCF files cancelled in {}", stopwatch.stop());
+      return 1;
+    }
+
     log.info("Import VCF/BCF files succeeded in {}", stopwatch.stop());
     return 0;
   }
@@ -94,6 +99,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
     int total = options.getFiles().size() + 1;
     int count = 1;
     for (String vcfFilePath : options.getFiles()) {
+      if (getShell().isCancelled()) break;
       getShell().printf(String.format("Importing VCF/BCF file (%s)", vcfFilePath));
       getShell().progress(String.format("Importing VCF/BCF file (%s)", vcfFilePath), count, total, (count*100)/total);
       FileObject vcfFileObject = resolveFileInFileSystem(vcfFilePath);
@@ -105,7 +111,11 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
       store.writeVCF(vcfFile.getName(), new FileInputStream(vcfFile));
       count++;
     }
-    getShell().progress(String.format("VCF/BCF file(s) import completed."), total, total, 100);
+    if (getShell().isCancelled()) {
+      getShell().printf("VCF/BCF file import cancelled.");
+    } else {
+      getShell().progress(String.format("VCF/BCF file(s) import completed."), total, total, 100);
+    }
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {

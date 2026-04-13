@@ -142,6 +142,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
 
     int count = 1;
     for (String vcfName : options.getNames()) {
+      if (getShell().isCancelled()) break;
       String baseVcfName = vcfName;
       if (vcfName.endsWith(".vcf.gz")) baseVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "");
       else if (vcfName.endsWith(".bcf.gz")) baseVcfName = vcfName.replaceAll("\\.bcf\\.gz$", "");
@@ -166,7 +167,10 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       }
       count++;
     }
-    getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);
+    if (getShell().isCancelled())
+      getShell().printf("VCF/BCF file(s) export cancelled.");
+    else
+      getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);
   }
 
   private void exportVCFFile(String baseVcfName, File vcfFile, Collection<String> sampleIds) throws IOException {
