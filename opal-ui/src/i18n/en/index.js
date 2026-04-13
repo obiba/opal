@@ -1189,6 +1189,7 @@ export default {
   nature: 'Nature',
   new_name: 'New name',
   no_bookmarks: 'No favorites',
+  no_data: 'No data',
   no_datasource_configuration: 'No datasource configuration',
   no_entity_filter: 'No script for filtering the entities of the view is defined.',
   no_options: 'No options',

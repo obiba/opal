@@ -1,62 +1,69 @@
 <template>
-  <div class="row q-gutter-md">
-    <q-input
-      v-model="limit"
-      flat
-      dense
-      :label="t('limit')"
-      type="number"
-      min="0"
-      :max="total"
-      :step="STEP_COUNT"
-      debounce="500"
-      @update:model-value="init"
-      style="width: 200px"
-    >
-      <template v-slot:after>
-        <span class="on-right text-body1">/ {{ total }}</span>
-      </template>
-    </q-input>
-    <q-btn
-      color="secondary"
-      icon="refresh"
-      :title="t('refresh')"
-      outline
-      size="sm"
-      @click="init"
-      class="q-mt-lg"
-      style="height: 2.5em"
-      :disable="loading"
-    />
-    <q-btn
-      color="primary"
-      icon="analytics"
-      :label="t('full_summary')"
-      size="sm"
-      @click="onFullSummary"
-      class="q-mt-lg"
-      style="height: 2.5em"
-      :disable="loading"
-    />
-  </div>
-  <q-separator class="q-mt-md q-mb-md" />
-  <div v-if="loading">
-    <q-spinner-dots size="lg" class="q-mt-md" />
-  </div>
-  <div v-else-if="categoricalData">
-    <categorical-summary-chart :variable="variable" :data="categoricalData" class="q-mt-md" />
-  </div>
-  <div v-else-if="textData">
-    <categorical-summary-chart :variable="variable" :data="textData" class="q-mt-md" />
-  </div>
-  <div v-else-if="continuousData">
-    <continuous-summary-chart :variable="variable" :data="continuousData" class="q-mt-md" />
-  </div>
-  <div v-else-if="defaultData">
-    <default-summary-chart :variable="variable" :data="defaultData" class="q-mt-md" />
-  </div>
-  <div v-else-if="total > 0">
-    <pre>{{ summary }}</pre>
+  <div>
+    <div v-if="hasSummary">
+      <div class="row q-gutter-md">
+        <q-input
+          v-model="limit"
+          flat
+          dense
+          :label="t('limit')"
+          type="number"
+          min="0"
+          :max="total"
+          :step="STEP_COUNT"
+          debounce="500"
+          @update:model-value="init"
+          style="width: 200px"
+        >
+          <template v-slot:after>
+            <span class="on-right text-body1">/ {{ total }}</span>
+          </template>
+        </q-input>
+        <q-btn
+          color="secondary"
+          icon="refresh"
+          :title="t('refresh')"
+          outline
+          size="sm"
+          @click="init"
+          class="q-mt-lg"
+          style="height: 2.5em"
+          :disable="loading"
+        />
+        <q-btn
+          color="primary"
+          icon="analytics"
+          :label="t('full_summary')"
+          size="sm"
+          @click="onFullSummary"
+          class="q-mt-lg"
+          style="height: 2.5em"
+          :disable="loading"
+        />
+      </div>
+      <q-separator class="q-mt-md q-mb-md" />
+      <div v-if="loading">
+        <q-spinner-dots size="lg" class="q-mt-md" />
+      </div>
+      <div v-else-if="categoricalData">
+        <categorical-summary-chart :variable="variable" :data="categoricalData" class="q-mt-md" />
+      </div>
+      <div v-else-if="textData">
+        <categorical-summary-chart :variable="variable" :data="textData" class="q-mt-md" />
+      </div>
+      <div v-else-if="continuousData">
+        <continuous-summary-chart :variable="variable" :data="continuousData" class="q-mt-md" />
+      </div>
+      <div v-else-if="defaultData">
+        <default-summary-chart :variable="variable" :data="defaultData" class="q-mt-md" />
+      </div>
+      <div v-else-if="total > 0">
+        <pre>{{ summary }}</pre>
+      </div>
+    </div>
+    <div v-else class="text-grey q-mt-md">
+      {{ t('no_data') }}
+    </div>
   </div>
 </template>
 
@@ -94,6 +101,7 @@ const loading = ref(false);
 
 const dsName = computed(() => route.params.id as string);
 const tName = computed(() => route.params.tid as string);
+const hasSummary = computed(() => summary.value && Object.keys(summary.value).length > 0);
 
 onMounted(() => {
   init();
@@ -122,7 +130,7 @@ function init() {
     })
     .catch((error) => {
       summary.value = {};
-      console.error('Failed to load variable summary', error);
+      console.debug('Failed to load variable summary', error);
     })
     .finally(() => {
       loading.value = false;

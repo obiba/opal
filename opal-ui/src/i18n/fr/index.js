@@ -1189,6 +1189,7 @@ export default {
   nature: 'Nature',
   new_name: 'Nouveau nom',
   no_bookmarks: 'Aucun favori',
+  no_data: 'Aucune donnée',
   no_datasource_configuration: 'Aucune configuration pour la source de données',
   no_entity_filter: "Aucun filtre d'entité n'est défini pour la vue.",
   no_options: 'Aucune option',

@@ -119,6 +119,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadDatasourcePermissions(name: string) {
     return Promise.all([
       api.options(`/project/${name}/permissions/datasource`),
+      // FIXME: OPTIONS not working for datasource SQL endpoint
       api.options(`/datasource/${name}/_sql`),
     ]).then(([datasourcePermissions, datasourceSql]) => {
       perms.value.datasourcePermissions = new Perms(datasourcePermissions);
@@ -204,6 +205,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
               perms.value.variablePermissions = new Perms(response);
               return response;
             }),
+          // FIXME: OPTIONS not working for variable summary endpoint
           api
             .options(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
             .then((response) => {
