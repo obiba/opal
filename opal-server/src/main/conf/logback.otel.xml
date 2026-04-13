@@ -87,6 +87,34 @@
     </encoder-->
   </appender>
 
+  <appender name="otel" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    <endpoint>${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4317}</endpoint>
+    <resourceAttributes>service.name=${OTEL_SERVICE_NAME:-opal-server}</resourceAttributes>
+    <captureExperimentalAttributes>false</captureExperimentalAttributes>
+    <captureMdcAttributes>ip,username</captureMdcAttributes>
+    <flushInterval>1000</flushInterval>
+  </appender>
+
+  <!-- Dedicated OTel appender for REST audit logs -->
+  <appender name="otelrest" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    <endpoint>${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4317}</endpoint>
+    <resourceAttributes>service.name=${OTEL_SERVICE_NAME:-opal-rest}</resourceAttributes>
+    <captureExperimentalAttributes>false</captureExperimentalAttributes>
+    <captureMdcAttributes>ip,username,status,method</captureMdcAttributes>
+    <flushInterval>1000</flushInterval>
+  </appender>
+
+  <!-- Dedicated OTel appender for DataSHIELD audit logs.
+       captureMdcAttributes forwards all DataSHIELD MDC fields (ds_id, ds_profile,
+       ds_action, ds_eval, ds_symbol, username, ip) as OTel log record attributes. -->
+  <appender name="otelds" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    <endpoint>${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4317}</endpoint>
+    <resourceAttributes>service.name=${OTEL_SERVICE_NAME:-datashield}</resourceAttributes>
+    <captureExperimentalAttributes>false</captureExperimentalAttributes>
+    <captureMdcAttributes>ip,username,ds_id,ds_profile,ds_action,ds_eval,ds_symbol</captureMdcAttributes>
+    <flushInterval>1000</flushInterval>
+  </appender>
+
   <appender name="sql" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${OPAL_LOG}/sql.log</file>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -104,12 +132,15 @@
     </encoder>
   </appender>
 
+  <!-- additivity=false prevents propagation to root; both file and OTel appenders receive events -->
   <logger name="datashield" additivity="false" level="info">
     <appender-ref ref="datashield"/>
+    <appender-ref ref="otelds"/>
   </logger>
 
   <logger name="org.obiba.opal.web.security.AuditInterceptor" additivity="false" level="info">
     <appender-ref ref="rest"/>
+    <appender-ref ref="otelrest"/>
   </logger>
 
   <logger name="sql" additivity="false" level="info">
@@ -119,6 +150,7 @@
   <root level="info">
     <appender-ref ref="console"/>
     <appender-ref ref="opal"/>
+    <appender-ref ref="otel"/>
   </root>
 
 </configuration>
