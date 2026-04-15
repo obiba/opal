@@ -144,3 +144,8 @@ export interface RPackageCommandOptionsDto {
   manager: string;
   ref?: string | undefined;
 }
+
+export interface FileBundleCommandOptionsDto {
+  paths: string[];
+  password?: string | undefined;
+}

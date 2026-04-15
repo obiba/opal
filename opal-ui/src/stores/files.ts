@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl } from 'src/boot/api';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import type { FileObject } from 'src/components/models';
-import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
+import { type CommandStateDto, CommandStateDto_Status, type FileBundleCommandOptionsDto } from 'src/models/Commands';
 import { useAuthStore } from 'src/stores/auth';
 
 export const useFilesStore = defineStore('files', () => {
@@ -85,7 +85,7 @@ export const useFilesStore = defineStore('files', () => {
   }
 
   async function createFileBundle(paths: string[], password: string | undefined): Promise<CommandStateDto> {
-    const payload: Record<string, unknown> = { paths };
+    const payload: FileBundleCommandOptionsDto = { paths };
     if (password) payload['password'] = password;
     return api.post('/shell/commands/_file-bundle', payload).then((r) => r.data as CommandStateDto);
   }
