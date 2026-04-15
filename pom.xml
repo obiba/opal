@@ -63,7 +63,7 @@
     <jakarta-el.version>5.0.0</jakarta-el.version>
     <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
     <jettison.version>1.5.4</jettison.version>
-    <jetty.version>12.1.6</jetty.version>
+    <jetty.version>12.1.7</jetty.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>7.2.1.202505142326-r</jgit.version>
     <jib.version>0.27.3</jib.version>
