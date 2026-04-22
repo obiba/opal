@@ -1021,7 +1021,7 @@ export default {
   download_view: 'Télécharger la vue',
   download_views_backup: 'Sauvegarder les vues',
   download: 'Télécharger',
-  downloading_files: 'Aucun téléchargement | Téléchargement d\'un fichier | Téléchargement de {count} fichiers',
+  download_files_bundle: '- | Préparation du téléchargement | Préparation du téléchargement de {count} fichiers',
   duplicate: 'Dupliquer',
   duration: 'Durée',
   edit_category: 'Éditer la catégorie',

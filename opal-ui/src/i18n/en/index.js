@@ -1021,7 +1021,7 @@ export default {
   download_view: 'Download view',
   download_views_backup: 'Backup views',
   download: 'Download',
-  downloading_files: 'No file download | Downloading one file | Downloading {count} files',
+  download_files_bundle: '- | Preparing file download | Preparing download of {count} files',
   duplicate: 'Duplicate',
   duration: 'Duration',
   edit_category: 'Edit category',

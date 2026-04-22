@@ -5,290 +5,311 @@ import type { FileObject } from 'src/components/models';
 import { type CommandStateDto, CommandStateDto_Status, type FileBundleCommandOptionsDto } from 'src/models/Commands';
 import { useAuthStore } from 'src/stores/auth';
 
-export const useFilesStore = defineStore('files', () => {
-  const current = ref({} as FileDto);
-  const copySelection = ref<FileDto[]>([]);
-  const cutSelection = ref<FileDto[]>([]);
+export const useFilesStore = defineStore('files',
+  () => {
+    const current = ref({} as FileDto);
+    const copySelection = ref<FileDto[]>([]);
+    const cutSelection = ref<FileDto[]>([]);
+    const managedCommands = ref<number[]>([])
 
-  function reset() {
-    current.value = {} as FileDto;
-    copySelection.value = [];
-    cutSelection.value = [];
-  }
-
-  async function getFile(path: string) {
-    return api.get(`/files/_meta${path}`).then((response) => {
-      return response.data;
-    });
-  }
-
-  async function initFiles(path: string) {
-    if (current.value.path) return Promise.resolve();
-    return loadFiles(path);
-  }
-
-  async function refreshFiles(path: string) {
-    current.value = {} as FileDto;
-    return loadFiles(path);
-  }
-
-  async function loadFiles(path: string) {
-    return api.get(`/files/_meta${path}`).then((response) => {
-      current.value = response.data;
-      return response;
-    });
-  }
-
-  function downloadFile(path: string) {
-    downloadFiles(path, [], undefined);
-  }
-
-  function downloadFiles(path: string, files: FileDto[], password: string | undefined) {
-    if (password) {
-      return api
-        .get(`/files${path}`, {
-          params: {
-            file: files.map((f) => f.name),
-          },
-          paramsSerializer: {
-            indexes: null, // no brackets at all
-          },
-          headers: {
-            'X-File-Key': password,
-          },
-          responseType: 'blob',
-        })
-        .then((response) => {
-          let fileName = response.headers['content-disposition'].split('=')[1];
-          fileName = fileName.replace(/"/g, '');
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', fileName || 'file.zip');
-          document.body.appendChild(link);
-          link.click();
-          window.URL.revokeObjectURL(url);
-          return response;
-        });
-    } else {
-      let uri = `${baseUrl}/files${path}`;
-      if (files && files.length > 0) {
-        if (files.length > 1) {
-          uri += '?';
-          files.forEach((f) => (uri += `&file=${f.name}`));
-        } else if (files[0]) {
-          uri += `/${files[0].name}`;
-        }
-      }
-      window.open(uri, '_self');
+    function reset() {
+      current.value = {} as FileDto;
+      copySelection.value = [];
+      cutSelection.value = [];
     }
-  }
 
-  async function createFileBundle(paths: string[], password: string | undefined): Promise<CommandStateDto> {
-    const payload: FileBundleCommandOptionsDto = { paths };
-    if (password) payload['password'] = password;
-    return api.post('/shell/commands/_file-bundle', payload).then((r) => r.data as CommandStateDto);
-  }
-
-  async function getCommand(id: number): Promise<CommandStateDto> {
-    return api.get(`/shell/command/${id}`).then((r) => r.data as CommandStateDto);
-  }
-
-  async function downloadCommandResult(id: number): Promise<void> {
-    return api.get(`/shell/command/${id}/_result`, { responseType: 'blob' }).then((response) => {
-      const disposition: string = response.headers['content-disposition'] ?? '';
-      const match = disposition.match(/filename="?([^"]+)"?/);
-      const fileName = match ? match[1] || 'download.zip' : 'download.zip';
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    });
-  }
-
-  function deleteCommand(id: number): Promise<void> {
-    return api.delete(`/shell/command/${id}`).then(() => undefined);
-  }
-
-  async function getPendingFileDownloadCommands(): Promise<CommandStateDto[]> {
-    try {
-      const authStore = useAuthStore();
-      const currentUser = authStore.profile?.principal;
-      if (!currentUser) {
-        return [];
-      }
-
-      const response = await api.get('/shell/commands');
-      const allCommands = response.data as CommandStateDto[];
-
-      // Filter for pending file-bundle commands owned by the current user
-      const pendingFileCommands = allCommands.filter((cmd) => {
-        return (
-          cmd.command?.includes('file-bundle') &&
-          (cmd.status === CommandStateDto_Status.NOT_STARTED || cmd.status === CommandStateDto_Status.IN_PROGRESS || cmd.status === CommandStateDto_Status.SUCCEEDED) &&
-          cmd.owner === currentUser
-        );
+    async function getFile(path: string) {
+      return api.get(`/files/_meta${path}`).then((response) => {
+        return response.data;
       });
-
-      return pendingFileCommands;
-    } catch (err) {
-      // Log warning but don't throw - let component handle absence of pending commands gracefully
-      console.warn('Failed to fetch pending file download commands:', err);
-      return [];
     }
-  }
 
-  function addFolder(path: string, folderName: string) {
-    return api.post(`/files${path}`, folderName, {
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-    });
-  }
+    async function initFiles(path: string) {
+      if (current.value.path) return Promise.resolve();
+      return loadFiles(path);
+    }
 
-  function uploadFiles(path: string, files: FileObject[]) {
-    const formData = new FormData();
-    files.forEach((f) => {
-      formData.append('attachment', f);
-    });
-    return api.post(`/files${path}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  }
+    async function refreshFiles(path: string) {
+      current.value = {} as FileDto;
+      return loadFiles(path);
+    }
 
-  function extractArchive(path: string, destination: FileDto, key: string | undefined) {
-    if (destination.type !== FileDto_FileType.FOLDER) return Promise.reject('Invalid destination');
-    const params = {
-      action: 'unzip',
-      destination: destination.path,
-      key,
-    };
-
-    return api.post(`/files${path}`, {}, { params });
-  }
-
-  function deleteFile(path: string) {
-    return api.delete(`/files${path}`);
-  }
-
-  function deleteFiles(files: FileDto[]) {
-    return Promise.all(
-      files.map((f) => {
-        return api.delete(`/files${f.path}`);
-      }),
-    );
-  }
-
-  function setCopySelection(files: FileDto[]) {
-    copySelection.value = files;
-    cutSelection.value = [];
-  }
-
-  function setCutSelection(files: FileDto[]) {
-    cutSelection.value = files;
-    copySelection.value = [];
-  }
-
-  function pasteFiles(path: string) {
-    if (!canPasteSelection(path)) return Promise.reject('Invalid paste');
-    const params = {
-      action: copySelection.value.length > 0 ? 'copy' : 'move',
-      file:
-        copySelection.value.length > 0 ? copySelection.value.map((f) => f.path) : cutSelection.value.map((f) => f.path),
-    };
-    return api
-      .put(
-        `/files${path}`,
-        {},
-        {
-          params,
-          paramsSerializer: {
-            indexes: null, // no brackets at all
-          },
-        },
-      )
-      .then((response) => {
-        copySelection.value = [];
-        cutSelection.value = [];
+    async function loadFiles(path: string) {
+      return api.get(`/files/_meta${path}`).then((response) => {
+        current.value = response.data;
         return response;
       });
-  }
+    }
 
-  function canPasteSelection(path: string) {
-    // selections not in own parent folder or in itself when is a folder
-    function canPaste(files: FileDto[]) {
-      return files.every(
-        (f) => path !== getParentFolder(f.path) && (f.type === FileDto_FileType.FILE || !path.startsWith(f.path)),
+    function downloadFile(path: string) {
+      downloadFiles(path, [], undefined);
+    }
+
+    function downloadFiles(path: string, files: FileDto[], password: string | undefined) {
+      if (password) {
+        return api
+          .get(`/files${path}`, {
+            params: {
+              file: files.map((f) => f.name),
+            },
+            paramsSerializer: {
+              indexes: null, // no brackets at all
+            },
+            headers: {
+              'X-File-Key': password,
+            },
+            responseType: 'blob',
+          })
+          .then((response) => {
+            let fileName = response.headers['content-disposition'].split('=')[1];
+            fileName = fileName.replace(/"/g, '');
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName || 'file.zip');
+            document.body.appendChild(link);
+            link.click();
+            window.URL.revokeObjectURL(url);
+            return response;
+          });
+      } else {
+        let uri = `${baseUrl}/files${path}`;
+        if (files && files.length > 0) {
+          if (files.length > 1) {
+            uri += '?';
+            files.forEach((f) => (uri += `&file=${f.name}`));
+          } else if (files[0]) {
+            uri += `/${files[0].name}`;
+          }
+        }
+        window.open(uri, '_self');
+      }
+    }
+
+    async function createFileBundle(paths: string[], password: string | undefined): Promise<CommandStateDto> {
+      const payload: FileBundleCommandOptionsDto = { paths };
+      if (password) payload['password'] = password;
+      return api.post('/shell/commands/_file-bundle', payload)
+        .then((r) => {
+          const command = r.data as CommandStateDto;
+          managedCommands.value.push(command.id);
+          return command;
+        });
+    }
+
+    async function getCommand(id: number): Promise<CommandStateDto> {
+      return api.get(`/shell/command/${id}`).then((r) => r.data as CommandStateDto);
+    }
+
+    async function downloadCommandResult(id: number): Promise<void> {
+      return api.get(`/shell/command/${id}/_result`, { responseType: 'blob' }).then((response) => {
+        const disposition: string = response.headers['content-disposition'] ?? '';
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        const fileName = match ? match[1] || 'download.zip' : 'download.zip';
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      });
+    }
+
+    function isCommandManaged(id: number): boolean {
+      return managedCommands.value.includes(id);
+    }
+
+    function deleteCommand(id: number): Promise<void> {
+      managedCommands.value = managedCommands.value.filter((cmdId) => cmdId !== id);
+      return api.delete(`/shell/command/${id}`).then(() => undefined);
+    }
+
+    async function getPendingFileDownloadCommands(): Promise<CommandStateDto[]> {
+      try {
+        const authStore = useAuthStore();
+        const currentUser = authStore.profile?.principal;
+        if (!currentUser) {
+          return [];
+        }
+
+        const response = await api.get('/shell/commands');
+        const allCommands = response.data as CommandStateDto[];
+
+        // Filter for pending file-bundle commands owned by the current user
+        const pendingFileCommands = allCommands.filter((cmd) => {
+          return (
+            isCommandManaged(cmd.id) &&
+            cmd.command?.includes('file-bundle') &&
+            (cmd.status === CommandStateDto_Status.NOT_STARTED || cmd.status === CommandStateDto_Status.IN_PROGRESS || cmd.status === CommandStateDto_Status.SUCCEEDED) &&
+            cmd.owner === currentUser
+          );
+        });
+
+        return pendingFileCommands;
+      } catch (err) {
+        // Log warning but don't throw - let component handle absence of pending commands gracefully
+        console.warn('Failed to fetch pending file download commands:', err);
+        return [];
+      }
+    }
+
+    function addFolder(path: string, folderName: string) {
+      return api.post(`/files${path}`, folderName, {
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    }
+
+    function uploadFiles(path: string, files: FileObject[]) {
+      const formData = new FormData();
+      files.forEach((f) => {
+        formData.append('attachment', f);
+      });
+      return api.post(`/files${path}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    }
+
+    function extractArchive(path: string, destination: FileDto, key: string | undefined) {
+      if (destination.type !== FileDto_FileType.FOLDER) return Promise.reject('Invalid destination');
+      const params = {
+        action: 'unzip',
+        destination: destination.path,
+        key,
+      };
+
+      return api.post(`/files${path}`, {}, { params });
+    }
+
+    function deleteFile(path: string) {
+      return api.delete(`/files${path}`);
+    }
+
+    function deleteFiles(files: FileDto[]) {
+      return Promise.all(
+        files.map((f) => {
+          return api.delete(`/files${f.path}`);
+        }),
       );
     }
-    return (
-      (copySelection.value.length > 0 && canPaste(copySelection.value)) ||
-      (cutSelection.value.length > 0 && canPaste(cutSelection.value))
-    );
-  }
 
-  function renameFile(path: string, newName: string) {
-    const parts = parsePath(path);
-    parts.pop();
-    parts.push(newName);
-    const newPath = `/${parts.join('/')}`;
-    // check if file exists
-    return api.head(`/files${newPath}`).then(
-      () => {
-        return Promise.reject('file_already_exists');
-      },
-      () => {
-        const params = {
-          action: 'move',
-          file: path,
-        };
-        return api.put(`/files${newPath}`, {}, { params });
-      },
-    );
-  }
+    function setCopySelection(files: FileDto[]) {
+      copySelection.value = files;
+      cutSelection.value = [];
+    }
 
-  function getParentFolder(path: string) {
-    if (path === undefined) return '/';
-    const parts = path.split('/');
-    parts.pop();
-    return parts.join('/');
-  }
+    function setCutSelection(files: FileDto[]) {
+      cutSelection.value = files;
+      copySelection.value = [];
+    }
 
-  function parsePath(path: string) {
-    return path.split('/').filter((p) => p !== '');
-  }
+    function pasteFiles(path: string) {
+      if (!canPasteSelection(path)) return Promise.reject('Invalid paste');
+      const params = {
+        action: copySelection.value.length > 0 ? 'copy' : 'move',
+        file:
+          copySelection.value.length > 0 ? copySelection.value.map((f) => f.path) : cutSelection.value.map((f) => f.path),
+      };
+      return api
+        .put(
+          `/files${path}`,
+          {},
+          {
+            params,
+            paramsSerializer: {
+              indexes: null, // no brackets at all
+            },
+          },
+        )
+        .then((response) => {
+          copySelection.value = [];
+          cutSelection.value = [];
+          return response;
+        });
+    }
 
-  return {
-    current,
-    getFile,
-    initFiles,
-    refreshFiles,
-    loadFiles,
-    downloadFile,
-    downloadFiles,
-    createFileBundle,
-    getCommand,
-    downloadCommandResult,
-    deleteCommand,
-    getPendingFileDownloadCommands,
-    addFolder,
-    extractArchive,
-    uploadFiles,
-    deleteFile,
-    deleteFiles,
-    setCopySelection,
-    setCutSelection,
-    canPasteSelection,
-    pasteFiles,
-    renameFile,
-    getParentFolder,
-    parsePath,
-    reset,
-  };
-});
+    function canPasteSelection(path: string) {
+      // selections not in own parent folder or in itself when is a folder
+      function canPaste(files: FileDto[]) {
+        return files.every(
+          (f) => path !== getParentFolder(f.path) && (f.type === FileDto_FileType.FILE || !path.startsWith(f.path)),
+        );
+      }
+      return (
+        (copySelection.value.length > 0 && canPaste(copySelection.value)) ||
+        (cutSelection.value.length > 0 && canPaste(cutSelection.value))
+      );
+    }
+
+    function renameFile(path: string, newName: string) {
+      const parts = parsePath(path);
+      parts.pop();
+      parts.push(newName);
+      const newPath = `/${parts.join('/')}`;
+      // check if file exists
+      return api.head(`/files${newPath}`).then(
+        () => {
+          return Promise.reject('file_already_exists');
+        },
+        () => {
+          const params = {
+            action: 'move',
+            file: path,
+          };
+          return api.put(`/files${newPath}`, {}, { params });
+        },
+      );
+    }
+
+    function getParentFolder(path: string) {
+      if (path === undefined) return '/';
+      const parts = path.split('/');
+      parts.pop();
+      return parts.join('/');
+    }
+
+    function parsePath(path: string) {
+      return path.split('/').filter((p) => p !== '');
+    }
+
+    return {
+      current,
+      managedCommands,
+      getFile,
+      initFiles,
+      refreshFiles,
+      loadFiles,
+      downloadFile,
+      downloadFiles,
+      createFileBundle,
+      getCommand,
+      downloadCommandResult,
+      isCommandManaged,
+      deleteCommand,
+      getPendingFileDownloadCommands,
+      addFolder,
+      extractArchive,
+      uploadFiles,
+      deleteFile,
+      deleteFiles,
+      setCopySelection,
+      setCutSelection,
+      canPasteSelection,
+      pasteFiles,
+      renameFile,
+      getParentFolder,
+      parsePath,
+      reset,
+    };
+  },
+  {
+    persist: {
+      pick: ['managedCommands']
+    }
+  },
+);

@@ -34,8 +34,9 @@
           @click="onShowDeleteSingle(props.file)"
         />
       </q-breadcrumbs>
+      <q-space />
       <div v-if="downloadLoading" class="on-right">
-        <span class="text-hint q-mr-sm">{{ t('downloading_files', { count: downloadPollTimersCount }) }}</span>
+        <span class="text-hint text-info q-mr-sm">{{ t('download_files_bundle', { count: downloadPollTimersCount }) }}</span>
         <q-spinner-dots size="lg" />
       </div>
     </q-toolbar>
