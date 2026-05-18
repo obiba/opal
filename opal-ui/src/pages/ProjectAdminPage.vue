@@ -85,7 +85,7 @@
             <access-control-list
               :resource="`/project/${name}/permissions/project`"
               :options="[AclAction.PROJECT_ALL]"
-              :read-only="!projectsStore.perms.project?.canCreate()"
+              :read-only="!hasAdminPermission"
             />
           </q-card-section>
         </q-card>
@@ -221,7 +221,6 @@ const project = computed(() => projectsStore.project);
 const name = computed(() => route.params.id as string);
 const hasAdminPermission = computed(
   () =>
-    projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||
     projectsStore.perms.project?.canDelete(),
 );
