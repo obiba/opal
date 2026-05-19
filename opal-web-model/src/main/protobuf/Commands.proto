@@ -42,6 +42,7 @@ message CommandStateDto {
   // Display-friendly label for the command result (e.g. zip filename).
   // Present only when the command produced a result after successful execution.
   optional string result = 12;
+  optional string rCluster = 13;
 }
 
 message ImportCommandOptionsDto {

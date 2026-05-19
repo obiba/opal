@@ -48,6 +48,8 @@ public class DefaultCommandJobService implements CommandJobService {
 
   private final Map<String, Executor> projectExecutors;
 
+  private final Map<String, Executor> rClusterExecutors;
+
   private boolean isRunning;
 
   private final AtomicInteger lastJobId;
@@ -58,6 +60,8 @@ public class DefaultCommandJobService implements CommandJobService {
   private final BlockingQueue<Runnable> jobsNotStarted;
 
   private final Map<String, BlockingQueue<Runnable>> projectJobsNotStarted;
+
+  private final Map<String, BlockingQueue<Runnable>> rClusterJobsNotStarted;
 
   /**
    * Jobs in the process of being executed.
@@ -83,13 +87,16 @@ public class DefaultCommandJobService implements CommandJobService {
     jobComparator = new CommandJobComparator();
 
     jobsNotStarted = new LinkedBlockingQueue<>(); // thread-safe
-    jobsStarted = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
-    jobsTerminated = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
+    jobsStarted = Collections.synchronizedList(new ArrayList<>());
+    jobsTerminated = Collections.synchronizedList(new ArrayList<>());
 
     executor = createExecutor(jobsNotStarted);
 
     projectJobsNotStarted = Maps.newConcurrentMap();
     projectExecutors = Maps.newConcurrentMap();
+
+    rClusterJobsNotStarted = Maps.newConcurrentMap();
+    rClusterExecutors = Maps.newConcurrentMap();
   }
 
   //
@@ -109,6 +116,8 @@ public class DefaultCommandJobService implements CommandJobService {
     synchronized (this) {
       for (Runnable r : jobsNotStarted) all.add((FutureCommandJob) r);
       for (BlockingQueue<Runnable> q : projectJobsNotStarted.values())
+        for (Runnable r : q) all.add((FutureCommandJob) r);
+      for (BlockingQueue<Runnable> q : rClusterJobsNotStarted.values())
         for (Runnable r : q) all.add((FutureCommandJob) r);
       all.addAll(jobsStarted);
       all.addAll(jobsTerminated);
@@ -146,6 +155,8 @@ public class DefaultCommandJobService implements CommandJobService {
 
     if (commandJob.hasProject()) {
       return launchProjectCommand(commandJob, owner);
+    } else if (commandJob.hasRCluster()) {
+      return launchRClusterCommand(commandJob, owner);
     } else {
       executor.execute(new FutureCommandJob(owner, commandJob));
       return commandJob;
@@ -153,11 +164,20 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   private CommandJob launchProjectCommand(CommandJob commandJob, Subject owner) {
-    if (!projectJobsNotStarted.containsKey(commandJob.getProject())) {
-      projectJobsNotStarted.put(commandJob.getProject(), new LinkedBlockingQueue<>());
-      projectExecutors.put(commandJob.getProject(), createExecutor(projectJobsNotStarted.get(commandJob.getProject())));
-    }
-    projectExecutors.get(commandJob.getProject()).execute(new FutureCommandJob(owner, commandJob));
+    BlockingQueue<Runnable> queue = projectJobsNotStarted
+        .computeIfAbsent(commandJob.getProject(), k -> new LinkedBlockingQueue<>());
+    Executor exec = projectExecutors
+        .computeIfAbsent(commandJob.getProject(), k -> createExecutor(queue));
+    exec.execute(new FutureCommandJob(owner, commandJob));
+    return commandJob;
+  }
+
+  private CommandJob launchRClusterCommand(CommandJob commandJob, Subject owner) {
+    BlockingQueue<Runnable> queue = rClusterJobsNotStarted
+        .computeIfAbsent(commandJob.getRCluster(), k -> new LinkedBlockingQueue<>());
+    Executor exec = rClusterExecutors
+        .computeIfAbsent(commandJob.getRCluster(), k -> createExecutor(queue));
+    exec.execute(new FutureCommandJob(owner, commandJob));
     return commandJob;
   }
 
@@ -286,6 +306,11 @@ public class DefaultCommandJobService implements CommandJobService {
       }
       for (String project : projectJobsNotStarted.keySet()) {
         for (Runnable runnable : projectJobsNotStarted.get(project)) {
+          allFutureCommandJobs.add((FutureCommandJob) runnable);
+        }
+      }
+      for (String rCluster : rClusterJobsNotStarted.keySet()) {
+        for (Runnable runnable : rClusterJobsNotStarted.get(rCluster)) {
           allFutureCommandJobs.add((FutureCommandJob) runnable);
         }
       }

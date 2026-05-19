@@ -63,6 +63,8 @@ public class CommandJob implements OpalShell, Runnable {
 
   private String project;
 
+  private String rCluster;
+
   private String messageProgress;
 
   private Long currentProgress;
@@ -203,7 +205,7 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   public boolean hasProject() {
-    return project != null;
+    return !Strings.isNullOrEmpty(project);
   }
 
   public String getProject() {
@@ -212,6 +214,18 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void setProject(String project) {
     this.project = project;
+  }
+
+  public boolean hasRCluster() {
+    return !Strings.isNullOrEmpty(rCluster);
+  }
+
+  public String getRCluster() {
+    return rCluster;
+  }
+
+  public void setRCluster(String rCluster) {
+    this.rCluster = rCluster;
   }
 
   public Status getStatus() {

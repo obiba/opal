@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Path("/service/r/cluster/{cname}/commands/_install")
 @Tag(name = "R", description = "Operations on the R service")
 @Tag(name = "Tasks", description = "Operations on tasks")
-public class RClusterCommandsInstallResource extends AbstractCommandsResource {
+public class RClusterCommandsInstallResource extends AbstractRClusterCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsInstallResource.class);
 
@@ -48,6 +48,14 @@ public class RClusterCommandsInstallResource extends AbstractCommandsResource {
   @Autowired
   @Qualifier("web")
   private CommandRegistry commandRegistry;
+
+  @PathParam("cname")
+  protected String name;
+
+  @Override
+  public String getName() {
+    return name;
+  }
 
   @POST
   @Operation(
@@ -59,7 +67,7 @@ public class RClusterCommandsInstallResource extends AbstractCommandsResource {
     @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response installPackage(@PathParam("cname") String name, Commands.RPackageCommandOptionsDto optionsDto) {
+  public Response installPackage(Commands.RPackageCommandOptionsDto optionsDto) {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();
 

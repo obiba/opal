@@ -27,18 +27,22 @@ public final class Dtos {
         .setStatus(commandJob.getStatus().toString()) //
         .addAllMessages(commandJob.getMessages());
 
-    if(commandJob.hasProject()) {
+    if (commandJob.hasProject()) {
       dtoBuilder.setProject(commandJob.getProject());
     }
 
-    if(commandJob.getStartTime() != null) {
+    if (commandJob.hasRCluster()) {
+      dtoBuilder.setRCluster(commandJob.getRCluster());
+    }
+
+    if (commandJob.getStartTime() != null) {
       dtoBuilder.setStartTime(DateTimeType.get().valueOf(commandJob.getStartTime()).toString());
     }
-    if(commandJob.getEndTime() != null) {
+    if (commandJob.getEndTime() != null) {
       dtoBuilder.setEndTime(DateTimeType.get().valueOf(commandJob.getEndTime()).toString());
     }
 
-    if(commandJob.getMessageProgress() != null) {
+    if (commandJob.getMessageProgress() != null) {
       dtoBuilder.setProgress(progressAsDto(commandJob));
     }
 
