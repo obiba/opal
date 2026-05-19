@@ -231,7 +231,7 @@ const columns = computed(() => {
       required: false,
       label: t('context'),
       align: DefaultAlignment,
-      field: 'project',
+      field: (row: CommandStateDto) => row.project ?? row.rCluster ?? '',
       sortable: true,
     });
   }

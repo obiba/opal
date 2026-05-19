@@ -164,20 +164,20 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   private CommandJob launchProjectCommand(CommandJob commandJob, Subject owner) {
-    if (!projectJobsNotStarted.containsKey(commandJob.getProject())) {
-      projectJobsNotStarted.put(commandJob.getProject(), new LinkedBlockingQueue<>());
-      projectExecutors.put(commandJob.getProject(), createExecutor(projectJobsNotStarted.get(commandJob.getProject())));
-    }
-    projectExecutors.get(commandJob.getProject()).execute(new FutureCommandJob(owner, commandJob));
+    BlockingQueue<Runnable> queue = projectJobsNotStarted
+        .computeIfAbsent(commandJob.getProject(), k -> new LinkedBlockingQueue<>());
+    Executor exec = projectExecutors
+        .computeIfAbsent(commandJob.getProject(), k -> createExecutor(queue));
+    exec.execute(new FutureCommandJob(owner, commandJob));
     return commandJob;
   }
 
   private CommandJob launchRClusterCommand(CommandJob commandJob, Subject owner) {
-    if (!rClusterJobsNotStarted.containsKey(commandJob.getRCluster())) {
-      rClusterJobsNotStarted.put(commandJob.getRCluster(), new LinkedBlockingQueue<>());
-      rClusterExecutors.put(commandJob.getRCluster(), createExecutor(rClusterJobsNotStarted.get(commandJob.getRCluster())));
-    }
-    rClusterExecutors.get(commandJob.getRCluster()).execute(new FutureCommandJob(owner, commandJob));
+    BlockingQueue<Runnable> queue = rClusterJobsNotStarted
+        .computeIfAbsent(commandJob.getRCluster(), k -> new LinkedBlockingQueue<>());
+    Executor exec = rClusterExecutors
+        .computeIfAbsent(commandJob.getRCluster(), k -> createExecutor(queue));
+    exec.execute(new FutureCommandJob(owner, commandJob));
     return commandJob;
   }
 
