@@ -75,10 +75,11 @@
             </div>
           </q-td>
 
-          <q-td key="project" :props="props">
+          <q-td key="context" :props="props">
             <router-link v-if="props.row.project" :to="`/project/${props.row.project}`"
               >{{ props.row.project }}
             </router-link>
+            <q-badge v-if="props.row.rCluster">R: {{ props.row.rCluster }}</q-badge>
           </q-td>
 
           <q-td key="owner" :props="props">
@@ -226,12 +227,11 @@ const columns = computed(() => {
   ];
   if (!props.project) {
     cols.splice(2, 0, {
-      name: 'project',
+      name: 'context',
       required: false,
-      label: t('project'),
+      label: t('context'),
       align: DefaultAlignment,
       field: 'project',
-      format: (val: string) => val,
       sortable: true,
     });
   }

@@ -17,11 +17,8 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
-import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
-import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.RPackagesCommandOptions;
 import org.obiba.opal.shell.web.RPackagesCommandOptionsDtoImpl;
@@ -38,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Path("/service/r/cluster/{cname}/commands/_update")
 @Tag(name = "R", description = "Operations on the R service")
 @Tag(name = "Tasks", description = "Operations on tasks")
-public class RClusterCommandsUpdateResource extends AbstractCommandsResource {
+public class RClusterCommandsUpdateResource extends AbstractRClusterCommandsResource {
 
   private static final Logger log = LoggerFactory.getLogger(RClusterCommandsUpdateResource.class);
 
@@ -48,6 +45,14 @@ public class RClusterCommandsUpdateResource extends AbstractCommandsResource {
   @Autowired
   @Qualifier("web")
   private CommandRegistry commandRegistry;
+
+  @PathParam("cname")
+  protected String name;
+
+  @Override
+  public String getName() {
+    return name;
+  }
 
   @POST
   @Operation(
@@ -59,7 +64,7 @@ public class RClusterCommandsUpdateResource extends AbstractCommandsResource {
     @ApiResponse(responseCode = "403", description = "R package management is not allowed"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response updateAllPackages(@PathParam("cname") String name) {
+  public Response updateAllPackages() {
     if (!opalGeneralConfigService.getConfig().isAllowRPackageManagement())
       return Response.status(Response.Status.FORBIDDEN).build();
 
@@ -68,13 +73,5 @@ public class RClusterCommandsUpdateResource extends AbstractCommandsResource {
     Command<RPackagesCommandOptions> rCommand = commandRegistry.newCommand("r-packages");
     rCommand.setOptions(new RPackagesCommandOptionsDtoImpl(optionsDto));
     return launchCommand(rCommand);
-  }
-
-  @Override
-  protected Response buildLaunchCommandResponse(CommandJob commandJob) {
-    return Response.created(
-            UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(commandJob.getId()))
-        .entity(Dtos.asDto(commandJob))
-        .build();
   }
 }

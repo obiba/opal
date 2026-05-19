@@ -25,6 +25,7 @@ export interface CommandStateDto {
   project?: string | undefined;
   name: string;
   progress?: CommandStateDto_ProgressDto | undefined;
+  rCluster?: string | undefined;
 }
 
 export enum CommandStateDto_Status {
