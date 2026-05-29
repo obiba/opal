@@ -69,7 +69,7 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
             toRest("/service/r/clusters", "GET"),
             toRest("/service/r/activity/_summary", "GET"),
             toRest("/system/subject-profile", "GET:GET/GET"),
-            toRest("/system/permissions/datashield", "GET"),
+            toRest("/system/permissions", "GET:GET/GET"),
             toRest("/system/log/datashield.log", "GET"),
             toRest("/datashield/profile", "GET:GET/GET"),
             toRest("/datashield/env", "GET:GET/GET"),
