@@ -47,7 +47,7 @@ public class AdministrationPermissionConverterTest
         "rest:/service/r/clusters:GET",
         "rest:/service/r/activity/_summary:GET",
         "rest:/system/subject-profile:GET:GET/GET",
-        "rest:/system/permissions/datashield:GET",
+        "rest:/system/permissions:GET:GET/GET",
         "rest:/system/log/datashield.log:GET",
         "rest:/datashield/profile:GET:GET/GET",
         "rest:/datashield/env:GET:GET/GET",
