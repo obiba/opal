@@ -152,6 +152,7 @@
 </template>
 
 <script setup lang="ts">
+import type { QTableColumn } from 'quasar';
 import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';
@@ -180,7 +181,7 @@ const showMessages = ref(false);
 const selected = ref<CommandStateDto | null>(null);
 
 const columns = computed(() => {
-  const cols = [
+  const cols: QTableColumn[] = [
     {
       name: 'id',
       required: true,
