@@ -80,16 +80,18 @@
       </template>
       <template v-slot:body-cell-providerUrl="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <a :href="props.value" target="_blank">
+          <a v-if="props.value" :href="props.value" target="_blank">
             {{ t('identity_provider_url') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
           </a>
+          <span v-else>-</span>
         </q-td>
       </template>
       <template v-slot:body-cell-parameters="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <a :href="props.value" target="_blank">
+          <a v-if="props.value" :href="props.value" target="_blank">
             {{ t('identity_provider_discovery_uri') }}<q-icon name="open_in_new" style="margin-left: 3px"></q-icon>
           </a>
+          <span v-else>-</span>
         </q-td>
       </template>
       <template v-slot:body-cell-enabled="props">
