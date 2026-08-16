@@ -148,7 +148,7 @@
             flat
             :label="t('submit')"
             color="primary"
-            :disable="selected.subject.principal"
+            :disable="!selected.subject.principal"
             @click="onSubmitPermission"
             v-close-popup
           />
