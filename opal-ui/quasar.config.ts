@@ -70,7 +70,8 @@ export default defineConfig((ctx) => {
 
       // publicPath,
       defineEnv: {
-        API: ctx.dev ? 'http://localhost:8080/ws' : (import.meta.env.OPAL_URL ? import.meta.env.OPAL_URL : '') + '/ws',
+        // in production the app is served by the Opal server it talks to
+        API: ctx.dev ? 'http://localhost:8080/ws' : '/ws',
       },
       // ignorePublicFolder: true,
       // minify: false,
