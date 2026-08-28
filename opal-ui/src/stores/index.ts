@@ -1,4 +1,4 @@
-import { defineStore } from '#q-app/wrappers';
+import { defineStore } from '#q-app';
 import { createPinia } from 'pinia';
 import type { Router } from 'vue-router';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
