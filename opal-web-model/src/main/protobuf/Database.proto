@@ -14,6 +14,7 @@ message JdbcDriverDto {
   optional string version = 4;
   required string jdbcUrlExample = 5; // e.g., "jdbc:mysql://localhost:3306/opal"
   repeated string supportedSchemas = 6;
+  repeated string supportedUsages = 7; // e.g., "STORAGE", see DatabaseDto.Usage
 }
 
 message DatabasesStatusDto {

@@ -32,10 +32,12 @@ import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
+import org.obiba.opal.core.runtime.jdbc.H2DatabaseUrls;
 import org.obiba.opal.core.service.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -47,6 +49,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.sql.SQLException;
 
 @Component
@@ -69,6 +72,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Autowired
   private TransactionTemplate transactionTemplate;
+
+  @Value("${OPAL_HOME}/data/h2")
+  private File h2Root;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
@@ -167,6 +173,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private void persist(Database database) {
     validUniqueIdentifiersDatabase(database);
+    validH2Database(database);
 
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
@@ -181,6 +188,20 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     } else {
       orientDbService.save(database, database);
     }
+  }
+
+  /**
+   * H2 is an embedded database: it is registered by name only, its file lives in the Opal H2 folder, and it can only
+   * be used for storage as there is no pre-existing database to import from or export to.
+   */
+  private void validH2Database(Database database) throws InvalidH2DatabaseException {
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings == null || !H2DatabaseUrls.isH2(sqlSettings.getDriverClass())) return;
+
+    if(database.getUsage() != Database.Usage.STORAGE) {
+      throw new InvalidH2DatabaseException("H2 databases can only be used for storage");
+    }
+    H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {

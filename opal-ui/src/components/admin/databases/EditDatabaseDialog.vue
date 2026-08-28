@@ -46,7 +46,13 @@
             class="q-mb-md"
             @update:model-value="onDriverChange"
           />
-          <q-input v-model="database.sqlSettings.url" label="URL" dense class="q-mb-md" />
+          <q-input
+            v-model="database.sqlSettings.url"
+            label="URL"
+            :hint="selectedDriver?.jdbcUrlTemplate"
+            dense
+            class="q-mb-md"
+          />
           <q-form ref="formRef">
             <div class="row q-col-gutter-md q-mb-md">
               <div class="col">
@@ -197,15 +203,25 @@ const database = ref<DatabaseDto>(props.database || ({} as DatabaseDto));
 const jdbcDatasourceSettings = ref<JdbcDatasourceSettingsDto>({} as JdbcDatasourceSettingsDto);
 const editMode = ref<boolean>(false);
 const hasDatasource = ref<boolean>(false);
-let jdbcDrivers = [] as JdbcDriverDto[];
+const jdbcDrivers = ref([] as JdbcDriverDto[]);
 const driverOptions = ref([] as { label: string; value: string }[]);
 
 const hasUrl = computed(() => database.value.sqlSettings?.url || database.value.mongoDbSettings?.url);
-const usageOptions = [
-  { label: t('storage'), value: DatabaseDto_Usage.STORAGE },
-  { label: t('import'), value: DatabaseDto_Usage.IMPORT },
-  { label: t('export'), value: DatabaseDto_Usage.EXPORT },
-];
+
+const selectedDriver = computed(() =>
+  jdbcDrivers.value.find((driver) => driver.driverClass === database.value.sqlSettings?.driverClass),
+);
+
+// some drivers do not support every usage: H2 is embedded and can only be used for storage
+const usageOptions = computed(() => {
+  const options = [
+    { label: t('storage'), value: DatabaseDto_Usage.STORAGE },
+    { label: t('import'), value: DatabaseDto_Usage.IMPORT },
+    { label: t('export'), value: DatabaseDto_Usage.EXPORT },
+  ];
+  const supported = selectedDriver.value?.supportedUsages;
+  return supported?.length ? options.filter((option) => supported.includes(option.value)) : options;
+});
 
 const validateRequiredPassword = (value: string) => {
   if (database.value.sqlSettings) {
@@ -216,10 +232,10 @@ const validateRequiredPassword = (value: string) => {
 };
 
 function initializeJdbcDrivers() {
-  if (!jdbcDrivers.length) {
+  if (!jdbcDrivers.value.length) {
     systemStore.getJdbcDrivers().then((drivers) => {
-      jdbcDrivers = drivers;
-      (jdbcDrivers || []).forEach((driver: JdbcDriverDto) => {
+      jdbcDrivers.value = drivers || [];
+      jdbcDrivers.value.forEach((driver: JdbcDriverDto) => {
         driverOptions.value.push({ label: driver.driverName, value: driver.driverClass });
       });
     });
@@ -228,8 +244,11 @@ function initializeJdbcDrivers() {
 
 function onDriverChange(driverClass: string) {
   if (database.value.sqlSettings) {
-    const jdbcDriver: JdbcDriverDto | undefined = jdbcDrivers.find((d) => d.driverClass === driverClass);
+    const jdbcDriver: JdbcDriverDto | undefined = jdbcDrivers.value.find((d) => d.driverClass === driverClass);
     if (jdbcDriver) database.value.sqlSettings.url = jdbcDriver.jdbcUrlExample;
+    if (!usageOptions.value.some((option) => option.value === database.value.usage)) {
+      database.value.usage = usageOptions.value[0]?.value || DatabaseDto_Usage.STORAGE;
+    }
   }
 }
 
@@ -296,7 +315,7 @@ async function onSubmit() {
         onHide();
       })
       .catch((error) => {
-        notifyError(t('db.save_error', { error: error.response.data.message }));
+        notifyError(error);
       });
   }
 }

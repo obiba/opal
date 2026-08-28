@@ -95,7 +95,6 @@ export default {
     default_updated_column_hint: "Le nom de la colonne contenant la date de mise à jour des entités, requis pour effectuer des imports incrémentaux. Assurez-vous qu'il ne sera pas en conflit avec un nom de variable.",
     use_metadata_tables: 'Avec les tables de variables',
     use_metadata_tables_hint: 'Exporter les dictionnaires de données dans les tables de méta-données.',
-    save_error: "Erreur lors de l'enregistrement de la base de données",
   },
   clipboard: {
     copy: 'Copier dans le presse-papiers',
@@ -138,6 +137,7 @@ export default {
     PasswordTooWeak: 'Mot de passe trop faible',
     OldPasswordMismatch: "L'ancien mot n'est pas valide",
     IllegalArgument: 'Données non valides',
+    InvalidH2Database: 'Base de données H2 non valide',
     Conflict: 'Conflit détecté',
     BannedUser: "Trop d'erreurs d'identification, l'utilisateur {0} est banni pour une durée de {1} secondes",
     InvalidCredentials: "Nom d'utilisateur ou mot de passe incorrect, veuillez réessayer",

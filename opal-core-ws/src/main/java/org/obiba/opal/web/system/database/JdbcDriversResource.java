@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.obiba.opal.web.model.Database;
+import org.obiba.opal.web.model.Database.DatabaseDto.Usage;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +23,16 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Component
 @Transactional
 @Path("/system/databases/jdbc-drivers")
 @Tag(name = "Databases", description = "Operations on databases")
 public class JdbcDriversResource {
+
+  private static final Collection<String> ALL_USAGES = List
+      .of(Usage.IMPORT.name(), Usage.STORAGE.name(), Usage.EXPORT.name());
 
   @GET
   @Operation(
@@ -46,6 +51,7 @@ public class JdbcDriversResource {
         .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal") //
         .addSupportedSchemas("jdbc") //
+        .addAllSupportedUsages(ALL_USAGES) //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("MariaDB") //
@@ -53,6 +59,7 @@ public class JdbcDriversResource {
         .setJdbcUrlTemplate("jdbc:mariadb://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:mariadb://localhost:3306/opal") //
         .addSupportedSchemas("jdbc") //
+        .addAllSupportedUsages(ALL_USAGES) //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("PostgreSQL") //
@@ -60,6 +67,7 @@ public class JdbcDriversResource {
         .setJdbcUrlTemplate("jdbc:postgresql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:postgresql://localhost:5432/opal") //
         .addSupportedSchemas("jdbc") //
+        .addAllSupportedUsages(ALL_USAGES) //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("SQL Server") //
@@ -67,6 +75,17 @@ public class JdbcDriversResource {
         .setJdbcUrlTemplate("jdbc:sqlserver://{hostname}:{port};databaseName={databaseName}") //
         .setJdbcUrlExample("jdbc:sqlserver://localhost:1433;databaseName=opal") //
         .addSupportedSchemas("jdbc") //
+        .addAllSupportedUsages(ALL_USAGES) //
+        .build());
+    // H2 is embedded: the database is registered by name only, its file lives in the Opal H2 folder, and it can only
+    // be used for storage as there is no pre-existing database to import from or export to.
+    drivers.add(Database.JdbcDriverDto.newBuilder() //
+        .setDriverName("H2") //
+        .setDriverClass("org.h2.Driver") //
+        .setJdbcUrlTemplate("jdbc:h2:file:{databaseName}") //
+        .setJdbcUrlExample("jdbc:h2:file:opal") //
+        .addSupportedSchemas("jdbc") //
+        .addSupportedUsages(Usage.STORAGE.name()) //
         .build());
     return drivers;
   }

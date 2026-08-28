@@ -19,6 +19,8 @@ export interface JdbcDriverDto {
   /** e.g., "jdbc:mysql://localhost:3306/opal" */
   jdbcUrlExample: string;
   supportedSchemas: string[];
+  /** e.g., "STORAGE", see DatabaseDto.Usage */
+  supportedUsages: string[];
 }
 
 export interface DatabasesStatusDto {
