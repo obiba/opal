@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      # a JDK 25 failure must not cancel the JDK 21 leg, which is the one that deploys
+      fail-fast: false
       matrix:
-        java-version: [21]
+        java-version: [21, 25]
 
     steps:
       - name: Checkout repository
@@ -37,8 +39,9 @@ jobs:
           path: |
             ~/.m2
             ~/.cache
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-jdk${{ matrix.java-version }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
+            ${{ runner.os }}-maven-jdk${{ matrix.java-version }}-
             ${{ runner.os }}-maven-
 
       - name: Set up Maven settings
@@ -47,7 +50,7 @@ jobs:
           cp .settings.xml ~/.m2/settings.xml
 
       - name: Deploy Snapshot
-        if: github.ref == 'refs/heads/snapshot' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/snapshot' && github.event_name == 'push' && matrix.java-version == 21
         run: mvn -U deploy
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +58,7 @@ jobs:
           ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
 
       - name: Deploy Release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && matrix.java-version == 21
         run: mvn -Prelease deploy
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,5 +66,5 @@ jobs:
           ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
 
       - name: Maven Install (non-snapshot, non-tag)
-        if: github.ref != 'refs/heads/snapshot' && !startsWith(github.ref, 'refs/tags/')
+        if: matrix.java-version != 21 || (github.ref != 'refs/heads/snapshot' && !startsWith(github.ref, 'refs/tags/'))
         run: mvn -U install
