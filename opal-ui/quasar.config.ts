@@ -1,28 +1,28 @@
 // Configuration for your app
-// https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
+// https://quasar.dev/quasar-cli-vite/quasar-config-file
 
-import { defineConfig } from '#q-app/wrappers';
+import { defineConfig } from '#q-app';
 import { fileURLToPath } from 'node:url';
 //const path = require('path');
 
 export default defineConfig((ctx) => {
   return {
-    // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
+    // https://quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
-    // https://v2.quasar.dev/quasar-cli-vite/boot-files
+    // https://quasar.dev/quasar-cli-vite/boot-files
     boot: ['i18n', 'api', 'ace'],
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
+    // https://quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
       // 'mdi-v7',
-      'fontawesome-v6',
+      'fontawesome-v7',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
@@ -32,11 +32,24 @@ export default defineConfig((ctx) => {
       'material-icons', // optional, you are not bound to it
     ],
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
+    // Full list of options: https://quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
       target: {
         browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
-        node: 'node20',
+        node: 'node22',
+      },
+
+      // @quasar/app-vite v3 only injects the "@/" alias; keep the legacy
+      // ones so that existing "src/...", "boot/...", etc. imports keep working
+      alias: {
+        src: ctx.appPaths.srcDir,
+        app: ctx.appPaths.appDir,
+        components: ctx.appPaths.resolve.src('components'),
+        layouts: ctx.appPaths.resolve.src('layouts'),
+        pages: ctx.appPaths.resolve.src('pages'),
+        assets: ctx.appPaths.resolve.src('assets'),
+        boot: ctx.appPaths.resolve.src('boot'),
+        stores: ctx.appPaths.resolve.src('stores'),
       },
 
       typescript: {
@@ -48,19 +61,20 @@ export default defineConfig((ctx) => {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
-      // vueOptionsAPI: false,
+
+      // defaults to false since @quasar/app-vite v3;
+      // required by vue3-ace-editor, which is an Options API component
+      vueOptionsAPI: true,
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
       // publicPath,
-      // analyze: true,
-      env: {
-        API: ctx.dev ? 'http://localhost:8080/ws' : (process.env.OPAL_URL ? process.env.OPAL_URL : '') + '/ws',
+      defineEnv: {
+        // in production the app is served by the Opal server it talks to
+        API: ctx.dev ? 'http://localhost:8080/ws' : '/ws',
       },
-      // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
-      // polyfillModulePreload: true,
       // distDir
 
       extendViteConf(viteConf) {
@@ -91,7 +105,7 @@ export default defineConfig((ctx) => {
             // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
             // you need to set `runtimeOnly: false`
             runtimeOnly: false,
-            ssr: ctx.modeName === 'ssr',
+            ssr: ctx.mode.ssr || ctx.mode.ssg,
             // you need to set i18n resource including paths !
             include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
           },
@@ -110,13 +124,13 @@ export default defineConfig((ctx) => {
       ],
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devServer
+    // Full list of options: https://quasar.dev/quasar-cli-vite/quasar-config-file#devServer
     devServer: {
       // https: true
       open: false, // opens browser window automatically
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
+    // https://quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
       config: {},
 
@@ -138,7 +152,7 @@ export default defineConfig((ctx) => {
     // https://v2.quasar.dev/options/animations
     animations: [],
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
+    // https://quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
     // sourceFiles: {
     //   rootComponent: 'src/App.vue',
     //   router: 'src/router/index',
@@ -150,16 +164,13 @@ export default defineConfig((ctx) => {
     //   electronPreload: 'src-electron/electron-preload'
     // },
 
-    // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
+    // https://quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
     ssr: {
       prodPort: 3000, // The default port that the production server should use
       // (gets superseded if process.env.PORT is specified at runtime)
 
-      // extendSSRWebserverConf (esbuildConf) {},
-      // extendPackageJson (json) {},
-
-      // extendPackageJson (json) {},
-      // extendSSRWebserverConf (esbuildConf) {},
+      // extendSSRPackageJson (json) {},
+      // extendSSRWebserverConf (rolldownConf) {},
 
       // manualStoreSerialization: true,
       // manualStoreSsrContextInjection: true,
@@ -170,39 +181,37 @@ export default defineConfig((ctx) => {
       pwa: false,
       // pwaOfflineHtmlFilename: 'offline.html', // do NOT use index.html as name!
 
-      // pwaExtendGenerateSWOptions (cfg) {},
-      // pwaExtendInjectManifestOptions (cfg) {}
+      // extendSSRGenerateSWOptions (cfg) {},
+      // extendSSRInjectManifestOptions (cfg) {}
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
+    // https://quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
       workboxMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       // swFilename: 'sw.js',
       // manifestFilename: 'manifest.json',
-      // extendManifestJson (json) {},
+      // extendPWAManifestJson (json) {},
       // useCredentialsForManifestTag: true,
-      // injectPwaMetaTags: false,
-      // extendPWACustomSWConf (esbuildConf) {},
-      // extendGenerateSWOptions (cfg) {},
-      // extendInjectManifestOptions (cfg) {}
+      // injectPWAMetaTags: false,
+      // extendPWACustomSWConf (rolldownConf) {},
+      // extendPWAGenerateSWOptions (cfg) {},
+      // extendPWAInjectManifestOptions (cfg) {}
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
-    cordova: {
-      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
-    },
+    // Full list of options: https://quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
+    cordova: {},
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
+    // Full list of options: https://quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
     capacitor: {
       hideSplashscreen: true,
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
+    // Full list of options: https://quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
-      // extendElectronMainConf (esbuildConf) {},
-      // extendElectronPreloadConf (esbuildConf) {},
+      // extendElectronMainConf (rolldownConf) {},
+      // extendElectronPreloadConf (rolldownConf) {},
 
-      // extendPackageJson (json) {},
+      // extendElectronPackageJson (json) {},
       // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
       preloadScripts: ['electron-preload'],
       // specify the debugging port to use for the Electron app when running in development mode
@@ -229,9 +238,9 @@ export default defineConfig((ctx) => {
       },
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
+    // Full list of options: https://quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      // extendBexScriptsConf (esbuildConf) {},
+      // extendBexScriptsConf (rolldownConf) {},
       // extendBexManifestJson (json) {},
       /**
        * The list of extra scripts (js/ts) not in your bex manifest that you want to
