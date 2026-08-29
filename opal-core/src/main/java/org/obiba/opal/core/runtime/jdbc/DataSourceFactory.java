@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.io.File;
 
 @Component
 public class DataSourceFactory {
@@ -28,6 +29,9 @@ public class DataSourceFactory {
 
   @Value("${org.obiba.opal.jdbc.maxPoolSize}")
   private Integer maxPoolSize;
+
+  @Value("${OPAL_HOME}/data/h2")
+  private File h2Root;
 
   public DataSourceFactory() {}
 
@@ -41,8 +45,16 @@ public class DataSourceFactory {
       throw new IllegalArgumentException("Cannot create a JDBC DataSource without SqlSettings");
     }
 
-    factoryBean.setDriverClass(sqlSettings.getDriverClass());
-    factoryBean.setUrl(sqlSettings.getUrl());
+    String driverClass = sqlSettings.getDriverClass();
+    factoryBean.setDriverClass(driverClass);
+    if(H2DatabaseUrls.isH2(driverClass)) {
+      // H2 databases are registered by name only, the file lives in the Opal H2 folder
+      factoryBean.setUrl(H2DatabaseUrls.expand(sqlSettings.getUrl(), h2Root));
+      // the settings are rejected when the database is registered, check them again on the way to the driver
+      H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
+    } else {
+      factoryBean.setUrl(sqlSettings.getUrl());
+    }
     factoryBean.setUsername(sqlSettings.getUsername());
     factoryBean.setPassword(sqlSettings.getPassword());
     factoryBean.setConnectionProperties(sqlSettings.getProperties());

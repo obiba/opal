@@ -95,7 +95,6 @@ export default {
     default_updated_column_hint: 'The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.',
     use_metadata_tables: 'With variables description tables',
     use_metadata_tables_hint: 'Export data dictionnaries to metadata tables.',
-    save_error: 'Error saving database',
   },
   clipboard: {
     copy: 'Copy to clipboard',
@@ -138,6 +137,7 @@ export default {
     PasswordTooWeak: 'Password is too weak',
     OldPasswordMismatch: 'Old password is invalid',
     IllegalArgument: 'Invalid data',
+    InvalidH2Database: 'Invalid H2 database',
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
     InvalidCredentials: 'Invalid credentials, please try again',

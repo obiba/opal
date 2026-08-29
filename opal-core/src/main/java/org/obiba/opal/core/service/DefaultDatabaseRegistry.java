@@ -32,10 +32,12 @@ import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
+import org.obiba.opal.core.runtime.jdbc.H2DatabaseUrls;
 import org.obiba.opal.core.service.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -47,6 +49,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.sql.SQLException;
 
 @Component
@@ -69,6 +72,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Autowired
   private TransactionTemplate transactionTemplate;
+
+  @Value("${OPAL_HOME}/data/h2")
+  private File h2Root;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
@@ -167,6 +173,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private void persist(Database database) {
     validUniqueIdentifiersDatabase(database);
+    validH2Database(database);
 
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
@@ -180,6 +187,41 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       }
     } else {
       orientDbService.save(database, database);
+    }
+  }
+
+  /**
+   * H2 is an embedded database: it is registered by name only, its file lives in the Opal H2 folder, and it can only
+   * be used for storage as there is no pre-existing database to import from or export to.
+   */
+  private void validH2Database(Database database) throws InvalidH2DatabaseException {
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings == null || !H2DatabaseUrls.isH2(sqlSettings.getDriverClass())) return;
+
+    if(database.getUsage() != Database.Usage.STORAGE) {
+      throw new InvalidH2DatabaseException("H2 databases can only be used for storage");
+    }
+    H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
+    H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
+    validUniqueH2DatabaseFile(database, H2DatabaseUrls.getDatabaseName(sqlSettings.getUrl()));
+  }
+
+  /**
+   * Two registrations naming the same file would be two Opal databases sharing one set of tables. The comparison
+   * ignores case: on a case insensitive file system 'opal' and 'Opal' are the same file, and a name that only holds on
+   * Linux would not survive a move of the H2 folder.
+   */
+  private void validUniqueH2DatabaseFile(Database database, String name) throws InvalidH2DatabaseException {
+    // the identifiers database is an H2 candidate too, so look at every SQL database and not just the listed ones
+    for(Database other : orientDbService
+        .list(Database.class, "select from " + Database.class.getSimpleName() + " where sqlSettings is not null")) {
+      if(other.getName().equals(database.getName())) continue;
+      SqlSettings otherSettings = other.getSqlSettings();
+      if(otherSettings == null || !H2DatabaseUrls.isH2(otherSettings.getDriverClass())) continue;
+      if(name.equalsIgnoreCase(H2DatabaseUrls.getDatabaseName(otherSettings.getUrl()))) {
+        throw new InvalidH2DatabaseException(
+            "H2 database '" + name + "' is already registered as '" + other.getName() + "'");
+      }
     }
   }
 
