@@ -26,8 +26,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.repository.DatabaseRepository;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
@@ -62,7 +62,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   private DataSourceFactory dataSourceFactory;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private DatabaseRepository databaseRepository;
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
@@ -85,7 +85,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(Database.class);
     processHibernate5Upgrade();
   }
 
@@ -97,8 +96,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public Iterable<Database> list() {
-    return orientDbService
-        .list(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? order by name", false);
+    return databaseRepository.findByUsedForIdentifiersOrderByName(false);
   }
 
   @Override
@@ -106,21 +104,17 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(usage == null) {
       return list();
     }
-    return orientDbService.list(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ? order by name", false, usage.toString());
+    return databaseRepository.findByUsedForIdentifiersAndUsageOrderByName(false, usage);
   }
 
   @Override
   public Iterable<Database> listSqlDatabases() {
-    return orientDbService.list(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and sqlSettings is not null order by name",
-        false);
+    return databaseRepository.findByUsedForIdentifiersAndSqlSettingsIsNotNullOrderByName(false);
   }
 
   @Override
   public Iterable<Database> listMongoDatabases() {
-    return orientDbService.list(Database.class, "select from " + Database.class.getSimpleName() +
-        " where usedForIdentifiers = ? and mongoDbSettings is not null order by name", false);
+    return databaseRepository.findByUsedForIdentifiersAndMongoDbSettingsIsNotNullOrderByName(false);
   }
 
   @Override
@@ -130,18 +124,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public boolean hasDatabase(@org.jetbrains.annotations.Nullable String name) {
-    Database database = orientDbService.findUnique(Database.Builder.create().name(name).build());
-    return database != null;
+    return databaseRepository.findByName(name).isPresent();
   }
 
   @NotNull
   @Override
   public Database getDatabase(@NotNull String name) throws NoSuchDatabaseException {
-    Database database = orientDbService.findUnique(Database.Builder.create().name(name).build());
-    if(database == null) {
-      throw new NoSuchDatabaseException(name);
-    }
-    return database;
+    return databaseRepository.findByName(name).orElseThrow(() -> new NoSuchDatabaseException(name));
   }
 
   @Override
@@ -154,7 +143,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
-    if(orientDbService.findUnique(database) == null) {
+    if(databaseRepository.findByName(database.getName()).isEmpty()) {
       persist(database);
     } else {
       throw new IllegalArgumentException("Database already exists");
@@ -164,7 +153,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void update(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
-    Preconditions.checkArgument(orientDbService.findUnique(database) != null,
+    Preconditions.checkArgument(databaseRepository.findByName(database.getName()).isPresent(),
         "Cannot update non existing Database " + database.getName());
 
     destroyCache(database.getName());
@@ -178,15 +167,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
       if(previousDefaultStorageDatabase == null || previousDefaultStorageDatabase.equals(database)) {
-        orientDbService.save(database, database);
+        databaseRepository.upsert(database);
       } else {
         previousDefaultStorageDatabase.setDefaultStorage(false);
-        orientDbService.save(ImmutableMap
-            .<HasUniqueProperties, HasUniqueProperties>of(database, database, previousDefaultStorageDatabase,
-                previousDefaultStorageDatabase));
+        databaseRepository.upsert(previousDefaultStorageDatabase);
+        databaseRepository.upsert(database);
       }
     } else {
-      orientDbService.save(database, database);
+      databaseRepository.upsert(database);
     }
   }
 
@@ -213,8 +201,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
    */
   private void validUniqueH2DatabaseFile(Database database, String name) throws InvalidH2DatabaseException {
     // the identifiers database is an H2 candidate too, so look at every SQL database and not just the listed ones
-    for(Database other : orientDbService
-        .list(Database.class, "select from " + Database.class.getSimpleName() + " where sqlSettings is not null")) {
+    for(Database other : databaseRepository.findBySqlSettingsIsNotNull()) {
       if(other.getName().equals(database.getName())) continue;
       SqlSettings otherSettings = other.getSqlSettings();
       if(otherSettings == null || !H2DatabaseUrls.isH2(otherSettings.getDriverClass())) continue;
@@ -240,9 +227,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getDefaultStorageDatabase() {
-    return orientDbService.uniqueResult(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and defaultStorage = ?", false,
-        true);
+    return databaseRepository.findByUsedForIdentifiersAndDefaultStorage(false, true).orElse(null);
   }
 
   @Override
@@ -283,7 +268,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       }
       unregister(database.getName(), identifiersTableService.getDatasourceName());
     }
-    orientDbService.delete(database);
+    databaseRepository.deleteByKey(database);
     destroyCache(database.getName());
   }
 
@@ -306,19 +291,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public boolean hasIdentifiersDatabase() {
-    return orientDbService
-        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
-            true) != null;
+    return databaseRepository.findByUsedForIdentifiers(true).isPresent();
   }
 
   @NotNull
   @Override
   public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
-    Database database = orientDbService
-        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
-            true);
-    if(database == null) throw new IdentifiersDatabaseNotFoundException();
-    return database;
+    return databaseRepository.findByUsedForIdentifiers(true)
+        .orElseThrow(IdentifiersDatabaseNotFoundException::new);
   }
 
   @NotNull

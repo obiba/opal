@@ -12,6 +12,8 @@ package org.obiba.opal.core.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +31,23 @@ public abstract class AbstractTimestamped implements Timestamped {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
+
+  /**
+   * Keeps the timestamps up to date on the way to the database, which is what the OrientDB TimestampedHook did for
+   * every document written. Unlike that hook, this does not overwrite a creation date the object already carries: the
+   * field defaults to now for a new object, and a row being migrated from the old store has to keep the date it was
+   * actually created on.
+   */
+  @PrePersist
+  void onPersist() {
+    if(created == null) created = new Date();
+    if(updated == null) updated = created;
+  }
+
+  @PreUpdate
+  void onUpdate() {
+    updated = new Date();
+  }
 
   @Override
   @NotNull

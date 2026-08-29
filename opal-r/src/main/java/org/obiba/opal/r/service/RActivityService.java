@@ -12,11 +12,9 @@ package org.obiba.opal.r.service;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.apache.commons.compress.utils.Lists;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.r.repository.RSessionActivityRepository;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.r.service.event.RServerSessionClosedEvent;
 import org.obiba.opal.r.service.event.RServerSessionEvent;
@@ -35,36 +33,28 @@ import java.util.stream.StreamSupport;
 @Component
 public class RActivityService implements SystemService {
 
-  private final OrientDbService orientDbService;
+  private final RSessionActivityRepository rSessionActivityRepository;
 
   @Autowired
-  public RActivityService(OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
+  public RActivityService(RSessionActivityRepository rSessionActivityRepository) {
+    this.rSessionActivityRepository = rSessionActivityRepository;
   }
 
   public List<RSessionActivity> getActivities(String context, String user, String profile, Date fromDate, Date toDate) {
     checkAlphanumeric(context);
     Iterable<RSessionActivity> records;
     if (Strings.isNullOrEmpty(user) && Strings.isNullOrEmpty(profile)) {
-      String sql = String.format("select * from %s where context = ?", RSessionActivity.class.getSimpleName());
-      records = orientDbService.list(RSessionActivity.class,
-          sql, context);
+      records = rSessionActivityRepository.findByContext(context);
     } else if (Strings.isNullOrEmpty(user)) {
       checkAlphanumeric(profile);
-      String sql = String.format("select * from %s where context = ? and profile = ?", RSessionActivity.class.getSimpleName());
-      records = orientDbService.list(RSessionActivity.class,
-          sql, context, profile);
+      records = rSessionActivityRepository.findByContextAndProfile(context, profile);
     } else if (Strings.isNullOrEmpty(profile)) {
       checkAlphanumeric(user);
-      String sql = String.format("select * from %s where context = ? and user = ?", RSessionActivity.class.getSimpleName());
-      records = orientDbService.list(RSessionActivity.class,
-          sql, context, user);
+      records = rSessionActivityRepository.findByContextAndUser(context, user);
     } else {
       checkAlphanumeric(profile);
       checkAlphanumeric(user);
-      String sql = String.format("select * from %s where context = ? and user = ? and profile = ?", RSessionActivity.class.getSimpleName());
-      records = orientDbService.list(RSessionActivity.class,
-          sql, context, user, profile);
+      records = rSessionActivityRepository.findByContextAndUserAndProfile(context, user, profile);
     }
     // TODO filter dates in the SQL query
     return StreamSupport.stream(records.spliterator(), false)
@@ -111,39 +101,31 @@ public class RActivityService implements SystemService {
     metric.setProfile(event.getProfile());
     metric.setCreated(event.getCreated());
     metric.setUpdated(new Date());
-    orientDbService.save(metric, metric);
+    rSessionActivityRepository.upsert(metric);
   }
 
   @Subscribe
   public void onRServerSessionUpdated(RServerSessionUpdatedEvent event) {
     if (isOpalSystemUser(event)) return;
-    RSessionActivity template = new RSessionActivity();
-    template.setId(event.getId());
-    RSessionActivity metric = orientDbService.findUnique(template);
+    RSessionActivity metric = rSessionActivityRepository.findById(event.getId()).orElse(null);
     if (metric == null) return; // broken for some reason
     metric.setUpdated(new Date());
     metric.setExecutionTimeMillis(event.getExecutionTimeMillis());
-    orientDbService.save(template, metric);
+    rSessionActivityRepository.upsert(metric);
   }
 
   @Subscribe
   public void onRServerSessionClosed(RServerSessionClosedEvent event) {
     if (isOpalSystemUser(event)) return;
-    RSessionActivity template = new RSessionActivity();
-    template.setId(event.getId());
-    RSessionActivity metric = orientDbService.findUnique(template);
+    RSessionActivity metric = rSessionActivityRepository.findById(event.getId()).orElse(null);
     if (metric == null) return; // broken for some reason
     metric.setUpdated(new Date());
-    orientDbService.save(template, metric);
+    rSessionActivityRepository.upsert(metric);
   }
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueIndex(RSessionActivity.class);
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "user");
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "context");
-    orientDbService.createIndex(RSessionActivity.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "profile");
   }
 
   @Override

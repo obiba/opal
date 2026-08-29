@@ -19,10 +19,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.repository.SubjectProfileRepository;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -52,7 +52,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   static final String FILES_SHARE_PERM = "FILES_SHARE";
 
   @Autowired
-  private OrientDbService orientDbService;
+  private SubjectProfileRepository subjectProfileRepository;
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -71,7 +71,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(SubjectProfile.class);
+
   }
 
   @Override
@@ -106,7 +106,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
       SubjectProfile profile = getProfile(principal);
       profile.setGroups(groups);
       profile.setUpdated(new Date());
-      orientDbService.save(profile, profile);
+      subjectProfileRepository.upsert(profile);
     } catch (NoSuchSubjectProfileException e) {
       // ignore
     }
@@ -116,7 +116,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   public void deleteProfile(@NotNull String principal) {
     try {
       SubjectProfile profile = getProfile(principal);
-      orientDbService.delete(profile);
+      subjectProfileRepository.deleteByKey(profile);
       eventBus.post(new SubjectProfileDeletedEvent(profile));
     } catch (NoSuchSubjectProfileException ignored) {
       // ignore
@@ -127,37 +127,34 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public SubjectProfile getProfile(@Nullable String principal) throws NoSuchSubjectProfileException {
     if (principal == null) throw new NoSuchSubjectProfileException(principal);
-    SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
-    if (subjectProfile == null) {
-      throw new NoSuchSubjectProfileException(principal);
-    }
-    return subjectProfile;
+    return subjectProfileRepository.findByPrincipal(principal)
+        .orElseThrow(() -> new NoSuchSubjectProfileException(principal));
   }
 
   @Override
   public synchronized void updateProfile(@NotNull String principal) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     profile.setUpdated(new Date());
-    orientDbService.save(profile, profile);
+    subjectProfileRepository.upsert(profile);
   }
 
   @Override
   public void updateProfileSecret(String principal, boolean enable) {
     SubjectProfile profile = getProfile(principal);
     profile.setSecret(enable ? (profile.hasTmpSecret() ? profile.getTmpSecret() : totpService.generateSecret()) : null);
-    orientDbService.save(profile, profile);
+    subjectProfileRepository.upsert(profile);
   }
 
   @Override
   public void updateProfileTmpSecret(String principal, boolean enable) {
     SubjectProfile profile = getProfile(principal);
     profile.setTmpSecret(enable ? totpService.generateSecret() : null);
-    orientDbService.save(profile, profile);
+    subjectProfileRepository.upsert(profile);
   }
 
   @Override
   public Iterable<SubjectProfile> getProfiles() {
-    return orientDbService.list(SubjectProfile.class);
+    return subjectProfileRepository.findAll();
   }
 
   @Override
@@ -166,27 +163,27 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     for (String resource : resources) {
       profile.addBookmark(resource);
     }
-    orientDbService.save(profile, profile);
+    subjectProfileRepository.upsert(profile);
   }
 
   @Override
   public synchronized void deleteBookmark(String principal, String path) throws NoSuchSubjectProfileException {
     SubjectProfile profile = getProfile(principal);
     if (profile.hasBookmark(path) && profile.removeBookmark(path)) {
-      orientDbService.save(profile, profile);
+      subjectProfileRepository.upsert(profile);
     }
   }
 
   @Override
   public synchronized void deleteBookmarks(String path) throws NoSuchSubjectProfileException {
-    for (SubjectProfile profile : orientDbService.list(SubjectProfile.class)) {
+    for (SubjectProfile profile : subjectProfileRepository.findAll()) {
       if (!profile.hasBookmarks()) return;
       List<Bookmark> toRemove = profile.getBookmarks().stream()
           .filter(b -> b.getResource().equals(path) || b.getResource().startsWith(path + "/"))
           .collect(Collectors.toList());
       if (!toRemove.isEmpty()) {
         toRemove.forEach(profile::removeBookmark);
-        orientDbService.save(profile, profile);
+        subjectProfileRepository.upsert(profile);
       }
     }
   }
@@ -208,11 +205,11 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
       updateProfileRealm(profile, realm);
       updateUserInfo(profile, principalCollection);
       profile.setUpdated(new Date());
-      orientDbService.save(profile, profile);
+      subjectProfileRepository.upsert(profile);
     } catch (NoSuchSubjectProfileException e) {
       SubjectProfile newProfile = new SubjectProfile(principal, realm);
       updateUserInfo(newProfile, principalCollection);
-      orientDbService.save(newProfile, newProfile);
+      subjectProfileRepository.upsert(newProfile);
     }
   }
 

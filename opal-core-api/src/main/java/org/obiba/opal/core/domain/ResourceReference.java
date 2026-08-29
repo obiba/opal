@@ -72,6 +72,20 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
 
+  /**
+   * Same as AbstractTimestamped, which this one does not extend.
+   */
+  @PrePersist
+  void onPersist() {
+    if(created == null) created = new Date();
+    if(updated == null) updated = created;
+  }
+
+  @PreUpdate
+  void onUpdate() {
+    updated = new Date();
+  }
+
   public String getName() {
     return name;
   }

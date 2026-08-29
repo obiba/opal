@@ -12,11 +12,12 @@ package org.obiba.opal.core.service;
 
 import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.repository.OpalAnalysisRepository;
+import org.obiba.opal.core.repository.OpalAnalysisResultRepository;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.slf4j.Logger;
@@ -35,55 +36,43 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisServiceImpl.class);
 
-  private final OrientDbService orientDbService;
+  private final OpalAnalysisRepository opalAnalysisRepository;
+
+  private final OpalAnalysisResultRepository opalAnalysisResultRepository;
 
   @Autowired
-  public OpalAnalysisServiceImpl(OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
+  public OpalAnalysisServiceImpl(OpalAnalysisRepository opalAnalysisRepository,
+                                 OpalAnalysisResultRepository opalAnalysisResultRepository) {
+    this.opalAnalysisRepository = opalAnalysisRepository;
+    this.opalAnalysisResultRepository = opalAnalysisResultRepository;
   }
 
   @Override
   public OpalAnalysis getAnalysis(String datasource, String table, String name) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "name = ?")
-      .build();
-    return orientDbService.uniqueResult(OpalAnalysis.class, query, datasource, table, name);
+    return opalAnalysisRepository.findByDatasourceAndTableAndName(datasource, table, name).orElse(null);
   }
 
   @Override
   public Iterable<OpalAnalysis> getAnalyses() {
-    return orientDbService.list(OpalAnalysis.class);
+    return opalAnalysisRepository.findAll();
   }
 
   @Override
   public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?")
-      .order("desc")
-      .build();
-
-    return orientDbService.list(OpalAnalysis.class, query, datasource);
+    return opalAnalysisRepository.findByDatasourceOrderByCreatedDesc(datasource);
   }
 
   @Override
   public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource,
                                                                 String table) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysis.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?")
-      .order("desc")
-      .build();
-
-    return orientDbService.list(OpalAnalysis.class, query, datasource, table);
+    return opalAnalysisRepository.findByDatasourceAndTableOrderByCreatedDesc(datasource, table);
   }
 
   @Override
   public void save(OpalAnalysis analysis) throws AnalysisAlreadyExistsException {
     OpalAnalysis existingAnalysis = getAnalysis(analysis.getDatasource(), analysis.getTable(), analysis.getName());
     if (existingAnalysis == null) {
-      orientDbService.save(analysis, analysis);
+      opalAnalysisRepository.upsert(analysis);
     } else {
       throw new AnalysisAlreadyExistsException(analysis.getName());
     }
@@ -91,16 +80,8 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
-    orientDbService.delete(analysis);
-
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(OpalAnalysisResult.class.getSimpleName())
-        .whereClauses("analysisName = ? ")
-        .build();
-
-    StreamSupport
-        .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getName()).spliterator(), false)
-        .forEach(orientDbService::delete);
+    opalAnalysisRepository.deleteByKey(analysis);
+    opalAnalysisResultRepository.deleteAll(opalAnalysisResultRepository.findByAnalysisName(analysis.getName()));
 
     deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));
   }
@@ -117,7 +98,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(OpalAnalysis.class);
+
   }
 
   @Override

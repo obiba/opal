@@ -17,7 +17,7 @@ import org.obiba.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.repository.KeyStoreStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.annotation.Nullable;
@@ -42,7 +42,7 @@ public abstract class AbstractKeyStoreService {
   protected CallbackHandler callbackHandler;
 
   @NotNull
-  protected OrientDbService orientDbService;
+  protected KeyStoreStateRepository keyStoreStateRepository;
 
   @Autowired
   public void setCallbackHandler(@NotNull CallbackHandler callbackHandler) {
@@ -50,12 +50,12 @@ public abstract class AbstractKeyStoreService {
   }
 
   @Autowired
-  public void setOrientDbService(@NotNull OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
+  public void setKeyStoreStateRepository(@NotNull KeyStoreStateRepository keyStoreStateRepository) {
+    this.keyStoreStateRepository = keyStoreStateRepository;
   }
 
   public void start() {
-    orientDbService.createUniqueIndex(KeyStoreState.class);
+
   }
 
   OpalKeyStore getOrCreateKeyStore(@NotNull String name) {
@@ -108,7 +108,7 @@ public abstract class AbstractKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(keyStore));
 
-    orientDbService.save(state, state);
+    keyStoreStateRepository.upsert(state);
   }
 
   void deleteKey(@NotNull String name, @NotNull String alias) {
@@ -217,7 +217,7 @@ public abstract class AbstractKeyStoreService {
   }
 
   private KeyStoreState findByName(String name) {
-    return orientDbService.findUnique(new KeyStoreState(name));
+    return keyStoreStateRepository.findByName(name).orElse(null);
   }
 
   private byte[] getKeyStoreByteArray(OpalKeyStore opalKeyStore) {

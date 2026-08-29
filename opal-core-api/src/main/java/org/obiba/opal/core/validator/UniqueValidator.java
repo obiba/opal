@@ -11,11 +11,12 @@ package org.obiba.opal.core.validator;
 
 import java.util.Arrays;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class UniqueValidator implements ConstraintValidator<Unique, HasUniqueProperties> {
 
   @Autowired
-  private OrientDbService orientDbService;
+  private EntityManager entityManager;
 
   private Unique unique;
 
@@ -53,9 +54,10 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
     Class<? extends HasUniqueProperties> annotatedClass = findAnnotatedClass(value.getClass());
     PropertyAccessor beanWrapper = new BeanWrapperImpl(value);
     for(String property : unique.properties()) {
-      String query = String.format("select from %s where %s = ?", annotatedClass.getSimpleName(), property);
+      String query = String.format("select e from %s e where e.%s = :value", annotatedClass.getSimpleName(), property);
       Object propertyValue = beanWrapper.getPropertyValue(property);
-      HasUniqueProperties existing = orientDbService.uniqueResult(value.getClass(), query, propertyValue);
+      HasUniqueProperties existing = firstResult(
+          entityManager.createQuery(query, HasUniqueProperties.class).setParameter("value", propertyValue));
       if(existing != null && !existing.equals(value)) {
         buildConstraintViolation(context, property);
         return false;
@@ -80,22 +82,24 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
   private HasUniqueProperties findExisting(HasUniqueProperties value,
       Class<? extends HasUniqueProperties> annotatedClass, PropertyAccessor beanWrapper,
       Unique.CompoundProperty compoundProperty) {
-    StringBuilder query = new StringBuilder("select from " + annotatedClass.getSimpleName() + " where ");
+    StringBuilder query = new StringBuilder("select e from " + annotatedClass.getSimpleName() + " e where ");
     Object propertyValue = null;
     int length = compoundProperty.properties().length;
     for(int i = 0; i < length; i++) {
       String property = compoundProperty.properties()[i];
-      query.append(property).append(" = ?");
+      query.append("e.").append(property).append(" = :value");
       if(beanWrapper.isReadableProperty(property)) {
         propertyValue = beanWrapper.getPropertyValue(property);
       }
       if(i + 1 < length) query.append(" or ");
     }
-    Object[] args = new Object[length];
-    for(int i = 0; i < length; i++) {
-      args[i] = propertyValue;
-    }
-    return orientDbService.uniqueResult(value.getClass(), query.toString(), args);
+    // Every clause was given the same value before, and still is: the last readable property wins.
+    return firstResult(
+        entityManager.createQuery(query.toString(), HasUniqueProperties.class).setParameter("value", propertyValue));
+  }
+
+  private HasUniqueProperties firstResult(TypedQuery<HasUniqueProperties> query) {
+    return query.setMaxResults(1).getResultList().stream().findFirst().orElse(null);
   }
 
   private void buildConstraintViolation(ConstraintValidatorContext context, String property) {
@@ -119,7 +123,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
   }
 
   @VisibleForTesting
-  void setOrientDbService(OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
+  void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 }

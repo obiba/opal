@@ -21,6 +21,8 @@ import org.obiba.opal.core.domain.RockAppConfig;
 import org.obiba.opal.core.event.AppRegisteredEvent;
 import org.obiba.opal.core.event.AppRejectedEvent;
 import org.obiba.opal.core.event.AppUnregisteredEvent;
+import org.obiba.opal.core.repository.AppRepository;
+import org.obiba.opal.core.repository.AppsConfigRepository;
 import org.obiba.opal.core.runtime.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,9 @@ public class AppsServiceImpl implements AppsService {
 
   private static final Logger log = LoggerFactory.getLogger(AppsServiceImpl.class);
 
-  private final OrientDbService orientDbService;
+  private final AppRepository appRepository;
+
+  private final AppsConfigRepository appsConfigRepository;
 
   private final EventBus eventBus;
 
@@ -60,8 +64,9 @@ public class AppsServiceImpl implements AppsService {
   private final Lock configLock = new ReentrantLock();
 
   @Autowired
-  public AppsServiceImpl(OrientDbService orientDbService, EventBus eventBus) {
-    this.orientDbService = orientDbService;
+  public AppsServiceImpl(AppRepository appRepository, AppsConfigRepository appsConfigRepository, EventBus eventBus) {
+    this.appRepository = appRepository;
+    this.appsConfigRepository = appsConfigRepository;
     this.eventBus = eventBus;
   }
 
@@ -72,7 +77,7 @@ public class AppsServiceImpl implements AppsService {
       List<App> existing = findApps(app);
       if (existing.isEmpty()) {
         app.setId(UUID.randomUUID().toString());
-        orientDbService.save(app, app);
+        appRepository.upsert(app);
         eventBus.post(new AppRegisteredEvent(app));
       }
     } finally {
@@ -87,7 +92,7 @@ public class AppsServiceImpl implements AppsService {
       if (Strings.isNullOrEmpty(app.getId())) {
         findApps(app).forEach(this::unregisterApp);
       } else {
-        orientDbService.delete(app);
+        appRepository.delete(app);
         eventBus.post(new AppUnregisteredEvent(app));
       }
     } finally {
@@ -103,7 +108,7 @@ public class AppsServiceImpl implements AppsService {
       if (Strings.isNullOrEmpty(app.getId())) {
         findApps(app).forEach(this::unregisterApp);
       } else {
-        orientDbService.delete(app);
+        appRepository.delete(app);
       }
     } finally {
       registryLock.unlock();
@@ -112,28 +117,24 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public List<App> getApps() {
-    List<App> apps = Lists.newArrayList(orientDbService.list(App.class));
-    return apps;
+    return appRepository.findAll();
   }
 
   @Override
   public List<App> getApps(String type) {
     if (Strings.isNullOrEmpty(type)) return getApps();
-    return Lists.newArrayList(orientDbService.list(App.class,
-        String.format("select from %s where type = ?", App.class.getSimpleName()), type));
+    return appRepository.findByType(type);
   }
 
   @Override
   public App getApp(String id) {
-    App found = orientDbService.findUnique(new App(id));
-    if (found != null) return found;
-    throw new NoSuchElementException("No registered app with ID: " + id);
+    return appRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("No registered app with ID: " + id));
   }
 
   @Override
   public boolean hasApp(String id) {
-    App app = orientDbService.findUnique(new App(id));
-    return app != null;
+    return appRepository.existsById(id);
   }
 
   @Override
@@ -163,8 +164,7 @@ public class AppsServiceImpl implements AppsService {
   }
 
   public AppsConfig getAppsConfig() {
-    AppsConfig found = orientDbService.findUnique(new AppsConfig());
-    return found == null ? getDefaultAppsConfig() : found;
+    return appsConfigRepository.findConfig().orElseGet(this::getDefaultAppsConfig);
   }
 
   @Override
@@ -181,7 +181,7 @@ public class AppsServiceImpl implements AppsService {
   public void resetConfig() {
     configLock.lock();
     try {
-      orientDbService.deleteAll(AppsConfig.class);
+      appsConfigRepository.deleteAll();
     } finally {
       configLock.unlock();
     }
@@ -200,20 +200,17 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(AppsConfig.class);
-    orientDbService.createUniqueIndex(App.class);
-
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
-        orientDbService.list(App.class).forEach(app -> eventBus.post(new AppRegisteredEvent(app)));
+        appRepository.findAll().forEach(app -> eventBus.post(new AppRegisteredEvent(app)));
       }
     }, 5000);
   }
 
   @Override
   public void stop() {
-    orientDbService.list(App.class).forEach(app -> eventBus.post(new AppUnregisteredEvent(app)));
+    appRepository.findAll().forEach(app -> eventBus.post(new AppUnregisteredEvent(app)));
   }
 
   //
@@ -221,13 +218,11 @@ public class AppsServiceImpl implements AppsService {
   //
 
   private List<App> findApps(App template) {
-    return Lists.newArrayList(orientDbService.list(App.class,
-        String.format("select from %s where name = ? and type = ? and server = ?", App.class.getSimpleName()),
-        template.getName(), template.getType(), template.getServer()));
+    return appRepository.findByNameAndTypeAndServer(template.getName(), template.getType(), template.getServer());
   }
 
   private void saveAppsConfig(AppsConfig config) {
-    orientDbService.save(config, config);
+    appsConfigRepository.upsert(config);
   }
 
   private AppsConfig getDefaultAppsConfig() {
