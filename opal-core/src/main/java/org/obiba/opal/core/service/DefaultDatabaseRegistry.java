@@ -203,6 +203,26 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     }
     H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
     H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
+    validUniqueH2DatabaseFile(database, H2DatabaseUrls.getDatabaseName(sqlSettings.getUrl()));
+  }
+
+  /**
+   * Two registrations naming the same file would be two Opal databases sharing one set of tables. The comparison
+   * ignores case: on a case insensitive file system 'opal' and 'Opal' are the same file, and a name that only holds on
+   * Linux would not survive a move of the H2 folder.
+   */
+  private void validUniqueH2DatabaseFile(Database database, String name) throws InvalidH2DatabaseException {
+    // the identifiers database is an H2 candidate too, so look at every SQL database and not just the listed ones
+    for(Database other : orientDbService
+        .list(Database.class, "select from " + Database.class.getSimpleName() + " where sqlSettings is not null")) {
+      if(other.getName().equals(database.getName())) continue;
+      SqlSettings otherSettings = other.getSqlSettings();
+      if(otherSettings == null || !H2DatabaseUrls.isH2(otherSettings.getDriverClass())) continue;
+      if(name.equalsIgnoreCase(H2DatabaseUrls.getDatabaseName(otherSettings.getUrl()))) {
+        throw new InvalidH2DatabaseException(
+            "H2 database '" + name + "' is already registered as '" + other.getName() + "'");
+      }
+    }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {

@@ -331,6 +331,34 @@ public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
   }
 
   @Test
+  public void test_h2_database_file_is_registered_once() {
+    databaseRegistry.create(createH2Database(Usage.STORAGE, "jdbc:h2:file:opal"));
+
+    for(String url : new String[] { "jdbc:h2:file:opal", "jdbc:h2:file:OPAL" }) {
+      Database duplicate = createH2Database(Usage.STORAGE, url);
+      duplicate.setName("another-" + url);
+      try {
+        databaseRegistry.create(duplicate);
+        fail("Expected an InvalidH2DatabaseException for URL: " + url);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+  }
+
+  @Test
+  public void test_h2_database_can_be_updated_in_place() {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+
+    // the database is not a duplicate of itself
+    database.getSqlSettings().setUsername("opal");
+    databaseRegistry.update(database);
+
+    assertThat(databaseRegistry.getDatabase(database.getName()).getSqlSettings().getUsername()).isEqualTo("opal");
+  }
+
+  @Test
   public void test_h2_database_usage_is_validated_on_update() {
     Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
     databaseRegistry.create(database);
