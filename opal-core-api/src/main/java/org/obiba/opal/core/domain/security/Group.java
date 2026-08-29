@@ -18,7 +18,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 import com.google.common.collect.Lists;
@@ -26,7 +25,7 @@ import com.google.common.collect.Lists;
 @Entity
 @Table(name = "subject_groups",
     uniqueConstraints = @UniqueConstraint(name = "uk_subject_groups_name", columnNames = "name"))
-public class Group extends AbstractTimestamped implements HasUniqueProperties, Comparable<Group> {
+public class Group extends AbstractTimestamped implements Comparable<Group> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,16 +46,6 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
 
   public Group(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
   }
 
   @NotNull

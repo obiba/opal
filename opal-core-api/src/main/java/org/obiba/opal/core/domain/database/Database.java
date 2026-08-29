@@ -18,7 +18,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.DatabaseUsageConverter;
 import org.obiba.opal.core.domain.converter.MongoDbSettingsConverter;
 import org.obiba.opal.core.domain.converter.SqlSettingsConverter;
@@ -30,7 +29,7 @@ import com.google.common.collect.Lists;
 @Entity
 @Table(name = "databases",
     uniqueConstraints = @UniqueConstraint(name = "uk_databases_name", columnNames = "name"))
-public class Database extends AbstractTimestamped implements HasUniqueProperties {
+public class Database extends AbstractTimestamped {
 
   public enum Usage {
     IMPORT, STORAGE, EXPORT
@@ -70,16 +69,6 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
   @Convert(converter = MongoDbSettingsConverter.class)
   @Column(name = "mongo_db_settings")
   private MongoDbSettings mongoDbSettings;
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
-  }
 
   public boolean isDefaultStorage() {
     return defaultStorage;

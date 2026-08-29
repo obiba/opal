@@ -28,7 +28,7 @@ import java.util.List;
 @Entity
 @Table(name = "resource_references",
     uniqueConstraints = @UniqueConstraint(name = "uk_resource_references", columnNames = {"name", "project"}))
-public class ResourceReference implements Timestamped, HasUniqueProperties {
+public class ResourceReference implements Timestamped {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -175,16 +175,6 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
         return DateTimeType.get().valueOf(created);
       }
     };
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name", "project");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name, project);
   }
 
   public Date getCreated() {

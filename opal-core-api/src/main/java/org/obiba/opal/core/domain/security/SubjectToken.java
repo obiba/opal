@@ -16,7 +16,6 @@ import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +30,7 @@ import java.util.Set;
 @Entity
 @Table(name = "subject_tokens",
     uniqueConstraints = @UniqueConstraint(name = "uk_subject_tokens_token", columnNames = "token"))
-public class SubjectToken extends AbstractTimestamped implements HasUniqueProperties {
+public class SubjectToken extends AbstractTimestamped {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,16 +96,6 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
     this.token = token;
     this.principal = principal;
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("token");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(token);
   }
 
   @NotNull

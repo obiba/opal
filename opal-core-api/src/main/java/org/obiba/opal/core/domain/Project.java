@@ -37,7 +37,7 @@ import org.obiba.opal.core.domain.converter.StringSetConverter;
 @Entity
 @Table(name = "projects",
     uniqueConstraints = @UniqueConstraint(name = "uk_projects_name", columnNames = "name"))
-public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project>, org.obiba.magma.Timestamped {
+public class Project extends AbstractTimestamped implements Comparable<Project>, org.obiba.magma.Timestamped {
 
   /**
    * Surrogate key. The name is what identifies a project everywhere else, and stays unique; this only gives the
@@ -90,16 +90,6 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   public Project(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
   }
 
   @NotNull

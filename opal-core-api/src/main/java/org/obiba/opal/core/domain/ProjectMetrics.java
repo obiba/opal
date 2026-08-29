@@ -13,7 +13,7 @@ package org.obiba.opal.core.domain;
 import java.util.Date;
 import java.util.List;
 
-public class ProjectMetrics implements HasUniqueProperties, Comparable<ProjectMetrics>{
+public class ProjectMetrics implements Comparable<ProjectMetrics>{
 
   private String name;
 
@@ -72,13 +72,4 @@ public class ProjectMetrics implements HasUniqueProperties, Comparable<ProjectMe
     return timestamp.compareTo(projectMetrics.timestamp);
   }
 
-  @Override
-  public List<String> getUniqueProperties() {
-    return null;
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return null;
-  }
 }

@@ -5,7 +5,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.persistence.*;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.ContainerConverter;
 import org.obiba.opal.core.domain.converter.StringMapConverter;
 import org.obiba.opal.core.domain.converter.TolerationListConverter;
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "pod_specs")
-public class PodSpec implements HasUniqueProperties {
+public class PodSpec {
 
   @Id
   private String id = "1";
@@ -165,15 +164,5 @@ public class PodSpec implements HasUniqueProperties {
   }
 
   // DB methods
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
-  }
 
 }

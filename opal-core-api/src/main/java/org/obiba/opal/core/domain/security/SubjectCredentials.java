@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.AuthenticationTypeConverter;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
@@ -30,7 +29,7 @@ import java.util.Set;
 @Table(name = "subject_credentials",
     uniqueConstraints = @UniqueConstraint(name = "uk_subject_credentials_name", columnNames = "name"))
 public class SubjectCredentials extends AbstractTimestamped
-    implements Comparable<SubjectCredentials>, HasUniqueProperties {
+    implements Comparable<SubjectCredentials> {
 
   public enum AuthenticationType {
     PASSWORD, CERTIFICATE
@@ -79,16 +78,6 @@ public class SubjectCredentials extends AbstractTimestamped
 
   public SubjectCredentials(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name);
   }
 
   public String generateCertificateAlias() {

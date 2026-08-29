@@ -12,7 +12,6 @@ package org.obiba.opal.core.runtime;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import jakarta.persistence.*;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.StringListConverter;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import java.util.List;
         @Index(name = "idx_apps_type", columnList = "type"),
         @Index(name = "idx_apps_name_type_server", columnList = "name, type, server")
     })
-public class App implements HasUniqueProperties {
+public class App {
 
   /**
    * Assigned when the application registers, so it is the key as it stands.
@@ -149,16 +148,6 @@ public class App implements HasUniqueProperties {
         && this.type.equals(rhs.type)
         && this.cluster.equals(rhs.cluster)
         && this.server.equals(rhs.server);
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
   }
 
   @Override

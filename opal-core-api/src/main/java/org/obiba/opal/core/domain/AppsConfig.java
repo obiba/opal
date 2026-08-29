@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "apps_config")
-public class AppsConfig  implements HasUniqueProperties {
+public class AppsConfig  {
 
   @Id
   private String id = "1";
@@ -62,15 +62,5 @@ public class AppsConfig  implements HasUniqueProperties {
   }
 
   // DB methods
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
-  }
 
 }

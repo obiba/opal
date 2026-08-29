@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
 @Table(name = "opal_analyses",
     uniqueConstraints = @UniqueConstraint(name = "uk_opal_analyses",
         columnNames = {"name", "datasource", "table_name"}))
-public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUniqueProperties {
+public class OpalAnalysis extends AbstractTimestamped implements Analysis {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -107,16 +107,6 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   @Override
   public List<String> getVariables() {
     return variables;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name", "datasource", "table");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name, datasource, table);
   }
 
   @Override

@@ -16,7 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.List;
         @Index(name = "idx_r_session_activities_context", columnList = "context"),
         @Index(name = "idx_r_session_activities_profile", columnList = "profile")
     })
-public class RSessionActivity extends RActivity implements HasUniqueProperties {
+public class RSessionActivity extends RActivity {
 
   /**
    * The R session's own identifier, assigned when the session is created.
@@ -40,16 +39,6 @@ public class RSessionActivity extends RActivity implements HasUniqueProperties {
   @NotNull
   @NotBlank
   private String id;
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
-  }
 
   public String getId() {
     return id;

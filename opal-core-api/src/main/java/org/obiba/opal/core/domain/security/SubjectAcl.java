@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.SubjectTypeConverter;
 
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +35,7 @@ import java.util.List;
         @Index(name = "idx_subject_acls_principal", columnList = "principal"),
         @Index(name = "idx_subject_acls_type", columnList = "type")
     })
-public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
+public class SubjectAcl extends AbstractTimestamped {
 
   public enum SubjectType {
 
@@ -95,16 +94,6 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
     this.principal = principal;
     this.type = type;
     this.permission = permission;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("domain", "node", "principal", "type", "permission");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(domain, node, principal, type.toString(), permission);
   }
 
   @NotNull

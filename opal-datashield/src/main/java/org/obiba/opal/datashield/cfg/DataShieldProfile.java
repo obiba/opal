@@ -21,7 +21,6 @@ import org.obiba.datashield.core.impl.DefaultDSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.DefaultDSOption;
 import jakarta.persistence.*;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.StringMapConverter;
 import org.obiba.opal.r.service.RServerProfile;
 
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "datashield_profiles",
     uniqueConstraints = @UniqueConstraint(name = "uk_datashield_profiles_name", columnNames = "name"))
-public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUniqueProperties {
+public class DataShieldProfile implements RServerProfile, DSConfiguration {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -168,16 +167,6 @@ public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUn
     if (this.hasOption(name)) {
       this.options.remove(name);
     }
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name);
   }
 
   //

@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "vcf_samples_mappings",
     uniqueConstraints = @UniqueConstraint(name = "uk_vcf_samples_mappings_project", columnNames = "project_name"))
-public class VCFSamplesMapping implements HasUniqueProperties {
+public class VCFSamplesMapping {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,16 +91,6 @@ public class VCFSamplesMapping implements HasUniqueProperties {
 
   public void setSampleRoleVariable(String sampleRoleVariable) {
     this.sampleRoleVariable = sampleRoleVariable;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("projectName");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(projectName);
   }
 
   public static class Builder {

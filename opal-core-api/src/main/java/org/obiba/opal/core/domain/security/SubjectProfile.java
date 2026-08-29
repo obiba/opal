@@ -16,7 +16,6 @@ import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.converter.BookmarkSetConverter;
 import org.obiba.opal.core.domain.converter.ObjectMapConverter;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
@@ -30,7 +29,7 @@ import java.util.Set;
 @Entity
 @Table(name = "subject_profiles",
     uniqueConstraints = @UniqueConstraint(name = "uk_subject_profiles_principal", columnNames = "principal"))
-public class SubjectProfile extends AbstractTimestamped implements HasUniqueProperties {
+public class SubjectProfile extends AbstractTimestamped {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,16 +72,6 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   public SubjectProfile(@NotNull String principal, @NotNull String realm) {
     this.principal = principal;
     this.realm = realm;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("principal");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(principal);
   }
 
   @NotNull

@@ -1244,11 +1244,10 @@
         <version>${mongodb-driver.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>com.orientechnologies</groupId>
-        <artifactId>orientdb-server</artifactId>
-        <version>${orientdb.version}</version>
-      </dependency>
+      <!--
+        Only opal-upgrade still depends on this, to read the configuration of an installation being upgraded from a
+        version that kept it in OrientDB. It leaves with that upgrade step.
+      -->
       <dependency>
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-core</artifactId>

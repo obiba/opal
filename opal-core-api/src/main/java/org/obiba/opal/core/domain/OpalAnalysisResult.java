@@ -30,7 +30,7 @@ import org.obiba.opal.spi.analysis.AnalysisStatus;
     })
 public class OpalAnalysisResult<T extends Analysis>
   extends AbstractTimestamped
-  implements AnalysisResult<T, OpalAnalysisResultItem>, HasUniqueProperties {
+  implements AnalysisResult<T, OpalAnalysisResultItem> {
 
   private static final String DEFAULT_ID = "empty";
 
@@ -121,16 +121,6 @@ public class OpalAnalysisResult<T extends Analysis>
   @Override
   public List<OpalAnalysisResultItem> getResultItems() {
     return resultItems;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
   }
 
   @Override

@@ -14,7 +14,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
 @Entity
 @Table(name = "keystore_states",
     uniqueConstraints = @UniqueConstraint(name = "uk_keystore_states_name", columnNames = "name"))
-public class KeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
+public class KeyStoreState extends AbstractTimestamped {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,16 +48,6 @@ public class KeyStoreState extends AbstractTimestamped implements HasUniquePrope
 
   public KeyStoreState(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
   }
 
   @NotNull
