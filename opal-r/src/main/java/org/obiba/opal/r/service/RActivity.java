@@ -10,21 +10,26 @@
 
 package org.obiba.opal.r.service;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import jakarta.validation.constraints.NotNull;
 
+@MappedSuperclass
 public class RActivity extends AbstractTimestamped {
 
   @NotNull
   @NotBlank
+  @Column(name = "user_name")
   private String user;
 
   private String context;
 
   private String profile;
 
+  @Column(name = "execution_time_millis", nullable = false)
   private long executionTimeMillis = 0;
 
   public String getUser() {

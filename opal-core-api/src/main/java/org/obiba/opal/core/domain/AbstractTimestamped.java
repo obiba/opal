@@ -10,16 +10,24 @@
 
 package org.obiba.opal.core.domain;
 
-import java.util.Date;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Date;
+
 @SuppressWarnings("AssignmentToDateFieldFromParameter")
+@MappedSuperclass
 public abstract class AbstractTimestamped implements Timestamped {
 
   @NotNull
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(nullable = false)
   private Date created = new Date();
 
+  @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
 
   @Override

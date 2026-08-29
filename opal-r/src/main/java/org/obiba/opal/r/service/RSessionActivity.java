@@ -11,14 +11,32 @@
 package org.obiba.opal.r.service;
 
 import com.google.common.collect.Lists;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * An activity log rather than a piece of configuration, and by far the largest of these tables on a busy server.
+ */
+@Entity
+@Table(name = "r_session_activities",
+    indexes = {
+        @Index(name = "idx_r_session_activities_user", columnList = "user_name"),
+        @Index(name = "idx_r_session_activities_context", columnList = "context"),
+        @Index(name = "idx_r_session_activities_profile", columnList = "profile")
+    })
 public class RSessionActivity extends RActivity implements HasUniqueProperties {
 
+  /**
+   * The R session's own identifier, assigned when the session is created.
+   */
+  @Id
   @NotNull
   @NotBlank
   private String id;

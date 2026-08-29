@@ -17,20 +17,47 @@ import com.google.common.collect.Lists;
 import java.beans.Transient;
 import java.util.List;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.obiba.opal.core.domain.converter.StringListConverter;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.springframework.util.Assert;
 
+@Entity
+@Table(name = "opal_analyses",
+    uniqueConstraints = @UniqueConstraint(name = "uk_opal_analyses",
+        columnNames = {"name", "datasource", "table_name"}))
 public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUniqueProperties {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false)
   private String name;
+
+  @Column(name = "template_name")
   private String templateName;
+
+  @Column(name = "plugin_name")
   private String pluginName;
+
+  @Lob
+  @Column(name = "parameters_string")
   private String parametersString;
+
+  @Lob
+  @Convert(converter = StringListConverter.class)
   private List<String> variables;
 
+  @Column(nullable = false)
   private String datasource;
+
+  /**
+   * `table` is a reserved word, so the column carries the suffix the field cannot.
+   */
+  @Column(name = "table_name", nullable = false)
   private String table;
 
   @Override

@@ -11,15 +11,26 @@
 package org.obiba.opal.core.domain;
 
 import com.google.common.collect.Lists;
+import jakarta.persistence.*;
+import org.obiba.opal.core.domain.converter.RockAppConfigListConverter;
 
 import java.util.List;
 
+/**
+ * Also a single row: the id is fixed at "1" and has been since it was written, which is what makes it the key.
+ */
+@Entity
+@Table(name = "apps_config")
 public class AppsConfig  implements HasUniqueProperties {
 
+  @Id
   private String id = "1";
 
   private String token;
 
+  @Lob
+  @Convert(converter = RockAppConfigListConverter.class)
+  @Column(name = "rock_app_configs")
   private List<RockAppConfig> rockAppConfigs = Lists.newArrayList();
 
   public String getId() {

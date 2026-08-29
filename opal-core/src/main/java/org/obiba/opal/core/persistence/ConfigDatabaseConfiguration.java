@@ -169,6 +169,12 @@ public class ConfigDatabaseConfiguration {
     // export and copy data.
     properties.setProperty(AvailableSettings.JTA_PLATFORM, NoJtaPlatform.class.getName());
     properties.setProperty(AvailableSettings.TRANSACTION_COORDINATOR_STRATEGY, "jdbc");
+    // A backstop, not the mechanism: the enumerations in the configuration model go through an EnumNameConverter,
+    // because this setting alone does not keep them out of a native type - for @Enumerated(STRING) Hibernate consults
+    // the dialect's inline ENUM descriptor before ever reading it, which is how H2 ends up with
+    // `enum ('EXPORT','IMPORT','STORAGE')`. What it does prevent is a future @Enumerated field silently acquiring a
+    // `create type ... as enum` of its own on PostgreSQL.
+    properties.setProperty(AvailableSettings.PREFER_NATIVE_ENUM_TYPES, "false");
     if(!Strings.isNullOrEmpty(dialect)) {
       properties.setProperty(AvailableSettings.DIALECT, dialect);
     }

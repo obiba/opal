@@ -13,21 +13,33 @@ package org.obiba.opal.core.domain;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+@Entity
+@Table(name = "vcf_samples_mappings",
+    uniqueConstraints = @UniqueConstraint(name = "uk_vcf_samples_mappings_project", columnNames = "project_name"))
 public class VCFSamplesMapping implements HasUniqueProperties {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @NotNull
+  @Column(name = "project_name", nullable = false)
   private String projectName;
 
   @NotNull
+  @Column(name = "table_reference")
   private String tableReference;
 
   @NotNull
+  @Column(name = "participant_id_variable")
   private String participantIdVariable;
 
   @NotNull
+  @Column(name = "sample_role_variable")
   private String sampleRoleVariable;
 
   public VCFSamplesMapping() {

@@ -73,6 +73,7 @@
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.14.2</joda-time.version>
     <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
+    <jboss-logging.version>3.6.1.Final</jboss-logging.version>
     <json.version>20260719</json.version>
     <json-smart.version>2.6.0</json-smart.version>
     <jsr305.version>3.0.2</jsr305.version>
@@ -620,6 +621,16 @@
         <groupId>org.hibernate.orm</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
+      </dependency>
+      <!--
+        Hibernate 7 calls Logger.getMessageLogger(MethodHandles.Lookup, ...), which only exists from 3.6. RESTEasy
+        brings 3.5.3 at a shallower depth, so without this the nearest-wins rule hands Hibernate a version that fails
+        at startup with NoSuchMethodError.
+      -->
+      <dependency>
+        <groupId>org.jboss.logging</groupId>
+        <artifactId>jboss-logging</artifactId>
+        <version>${jboss-logging.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.data</groupId>

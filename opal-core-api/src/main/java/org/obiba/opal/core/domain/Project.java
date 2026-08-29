@@ -16,6 +16,7 @@ import java.util.Set;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -27,32 +28,61 @@ import org.obiba.magma.type.DateTimeType;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.domain.converter.ProjectIdentifiersMappingSetConverter;
+import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 /**
  * Description of a project in Opal.
  */
+@Entity
+@Table(name = "projects",
+    uniqueConstraints = @UniqueConstraint(name = "uk_projects_name", columnNames = "name"))
 public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project>, org.obiba.magma.Timestamped {
+
+  /**
+   * Surrogate key. The name is what identifies a project everywhere else, and stays unique; this only gives the
+   * database a stable primary key that renaming cannot disturb. Deliberately without accessors: nothing outside
+   * persistence has any business with it.
+   */
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String name;
 
   @NotNull
   @NotBlank
   private String title;
 
+  @Lob
   private String description;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
   private Set<String> tags;
 
+  @Column(nullable = false)
   private boolean archived;
 
+  /**
+   * The name of the Database this project stores its data in. Named database_name in the schema because `database` is
+   * a keyword on some servers.
+   */
+  @Column(name = "database_name")
   private String database;
 
+  @Column(name = "vcf_store_service")
   private String vcfStoreService;
 
+  @Column(name = "export_folder")
   private String exportFolder;
 
+  @Lob
+  @Convert(converter = ProjectIdentifiersMappingSetConverter.class)
+  @Column(name = "identifiers_mappings")
   private Set<ProjectIdentifiersMapping> identifiersMappings;
 
   public Project() {

@@ -123,6 +123,11 @@
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-server</artifactId>
     </dependency>
+    <!-- The configuration model is mapped in place: annotations only, no persistence provider here -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-shiro</artifactId>

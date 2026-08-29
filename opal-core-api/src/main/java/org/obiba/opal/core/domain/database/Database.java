@@ -13,37 +13,62 @@ package org.obiba.opal.core.domain.database;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.DatabaseUsageConverter;
+import org.obiba.opal.core.domain.converter.MongoDbSettingsConverter;
+import org.obiba.opal.core.domain.converter.SqlSettingsConverter;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
+@Entity
+@Table(name = "databases",
+    uniqueConstraints = @UniqueConstraint(name = "uk_databases_name", columnNames = "name"))
 public class Database extends AbstractTimestamped implements HasUniqueProperties {
 
   public enum Usage {
     IMPORT, STORAGE, EXPORT
   }
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String name;
 
   @NotNull
+  @Convert(converter = DatabaseUsageConverter.class)
   private Usage usage;
 
+  @Column(name = "default_storage", nullable = false)
   private boolean defaultStorage;
 
+  @Column(name = "used_for_identifiers", nullable = false)
   private boolean usedForIdentifiers;
 
+  /**
+   * Queried for its presence - "the SQL databases" is `sqlSettings is not null` - which a text column answers as well
+   * as a table would.
+   */
   @Nullable
+  @Lob
+  @Convert(converter = SqlSettingsConverter.class)
+  @Column(name = "sql_settings")
   private SqlSettings sqlSettings;
 
   @Nullable
+  @Lob
+  @Convert(converter = MongoDbSettingsConverter.class)
+  @Column(name = "mongo_db_settings")
   private MongoDbSettings mongoDbSettings;
 
   @Override

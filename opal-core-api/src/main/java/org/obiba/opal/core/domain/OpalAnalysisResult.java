@@ -14,11 +14,20 @@ import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.obiba.opal.core.domain.converter.AnalysisStatusConverter;
+import org.obiba.opal.core.domain.converter.OpalAnalysisResultItemListConverter;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
 
+@Entity
+@Table(name = "opal_analysis_results",
+    indexes = {
+        @Index(name = "idx_opal_analysis_results_analysis", columnList = "analysis_name"),
+        @Index(name = "idx_opal_analysis_results_table", columnList = "datasource, table_name")
+    })
 public class OpalAnalysisResult<T extends Analysis>
   extends AbstractTimestamped
   implements AnalysisResult<T, OpalAnalysisResultItem>, HasUniqueProperties {
@@ -26,14 +35,36 @@ public class OpalAnalysisResult<T extends Analysis>
   private static final String DEFAULT_ID = "empty";
 
   private String datasource;
+
+  @Column(name = "table_name")
   private String table;
 
+  @Column(name = "analysis_name")
   private String analysisName;
+
+  /**
+   * Assigned by the analysis that produced the result, not generated here, so it is the primary key as it stands.
+   */
+  @Id
   private String id;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "start_date")
   private Date startDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "end_date")
   private Date endDate;
+
+  @Lob
+  @Convert(converter = OpalAnalysisResultItemListConverter.class)
+  @Column(name = "result_items")
   private List<OpalAnalysisResultItem> resultItems;
+
+  @Convert(converter = AnalysisStatusConverter.class)
   private AnalysisStatus status;
+
+  @Lob
   private String message;
 
   public OpalAnalysisResult() {

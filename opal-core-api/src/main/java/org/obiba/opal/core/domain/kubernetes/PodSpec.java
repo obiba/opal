@@ -4,31 +4,54 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.persistence.*;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.ContainerConverter;
+import org.obiba.opal.core.domain.converter.StringMapConverter;
+import org.obiba.opal.core.domain.converter.TolerationListConverter;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The deepest object graph of the configuration model, and the one that most clearly belongs together: a pod
+ * specification is written and read whole, and nothing looks inside its labels, selectors or tolerations.
+ */
+@Entity
+@Table(name = "pod_specs")
 public class PodSpec implements HasUniqueProperties {
 
+  @Id
   private String id = "1";
 
   private String type = "rock";
 
+  @Lob
   private String description = "";
 
   private String namespace;
 
+  @Lob
+  @Convert(converter = StringMapConverter.class)
   private Map<String, String> labels;
 
+  @Lob
+  @Convert(converter = ContainerConverter.class)
   private Container container;
 
+  @Column(name = "node_name")
   private String nodeName;
 
+  @Lob
+  @Convert(converter = StringMapConverter.class)
+  @Column(name = "node_selector")
   private Map<String, String> nodeSelector;
 
+  @Lob
+  @Convert(converter = TolerationListConverter.class)
   private List<Toleration> tolerations;
 
+  @Column(nullable = false)
   private boolean enabled = false;
 
   public PodSpec() {}

@@ -13,20 +13,33 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 import com.google.common.collect.Lists;
 
+@Entity
+@Table(name = "subject_groups",
+    uniqueConstraints = @UniqueConstraint(name = "uk_subject_groups_name", columnNames = "name"))
 public class Group extends AbstractTimestamped implements HasUniqueProperties, Comparable<Group> {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String name;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
+  @Column(name = "subject_credentials")
   private Set<String> subjectCredentials = new HashSet<>();
 
   public Group() {
