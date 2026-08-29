@@ -30,11 +30,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Moves the configuration out of OrientDB and into the configuration database.
@@ -47,9 +50,12 @@ import java.util.List;
  * one table that can hold hundreds of thousands of rows. An administrator who wants to prune old activity can do so
  * afterwards, deliberately.
  * <p>
- * The step is idempotent, which it has to be: the upgrade manager runs a step whenever the installed version is below
- * the one it applies to, with no upper bound, so a later upgrade can reach it a second time. A class whose table
- * already holds rows is reported and skipped rather than migrated twice.
+ * The step is idempotent record by record, which it has to be for two reasons. The upgrade manager runs a step
+ * whenever the installed version is below the one it applies to, with no upper bound, so a later upgrade can reach it
+ * a second time. And a run that fails part way leaves behind whatever it had already committed, so the next attempt
+ * has to be able to finish the job. Every record is therefore written under its natural key - the key the
+ * configuration has always identified it by - so writing one twice updates it rather than duplicating it, and a
+ * repeated run converges on the same result whether it starts from nothing, from half a table, or from a full one.
  */
 public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
 
@@ -63,6 +69,14 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
 
   @Value("${OPAL_HOME}/data/orientdb/opal-config")
   private String orientDbPath;
+
+  /**
+   * Named rather than taken by type: the upgrade context also holds the application's JTA manager, which belongs to
+   * the Magma datasources and has no business here.
+   */
+  @Autowired
+  @Qualifier("configTransactionManager")
+  private PlatformTransactionManager transactionManager;
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -150,15 +164,6 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
       log.debug("Migrating {}: nothing to migrate", className);
       return;
     }
-    long alreadyThere = migration.repository.count();
-    if(alreadyThere > 0) {
-      // Only reachable when the step runs a second time. Migrating again would duplicate every row that has no
-      // unique key to collide on, so say so and leave it alone.
-      log.warn("Migrating {}: skipped, the configuration database already holds {} of them", className, alreadyThere);
-      migration.skipped = true;
-      return;
-    }
-
     log.info("Migrating {}: {} records", className, migration.read);
     long started = System.currentTimeMillis();
     List<T> batch = new ArrayList<>(BATCH_SIZE);
@@ -193,12 +198,21 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
   private <T> int write(Migration<T> migration, List<T> batch) {
     if(batch.isEmpty()) return 0;
     int size = batch.size();
-    // One transaction per batch. The entities carry the state they had in OrientDB, timestamps included: the JPA
+    // One transaction per batch, each record written under its natural key so that a record already there is updated
+    // rather than duplicated. The entities carry the state they had in OrientDB, timestamps included: the JPA
     // callbacks only fill a creation date in when there is none, so a migrated row keeps the date it was created on.
-    migration.repository.saveAll(batch);
+    List<T> toWrite = new ArrayList<>(batch);
+    transactionTemplate().executeWithoutResult(status -> toWrite.forEach(migration.upsert));
     batch.clear();
     return size;
   }
+
+  private TransactionTemplate transactionTemplate() {
+    if(transactionTemplate == null) transactionTemplate = new TransactionTemplate(transactionManager);
+    return transactionTemplate;
+  }
+
+  private TransactionTemplate transactionTemplate;
 
   private long countInSource(ODatabaseDocument db, String className) {
     if(db.getMetadata().getSchema().getClass(className) == null) return 0;
@@ -230,9 +244,7 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
   private void logSummary(List<Migration<?>> migrations, long elapsed, File source) {
     log.info("Configuration migration complete, in {} ms", elapsed);
     for(Migration<?> migration : migrations) {
-      if(migration.skipped) {
-        log.info("  {}: skipped, already migrated", migration.type.getSimpleName());
-      } else if(migration.read > 0) {
+      if(migration.read > 0) {
         log.info("  {}: {} read, {} written, {} ms", migration.type.getSimpleName(), migration.read,
             migration.written, migration.elapsed);
       }
@@ -243,24 +255,24 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
 
   private List<Migration<?>> migrations() {
     return Lists.newArrayList(
-        new Migration<>(Project.class, projectRepository),
-        new Migration<>(Database.class, databaseRepository),
-        new Migration<>(SubjectAcl.class, subjectAclRepository),
-        new Migration<>(SubjectCredentials.class, subjectCredentialsRepository),
-        new Migration<>(SubjectProfile.class, subjectProfileRepository),
-        new Migration<>(SubjectToken.class, subjectTokenRepository),
-        new Migration<>(Group.class, groupRepository),
-        new Migration<>(ResourceReference.class, resourceReferenceRepository),
-        new Migration<>(VCFSamplesMapping.class, vcfSamplesMappingRepository),
-        new Migration<>(OpalAnalysis.class, opalAnalysisRepository),
-        new Migration<>(OpalAnalysisResult.class, opalAnalysisResultRepository),
-        new Migration<>(OpalGeneralConfig.class, opalGeneralConfigRepository),
-        new Migration<>(AppsConfig.class, appsConfigRepository),
-        new Migration<>(App.class, appRepository),
-        new Migration<>(PodSpec.class, podSpecRepository),
-        new Migration<>(KeyStoreState.class, keyStoreStateRepository),
-        new Migration<>(DataShieldProfile.class, dataShieldProfileRepository),
-        new Migration<>(RSessionActivity.class, rSessionActivityRepository));
+        new Migration<>(Project.class, projectRepository::upsert),
+        new Migration<>(Database.class, databaseRepository::upsert),
+        new Migration<>(SubjectAcl.class, subjectAclRepository::upsert),
+        new Migration<>(SubjectCredentials.class, subjectCredentialsRepository::upsert),
+        new Migration<>(SubjectProfile.class, subjectProfileRepository::upsert),
+        new Migration<>(SubjectToken.class, subjectTokenRepository::upsert),
+        new Migration<>(Group.class, groupRepository::upsert),
+        new Migration<>(ResourceReference.class, resourceReferenceRepository::upsert),
+        new Migration<>(VCFSamplesMapping.class, vcfSamplesMappingRepository::upsert),
+        new Migration<>(OpalAnalysis.class, opalAnalysisRepository::upsert),
+        new Migration<>(OpalAnalysisResult.class, opalAnalysisResultRepository::upsert),
+        new Migration<>(OpalGeneralConfig.class, opalGeneralConfigRepository::upsert),
+        new Migration<>(AppsConfig.class, appsConfigRepository::upsert),
+        new Migration<>(App.class, appRepository::upsert),
+        new Migration<>(PodSpec.class, podSpecRepository::upsert),
+        new Migration<>(KeyStoreState.class, keyStoreStateRepository::upsert),
+        new Migration<>(DataShieldProfile.class, dataShieldProfileRepository::upsert),
+        new Migration<>(RSessionActivity.class, rSessionActivityRepository::upsert));
   }
 
   /**
@@ -278,7 +290,10 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
 
     private final Class<T> type;
 
-    private final JpaRepository<T, ?> repository;
+    /**
+     * Writes one record under its natural key, which is what makes running this twice harmless.
+     */
+    private final Consumer<T> upsert;
 
     private long read;
 
@@ -286,11 +301,9 @@ public class OrientDbToH2UpgradeStep extends AbstractUpgradeStep {
 
     private long elapsed;
 
-    private boolean skipped;
-
-    private Migration(Class<T> type, JpaRepository<T, ?> repository) {
+    private Migration(Class<T> type, Consumer<T> upsert) {
       this.type = type;
-      this.repository = repository;
+      this.upsert = upsert;
     }
 
     /**

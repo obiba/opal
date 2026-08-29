@@ -193,6 +193,34 @@ public class OrientDbToH2UpgradeStepTest {
   }
 
   @Test
+  public void test_resumes_when_a_previous_run_got_part_way() {
+    // What a run that failed half way leaves behind: some of the records written, the rest not. Skipping a class that
+    // already holds rows would strand the remainder for good, so every record is written under its natural key and a
+    // second run finishes the job.
+    writeOrientDb(db -> {
+      for(int i = 0; i < 40; i++) {
+        RSessionActivity activity = new RSessionActivity();
+        activity.setId("session-" + i);
+        activity.setUser("alice");
+        activity.setContext("R");
+        save(db, "RSessionActivity", activity);
+      }
+    });
+
+    run();
+    RSessionActivityRepository repository = context.getBean(RSessionActivityRepository.class);
+    assertThat(repository.count()).isEqualTo(40);
+
+    // Throw away three quarters of it, as an interrupted run would have left it.
+    repository.findAll().stream().limit(30).forEach(repository::delete);
+    assertThat(repository.count()).isEqualTo(10);
+
+    context.getBean(OrientDbToH2UpgradeStep.class).execute(new Version("5.7.0"));
+
+    assertThat(repository.count()).isEqualTo(40);
+  }
+
+  @Test
   public void test_no_orientdb_database_is_not_a_failure() {
     // A new installation has nothing to migrate.
     run();
