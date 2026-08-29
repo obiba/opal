@@ -30,9 +30,11 @@
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
-  <bean id="orientDbService" class="org.obiba.opal.core.service.OrientDbServiceImpl"/>
-
-  <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.LocalOrientDbServerFactory"/>
+  <!--
+    The configuration database the upgrade writes into: datasource, changelog and repositories, wired exactly as the
+    server wires them. OrientDB is no longer a bean here; the migration step opens the folder it is reading directly.
+  -->
+  <bean class="org.obiba.opal.core.persistence.ConfigDatabaseConfiguration"/>
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.service.DefaultDatabaseRegistry"/>
 
@@ -121,6 +123,12 @@
         <bean class="org.obiba.opal.core.upgrade.v5_0_x.ElasticSearchUpgradeStep">
           <property name="description" value="Upgrade ES folder"/>
           <property name="appliesTo" value="5.0.0"/>
+        </bean>
+
+        <!-- 6.0.0 / configuration database -->
+        <bean class="org.obiba.opal.core.upgrade.v6_0_x.OrientDbToH2UpgradeStep">
+          <property name="description" value="Migrate the configuration from OrientDB to the configuration database"/>
+          <property name="appliesTo" value="6.0.0"/>
         </bean>
 
       </list>

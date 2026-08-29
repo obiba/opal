@@ -10,13 +10,9 @@
 package org.obiba.opal.core.domain.converter;
 
 import com.google.common.base.Strings;
-import com.google.gson.*;
 import jakarta.persistence.AttributeConverter;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Stores a structured attribute - a nested bean, a collection, a map - as JSON in a text column.
@@ -36,13 +32,6 @@ import java.util.Date;
  */
 public abstract class JsonAttributeConverter<T> implements AttributeConverter<T, String> {
 
-  private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-  protected static final Gson GSON = new GsonBuilder() //
-      .setDateFormat(DATE_PATTERN) //
-      .registerTypeAdapter(Date.class, new DateDeserializer()) //
-      .create();
-
   /**
    * The attribute's full generic type, which erasure would otherwise lose.
    */
@@ -50,32 +39,11 @@ public abstract class JsonAttributeConverter<T> implements AttributeConverter<T,
 
   @Override
   public String convertToDatabaseColumn(T attribute) {
-    return attribute == null ? null : GSON.toJson(attribute);
+    return attribute == null ? null : DomainGson.get().toJson(attribute);
   }
 
   @Override
   public T convertToEntityAttribute(String dbData) {
-    return Strings.isNullOrEmpty(dbData) ? null : GSON.fromJson(dbData, getType());
-  }
-
-  /**
-   * Reads the pattern Opal writes, and falls back on a timestamp for the values written before it was fixed.
-   */
-  private static class DateDeserializer implements JsonDeserializer<Date> {
-
-    @Override
-    public Date deserialize(JsonElement jsonElement, Type typeOf, JsonDeserializationContext context)
-        throws JsonParseException {
-      try {
-        return new SimpleDateFormat(DATE_PATTERN).parse(jsonElement.getAsString());
-      } catch(ParseException ignored) {
-        // not the expected pattern, try a timestamp
-      }
-      try {
-        return new Date(jsonElement.getAsLong());
-      } catch(NumberFormatException e) {
-        throw new JsonParseException("Unparseable date: " + jsonElement.getAsString());
-      }
-    }
+    return Strings.isNullOrEmpty(dbData) ? null : DomainGson.get().fromJson(dbData, getType());
   }
 }

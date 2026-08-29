@@ -175,6 +175,9 @@ public class ConfigDatabaseConfiguration {
     // `enum ('EXPORT','IMPORT','STORAGE')`. What it does prevent is a future @Enumerated field silently acquiring a
     // `create type ... as enum` of its own on PostgreSQL.
     properties.setProperty(AvailableSettings.PREFER_NATIVE_ENUM_TYPES, "false");
+    // Only the entities with an application-assigned key can actually be batched - an identity column has to be read
+    // back per row - but that is the R session activity, which is the one table large enough for it to matter.
+    properties.setProperty(AvailableSettings.STATEMENT_BATCH_SIZE, "50");
     if(!Strings.isNullOrEmpty(dialect)) {
       properties.setProperty(AvailableSettings.DIALECT, dialect);
     }
