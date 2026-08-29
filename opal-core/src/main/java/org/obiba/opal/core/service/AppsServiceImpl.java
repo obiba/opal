@@ -128,13 +128,19 @@ public class AppsServiceImpl implements AppsService {
 
   @Override
   public App getApp(String id) {
+    if (Strings.isNullOrEmpty(id)) throw new NoSuchElementException("No registered app with ID: " + id);
     return appRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("No registered app with ID: " + id));
   }
 
+  /**
+   * An application that was never registered has no identifier, and the answer for it is no. The document store gave
+   * that answer by itself - a lookup on a null key simply matched nothing - where a repository rejects the null
+   * outright, so the question has to be settled here.
+   */
   @Override
   public boolean hasApp(String id) {
-    return appRepository.existsById(id);
+    return !Strings.isNullOrEmpty(id) && appRepository.existsById(id);
   }
 
   @Override

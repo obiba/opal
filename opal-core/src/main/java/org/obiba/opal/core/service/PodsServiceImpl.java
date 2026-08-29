@@ -72,6 +72,10 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public PodSpec getSpec(String id) {
+    // As in AppsServiceImpl: no identifier means no specification, which a repository will not be asked.
+    if (Strings.isNullOrEmpty(id)) {
+      throw new NoSuchElementException("No registered pod specifications with ID: " + id);
+    }
     return podSpecRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("No registered pod specifications with ID: " + id));
   }
@@ -281,7 +285,7 @@ public class PodsServiceImpl implements PodsService {
         if (!Strings.isNullOrEmpty(defaultRockPodSpecs)) {
           List<PodSpec> podSpecs = RockPodSpecFactory.makeRockPodSpecs(defaultRockPodSpecs);
           for (PodSpec podSpec : podSpecs) {
-            if (!podSpecRepository.existsById(podSpec.getId())) {
+            if (Strings.isNullOrEmpty(podSpec.getId()) || !podSpecRepository.existsById(podSpec.getId())) {
               saveSpec(podSpec);
             }
           }

@@ -107,7 +107,7 @@ public class RActivityService implements SystemService {
   @Subscribe
   public void onRServerSessionUpdated(RServerSessionUpdatedEvent event) {
     if (isOpalSystemUser(event)) return;
-    RSessionActivity metric = rSessionActivityRepository.findById(event.getId()).orElse(null);
+    RSessionActivity metric = findActivity(event.getId());
     if (metric == null) return; // broken for some reason
     metric.setUpdated(new Date());
     metric.setExecutionTimeMillis(event.getExecutionTimeMillis());
@@ -117,10 +117,18 @@ public class RActivityService implements SystemService {
   @Subscribe
   public void onRServerSessionClosed(RServerSessionClosedEvent event) {
     if (isOpalSystemUser(event)) return;
-    RSessionActivity metric = rSessionActivityRepository.findById(event.getId()).orElse(null);
+    RSessionActivity metric = findActivity(event.getId());
     if (metric == null) return; // broken for some reason
     metric.setUpdated(new Date());
     rSessionActivityRepository.upsert(metric);
+  }
+
+  /**
+   * A session without an identifier has no activity recorded against it, and asking the repository for a null key is
+   * an error rather than an empty answer.
+   */
+  private RSessionActivity findActivity(String id) {
+    return Strings.isNullOrEmpty(id) ? null : rSessionActivityRepository.findById(id).orElse(null);
   }
 
   @Override
