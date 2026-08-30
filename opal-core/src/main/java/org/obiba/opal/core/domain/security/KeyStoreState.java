@@ -9,14 +9,12 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Persisted keystore.

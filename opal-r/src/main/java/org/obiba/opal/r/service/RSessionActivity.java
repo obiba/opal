@@ -10,7 +10,6 @@
 
 package org.obiba.opal.r.service;
 
-import com.google.common.collect.Lists;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
@@ -18,7 +17,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * An activity log rather than a piece of configuration, and by far the largest of these tables on a busy server.

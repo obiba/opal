@@ -11,7 +11,6 @@
 package org.obiba.opal.core.domain;
 
 import java.util.Date;
-import java.util.List;
 
 public class ProjectMetrics implements Comparable<ProjectMetrics>{
 

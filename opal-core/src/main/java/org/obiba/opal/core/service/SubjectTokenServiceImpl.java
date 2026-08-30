@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.service;
 
-import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;

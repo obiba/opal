@@ -19,9 +19,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
   Optional<Project> findByName(String name);
 
   /**
-   * Save the project under its name, replacing the one already stored under that name if there is one.
-   */
-  /**
    * Delete the stored Project identified by its natural key, whether or not the object handed in is the one that was
    * loaded. {@code delete} alone would not: given an object built by a caller, it has no primary key to delete by and
    * silently does nothing, where the document store this replaces always resolved the unique properties first.

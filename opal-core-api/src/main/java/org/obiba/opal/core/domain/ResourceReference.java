@@ -12,7 +12,6 @@ package org.obiba.opal.core.domain;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.json.JSONObject;
@@ -23,7 +22,6 @@ import org.obiba.magma.type.DateTimeType;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "resource_references",

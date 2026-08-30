@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.upgrade.v6_0_x;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;

@@ -11,7 +11,6 @@
 package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.datashield.core.DSConfiguration;
 import org.obiba.datashield.core.DSEnvironment;

@@ -10,7 +10,6 @@
 package org.obiba.opal.core.domain.security;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -20,7 +19,6 @@ import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
 
-import com.google.common.collect.Lists;
 
 @Entity
 @Table(name = "subject_groups",

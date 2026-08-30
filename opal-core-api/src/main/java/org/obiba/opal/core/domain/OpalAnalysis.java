@@ -12,7 +12,6 @@ package org.obiba.opal.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
 
 import java.beans.Transient;
 import java.util.List;

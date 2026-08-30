@@ -11,7 +11,6 @@ package org.obiba.opal.core.domain;
 
 import java.beans.Transient;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
@@ -27,7 +26,6 @@ import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.converter.ProjectIdentifiersMappingSetConverter;
 import org.obiba.opal.core.domain.converter.StringSetConverter;
 

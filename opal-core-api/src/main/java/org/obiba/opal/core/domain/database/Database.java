@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.domain.database;
 
-import java.util.List;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -24,7 +23,6 @@ import org.obiba.opal.core.domain.converter.SqlSettingsConverter;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 
 @Entity
 @Table(name = "databases",

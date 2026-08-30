@@ -14,7 +14,6 @@ import com.google.common.eventbus.Subscribe;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.repository.OpalAnalysisRepository;
 import org.obiba.opal.core.repository.OpalAnalysisResultRepository;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.StreamSupport;
 
 @Component
 public class OpalAnalysisServiceImpl implements OpalAnalysisService {

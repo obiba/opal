@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;

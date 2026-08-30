@@ -16,7 +16,6 @@ import com.google.common.io.Files;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Group;
-import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.repository.GroupRepository;
 import org.obiba.opal.core.repository.KeyStoreStateRepository;

@@ -11,11 +11,9 @@
 package org.obiba.opal.core.domain;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 @Entity
 @Table(name = "vcf_samples_mappings",

@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.domain;
 
-import com.google.common.collect.Lists;
 import java.util.Date;
 import java.util.List;
 import jakarta.annotation.Nullable;
