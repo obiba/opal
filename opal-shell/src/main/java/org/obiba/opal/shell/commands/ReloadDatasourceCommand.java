@@ -15,7 +15,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.service.DatasourceLoaderService;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.shell.commands.options.ReloadDatasourceCommandOptions;
@@ -38,7 +38,7 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
   private ViewManager viewManager;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private ProjectRepository projectRepository;
 
   @Autowired
   private ProjectsState projectsState;
@@ -49,7 +49,7 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
   @Override
   public int execute() {
     String projectName = getOptions().getProject();
-    Project project = orientDbService.findUnique(new Project(projectName));
+    Project project = projectRepository.findByName(projectName).orElse(null);
 
     if (project != null && MagmaEngine.get().hasDatasource(project.getName())) {
       projectsState.updateProjectState(projectName, State.LOADING);

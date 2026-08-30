@@ -26,7 +26,7 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.service.DataImportService;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.ResourceReferenceService;
@@ -60,7 +60,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
   private TransactionTemplate transactionTemplate;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private ProjectRepository projectRepository;
 
   @Autowired
   private ProjectsState projectsState;
@@ -90,7 +90,7 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     Stopwatch stopwatch = Stopwatch.createStarted();
 
     if (archiveFolder.exists()) {
-      Project project = orientDbService.findUnique(new Project(projectName));
+      Project project = projectRepository.findByName(projectName).orElse(null);
       if (project == null) {
         getShell().printf("An empty project must be created before restoring its content");
       } else {

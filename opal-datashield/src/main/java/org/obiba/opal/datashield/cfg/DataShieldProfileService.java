@@ -18,7 +18,7 @@ import org.obiba.datashield.core.DSMethod;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.datashield.repository.DataShieldProfileRepository;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.datashield.CustomRScriptMethod;
@@ -53,7 +53,7 @@ public class DataShieldProfileService implements SystemService {
 
   private final RServerManagerService rServerManagerService;
 
-  private final OrientDbService orientDbService;
+  private final DataShieldProfileRepository dataShieldProfileRepository;
 
   private final SubjectAclService subjectAclService;
 
@@ -62,9 +62,9 @@ public class DataShieldProfileService implements SystemService {
   private final DatashieldConfigurationSupplier datashieldConfigurationSupplier;
 
   @Autowired
-  public DataShieldProfileService(RServerManagerService rServerManagerService, OrientDbService orientDbService, SubjectAclService subjectAclService, DatashieldConfigurationSupplier datashieldConfigurationSupplier) {
+  public DataShieldProfileService(RServerManagerService rServerManagerService, DataShieldProfileRepository dataShieldProfileRepository, SubjectAclService subjectAclService, DatashieldConfigurationSupplier datashieldConfigurationSupplier) {
     this.rServerManagerService = rServerManagerService;
-    this.orientDbService = orientDbService;
+    this.dataShieldProfileRepository = dataShieldProfileRepository;
     this.subjectAclService = subjectAclService;
     this.datashieldConfigurationSupplier = datashieldConfigurationSupplier;
   }
@@ -82,7 +82,7 @@ public class DataShieldProfileService implements SystemService {
   public List<DataShieldProfile> getProfiles() {
     lock.lock();
     try {
-      List<DataShieldProfile> profiles = Lists.newArrayList(orientDbService.list(DataShieldProfile.class));
+      List<DataShieldProfile> profiles = Lists.newArrayList(dataShieldProfileRepository.findAll());
       List<String> clusterNames = getClusterNames();
       Set<String> primaryProfileNames = profiles.stream()
           .filter(p -> p.getName().equals(p.getCluster()))
@@ -159,7 +159,7 @@ public class DataShieldProfileService implements SystemService {
    */
   public DataShieldProfile findProfile(String name) {
     String p = Strings.isNullOrEmpty(name) ? rServerManagerService.getDefaultClusterName() : name;
-    return orientDbService.findUnique(new DataShieldProfile(p));
+    return dataShieldProfileRepository.findByName(p).orElse(null);
   }
 
   /**
@@ -170,7 +170,7 @@ public class DataShieldProfileService implements SystemService {
   public void saveProfile(DataShieldProfile profile) {
     lock.lock();
     try {
-      orientDbService.save(profile, profile);
+      dataShieldProfileRepository.upsert(profile);
       if (!profile.isRestrictedAccess())
         subjectAclService.deleteNodePermissions("opal", "/datashield/profile/" + profile.getName());
     } finally {
@@ -186,7 +186,7 @@ public class DataShieldProfileService implements SystemService {
   public void deleteProfile(DataShieldProfile profile) {
     lock.lock();
     try {
-      orientDbService.delete(profile);
+      dataShieldProfileRepository.deleteByKey(profile);
       if (profile.isRestrictedAccess())
         subjectAclService.deleteNodePermissions("opal", "/datashield/profile/" + profile.getName());
     } finally {
@@ -196,7 +196,6 @@ public class DataShieldProfileService implements SystemService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(DataShieldProfile.class);
     upgradeDefaultDataShieldConfig();
   }
 
@@ -312,7 +311,7 @@ public class DataShieldProfileService implements SystemService {
   }
 
   private void upgradeDefaultDataShieldConfig() {
-    if (orientDbService.count(DataShieldProfile.class) == 0) {
+    if (dataShieldProfileRepository.count() == 0) {
       log.info("Upgrading DataSHIELD configuration...");
       try {
         DatashieldConfiguration datashieldConfiguration = datashieldConfigurationSupplier.get();

@@ -17,10 +17,10 @@ import org.json.JSONArray;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.domain.ResourceReference;
+import org.obiba.opal.core.repository.ResourceReferenceRepository;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.spi.resource.Resource;
 import org.slf4j.Logger;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 public class ResourceReferenceServiceImpl implements ResourceReferenceService {
@@ -40,7 +39,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
-  private final OrientDbService orientDbService;
+  private final ResourceReferenceRepository resourceReferenceRepository;
 
   private final CryptoService cryptoService;
 
@@ -49,8 +48,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   private final ResourceProvidersService resourceProvidersService;
 
   @Autowired
-  public ResourceReferenceServiceImpl(OrientDbService orientDbService, CryptoService cryptoService, SubjectAclService subjectAclService, ResourceProvidersService resourceProvidersService) {
-    this.orientDbService = orientDbService;
+  public ResourceReferenceServiceImpl(ResourceReferenceRepository resourceReferenceRepository, CryptoService cryptoService, SubjectAclService subjectAclService, ResourceProvidersService resourceProvidersService) {
+    this.resourceReferenceRepository = resourceReferenceRepository;
     this.cryptoService = cryptoService;
     this.subjectAclService = subjectAclService;
     this.resourceProvidersService = resourceProvidersService;
@@ -58,11 +57,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public List<ResourceReference> getResourceReferences(String project) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(ResourceReference.class.getSimpleName())
-        .whereClauses("project = ?")
-        .build();
-    return StreamSupport.stream(orientDbService.list(ResourceReference.class, query, project).spliterator(), false)
+    return resourceReferenceRepository.findByProject(project).stream()
         .filter(ref -> canViewResourceReference(project, ref.getName()))
         .map(this::decryptCredentials)
         .collect(Collectors.toList());
@@ -117,20 +112,20 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
     if (resourceReference == null) return;
     resourceReference.setUpdated(new Date());
     ResourceReference resourceReference1 = encryptCredentials(resourceReference);
-    orientDbService.save(resourceReference1, resourceReference1);
+    resourceReferenceRepository.upsert(resourceReference1);
   }
 
   @Override
   public void delete(ResourceReference resourceReference) {
     if (resourceReference == null) return;
-    orientDbService.delete(resourceReference);
+    resourceReferenceRepository.deleteByKey(resourceReference);
     subjectAclService.deleteNodePermissions(getPermissionNode(resourceReference.getProject(), resourceReference.getName()));
   }
 
   @Override
   public void delete(String project, String name) {
     try {
-      orientDbService.delete(getResourceReference(project, name));
+      resourceReferenceRepository.deleteByKey(getResourceReference(project, name));
       subjectAclService.deleteNodePermissions(getPermissionNode(project, name));
     } catch (NoSuchResourceReferenceException e) {
       // ignore
@@ -139,7 +134,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public void deleteAll(String project) {
-    getResourceReferences(project).forEach(orientDbService::delete);
+    getResourceReferences(project).forEach(resourceReferenceRepository::deleteByKey);
     subjectAclService.deleteNodePermissions("/project/" + project + "/resource");
   }
 
@@ -168,7 +163,7 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(ResourceReference.class);
+
   }
 
   @Override
@@ -185,13 +180,8 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
   //
 
   private ResourceReference getResourceReferenceInternal(String project, String name) throws NoSuchResourceReferenceException {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-        .table(ResourceReference.class.getSimpleName())
-        .whereClauses("project = ?", "name = ?")
-        .build();
-    ResourceReference resourceReference = orientDbService.uniqueResult(ResourceReference.class, query, project, name);
-    if (resourceReference == null)
-      throw new NoSuchResourceReferenceException(project, name);
+    ResourceReference resourceReference = resourceReferenceRepository.findByProjectAndName(project, name)
+        .orElseThrow(() -> new NoSuchResourceReferenceException(project, name));
     return decryptCredentials(resourceReference);
   }
 

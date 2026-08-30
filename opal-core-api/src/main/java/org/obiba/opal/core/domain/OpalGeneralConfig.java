@@ -13,13 +13,21 @@ import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.obiba.opal.core.domain.converter.LocaleListConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * The one general configuration of this Opal. It is a single row, and the only one of these classes that has never had
+ * a unique key: there is nothing to be unique about.
+ */
+@Entity
+@Table(name = "opal_general_config")
 public class OpalGeneralConfig extends AbstractTimestamped {
 
   public static final String DEFAULT_NAME = "Opal";
@@ -28,26 +36,39 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @NotNull
   @NotBlank
   private String name = DEFAULT_NAME;
 
+  @Lob
+  @Convert(converter = LocaleListConverter.class)
   private List<Locale> locales = new ArrayList<>();
 
+  @Column(name = "default_character_set")
   private String defaultCharacterSet = DEFAULT_CHARSET;
 
+  @Column(name = "public_url")
   private String publicUrl;
 
+  @Column(name = "logout_url")
   private String logoutUrl;
 
   // One time password strategy
+  @Column(name = "otp_strategy")
   private String otpStrategy = "TOTP";
 
+  @Column(name = "enforced_2fa", nullable = false)
   private boolean enforced2FA = false;
 
+  @Column(name = "allow_r_package_management", nullable = false)
   private boolean allowRPackageManagement = false;
 
   // Allow only Personal Access Token for R/Datashield sessions
+  @Column(name = "allow_r_pat_only", nullable = false)
   private boolean allowRPatOnly = false;
 
   @NotNull

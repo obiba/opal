@@ -11,16 +11,29 @@ package org.obiba.opal.core.domain.security;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.SubjectTypeConverter;
 
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
 
-public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
+/**
+ * One permission granted to one subject on one node. Every access check in Opal reads this table, so its five
+ * identifying columns are indexed individually as well as together.
+ */
+@Entity
+@Table(name = "subject_acls",
+    uniqueConstraints = @UniqueConstraint(name = "uk_subject_acls",
+        columnNames = {"domain", "node", "principal", "type", "permission"}),
+    indexes = {
+        @Index(name = "idx_subject_acls_domain", columnList = "domain"),
+        @Index(name = "idx_subject_acls_node", columnList = "node"),
+        @Index(name = "idx_subject_acls_principal", columnList = "principal"),
+        @Index(name = "idx_subject_acls_type", columnList = "type")
+    })
+public class SubjectAcl extends AbstractTimestamped {
 
   public enum SubjectType {
 
@@ -31,23 +44,36 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
     }
   }
 
-  @NotNull
-  @NotBlank
-  private String domain;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
+  private String domain;
+
+  /**
+   * A resource path - down to a single variable - so it needs more room than a name.
+   */
+  @NotNull
+  @NotBlank
+  @Column(nullable = false, length = 1000)
   private String node;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String principal;
 
   @NotNull
+  @Convert(converter = SubjectTypeConverter.class)
+  @Column(nullable = false)
   private SubjectType type;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String permission;
 
   public SubjectAcl() {
@@ -66,16 +92,6 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
     this.principal = principal;
     this.type = type;
     this.permission = permission;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("domain", "node", "principal", "type", "permission");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(domain, node, principal, type.toString(), permission);
   }
 
   @NotNull

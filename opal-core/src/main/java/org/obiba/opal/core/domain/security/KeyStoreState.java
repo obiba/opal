@@ -9,25 +9,36 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Persisted keystore.
  */
-public class KeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
+@Entity
+@Table(name = "keystore_states",
+    uniqueConstraints = @UniqueConstraint(name = "uk_keystore_states_name", columnNames = "name"))
+public class KeyStoreState extends AbstractTimestamped {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String name;
 
+  /**
+   * The serialised keystore itself: bytes, not text, and of no fixed size.
+   */
   @NotNull
+  @Lob
+  @Column(name = "key_store")
   private byte[] keyStore;
 
   public KeyStoreState() {
@@ -35,16 +46,6 @@ public class KeyStoreState extends AbstractTimestamped implements HasUniquePrope
 
   public KeyStoreState(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
   }
 
   @NotNull

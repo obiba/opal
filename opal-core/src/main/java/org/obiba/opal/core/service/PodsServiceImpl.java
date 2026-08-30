@@ -4,7 +4,6 @@ import com.google.cloud.tools.jib.api.ImageReference;
 import com.google.cloud.tools.jib.api.InvalidImageReferenceException;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.google.common.eventbus.EventBus;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -12,6 +11,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.obiba.opal.core.cfg.PodsService;
 import org.obiba.opal.core.domain.kubernetes.PodRef;
 import org.obiba.opal.core.domain.kubernetes.PodSpec;
+import org.obiba.opal.core.repository.PodSpecRepository;
 import org.obiba.opal.core.event.PodSpecRegisteredEvent;
 import org.obiba.opal.core.event.PodSpecUnregisteredEvent;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class PodsServiceImpl implements PodsService {
 
   private final List<ImageReference> allowedPodImageRefsRock = Lists.newArrayList();
 
-  private final OrientDbService orientDbService;
+  private final PodSpecRepository podSpecRepository;
 
   private final EventBus eventBus;
 
@@ -59,28 +59,31 @@ public class PodsServiceImpl implements PodsService {
   }
 
   @Autowired
-  public PodsServiceImpl(OrientDbService orientDbService, EventBus eventBus) {
-    this.orientDbService = orientDbService;
+  public PodsServiceImpl(PodSpecRepository podSpecRepository, EventBus eventBus) {
+    this.podSpecRepository = podSpecRepository;
     this.eventBus = eventBus;
   }
 
   @Override
   public List<PodSpec> getSpecs() {
-    return Lists.newArrayList(orientDbService.list(PodSpec.class));
+    return podSpecRepository.findAll();
   }
 
   @Override
   public PodSpec getSpec(String id) {
-    PodSpec found = orientDbService.findUnique(new PodSpec(id));
-    if (found != null) return found;
-    throw new NoSuchElementException("No registered pod specifications with ID: " + id);
+    // As in AppsServiceImpl: no identifier means no specification, which a repository will not be asked.
+    if (Strings.isNullOrEmpty(id)) {
+      throw new NoSuchElementException("No registered pod specifications with ID: " + id);
+    }
+    return podSpecRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("No registered pod specifications with ID: " + id));
   }
 
   @Override
   public void deleteSpec(String id) {
     try {
       PodSpec spec = getSpec(id);
-      orientDbService.delete(new PodSpec(id));
+      podSpecRepository.deleteById(id);
       new Thread(() -> eventBus.post(new PodSpecUnregisteredEvent(spec))).start();
     } catch (Exception e) {
       log.warn("Unable to delete pod specification with ID: {}", id, e);
@@ -94,7 +97,7 @@ public class PodsServiceImpl implements PodsService {
       if (Strings.isNullOrEmpty(spec.getId())) {
         spec.setId(spec.getContainer().getName() + "-" + UUID.randomUUID().toString().substring(0, 8));
       }
-      orientDbService.save(spec, spec);
+      podSpecRepository.upsert(spec);
       new Thread(() -> eventBus.post(spec.isEnabled() ? new PodSpecRegisteredEvent(spec) : new PodSpecUnregisteredEvent(spec))).start();
     } catch (Exception e) {
       log.warn("Unable to save pod specification: {}", spec, e);
@@ -126,7 +129,7 @@ public class PodsServiceImpl implements PodsService {
   public void deleteSpecs() {
     try {
       List<PodSpec> specs = getSpecs();
-      orientDbService.deleteAll(PodSpec.class);
+      podSpecRepository.deleteAll();
       new Thread(() -> specs.forEach(spec -> eventBus.post(new PodSpecUnregisteredEvent(spec)))).start();
     } catch (Exception e) {
       log.warn("Unable to delete all pod specifications", e);
@@ -260,7 +263,6 @@ public class PodsServiceImpl implements PodsService {
   @Override
   public void start() {
     initClient();
-    orientDbService.createUniqueIndex(PodSpec.class);
 
     if (allowedRockPodImages != null) {
       allowedPodImageRefsRock.clear();
@@ -276,14 +278,13 @@ public class PodsServiceImpl implements PodsService {
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
-        Streams.stream(orientDbService.list(PodSpec.class))
+        podSpecRepository.findAll().stream()
             .filter(PodSpec::isEnabled)
             .forEach(spec -> eventBus.post(new PodSpecRegisteredEvent(spec)));
         if (!Strings.isNullOrEmpty(defaultRockPodSpecs)) {
           List<PodSpec> podSpecs = RockPodSpecFactory.makeRockPodSpecs(defaultRockPodSpecs);
           for (PodSpec podSpec : podSpecs) {
-            PodSpec found = orientDbService.findUnique(new PodSpec(podSpec.getId()).setType("rock"));
-            if (found == null) {
+            if (Strings.isNullOrEmpty(podSpec.getId()) || !podSpecRepository.existsById(podSpec.getId())) {
               saveSpec(podSpec);
             }
           }
@@ -294,7 +295,7 @@ public class PodsServiceImpl implements PodsService {
 
   @Override
   public void stop() {
-    orientDbService.list(PodSpec.class).forEach(spec -> eventBus.post(new PodSpecUnregisteredEvent(spec)));
+    podSpecRepository.findAll().forEach(spec -> eventBus.post(new PodSpecUnregisteredEvent(spec)));
     if (client == null) return;
     try {
       client.close();

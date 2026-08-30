@@ -11,7 +11,7 @@
 package org.obiba.opal.core.service;
 
 import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
+import org.obiba.opal.core.repository.OpalAnalysisResultRepository;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.spi.analysis.Analysis;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.util.Collections;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -29,66 +30,57 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
 
   private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisResultServiceImpl.class);
 
-  private final OrientDbService orientDbService;
+  private final OpalAnalysisResultRepository opalAnalysisResultRepository;
 
   @Autowired
-  public OpalAnalysisResultServiceImpl(OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
+  public OpalAnalysisResultServiceImpl(OpalAnalysisResultRepository opalAnalysisResultRepository) {
+    this.opalAnalysisResultRepository = opalAnalysisResultRepository;
   }
 
   @Override
   public OpalAnalysisResult getAnalysisResult(String analysisName, String resultId) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("analysisName = ?", "id = ?")
-      .build();
-
-    return orientDbService.uniqueResult(OpalAnalysisResult.class, query, analysisName, resultId);
+    return opalAnalysisResultRepository.findByAnalysisNameAndId(analysisName, resultId).orElse(null);
   }
 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult) {
-    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .order("desc");
-
+    // The OrientDB query this replaces was built with no where clause, which made it "WHERE null" and returned
+    // nothing. Nothing calls this method, so the behaviour it was reaching for is implemented rather than the one it
+    // had.
     if (lastResult) {
-      builder.limit(1);
+      return opalAnalysisResultRepository.findFirstByOrderByCreatedDesc()
+          .map(Collections::singletonList).orElse(Collections.emptyList());
     }
-
-    return orientDbService.list(OpalAnalysisResult.class, builder.build());
+    return opalAnalysisResultRepository.findAllByOrderByCreatedDesc();
   }
 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(String datasource, String table, String analysisName, boolean lastResult)
       throws NoSuchAnalysisException {
-    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("datasource = ?", "table = ?", "analysisName = ?")
-      .order("desc");
-
     if (lastResult) {
-      builder.limit(1);
+      return opalAnalysisResultRepository
+          .findFirstByDatasourceAndTableAndAnalysisNameOrderByCreatedDesc(datasource, table, analysisName)
+          .map(Collections::singletonList).orElse(Collections.emptyList());
     }
-
-    return orientDbService.list(OpalAnalysisResult.class, builder.build(), datasource, table, analysisName);
+    return opalAnalysisResultRepository
+        .findByDatasourceAndTableAndAnalysisNameOrderByCreatedDesc(datasource, table, analysisName);
   }
 
   @Override
   public void save(OpalAnalysisResult analysisResult) throws ConstraintViolationException {
-    orientDbService.save(analysisResult, analysisResult);
+    opalAnalysisResultRepository.upsert(analysisResult);
   }
 
   @Override
   public void delete(OpalAnalysisResult analysisResult) throws NoSuchAnalysisResultException {
-    orientDbService.delete(analysisResult);
+    opalAnalysisResultRepository.delete(analysisResult);
 
     deleteAnalysisResultFiles(Paths.get(Analysis.ANALYSES_HOME.toString(),analysisResult.getDatasource(), analysisResult.getTable(), analysisResult.getAnalysisName(), "results", analysisResult.getId()));
   }
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(OpalAnalysisResult.class);
+
   }
 
   @Override

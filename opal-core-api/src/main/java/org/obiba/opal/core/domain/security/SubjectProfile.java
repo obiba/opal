@@ -12,35 +12,56 @@ package org.obiba.opal.core.domain.security;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.BookmarkSetConverter;
+import org.obiba.opal.core.domain.converter.ObjectMapConverter;
+import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SubjectProfile extends AbstractTimestamped implements HasUniqueProperties {
+@Entity
+@Table(name = "subject_profiles",
+    uniqueConstraints = @UniqueConstraint(name = "uk_subject_profiles_principal", columnNames = "principal"))
+public class SubjectProfile extends AbstractTimestamped {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String principal;
 
   @NotNull
   @NotBlank
   private String realm;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
+  @Column(name = "group_names")
   private Set<String> groups;
 
+  @Lob
+  @Convert(converter = BookmarkSetConverter.class)
   private Set<Bookmark> bookmarks;
 
   private String secret;
 
+  @Column(name = "tmp_secret")
   private String tmpSecret;
 
+  /**
+   * Claims from the identity provider, whose shape is the provider's to decide. Stored as the JSON it arrived as.
+   */
+  @Lob
+  @Convert(converter = ObjectMapConverter.class)
+  @Column(name = "user_info")
   private Map<String, Object> userInfo;
 
   public SubjectProfile() {
@@ -49,16 +70,6 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   public SubjectProfile(@NotNull String principal, @NotNull String realm) {
     this.principal = principal;
     this.realm = realm;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("principal");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(principal);
   }
 
   @NotNull

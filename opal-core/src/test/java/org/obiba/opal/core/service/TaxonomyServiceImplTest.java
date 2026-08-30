@@ -42,7 +42,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 
 @ContextConfiguration(classes = TaxonomyServiceImplTest.Config.class)
-public class TaxonomyServiceImplTest extends AbstractOrientdbServiceTest {
+public class TaxonomyServiceImplTest extends AbstractConfigDbTest {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImplTest.class);
 
@@ -249,7 +249,7 @@ public class TaxonomyServiceImplTest extends AbstractOrientdbServiceTest {
 
   @Configuration
   @PropertySource("classpath:/META-INF/defaults.properties")
-  public static class Config extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractConfigDbTestConfig {
 
     @Bean
     public TaxonomyService taxonomyService() {

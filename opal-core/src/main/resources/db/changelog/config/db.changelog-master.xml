@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!--
+  Schema of the Opal configuration database. Liquibase owns it: Hibernate is configured to validate against it, never
+  to generate it, so every table and column an entity expects has to be declared here.
+
+  Changesets stay database-agnostic - no H2 or PostgreSQL specific types - because the same changelog has to apply to
+  an external PostgreSQL server.
+-->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    The configuration model, as it stood when it left OrientDB. Column types are the generic ones so the same
+    changelog applies to an external PostgreSQL server: CLOB becomes `text` there and `clob` on H2, BOOLEAN and
+    TIMESTAMP are native to both.
+
+    Enumerations are varchar columns holding the constant's name, written through an AttributeConverter rather than
+    @Enumerated. No check constraint is declared for them on purpose: it would turn adding a constant into a schema
+    migration, and Hibernate's validation does not look at check constraints anyway, so a drifted one would go
+    unnoticed until a write failed in production.
+  -->
+  <changeSet id="1-config-model" author="opal">
+    <createTable tableName="apps">
+      <column name="cluster" type="VARCHAR(255)"/>
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="pk_apps"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="server" type="VARCHAR(255)"/>
+      <column name="type" type="VARCHAR(255)"/>
+      <column name="tags" type="CLOB"/>
+    </createTable>
+
+    <createTable tableName="apps_config">
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="pk_apps_config"/>
+      </column>
+      <column name="token" type="VARCHAR(255)"/>
+      <column name="rock_app_configs" type="CLOB"/>
+    </createTable>
+
+    <createTable tableName="databases">
+      <column name="default_storage" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="used_for_identifiers" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_databases"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="usage" type="VARCHAR(255)"/>
+      <column name="mongo_db_settings" type="CLOB"/>
+      <column name="sql_settings" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="databases" columnNames="name" constraintName="uk_databases_name"/>
+
+    <createTable tableName="datashield_profiles">
+      <column name="enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="restricted_access" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_datashield_profiles"/>
+      </column>
+      <column name="cluster" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="r_parser_version" type="VARCHAR(255)"/>
+      <column name="environments" type="CLOB"/>
+      <column name="options" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="datashield_profiles" columnNames="name" constraintName="uk_datashield_profiles_name"/>
+
+    <createTable tableName="keystore_states">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_keystore_states"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="key_store" type="BLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="keystore_states" columnNames="name" constraintName="uk_keystore_states_name"/>
+
+    <createTable tableName="opal_analyses">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_opal_analyses"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="datasource" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="plugin_name" type="VARCHAR(255)"/>
+      <column name="table_name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="template_name" type="VARCHAR(255)"/>
+      <column name="parameters_string" type="CLOB"/>
+      <column name="variables" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="opal_analyses" columnNames="name, datasource, table_name" constraintName="uk_opal_analyses"/>
+
+    <createTable tableName="opal_analysis_results">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="end_date" type="TIMESTAMP"/>
+      <column name="start_date" type="TIMESTAMP"/>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="analysis_name" type="VARCHAR(255)"/>
+      <column name="datasource" type="VARCHAR(255)"/>
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="pk_opal_analysis_results"/>
+      </column>
+      <column name="status" type="VARCHAR(255)"/>
+      <column name="table_name" type="VARCHAR(255)"/>
+      <column name="message" type="CLOB"/>
+      <column name="result_items" type="CLOB"/>
+    </createTable>
+
+    <createTable tableName="opal_general_config">
+      <column name="allow_r_package_management" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="allow_r_pat_only" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="enforced_2fa" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_opal_general_config"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="default_character_set" type="VARCHAR(255)"/>
+      <column name="logout_url" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="otp_strategy" type="VARCHAR(255)"/>
+      <column name="public_url" type="VARCHAR(255)"/>
+      <column name="locales" type="CLOB"/>
+    </createTable>
+
+    <createTable tableName="pod_specs">
+      <column name="enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="pk_pod_specs"/>
+      </column>
+      <column name="namespace" type="VARCHAR(255)"/>
+      <column name="node_name" type="VARCHAR(255)"/>
+      <column name="type" type="VARCHAR(255)"/>
+      <column name="container" type="CLOB"/>
+      <column name="description" type="CLOB"/>
+      <column name="labels" type="CLOB"/>
+      <column name="node_selector" type="CLOB"/>
+      <column name="tolerations" type="CLOB"/>
+    </createTable>
+
+    <createTable tableName="projects">
+      <column name="archived" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_projects"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="database_name" type="VARCHAR(255)"/>
+      <column name="export_folder" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="VARCHAR(255)"/>
+      <column name="vcf_store_service" type="VARCHAR(255)"/>
+      <column name="description" type="CLOB"/>
+      <column name="identifiers_mappings" type="CLOB"/>
+      <column name="tags" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="projects" columnNames="name" constraintName="uk_projects_name"/>
+
+    <createTable tableName="r_session_activities">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="execution_time_millis" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="context" type="VARCHAR(255)"/>
+      <column name="id" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="pk_r_session_activities"/>
+      </column>
+      <column name="profile" type="VARCHAR(255)"/>
+      <column name="user_name" type="VARCHAR(255)"/>
+    </createTable>
+
+    <createTable tableName="resource_references">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_resource_references"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="factory" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="project" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="provider" type="VARCHAR(255)"/>
+      <column name="credentials_model" type="CLOB"/>
+      <column name="description" type="CLOB"/>
+      <column name="encrypted_credentials_model" type="CLOB"/>
+      <column name="parameters_model" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="resource_references" columnNames="name, project" constraintName="uk_resource_references"/>
+
+    <createTable tableName="subject_acls">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_subject_acls"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="node" type="VARCHAR(1000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="domain" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="permission" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="principal" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="subject_acls" columnNames="domain, node, principal, type, permission" constraintName="uk_subject_acls"/>
+
+    <createTable tableName="subject_credentials">
+      <column name="enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_subject_credentials"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="authentication_type" type="VARCHAR(255)"/>
+      <column name="certificate_alias" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="password" type="VARCHAR(255)"/>
+      <column name="group_names" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="subject_credentials" columnNames="name" constraintName="uk_subject_credentials_name"/>
+
+    <createTable tableName="subject_groups">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_subject_groups"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="subject_credentials" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="subject_groups" columnNames="name" constraintName="uk_subject_groups_name"/>
+
+    <createTable tableName="subject_profiles">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_subject_profiles"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="principal" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="realm" type="VARCHAR(255)"/>
+      <column name="secret" type="VARCHAR(255)"/>
+      <column name="tmp_secret" type="VARCHAR(255)"/>
+      <column name="bookmarks" type="CLOB"/>
+      <column name="group_names" type="CLOB"/>
+      <column name="user_info" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="subject_profiles" columnNames="principal" constraintName="uk_subject_profiles_principal"/>
+
+    <createTable tableName="subject_tokens">
+      <column name="create_project" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="delete_project" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="system_admin" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="update_project" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="use_datashield" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="use_r" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="use_sql" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_subject_tokens"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="access" type="VARCHAR(255)"/>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="principal" type="VARCHAR(255)"/>
+      <column name="token" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="commands" type="CLOB"/>
+      <column name="projects" type="CLOB"/>
+    </createTable>
+    <addUniqueConstraint tableName="subject_tokens" columnNames="token" constraintName="uk_subject_tokens_token"/>
+
+    <createTable tableName="vcf_samples_mappings">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_vcf_samples_mappings"/>
+      </column>
+      <column name="participant_id_variable" type="VARCHAR(255)"/>
+      <column name="project_name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="sample_role_variable" type="VARCHAR(255)"/>
+      <column name="table_reference" type="VARCHAR(255)"/>
+    </createTable>
+    <addUniqueConstraint tableName="vcf_samples_mappings" columnNames="project_name" constraintName="uk_vcf_samples_mappings_project"/>
+
+    <createIndex tableName="apps" indexName="idx_apps_type">
+      <column name="type"/>
+    </createIndex>
+    <createIndex tableName="apps" indexName="idx_apps_name_type_server">
+      <column name="name"/>
+      <column name="type"/>
+      <column name="server"/>
+    </createIndex>
+    <createIndex tableName="opal_analysis_results" indexName="idx_opal_analysis_results_analysis">
+      <column name="analysis_name"/>
+    </createIndex>
+    <createIndex tableName="opal_analysis_results" indexName="idx_opal_analysis_results_table">
+      <column name="datasource"/>
+      <column name="table_name"/>
+    </createIndex>
+    <createIndex tableName="r_session_activities" indexName="idx_r_session_activities_user">
+      <column name="user_name"/>
+    </createIndex>
+    <createIndex tableName="r_session_activities" indexName="idx_r_session_activities_context">
+      <column name="context"/>
+    </createIndex>
+    <createIndex tableName="r_session_activities" indexName="idx_r_session_activities_profile">
+      <column name="profile"/>
+    </createIndex>
+    <createIndex tableName="subject_acls" indexName="idx_subject_acls_domain">
+      <column name="domain"/>
+    </createIndex>
+    <createIndex tableName="subject_acls" indexName="idx_subject_acls_node">
+      <column name="node"/>
+    </createIndex>
+    <createIndex tableName="subject_acls" indexName="idx_subject_acls_principal">
+      <column name="principal"/>
+    </createIndex>
+    <createIndex tableName="subject_acls" indexName="idx_subject_acls_type">
+      <column name="type"/>
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

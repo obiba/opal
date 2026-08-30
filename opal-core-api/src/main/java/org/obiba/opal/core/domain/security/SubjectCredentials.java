@@ -9,10 +9,11 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.AuthenticationTypeConverter;
+import org.obiba.opal.core.domain.converter.StringSetConverter;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 
 import jakarta.validation.constraints.NotNull;
@@ -23,32 +24,52 @@ import java.util.Set;
 @NotNullIfAnotherFieldHasValue.List(
     @NotNullIfAnotherFieldHasValue(fieldName = "authenticationType", fieldValue = "PASSWORD",
         dependFieldName = "password"))
+@Entity
+@Table(name = "subject_credentials",
+    uniqueConstraints = @UniqueConstraint(name = "uk_subject_credentials_name", columnNames = "name"))
 public class SubjectCredentials extends AbstractTimestamped
-    implements Comparable<SubjectCredentials>, HasUniqueProperties {
+    implements Comparable<SubjectCredentials> {
 
   public enum AuthenticationType {
     PASSWORD, CERTIFICATE
   }
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String name;
 
   @NotNull
+  @Convert(converter = AuthenticationTypeConverter.class)
+  @Column(name = "authentication_type")
   private AuthenticationType authenticationType;
 
   private String password; // for user only
 
+  /**
+   * The certificate itself lives in the keystore, not here; this field only carries it between the request and the
+   * keystore service, which is why it has never been stored.
+   */
+  @Transient
   @SuppressWarnings("TransientFieldInNonSerializableClass")
   private transient byte[] certificate; // for application only
 
   /**
    * alias used to store certificate into KeyStore
    */
+  @Column(name = "certificate_alias")
   private String certificateAlias;
 
+  @Column(nullable = false)
   private boolean enabled;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
+  @Column(name = "group_names")
   private Set<String> groups = new HashSet<>();
 
   public SubjectCredentials() {
@@ -56,16 +77,6 @@ public class SubjectCredentials extends AbstractTimestamped
 
   public SubjectCredentials(@NotNull String name) {
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name);
   }
 
   public String generateCertificateAlias() {

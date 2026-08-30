@@ -23,6 +23,7 @@ import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.event.VariableRenamedEvent;
+import org.obiba.opal.core.repository.VCFSamplesMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,12 +36,10 @@ import java.util.stream.Collectors;
 public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
   @Autowired
-  private OrientDbService orientDbService;
-
+  private VCFSamplesMappingRepository vcfSamplesMappingRepository;
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(VCFSamplesMapping.class);
   }
 
   @Override
@@ -49,14 +48,13 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
   @Override
   public Iterable<VCFSamplesMapping> getVCFSamplesMappings() {
-    return orientDbService.list(VCFSamplesMapping.class);
+    return vcfSamplesMappingRepository.findAll();
   }
 
   @Override
   public VCFSamplesMapping getVCFSamplesMapping(@NotNull String projectName) throws NoSuchProjectException {
-    VCFSamplesMapping vcfSamplesMapping = orientDbService.findUnique(new VCFSamplesMapping(projectName));
-    if(vcfSamplesMapping == null) throw new NoSuchVCFSamplesMappingException(projectName);
-    return vcfSamplesMapping;
+    return vcfSamplesMappingRepository.findByProjectName(projectName)
+        .orElseThrow(() -> new NoSuchVCFSamplesMappingException(projectName));
   }
 
   @Override
@@ -71,22 +69,18 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
   @Override
   public void save(@NotNull VCFSamplesMapping vcfSamplesMapping) throws ConstraintViolationException {
-    orientDbService.save(vcfSamplesMapping, vcfSamplesMapping);
+    vcfSamplesMappingRepository.upsert(vcfSamplesMapping);
   }
 
   @Override
   public void delete(@NotNull String projectName) throws NoSuchVCFSamplesMappingException {
-    VCFSamplesMapping vcfSamplesMapping = getVCFSamplesMapping(projectName);
-    orientDbService.delete(vcfSamplesMapping, vcfSamplesMapping);
+    vcfSamplesMappingRepository.deleteByKey(getVCFSamplesMapping(projectName));
   }
 
   @Override
   public void deleteProjectSampleMappings(@NotNull String project) {
-    Iterable<VCFSamplesMapping> list = orientDbService.list(
-        VCFSamplesMapping.class,
-        "select from " + VCFSamplesMapping.class.getSimpleName() + " where tableReference like ?",
-        project);
-    list.forEach(s -> delete(s.getProjectName()));
+    vcfSamplesMappingRepository.findByTableReferenceLike(project)
+        .forEach(s -> delete(s.getProjectName()));
   }
 
   @Override
@@ -162,7 +156,7 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
       String newTableReference = String.format("%s.%s", event.getValueTable().getDatasource().getName(), event.getNewName());
       list.forEach(s -> {
         VCFSamplesMapping n = VCFSamplesMapping.newBuilder(s).tableName(newTableReference).build();
-        orientDbService.save(n, n);
+        vcfSamplesMappingRepository.upsert(n);
       });
     });
   }
@@ -180,7 +174,7 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
         }
 
         VCFSamplesMapping n = b.build();
-        orientDbService.save(n, n);
+        vcfSamplesMappingRepository.upsert(n);
       });
     });
   }
@@ -208,9 +202,7 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
     Optional<Iterable<VCFSamplesMapping>> list = Optional.empty();
     if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) {
       String tableReference = String.format("%s.%s", vt.getDatasource().getName(), vt.getName());
-      list = Optional.ofNullable(orientDbService.list(VCFSamplesMapping.class,
-          "select from " + VCFSamplesMapping.class.getSimpleName() + " where tableReference like ?",
-          tableReference));
+      list = Optional.of(vcfSamplesMappingRepository.findByTableReferenceLike(tableReference));
     }
 
     return list;

@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.service;
 
-import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
@@ -19,6 +18,7 @@ import org.apache.shiro.crypto.CryptoException;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectToken;
+import org.obiba.opal.core.repository.SubjectTokenRepository;
 import org.obiba.opal.core.service.event.SubjectProfileDeletedEvent;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.slf4j.Logger;
@@ -66,15 +66,15 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Value("${org.obiba.opal.security.login.pat.activityTimeout}")
   private int activityTimeout;
 
-  private final OrientDbService orientDbService;
+  private final SubjectTokenRepository subjectTokenRepository;
 
   private final OpalConfigurationService opalConfigurationService;
 
   private final Date legacyDate;
 
   @Autowired
-  public SubjectTokenServiceImpl(OrientDbService orientDbService, OpalConfigurationService opalConfigurationService) {
-    this.orientDbService = orientDbService;
+  public SubjectTokenServiceImpl(SubjectTokenRepository subjectTokenRepository, OpalConfigurationService opalConfigurationService) {
+    this.subjectTokenRepository = subjectTokenRepository;
     this.opalConfigurationService = opalConfigurationService;
     Date legacyDate;
     try {
@@ -87,7 +87,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(SubjectToken.class);
+
   }
 
   @Override
@@ -103,14 +103,14 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
       throw new IllegalArgumentException("Access token is missing");
     }
     token.setToken(hashToken(token.getToken()));
-    orientDbService.save(token, token);
+    subjectTokenRepository.upsert(token);
     return token;
   }
 
   @Override
   public void deleteToken(String id) {
     try {
-      orientDbService.delete(getToken(id));
+      subjectTokenRepository.deleteByKey(getToken(id));
     } catch (NoSuchSubjectTokenException e) {
       // ignore
     }
@@ -121,7 +121,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
     try {
       getTokens(principal).stream()
           .filter(tk -> tk.getName().equals(name))
-          .forEach(orientDbService::delete);
+          .forEach(subjectTokenRepository::deleteByKey);
     } catch (Exception e) {
       // ignore
     }
@@ -131,18 +131,13 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   public void renewToken(String principal, String name) {
     Optional<SubjectToken> first = getTokens(principal).stream()
         .filter(tk -> tk.getName().equals(name)).findFirst();
-    first.ifPresent(token -> orientDbService.save(token, token));
+    first.ifPresent(subjectTokenRepository::upsert);
   }
 
   @Override
   public SubjectToken getToken(String id) throws NoSuchSubjectTokenException {
-    SubjectToken template = new SubjectToken();
-    template.setToken(hashToken(id));
-    SubjectToken token = orientDbService.findUnique(template);
-    if (token == null) {
-      throw new NoSuchSubjectTokenException(id);
-    }
-    return token;
+    return subjectTokenRepository.findByToken(hashToken(id))
+        .orElseThrow(() -> new NoSuchSubjectTokenException(id));
   }
 
   @Override
@@ -155,7 +150,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Override
   public void touchToken(SubjectToken token) {
     token.setUpdated(new Date());
-    orientDbService.save(token, token);
+    subjectTokenRepository.upsert(token);
   }
 
   @Override
@@ -168,10 +163,7 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   @Override
   public boolean hasToken(String id) {
-    SubjectToken template = new SubjectToken();
-    template.setToken(hashToken(id));
-    SubjectToken token = orientDbService.findUnique(template);
-    return token != null;
+    return subjectTokenRepository.findByToken(hashToken(id)).isPresent();
   }
 
   @Override
@@ -181,13 +173,12 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
 
   @Override
   public void deleteTokens(String principal) {
-    getTokens(principal).forEach(orientDbService::delete);
+    getTokens(principal).forEach(subjectTokenRepository::deleteByKey);
   }
 
   @Override
   public List<SubjectToken> getTokens(String principal) {
-    return Lists.newArrayList(orientDbService.list(SubjectToken.class,
-        String.format("select from %s where principal = ?", SubjectToken.class.getSimpleName()), principal));
+    return subjectTokenRepository.findByPrincipal(principal);
   }
 
   @Override
@@ -209,13 +200,13 @@ public class SubjectTokenServiceImpl implements SubjectTokenService {
   @Scheduled(cron = "0 0 1 * * *")
   public void removeExpiredTokens() {
     if (expiresIn <= 0) return;
-    Iterable<SubjectToken> tokens = orientDbService.list(SubjectToken.class);
+    Iterable<SubjectToken> tokens = subjectTokenRepository.findAll();
     Date now = new Date();
     for (SubjectToken token : tokens) {
       Date expiresAt = DateUtils.addDays(token.getCreated(), expiresIn);
       if (now.after(expiresAt)) {
         log.info("Removing expired personal access token: {}:{}", token.getPrincipal(), token.getName());
-        orientDbService.delete(token);
+        subjectTokenRepository.deleteByKey(token);
       }
     }
   }

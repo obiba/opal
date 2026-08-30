@@ -12,11 +12,10 @@ package org.obiba.opal.core.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.repository.OpalGeneralConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,27 +27,18 @@ import java.util.Locale;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.Config.class)
-public class OpalGeneralConfigServiceImplTest extends AbstractOrientdbServiceTest {
+public class OpalGeneralConfigServiceImplTest extends AbstractConfigDbTest {
 
   @Autowired
   private OpalGeneralConfigService opalGeneralConfigService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private OpalGeneralConfigRepository opalGeneralConfigRepository;
 
   @Override
   public void startDB() throws Exception {
     super.startDB();
-    orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
-      @Override
-      protected void withinDocumentTxWithoutResult(ODatabaseDocument db) {
-        String className = OpalGeneralConfig.class.getSimpleName();
-        OSchema schema = db.getMetadata().getSchema();
-        if(schema.getClass(className) != null) {
-          schema.dropClass(className);
-        }
-      }
-    });
+    opalGeneralConfigRepository.deleteAll();
   }
 
   @Test(expected = OpalGeneralConfigMissingException.class)
@@ -92,7 +82,7 @@ public class OpalGeneralConfigServiceImplTest extends AbstractOrientdbServiceTes
   }
 
   @Configuration
-  public static class Config extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractConfigDbTestConfig {
 
     @Bean
     public EventBus eventBus() {
@@ -100,8 +90,8 @@ public class OpalGeneralConfigServiceImplTest extends AbstractOrientdbServiceTes
     }
 
     @Bean
-    public OpalGeneralConfigService userService() {
-      return new OpalGeneralConfigServiceImpl(orientDbService(), eventBus());
+    public OpalGeneralConfigService userService(OpalGeneralConfigRepository opalGeneralConfigRepository) {
+      return new OpalGeneralConfigServiceImpl(opalGeneralConfigRepository, eventBus());
     }
 
   }

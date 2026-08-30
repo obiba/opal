@@ -11,7 +11,6 @@
 package org.obiba.opal.datashield.cfg;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.datashield.core.DSConfiguration;
 import org.obiba.datashield.core.DSEnvironment;
@@ -20,7 +19,8 @@ import org.obiba.datashield.core.DSOption;
 import org.obiba.datashield.core.impl.DefaultDSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.core.impl.DefaultDSOption;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import jakarta.persistence.*;
+import org.obiba.opal.core.domain.converter.StringMapConverter;
 import org.obiba.opal.r.service.RServerProfile;
 
 import java.util.ArrayList;
@@ -29,21 +29,40 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUniqueProperties {
+@Entity
+@Table(name = "datashield_profiles",
+    uniqueConstraints = @UniqueConstraint(name = "uk_datashield_profiles_name", columnNames = "name"))
+public class DataShieldProfile implements RServerProfile, DSConfiguration {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(nullable = false)
   private String name;
 
   private String cluster;
 
+  @Column(nullable = false)
   private boolean enabled = false;
 
+  @Column(name = "restricted_access", nullable = false)
   private boolean restrictedAccess = false;
 
+  @Column(name = "r_parser_version")
   private String rParserVersion;
 
-  private final Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
+  /**
+   * The allowed methods, by method type. A profile can carry hundreds of them, and they are always read as a whole.
+   * No longer final: Hibernate assigns fields directly when it rebuilds an instance.
+   */
+  @Lob
+  @Convert(converter = DSEnvironmentsConverter.class)
+  private Map<DSMethodType, List<DefaultDSMethod>> environments = Maps.newHashMap();
 
-  private final Map<String, String> options = Maps.newHashMap();
+  @Lob
+  @Convert(converter = StringMapConverter.class)
+  private Map<String, String> options = Maps.newHashMap();
 
   public DataShieldProfile() {
   }
@@ -147,16 +166,6 @@ public class DataShieldProfile implements RServerProfile, DSConfiguration, HasUn
     if (this.hasOption(name)) {
       this.options.remove(name);
     }
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name);
   }
 
   //

@@ -12,7 +12,7 @@ package org.obiba.opal.core.domain;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.json.JSONObject;
 import org.obiba.magma.Timestamped;
@@ -22,16 +22,24 @@ import org.obiba.magma.type.DateTimeType;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
-public class ResourceReference implements Timestamped, HasUniqueProperties {
+@Entity
+@Table(name = "resource_references",
+    uniqueConstraints = @UniqueConstraint(name = "uk_resource_references", columnNames = {"name", "project"}))
+public class ResourceReference implements Timestamped {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String project;
 
   private String name;
 
+  @Lob
   private String description;
 
   // plugin name or internal provider
@@ -40,15 +48,41 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
   // resource factory name
   private String factory;
 
+  @Lob
+  @Column(name = "parameters_model")
   private String parametersModel;
 
+  @Lob
+  @Column(name = "credentials_model")
   private String credentialsModel;
 
+  @Lob
+  @Column(name = "encrypted_credentials_model")
   private String encryptedCredentialsModel;
 
+  /**
+   * This one keeps its own timestamps rather than extending AbstractTimestamped, and has since it was written.
+   */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(nullable = false)
   private Date created = new Date();
 
+  @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
+
+  /**
+   * Same as AbstractTimestamped, which this one does not extend.
+   */
+  @PrePersist
+  void onPersist() {
+    if(created == null) created = new Date();
+    if(updated == null) updated = created;
+  }
+
+  @PreUpdate
+  void onUpdate() {
+    updated = new Date();
+  }
 
   public String getName() {
     return name;
@@ -139,16 +173,6 @@ public class ResourceReference implements Timestamped, HasUniqueProperties {
         return DateTimeType.get().valueOf(created);
       }
     };
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name", "project");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(name, project);
   }
 
   public Date getCreated() {

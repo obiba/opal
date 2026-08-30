@@ -1,7 +1,7 @@
 ##
 ## Makefile for Opal developers
 ##
-version=5.8-SNAPSHOT
+version=6.0-SNAPSHOT
 magma_version=5.5-SNAPSHOT
 commons_version=5.2-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:+UseG1GC"
@@ -23,7 +23,6 @@ endif
 
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
-orientdb_version=3.2.27
 hsqldb_version=2.7.1
 
 mysql_root=root
@@ -232,23 +231,6 @@ sql-opal-import:
 sql-key-import:
 	mysql -u $(mysql_root) --password=$(mysql_password) -e "drop database `$(key_db)`; create database `$(key_db)`;" && \
 	mysql -u $(mysql_root) --password=$(mysql_password) `$(key_db)` < $(key_db)_$(version)_dump.sql
-
-download-orientdb:
-	mkdir -p ${opal_home}/work && \
-	cd ${opal_home}/work && \
-	wget "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/$(orientdb_version)/orientdb-community-$(orientdb_version).zip" && \
-	unzip orientdb-community-$(orientdb_version).zip && \
-	rm orientdb-community-$(orientdb_version).zip && \
-	chmod a+x orientdb-community-$(orientdb_version)/bin/*.sh
-
-orientdb-console:
-	@echo
-	@echo "To connect to Opal OrientDB:"
-	@echo "  connect premote:localhost:2424/opal-config admin admin"
-	@echo "or"
-	@echo "  connect plocal:$(opal_home)/data/orientdb/opal-config admin admin"
-	@echo
-	@cd ${opal_home}/work/orientdb-community-$(orientdb_version)/bin && ./console.sh
 
 hsqldb-tool:
 	cd ${opal_home} && \

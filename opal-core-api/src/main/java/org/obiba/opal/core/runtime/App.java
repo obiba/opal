@@ -11,7 +11,8 @@ package org.obiba.opal.core.runtime;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import jakarta.persistence.*;
+import org.obiba.opal.core.domain.converter.StringListConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,18 @@ import java.util.List;
  * A high-level abstraction of an external application offering some type of service which has its own lifecycle. Application instances
  * can be registered directly to Opal or discovered though Consul.
  */
-public class App implements HasUniqueProperties {
+@Entity
+@Table(name = "apps",
+    indexes = {
+        @Index(name = "idx_apps_type", columnList = "type"),
+        @Index(name = "idx_apps_name_type_server", columnList = "name, type, server")
+    })
+public class App {
 
+  /**
+   * Assigned when the application registers, so it is the key as it stands.
+   */
+  @Id
   private String id;
 
   private String name;
@@ -32,6 +43,8 @@ public class App implements HasUniqueProperties {
 
   private String server;
 
+  @Lob
+  @Convert(converter = StringListConverter.class)
   private List<String> tags = Lists.newArrayList();
 
   public App() {
@@ -135,16 +148,6 @@ public class App implements HasUniqueProperties {
         && this.type.equals(rhs.type)
         && this.cluster.equals(rhs.cluster)
         && this.server.equals(rhs.server);
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("id");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(id);
   }
 
   @Override

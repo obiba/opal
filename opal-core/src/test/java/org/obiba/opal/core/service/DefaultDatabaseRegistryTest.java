@@ -19,6 +19,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.repository.DatabaseRepository;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
@@ -44,13 +45,13 @@ import static org.fest.assertions.api.Assertions.fail;
 import static org.obiba.opal.core.domain.database.Database.Usage;
 
 @ContextConfiguration(classes = DefaultDatabaseRegistryTest.Config.class)
-public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
+public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private DatabaseRepository databaseRepository;
 
   @Autowired
   private DataSourceFactory dataSourceFactory;
@@ -59,7 +60,7 @@ public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
   public void startDB() throws Exception {
     super.startDB();
     databaseRegistry.stop();
-    orientDbService.deleteAll(Database.class);
+    databaseRepository.deleteAll();
   }
 
   @Override
@@ -452,7 +453,7 @@ public class DefaultDatabaseRegistryTest extends AbstractOrientdbServiceTest {
 
   @Configuration
   @PropertySource("classpath:/META-INF/defaults.properties")
-  public static class Config extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractConfigDbTestConfig {
 
     @Bean
     public DataSourceFactory dataSourceFactory() {

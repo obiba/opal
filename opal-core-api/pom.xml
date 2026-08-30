@@ -15,7 +15,7 @@
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>5.8-SNAPSHOT</version>
+    <version>6.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
   <artifactId>opal-core-api</artifactId>
@@ -119,9 +119,10 @@
       <groupId>org.glassfish.expressly</groupId>
       <artifactId>expressly</artifactId>
     </dependency>
+    <!-- The configuration model is mapped in place: annotations only, no persistence provider here -->
     <dependency>
-      <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-server</artifactId>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>

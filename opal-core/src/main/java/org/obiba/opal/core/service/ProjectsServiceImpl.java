@@ -19,6 +19,7 @@ import org.apache.shiro.subject.Subject;
 import org.obiba.magma.*;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.domain.ResourceReference;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
@@ -57,7 +58,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   private final OpalFileSystemService opalFileSystemService;
 
-  private final OrientDbService orientDbService;
+  private final ProjectRepository projectRepository;
 
   private final DatabaseRegistry databaseRegistry;
 
@@ -79,7 +80,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Autowired
   public ProjectsServiceImpl(OpalFileSystemService opalFileSystemService,
-                             OrientDbService orientDbService,
+                             ProjectRepository projectRepository,
                              DatabaseRegistry databaseRegistry,
                              ProjectsKeyStoreService projectsKeyStoreService,
                              IdentifiersTableService identifiersTableService,
@@ -88,7 +89,7 @@ public class ProjectsServiceImpl implements ProjectService {
                              EventBus eventBus, ResourceReferenceService resourceReferenceService,
                              ProjectsState projectsState, DatasourceLoaderService datasourceLoaderService) {
     this.opalFileSystemService = opalFileSystemService;
-    this.orientDbService = orientDbService;
+    this.projectRepository = projectRepository;
     this.databaseRegistry = databaseRegistry;
     this.projectsKeyStoreService = projectsKeyStoreService;
     this.identifiersTableService = identifiersTableService;
@@ -102,7 +103,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(Project.class);
+
   }
 
   @Override
@@ -127,7 +128,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Override
   public Iterable<Project> getProjects() {
-    return orientDbService.list(Project.class);
+    return projectRepository.findAll();
   }
 
   @Override
@@ -144,7 +145,7 @@ public class ProjectsServiceImpl implements ProjectService {
   public void delete(@NotNull String name, boolean archive) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
 
-    orientDbService.delete(project);
+    projectRepository.deleteByKey(project);
 
     Datasource datasource = project.getDatasource();
 
@@ -202,7 +203,7 @@ public class ProjectsServiceImpl implements ProjectService {
     }
 
     synchronized (this) {
-      orientDbService.save(project, project);
+      projectRepository.upsert(project);
       try {
         getProjectDirectory(project);
       } catch (FileSystemException e) {
@@ -214,9 +215,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @NotNull
   @Override
   public Project getProject(@NotNull String name) throws NoSuchProjectException {
-    Project project = orientDbService.findUnique(new Project(name));
-    if (project == null) throw new NoSuchProjectException(name);
-    return project;
+    return projectRepository.findByName(name).orElseThrow(() -> new NoSuchProjectException(name));
   }
 
   @Override

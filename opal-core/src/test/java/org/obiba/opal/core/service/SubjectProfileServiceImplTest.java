@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.repository.SubjectProfileRepository;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -36,7 +37,7 @@ import java.util.Set;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = SubjectProfileServiceImplTest.Config.class)
-public class SubjectProfileServiceImplTest extends AbstractOrientdbServiceTest {
+public class SubjectProfileServiceImplTest extends AbstractConfigDbTest {
 
   private static final String PRINCIPAL = "principal";
 
@@ -44,12 +45,12 @@ public class SubjectProfileServiceImplTest extends AbstractOrientdbServiceTest {
   private SubjectProfileService subjectProfileService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private SubjectProfileRepository subjectProfileRepository;
 
   @Override
   public void startDB() throws Exception {
     super.startDB();
-    orientDbService.deleteAll(SubjectProfile.class);
+    subjectProfileRepository.deleteAll();
   }
 
   @Test
@@ -147,7 +148,7 @@ public class SubjectProfileServiceImplTest extends AbstractOrientdbServiceTest {
   }
 
   @Configuration
-  public static class Config extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractConfigDbTestConfig {
 
     @Bean
     public EventBus eventBus() {

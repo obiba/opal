@@ -13,18 +13,18 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.repository.GroupRepository;
+import org.obiba.opal.core.repository.SubjectCredentialsRepository;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.NoSuchSubjectProfileException;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.event.GroupDeletedEvent;
 import org.obiba.opal.core.service.security.event.SubjectCredentialsDeletedEvent;
@@ -38,8 +38,8 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @Component
@@ -66,7 +66,10 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   private SubjectProfileService subjectProfileService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private SubjectCredentialsRepository subjectCredentialsRepository;
+
+  @Autowired
+  private GroupRepository groupRepository;
 
   @Autowired
   private OpalConfigurationService opalConfigurationService;
@@ -79,8 +82,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public void start() {
-    orientDbService.createUniqueIndex(SubjectCredentials.class);
-    orientDbService.createUniqueIndex(Group.class);
+
   }
 
   @Override
@@ -89,25 +91,22 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public Iterable<SubjectCredentials> getSubjectCredentials() {
-    return orientDbService.list(SubjectCredentials.class);
+    return subjectCredentialsRepository.findAll();
   }
 
   @Override
   public SubjectCredentials getSubjectCredentialsByCertificateAlias(String certificateAlias) {
-    return orientDbService.uniqueResult(SubjectCredentials.class,
-        "select from " + SubjectCredentials.class.getSimpleName() + " where certificateAlias = ?", certificateAlias);
+    return subjectCredentialsRepository.findByCertificateAlias(certificateAlias).orElse(null);
   }
 
   @Override
   public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.AuthenticationType authenticationType) {
-    return orientDbService.list(SubjectCredentials.class,
-        "select from " + SubjectCredentials.class.getSimpleName() + " where authenticationType = ?",
-        authenticationType);
+    return subjectCredentialsRepository.findByAuthenticationType(authenticationType);
   }
 
   @Override
   public SubjectCredentials getSubjectCredentials(String name) {
-    return orientDbService.findUnique(new SubjectCredentials(name));
+    return subjectCredentialsRepository.findByName(name).orElse(null);
   }
 
   @Override
@@ -205,12 +204,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
    * @param keyStore
    */
   private void persist(SubjectCredentials subjectCredentials, @Nullable OpalKeyStore keyStore) {
-    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    toSave.put(subjectCredentials, subjectCredentials);
-    for (Group group : findImpactedGroups(subjectCredentials)) {
-      toSave.put(group, group);
-    }
-    orientDbService.save(toSave);
+    // The impacted groups are worked out from the credentials as they are currently stored, so they have to be
+    // collected before the new state replaces them.
+    List<Group> impactedGroups = Lists.newArrayList(findImpactedGroups(subjectCredentials));
+    subjectCredentialsRepository.upsert(subjectCredentials);
+    impactedGroups.forEach(groupRepository::upsert);
 
     if (keyStore != null) {
       credentialsKeyStoreService.saveKeyStore(keyStore);
@@ -265,7 +263,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     Collection<Group> groups = new ArrayList<>();
 
     // check removed group
-    SubjectCredentials previousSubjectCredentials = orientDbService.findUnique(subjectCredentials);
+    SubjectCredentials previousSubjectCredentials = getSubjectCredentials(subjectCredentials.getName());
     if (previousSubjectCredentials != null) {
       Iterables
           .addAll(groups, Iterables.transform(previousSubjectCredentials.getGroups(), new Function<String, Group>() {
@@ -307,14 +305,14 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   @Override
   public void delete(SubjectCredentials subjectCredentials) {
 
-    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    List<Group> toSave = Lists.newArrayList();
     for (String groupName : subjectCredentials.getGroups()) {
       Group group = getGroup(groupName);
       group.removeSubjectCredential(subjectCredentials.getName());
-      toSave.put(group, group);
+      toSave.add(group);
     }
-    orientDbService.delete(subjectCredentials);
-    if (!toSave.isEmpty()) orientDbService.save(toSave);
+    subjectCredentialsRepository.deleteByKey(subjectCredentials);
+    toSave.forEach(groupRepository::upsert);
     eventBus.post(new SubjectCredentialsDeletedEvent(subjectCredentials));
 
     if (subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
@@ -330,31 +328,31 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public void createGroup(String name) throws ConstraintViolationException {
-    orientDbService.save(null, new Group(name));
+    groupRepository.upsert(new Group(name));
   }
 
   @Override
   public Iterable<Group> getGroups() {
-    return orientDbService.list(Group.class);
+    return groupRepository.findAll();
   }
 
   @Override
   public Group getGroup(String name) {
-    return orientDbService.findUnique(new Group(name));
+    return groupRepository.findByName(name).orElse(null);
   }
 
   @Override
   public void delete(Group group) {
-    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    List<SubjectCredentials> toSave = Lists.newArrayList();
     for (String userName : group.getSubjectCredentials()) {
       SubjectCredentials subjectCredentials = getSubjectCredentials(userName);
       subjectCredentials.removeGroup(group.getName());
-      toSave.put(subjectCredentials, subjectCredentials);
+      toSave.add(subjectCredentials);
     }
 
     // TODO we should execute these steps in a single transaction
-    orientDbService.delete(group);
-    if (!toSave.isEmpty()) orientDbService.save(toSave);
+    groupRepository.deleteByKey(group);
+    toSave.forEach(subjectCredentialsRepository::upsert);
     // Delete group's permissions
     eventBus.post(new GroupDeletedEvent(group));
   }

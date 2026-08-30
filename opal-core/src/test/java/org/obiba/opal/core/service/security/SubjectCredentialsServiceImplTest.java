@@ -16,8 +16,10 @@ import com.google.common.io.Files;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Group;
-import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.repository.GroupRepository;
+import org.obiba.opal.core.repository.KeyStoreStateRepository;
+import org.obiba.opal.core.repository.SubjectCredentialsRepository;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.*;
@@ -39,7 +41,7 @@ import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = SubjectCredentialsServiceImplTest.Config.class)
-public class SubjectCredentialsServiceImplTest extends AbstractOrientdbServiceTest {
+public class SubjectCredentialsServiceImplTest extends AbstractConfigDbTest {
 
 //  private static final Logger log = LoggerFactory.getLogger(SubjectCredentialsServiceImplTest.class);
 
@@ -47,7 +49,13 @@ public class SubjectCredentialsServiceImplTest extends AbstractOrientdbServiceTe
   private SubjectCredentialsService subjectCredentialsService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private SubjectCredentialsRepository subjectCredentialsRepository;
+
+  @Autowired
+  private GroupRepository groupRepository;
+
+  @Autowired
+  private KeyStoreStateRepository keyStoreStateRepository;
 
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
@@ -55,9 +63,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractOrientdbServiceTe
   @Override
   public void startDB() throws Exception {
     super.startDB();
-    orientDbService.deleteAll(SubjectCredentials.class);
-    orientDbService.deleteAll(Group.class);
-    orientDbService.deleteAll(KeyStoreState.class);
+    subjectCredentialsRepository.deleteAll();
+    groupRepository.deleteAll();
+    keyStoreStateRepository.deleteAll();
   }
 
   @Test
@@ -352,7 +360,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractOrientdbServiceTe
 
   @Configuration
   @PropertySource("classpath:org/obiba/opal/core/service/security/SubjectCredentialsServiceImplTest.properties")
-  public static class Config extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractConfigDbTestConfig {
 
     @Bean
     public EventBus eventBus() {

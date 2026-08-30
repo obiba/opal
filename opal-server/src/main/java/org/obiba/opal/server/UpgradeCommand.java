@@ -31,7 +31,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -42,8 +41,6 @@ public class UpgradeCommand {
   private static final Logger log = LoggerFactory.getLogger(UpgradeCommand.class);
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
-
-  private String opalConfigPath = Paths.get(System.getenv("OPAL_HOME"), "data", "orientdb", "opal-config").toString();
 
   public void execute() {
     standardUpgrade();

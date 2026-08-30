@@ -12,27 +12,34 @@ package org.obiba.opal.core.domain.security;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.converter.StringSetConverter;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * This is a Personal API access token: allow a tier to connect to Opal on behalf of a subject and with restricted permissions.
  */
-public class SubjectToken extends AbstractTimestamped implements HasUniqueProperties {
+@Entity
+@Table(name = "subject_tokens",
+    uniqueConstraints = @UniqueConstraint(name = "uk_subject_tokens_token", columnNames = "token"))
+public class SubjectToken extends AbstractTimestamped {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   /**
    * The token string.
    */
   @NotNull
   @NotBlank
+  @Column(nullable = false)
   private String token;
 
   /**
@@ -49,24 +56,35 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
   @NotBlank
   private String name;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
   private Set<String> projects;
 
+  @Lob
+  @Convert(converter = StringSetConverter.class)
   private Set<String> commands;
 
   private String access;
 
+  @Column(name = "create_project", nullable = false)
   private boolean createProject;
 
+  @Column(name = "update_project", nullable = false)
   private boolean updateProject;
 
+  @Column(name = "delete_project", nullable = false)
   private boolean deleteProject;
 
+  @Column(name = "use_r", nullable = false)
   private boolean useR;
 
+  @Column(name = "use_datashield", nullable = false)
   private boolean useDatashield;
 
+  @Column(name = "use_sql", nullable = false)
   private boolean useSQL;
 
+  @Column(name = "system_admin", nullable = false)
   private boolean systemAdmin;
 
   public SubjectToken() {
@@ -76,16 +94,6 @@ public class SubjectToken extends AbstractTimestamped implements HasUniqueProper
     this.token = token;
     this.principal = principal;
     this.name = name;
-  }
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("token");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.newArrayList(token);
   }
 
   @NotNull
