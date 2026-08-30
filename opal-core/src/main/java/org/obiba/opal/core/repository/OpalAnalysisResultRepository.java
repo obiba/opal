@@ -19,8 +19,6 @@ public interface OpalAnalysisResultRepository extends JpaRepository<OpalAnalysis
 
   Optional<OpalAnalysisResult> findByAnalysisNameAndId(String analysisName, String id);
 
-  List<OpalAnalysisResult> findByAnalysisName(String analysisName);
-
   List<OpalAnalysisResult> findAllByOrderByCreatedDesc();
 
   Optional<OpalAnalysisResult> findFirstByOrderByCreatedDesc();

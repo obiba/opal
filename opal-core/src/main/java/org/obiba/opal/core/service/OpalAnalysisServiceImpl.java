@@ -76,10 +76,16 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
     }
   }
 
+  /**
+   * An analysis is identified by its datasource, its table and its name, and so are its results. Deleting by name
+   * alone would take the results of every analysis that happens to share the name, on any table of any project.
+   */
   @Override
   public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
     opalAnalysisRepository.deleteByKey(analysis);
-    opalAnalysisResultRepository.deleteAll(opalAnalysisResultRepository.findByAnalysisName(analysis.getName()));
+    opalAnalysisResultRepository.deleteAll(opalAnalysisResultRepository
+        .findByDatasourceAndTableAndAnalysisNameOrderByCreatedDesc(analysis.getDatasource(), analysis.getTable(),
+            analysis.getName()));
 
     deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getDatasource(), analysis.getTable(), analysis.getName()));
   }
