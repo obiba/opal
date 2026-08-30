@@ -124,17 +124,22 @@ public class ResourceReferenceServiceImpl implements ResourceReferenceService {
 
   @Override
   public void delete(String project, String name) {
-    try {
-      resourceReferenceRepository.deleteByKey(getResourceReference(project, name));
+    resourceReferenceRepository.findByProjectAndName(project, name).ifPresent(reference -> {
+      resourceReferenceRepository.delete(reference);
       subjectAclService.deleteNodePermissions(getPermissionNode(project, name));
-    } catch (NoSuchResourceReferenceException e) {
-      // ignore
-    }
+    });
   }
 
+  /**
+   * Removing the resources of a project is authorized where it is asked for - the web resource, or the deletion of the
+   * project itself - so every reference of the project goes, not only the ones the current subject happens to be able
+   * to view. Filtering a deletion by view permission left behind exactly the rows nobody could see, credentials and
+   * all, and the node permissions removed just below made sure nobody ever would: no later deletion could reach them
+   * either.
+   */
   @Override
   public void deleteAll(String project) {
-    getResourceReferences(project).forEach(resourceReferenceRepository::deleteByKey);
+    resourceReferenceRepository.deleteAll(resourceReferenceRepository.findByProject(project));
     subjectAclService.deleteNodePermissions("/project/" + project + "/resource");
   }
 
