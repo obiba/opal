@@ -19,6 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.storage.DiskSpaceService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
@@ -46,6 +47,8 @@ public class FilesResourceTest {
 
   private SubjectAclService subjectAclServiceMock;
 
+  private DiskSpaceService diskSpaceServiceMock;
+
   private OpalFileSystem fileSystem;
 
   private FilesResource filesResource;
@@ -65,6 +68,9 @@ public class FilesResourceTest {
   public void setUp() throws URISyntaxException {
     opalFileSystemServiceMock = createMock(OpalFileSystemService.class);
     subjectAclServiceMock = createMock(SubjectAclService.class);
+    // nice: the disk is not what these tests are about, and a nice mock lets every check through
+    diskSpaceServiceMock = createNiceMock(DiskSpaceService.class);
+    replay(diskSpaceServiceMock);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
     File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
@@ -75,6 +81,7 @@ public class FilesResourceTest {
     filesResource = new FilesResource();
     filesResource.setOpalFileSystemService(opalFileSystemServiceMock);
     filesResource.setSubjectAclService(subjectAclServiceMock);
+    filesResource.setDiskSpaceService(diskSpaceServiceMock);
 
     fileItemMock = createMock(InputPart.class);
     fileObjectMock = createMock(FileObject.class);
@@ -275,12 +282,13 @@ public class FilesResourceTest {
     };
     fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
     fileResource.setSubjectAclService(subjectAclServiceMock);
+    fileResource.setDiskSpaceService(diskSpaceServiceMock);
 
     replay(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
     String destinationPath = "/folder1/folder11/folder111";
-    Response response = fileResource.uploadFile(destinationPath, uriInfoMock, null);
+    Response response = fileResource.uploadFile(destinationPath, uriInfoMock, null, -1);
     filesCreatedByTest.add(destinationPath);
 
     // Verify that the service response is CREATED.
@@ -309,8 +317,9 @@ public class FilesResourceTest {
     };
     fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
     fileResource.setSubjectAclService(subjectAclServiceMock);
+    fileResource.setDiskSpaceService(diskSpaceServiceMock);
 
-    Response response = fileResource.uploadFile("/", uriInfoMock, null);
+    Response response = fileResource.uploadFile("/", uriInfoMock, null, -1);
     assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
     verify(opalFileSystemServiceMock);
@@ -329,14 +338,16 @@ public class FilesResourceTest {
       }
     };
     fileResource.setOpalFileSystemService(opalFileSystemServiceMock);
+    fileResource.setDiskSpaceService(diskSpaceServiceMock);
     filesResource.setSubjectAclService(subjectAclServiceMock);
+    filesResource.setDiskSpaceService(diskSpaceServiceMock);
 
     replay(opalFileSystemServiceMock, fileItemMock, uriInfoMock);
 
     // Upload the file.
     String destinationPath = "/folder1/folder11/folder111/patate";
     try {
-      fileResource.uploadFile(destinationPath, uriInfoMock, null);
+      fileResource.uploadFile(destinationPath, uriInfoMock, null, -1);
       assertThat(false).isTrue();
     } catch (NoSuchFileException e) {
 

@@ -32,6 +32,8 @@ import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.storage.DiskSpaceService;
+import org.obiba.opal.core.service.storage.InsufficientStorageException;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -68,6 +70,13 @@ public class FilesResource {
 
   private SubjectAclService subjectAclService;
 
+  private DiskSpaceService diskSpaceService;
+
+  /**
+   * HTTP 507, which JAX-RS does not name.
+   */
+  private static final int INSUFFICIENT_STORAGE = 507;
+
   private final FileNameMap mimeTypes = URLConnection.getFileNameMap();;
 
   private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -86,6 +95,11 @@ public class FilesResource {
   @Autowired
   public void setSubjectAclService(SubjectAclService subjectAclService) {
     this.subjectAclService = subjectAclService;
+  }
+
+  @Autowired
+  public void setDiskSpaceService(DiskSpaceService diskSpaceService) {
+    this.diskSpaceService = diskSpaceService;
   }
 
   @GET
@@ -347,9 +361,10 @@ public class FilesResource {
   @ApiResponse(responseCode = "400", description = "Bad request")
   @ApiResponse(responseCode = "403", description = "Forbidden when destination folder is not writable")
   @ApiResponse(responseCode = "404", description = "Destination folder not found")
-  public Response uploadFile(@Context UriInfo uriInfo, @MultipartForm MultipartFormDataInput input)
+  public Response uploadFile(@Context UriInfo uriInfo, @MultipartForm MultipartFormDataInput input,
+                             @HeaderParam("Content-Length") @DefaultValue("-1") long contentLength)
       throws IOException {
-    return uploadFile("/", uriInfo, input);
+    return uploadFile("/", uriInfo, input, contentLength);
   }
 
   // The POST method is required here to be compatible with Html forms which do not support the PUT method.
@@ -364,8 +379,20 @@ public class FilesResource {
   @ApiResponse(responseCode = "400", description = "Bad request")
   @ApiResponse(responseCode = "403", description = "Forbidden when destination folder is not writable")
   @ApiResponse(responseCode = "404", description = "Destination folder not found")
+  @ApiResponse(responseCode = "507", description = "Not enough free disk space to store the file")
   public Response uploadFile(@PathParam("path") String path, @Context UriInfo uriInfo,
-                             @MultipartForm MultipartFormDataInput input) throws IOException {
+                             @MultipartForm MultipartFormDataInput input,
+                             @HeaderParam("Content-Length") @DefaultValue("-1") long contentLength)
+      throws IOException {
+
+    // The one write whose size is known before it happens. A sampler that runs once a minute cannot see a single 40 GB
+    // upload coming, so the announced length is checked against the volume the file system root is on.
+    try {
+      diskSpaceService.checkFileSystemWritable(contentLength);
+    } catch(InsufficientStorageException e) {
+      log.warn("Upload to {} refused: {}", path, e.getMessage());
+      return Response.status(INSUFFICIENT_STORAGE).entity(e.getMessage()).build();
+    }
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);

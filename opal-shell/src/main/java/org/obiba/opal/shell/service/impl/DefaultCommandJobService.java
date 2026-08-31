@@ -16,17 +16,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.event.DiskLevelChangedEvent;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.security.SessionDetachedSubject;
+import org.obiba.opal.core.service.storage.DiskLevel;
+import org.obiba.opal.core.service.storage.DiskSpaceService;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,6 +50,9 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   private Executor executor;
+
+  @Autowired(required = false)
+  private DiskSpaceService diskSpaceService;
 
   private final Map<String, Executor> projectExecutors;
 
@@ -152,6 +160,7 @@ public class DefaultCommandJobService implements CommandJobService {
     commandJob.setId(nextJobId());
     commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
+    commandJob.setDiskSpaceService(diskSpaceService);
 
     if (commandJob.hasProject()) {
       return launchProjectCommand(commandJob, owner);
@@ -250,6 +259,25 @@ public class DefaultCommandJobService implements CommandJobService {
         getTerminatedJobs().remove(futureCommandJob);
         cleanupResult(job);
       }
+    }
+  }
+
+  /**
+   * At {@code CRITICAL} the running writers are stopped as well, and not only the ones that have yet to start. A
+   * cancelled import can be run again once there is room; an MVStore that hits a full disk calls {@code panic()} and
+   * closes without persisting, and that costs a restart and whatever had not been written.
+   */
+  @Subscribe
+  public void onDiskLevelChanged(DiskLevelChangedEvent event) {
+    if(!event.getLevel().isAtLeast(DiskLevel.CRITICAL)) return;
+    if(diskSpaceService == null || !diskSpaceService.isEnforced()) return;
+
+    for(FutureCommandJob futureCommandJob : new ArrayList<>(getStartedJobs())) {
+      CommandJob job = futureCommandJob.getCommandJob();
+      if(job.getStatus() != Status.IN_PROGRESS) continue;
+      log.warn("Cancelling task {}, there is not enough free disk space: {}", job.getId(), event.getDetail());
+      job.setStatus(Status.CANCEL_PENDING);
+      futureCommandJob.cancel(true);
     }
   }
 
