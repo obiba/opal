@@ -65,10 +65,23 @@ public class H2DatabaseUrlsTest {
   }
 
   @Test
-  public void test_properties_without_an_init_setting_are_accepted() {
+  public void test_close_connection_properties_are_rejected() {
+    // H2 writes the store to physical disk when the database is closed, and these are the two ways of preventing
+    // that close from happening
+    assertPropertiesRejected("DB_CLOSE_ON_EXIT=FALSE");
+    assertPropertiesRejected("MODE=PostgreSQL;db_close_on_exit=false");
+    assertPropertiesRejected("DB_CLOSE_ON_EXIT");
+    assertPropertiesRejected("DB_CLOSE_DELAY=-1");
+    assertPropertiesRejected(" DB_CLOSE_DELAY = 10 ");
+  }
+
+  @Test
+  public void test_properties_without_a_reserved_setting_are_accepted() {
     H2DatabaseUrls.validateProperties(null);
     H2DatabaseUrls.validateProperties("");
-    H2DatabaseUrls.validateProperties("MODE=PostgreSQL;DB_CLOSE_DELAY=-1");
+    H2DatabaseUrls.validateProperties("MODE=PostgreSQL");
+    // stating the defaults Opal relies on is not a change
+    H2DatabaseUrls.validateProperties("DB_CLOSE_ON_EXIT=TRUE;DB_CLOSE_DELAY=0");
     // a value that merely mentions the setting is not one
     H2DatabaseUrls.validateProperties("MODE=INIT");
   }

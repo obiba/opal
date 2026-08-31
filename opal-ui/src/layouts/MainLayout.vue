@@ -107,6 +107,7 @@
     </q-drawer>
 
     <q-page-container>
+      <disk-space-banner />
       <router-view />
       <re-signin-dialog v-model="authStore.reAuthRequired" />
     </q-page-container>
@@ -122,6 +123,7 @@ import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
 import ReSigninDialog from 'src/components/ReSigninDialog.vue';
+import DiskSpaceBanner from 'src/components/DiskSpaceBanner.vue';
 import type { QueryResultDto } from 'src/models/Search';
 import type { ItemFieldsResultDto } from 'src/stores/search';
 

@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
  * The name is the whole URL: H2 settings, which a {@code ;} would introduce, are not accepted. They are not a way of
  * tuning the connection but a second language, in which {@code INIT} alone runs arbitrary SQL — {@code RUNSCRIPT FROM}
  * a remote URL included — every time the connection is opened. The same setting can be passed as a connection
- * property, so {@link #validateProperties(String)} rejects it there too.
+ * property, so {@link #validateProperties(String)} rejects it there too, along with the two settings that would take
+ * away the fsync H2 performs when the database is closed.
  */
 public final class H2DatabaseUrls {
 
@@ -44,6 +45,20 @@ public final class H2DatabaseUrls {
    * H2 setting that runs SQL statements when a connection is opened.
    */
   private static final String INIT_SETTING = "INIT";
+
+  /**
+   * H2 setting that decides whether the JVM shutdown hook closes the database. Left at its default, it is one of the
+   * two ways the store is written to physical disk; turned off, the hook falls back to a checkpoint that flushes
+   * without forcing, and a power loss right after a clean stop can still lose the last writes.
+   */
+  private static final String DB_CLOSE_ON_EXIT_SETTING = "DB_CLOSE_ON_EXIT";
+
+  /**
+   * H2 setting that decides how long the database stays open after the last connection is closed. Left at 0, closing
+   * the connection pool is enough to close the database; anything else keeps it open past the point where Opal
+   * believes it has released it.
+   */
+  private static final String DB_CLOSE_DELAY_SETTING = "DB_CLOSE_DELAY";
 
   /**
    * H2 1.x page store file suffix, unreadable by the H2 2.x driver that Opal ships.
@@ -92,18 +107,33 @@ public final class H2DatabaseUrls {
 
   /**
    * Verify that the connection properties, a {@code ;} separated list of {@code name=value} pairs handed to the driver
-   * as they are, carry no {@code INIT} setting: H2 reads its settings from the properties as well as from the URL.
+   * as they are, carry none of the settings Opal reserves for itself: H2 reads its settings from the properties as
+   * well as from the URL, so the properties are the remaining way of expressing them.
+   * <p>
+   * {@code INIT} is refused because it runs arbitrary SQL. {@code DB_CLOSE_ON_EXIT} and {@code DB_CLOSE_DELAY} are
+   * refused because H2 only writes the store to physical disk when the database is closed — {@code FileStore.stop()}
+   * ends in a {@code FileChannel.force(true)} — and these are the two settings that stop that close from happening.
+   * Turning either off would silently take away the durability everything else assumes.
    *
-   * @throws InvalidH2DatabaseException if an INIT setting is present
+   * @throws InvalidH2DatabaseException if a reserved setting is present
    */
   public static void validateProperties(@Nullable String properties) {
     if(Strings.isNullOrEmpty(properties)) return;
     for(String property : properties.split(";")) {
       int idx = property.indexOf('=');
       String name = (idx < 0 ? property : property.substring(0, idx)).trim();
+      String value = idx < 0 ? "" : property.substring(idx + 1).trim();
       if(INIT_SETTING.equalsIgnoreCase(name)) {
         throw new InvalidH2DatabaseException(
             "The H2 INIT setting is not allowed: it runs SQL statements every time the connection is opened");
+      }
+      if(DB_CLOSE_ON_EXIT_SETTING.equalsIgnoreCase(name) && !"TRUE".equalsIgnoreCase(value)) {
+        throw new InvalidH2DatabaseException("The H2 " + DB_CLOSE_ON_EXIT_SETTING +
+            " setting cannot be turned off: the database would no longer be written to disk when the JVM stops");
+      }
+      if(DB_CLOSE_DELAY_SETTING.equalsIgnoreCase(name) && !"0".equals(value)) {
+        throw new InvalidH2DatabaseException("The H2 " + DB_CLOSE_DELAY_SETTING +
+            " setting cannot be changed: the database would stay open, and unwritten, after Opal has released it");
       }
     }
   }

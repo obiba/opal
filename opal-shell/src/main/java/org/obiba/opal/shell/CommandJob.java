@@ -13,6 +13,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
+import org.obiba.opal.core.service.storage.DiskSpaceService;
+import org.obiba.opal.core.service.storage.InsufficientStorageException;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandResult;
 import org.obiba.opal.shell.commands.ResultCapable;
@@ -72,6 +74,12 @@ public class CommandJob implements OpalShell, Runnable {
   private Long endProgress;
 
   private Integer percentProgress;
+
+  /**
+   * Set when the job is launched, and left null by the callers that build a job by hand. A null one means no check,
+   * which is what keeps the class usable on its own.
+   */
+  private DiskSpaceService diskSpaceService;
 
   //
   // CommandJob
@@ -161,6 +169,14 @@ public class CommandJob implements OpalShell, Runnable {
       if(status != Status.CANCEL_PENDING) {
         status = Status.IN_PROGRESS;
         startTime = getCurrentTime();
+        // Every long running writer - import, copy, backup, restore, VCF export, analysis - passes through here, so
+        // this is where a full disk stops them, once, rather than in each command. It is checked at execution time
+        // and not at submission: a job can sit in its queue for a long while behind another one.
+        if(isRefusedForDiskSpace()) {
+          status = Status.FAILED;
+          printCompletion();
+          return;
+        }
         errorCode = command.execute();
       }
 
@@ -193,6 +209,22 @@ public class CommandJob implements OpalShell, Runnable {
 
   public Command<?> getCommand() {
     return command;
+  }
+
+  public void setDiskSpaceService(DiskSpaceService diskSpaceService) {
+    this.diskSpaceService = diskSpaceService;
+  }
+
+  private boolean isRefusedForDiskSpace() {
+    if(diskSpaceService == null) return false;
+    try {
+      diskSpaceService.checkWritable();
+      return false;
+    } catch(InsufficientStorageException e) {
+      printf("%s", e.getMessage());
+      log.warn("Task {} was not started, there is not enough free disk space: {}", id, e.getMessage());
+      return true;
+    }
   }
 
   public String getOwner() {

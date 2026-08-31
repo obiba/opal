@@ -329,6 +329,34 @@ export interface OpalStatus {
   nonHeapMemory: OpalStatus_MemoryUsage | undefined;
   threads: OpalStatus_ThreadsUsage | undefined;
   gcs: OpalStatus_GarbageCollectorUsage[];
+  disks: OpalStatus_DiskUsage[];
+  /** the worst of the volumes above */
+  diskLevel?: OpalStatus_DiskLevel | undefined;
+  /** whether that level is acted upon, or only reported */
+  diskEnforced?: boolean | undefined;
+}
+
+/**
+ * How much room is left on a volume Opal writes to. UNKNOWN means the volume could not be measured, and never
+ * blocks anything.
+ */
+export enum OpalStatus_DiskLevel {
+  UNKNOWN = 'UNKNOWN',
+  OK = 'OK',
+  WARN = 'WARN',
+  DEGRADED = 'DEGRADED',
+  CRITICAL = 'CRITICAL',
+  UNRECOGNIZED = 'UNRECOGNIZED',
+}
+
+/** One entry per volume, not per folder: the folders Opal watches are usually on the same mount. */
+export interface OpalStatus_DiskUsage {
+  /** the watched folders on this volume */
+  name: string;
+  path: string;
+  total: number;
+  usable: number;
+  level: OpalStatus_DiskLevel;
 }
 
 /** http://docs.oracle.com/javase/7/docs/api/java/lang/management/MemoryUsage.html */

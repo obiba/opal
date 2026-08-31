@@ -318,12 +318,32 @@ message OpalStatus {
     required int64 collectionCount = 2;
     required int64 collectionTime = 3;
   }
+  // How much room is left on a volume Opal writes to. UNKNOWN means the volume could not be measured, and never
+  // blocks anything.
+  enum DiskLevel {
+    UNKNOWN = 0;
+    OK = 1;
+    WARN = 2;
+    DEGRADED = 3;
+    CRITICAL = 4;
+  }
+  // One entry per volume, not per folder: the folders Opal watches are usually on the same mount.
+  message DiskUsage {
+    required string name = 1; // the watched folders on this volume
+    required string path = 2;
+    required int64 total = 3;
+    required int64 usable = 4;
+    required DiskLevel level = 5;
+  }
   required int64 timestamp = 1;
   required int64 uptime = 2;
   required MemoryUsage heapMemory = 3;
   required MemoryUsage nonHeapMemory = 4;
   required ThreadsUsage threads = 5;
   repeated GarbageCollectorUsage gcs = 6;
+  repeated DiskUsage disks = 7;
+  optional DiskLevel diskLevel = 8; // the worst of the volumes above
+  optional bool diskEnforced = 9; // whether that level is acted upon, or only reported
 }
 
 message GeneralConf {
