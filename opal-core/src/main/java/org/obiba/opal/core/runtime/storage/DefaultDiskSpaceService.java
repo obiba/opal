@@ -239,7 +239,7 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
           enforce ? "Imports, copies, backups and uploads are being refused." : "Enforcement is off, nothing is refused.");
     } else if(current == DiskLevel.WARN) {
       log.warn("Free disk space is low: {}", detail);
-    } else if(previous.isAtLeast(DiskLevel.WARN)) {
+    } else if(current == DiskLevel.OK && previous.isAtLeast(DiskLevel.WARN)) {
       log.info("Free disk space is back to normal: {}", detail);
     }
     eventBus.post(new DiskLevelChangedEvent(previous, current, detail));
