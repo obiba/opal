@@ -26,40 +26,37 @@ public class DefaultDiskSpaceServiceTest {
   public void setUp() {
     service = new DefaultDiskSpaceService();
     // the shipped defaults, so that the test says what an installation actually does
-    ReflectionTestUtils.setField(service, "warnPercent", 15);
     ReflectionTestUtils.setField(service, "warnBytes", 5 * GIB);
-    ReflectionTestUtils.setField(service, "degradedPercent", 5);
-    ReflectionTestUtils.setField(service, "degradedBytes", GIB);
-    ReflectionTestUtils.setField(service, "criticalPercent", 1);
-    ReflectionTestUtils.setField(service, "criticalBytes", 256 * 1024 * 1024L);
-  }
-
-  @Test
-  public void test_a_percentage_and_a_size_whichever_is_larger() {
-    // on a small volume the percentage is meaningless and the absolute floor decides
-    assertThat(service.requiredFreeSpace(20 * GIB, 5, GIB)).isEqualTo(GIB);
-    // on a large one it is the other way round
-    assertThat(service.requiredFreeSpace(1000 * GIB, 5, GIB)).isEqualTo(50 * GIB);
+    ReflectionTestUtils.setField(service, "degradedBytes", 2 * GIB);
+    ReflectionTestUtils.setField(service, "criticalBytes", 512 * 1024 * 1024L);
   }
 
   @Test
   public void test_levels_on_a_small_volume() {
     long total = 20 * GIB;
     assertThat(service.levelOf(total, 10 * GIB)).isEqualTo(DiskLevel.OK);
-    // 15% of 20 GiB is 3 GiB, but the 5 GiB floor is larger
     assertThat(service.levelOf(total, 4 * GIB)).isEqualTo(DiskLevel.WARN);
-    assertThat(service.levelOf(total, 900 * 1024 * 1024L)).isEqualTo(DiskLevel.DEGRADED);
+    assertThat(service.levelOf(total, GIB)).isEqualTo(DiskLevel.DEGRADED);
     assertThat(service.levelOf(total, 100 * 1024 * 1024L)).isEqualTo(DiskLevel.CRITICAL);
   }
 
   @Test
-  public void test_levels_on_a_large_volume() {
-    long total = 10000 * GIB;
-    assertThat(service.levelOf(total, 2000 * GIB)).isEqualTo(DiskLevel.OK);
-    // there the percentages are what decide: 15%, 5% and 1% of 10 TiB
-    assertThat(service.levelOf(total, 1000 * GIB)).isEqualTo(DiskLevel.WARN);
-    assertThat(service.levelOf(total, 300 * GIB)).isEqualTo(DiskLevel.DEGRADED);
-    assertThat(service.levelOf(total, 50 * GIB)).isEqualTo(DiskLevel.CRITICAL);
+  public void test_the_same_free_space_reads_the_same_on_any_volume() {
+    // what a level answers is whether there is room left to work, and that does not depend on how big the disk is.
+    // A percentage got this wrong: 15% of a 468 GB volume asked for 70 GB of headroom nothing would ever use.
+    for(long total : new long[] { 20 * GIB, 468 * GIB, 10000 * GIB }) {
+      assertThat(service.levelOf(total, 10 * GIB)).isEqualTo(DiskLevel.OK);
+      assertThat(service.levelOf(total, 4 * GIB)).isEqualTo(DiskLevel.WARN);
+      assertThat(service.levelOf(total, GIB)).isEqualTo(DiskLevel.DEGRADED);
+      assertThat(service.levelOf(total, 100 * 1024 * 1024L)).isEqualTo(DiskLevel.CRITICAL);
+    }
+  }
+
+  @Test
+  public void test_the_reading_that_started_this() {
+    // 27.64 GB free of 467.89 GB, reported as WARN by the percentage thresholds and four gigabytes away from having
+    // its imports refused, on a volume with ample room to operate
+    assertThat(service.levelOf(467_890_000_000L, 27_640_000_000L)).isEqualTo(DiskLevel.OK);
   }
 
   @Test

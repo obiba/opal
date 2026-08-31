@@ -69,20 +69,11 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
   @Value("${org.obiba.opal.storage.disk.enforce}")
   private boolean enforce;
 
-  @Value("${org.obiba.opal.storage.disk.warn.percent}")
-  private int warnPercent;
-
   @Value("${org.obiba.opal.storage.disk.warn.bytes}")
   private long warnBytes;
 
-  @Value("${org.obiba.opal.storage.disk.degraded.percent}")
-  private int degradedPercent;
-
   @Value("${org.obiba.opal.storage.disk.degraded.bytes}")
   private long degradedBytes;
-
-  @Value("${org.obiba.opal.storage.disk.critical.percent}")
-  private int criticalPercent;
 
   @Value("${org.obiba.opal.storage.disk.critical.bytes}")
   private long criticalBytes;
@@ -113,6 +104,11 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
    * Paths that could not be measured, so that a volume Opal cannot see is reported once and not once a minute.
    */
   private final Set<String> unreadable = Collections.synchronizedSet(new HashSet<>());
+
+  /**
+   * Volumes too small to ever satisfy the thresholds, reported once each.
+   */
+  private final Set<String> oversizedThreshold = Collections.synchronizedSet(new HashSet<>());
 
   @Override
   public void start() {
@@ -177,14 +173,13 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
     if(volume == null || volume.status.getLevel() == DiskLevel.UNKNOWN) return;
 
     long needed = withSafetyMargin(requiredBytes);
-    // What the write must leave behind it, and not only what it takes: the floor is what lets the databases compact
-    // and close cleanly, so a write is refused when it would eat into the floor rather than when it runs out.
-    long floor = requiredFreeSpace(volume.status.getTotalSpace(), degradedPercent, degradedBytes);
-    if(volume.status.getUsableSpace() - needed >= floor) return;
+    // What the write must leave behind it, and not only what it takes: the DEGRADED floor is what lets the databases
+    // compact and close cleanly, so a write is refused when it would eat into the floor rather than when it runs out.
+    if(volume.status.getUsableSpace() - needed >= degradedBytes) return;
 
     throw new InsufficientStorageException(
         "Not enough free disk space on " + volume.status.getPath() + " to write " + needed + " bytes: " +
-            volume.status.getUsableSpace() + " bytes free, of which " + floor + " are reserved.");
+            volume.status.getUsableSpace() + " bytes free, of which " + degradedBytes + " are reserved.");
   }
 
   @Override
@@ -221,6 +216,7 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
       DiskLevel previous = level;
       volumes = sampled;
       level = worst;
+      checkThresholdsFit(sampled);
       report(previous, worst);
     } catch(RuntimeException e) {
       // The checker is a safety net, and a safety net that throws on the scheduler thread stops being one.
@@ -243,6 +239,25 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
       log.info("Free disk space is back to normal: {}", detail);
     }
     eventBus.post(new DiskLevelChangedEvent(previous, current, detail));
+  }
+
+  /**
+   * A threshold larger than the volume it applies to holds that level on however empty the volume is. That is a
+   * configuration error rather than a reading worth acting upon, and saying so once is more use to an administrator
+   * than silently clamping the threshold to something they did not ask for. Only the WARN threshold is checked, being
+   * the largest of the three. Done here rather than at start(), since the volumes are resolved on every sample and
+   * the Opal file system root only appears once the configuration has been read.
+   */
+  private void checkThresholdsFit(List<Volume> sampled) {
+    for(Volume volume : sampled) {
+      DiskStatus status = volume.status;
+      if(status.getTotalSpace() <= 0 || status.getTotalSpace() > warnBytes) continue;
+      if(oversizedThreshold.add(status.getPath())) {
+        log.warn("Volume {} ({}) holds {} bytes in total, less than the {} bytes of the WARN threshold: it can never " +
+                "report OK. Lower org.obiba.opal.storage.disk.warn.bytes, or give Opal a larger volume.",
+            status.getName(), status.getPath(), status.getTotalSpace(), warnBytes);
+      }
+    }
   }
 
   private String describeWorstVolume() {
@@ -335,21 +350,18 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
     return null;
   }
 
+  /**
+   * The thresholds are absolute sizes and deliberately not a share of the volume. A level answers whether there is
+   * room left for Opal to do its work, and what has to fit — an import, a compaction, a clean close — does not need
+   * more room on a larger disk. A percentage gets the answer more wrong the bigger the volume gets: 15% of a 468 GB
+   * volume asks for 70 GB of headroom that nothing is ever going to use.
+   */
   DiskLevel levelOf(long total, long usable) {
     if(total <= 0 || usable < 0) return DiskLevel.UNKNOWN;
-    if(usable < requiredFreeSpace(total, criticalPercent, criticalBytes)) return DiskLevel.CRITICAL;
-    if(usable < requiredFreeSpace(total, degradedPercent, degradedBytes)) return DiskLevel.DEGRADED;
-    if(usable < requiredFreeSpace(total, warnPercent, warnBytes)) return DiskLevel.WARN;
+    if(usable < criticalBytes) return DiskLevel.CRITICAL;
+    if(usable < degradedBytes) return DiskLevel.DEGRADED;
+    if(usable < warnBytes) return DiskLevel.WARN;
     return DiskLevel.OK;
-  }
-
-  /**
-   * A percentage and an absolute size, whichever is larger. Neither works alone: 5% of a 10 TB volume is 500 GB, which
-   * would keep a mostly empty server permanently degraded, and 5% of a 20 GB volume is 1 GB, which a single import can
-   * cross without warning.
-   */
-  long requiredFreeSpace(long total, int percent, long bytes) {
-    return Math.max(total / 100 * percent, bytes);
   }
 
   //
