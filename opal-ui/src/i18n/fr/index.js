@@ -131,6 +131,12 @@ export default {
     settings_init_help: 'Selectionner quels paquets DataSHIELD auront leurs méthodes et options appliqués à ce profil.',
     settings_init: 'Initialiser la configuration DataSHIELD du profil à partir des paquets DataSHIELD sélectionnés',
   },
+  disk_space: {
+    free_of: 'libre sur',
+    warn: "L'espace disque du serveur Opal commence à manquer.",
+    degraded: "Espace disque insuffisant : les importations, copies, sauvegardes et téléversements sont refusés. Libérez de l'espace pour les reprendre.",
+    critical: "Espace disque critique : les tâches en cours sont annulées afin d'éviter une défaillance des bases de données. Libérez de l'espace immédiatement.",
+  },
   error: {
     Forbidden: "L'operation est interdite",
     NoSuchValueTableInDatasource: "La table n'existe pas ou vous n'y avez pas accès",

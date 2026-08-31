@@ -131,6 +131,12 @@ export default {
     settings_init_help: 'Select which DataSHIELD packages will get their methods and options applied to this profile.',
     settings_init: 'Initialize the DataSHIELD profile settings with selected DataSHIELD packages',
   },
+  disk_space: {
+    free_of: 'free of',
+    warn: 'Disk space is running low on the Opal server.',
+    degraded: 'Not enough free disk space: imports, copies, backups and uploads are being refused. Free some space to resume them.',
+    critical: 'Critically low disk space: running tasks are being cancelled to keep the databases from failing. Free some space now.',
+  },
   error: {
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',

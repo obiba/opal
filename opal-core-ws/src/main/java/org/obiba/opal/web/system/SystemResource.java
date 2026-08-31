@@ -30,6 +30,9 @@ import org.obiba.opal.core.security.AuthConfigurationProvider;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
+import org.obiba.opal.core.service.storage.DiskLevel;
+import org.obiba.opal.core.service.storage.DiskSpaceService;
+import org.obiba.opal.core.service.storage.DiskStatus;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.system.news.ObibaNews;
@@ -76,6 +79,9 @@ public class SystemResource {
 
   @Autowired
   private SystemKeyStoreService systemKeyStoreService;
+
+  @Autowired
+  private DiskSpaceService diskSpaceService;
 
   @Autowired
   private ApplicationContext applicationContext;
@@ -155,6 +161,11 @@ public class SystemResource {
       garbageCollectorUsagesValues.add(getGarbageCollector(GC));
     }
 
+    Collection<Opal.OpalStatus.DiskUsage> diskUsages = new ArrayList<>();
+    for (DiskStatus status : diskSpaceService.getStatuses()) {
+      diskUsages.add(getDiskUsage(status));
+    }
+
     return Opal.OpalStatus.newBuilder()//
         .setTimestamp(System.currentTimeMillis())//
         .setUptime(ManagementFactory.getRuntimeMXBean().getUptime())
@@ -162,6 +173,9 @@ public class SystemResource {
         .setNonHeapMemory(getMemory(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage()))
         .setThreads(getThread(ManagementFactory.getThreadMXBean()))//
         .addAllGcs(garbageCollectorUsagesValues)//
+        .addAllDisks(diskUsages)//
+        .setDiskLevel(getDiskLevel(diskSpaceService.getLevel()))//
+        .setDiskEnforced(diskSpaceService.isEnforced())//
         .build();
   }
 
@@ -198,6 +212,20 @@ public class SystemResource {
         .setCount(threadMXBean.getThreadCount())//
         .setPeak(threadMXBean.getPeakThreadCount())//
         .build();
+  }
+
+  private Opal.OpalStatus.DiskUsage getDiskUsage(DiskStatus status) {
+    return Opal.OpalStatus.DiskUsage.newBuilder()//
+        .setName(status.getName())//
+        .setPath(status.getPath())//
+        .setTotal(status.getTotalSpace())//
+        .setUsable(status.getUsableSpace())//
+        .setLevel(getDiskLevel(status.getLevel()))//
+        .build();
+  }
+
+  private Opal.OpalStatus.DiskLevel getDiskLevel(DiskLevel level) {
+    return Opal.OpalStatus.DiskLevel.valueOf(level.name());
   }
 
   private Opal.OpalStatus.GarbageCollectorUsage getGarbageCollector(GarbageCollectorMXBean garbageCollectorMXBean) {
