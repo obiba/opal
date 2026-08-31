@@ -385,15 +385,6 @@ public class FilesResource {
                              @HeaderParam("Content-Length") @DefaultValue("-1") long contentLength)
       throws IOException {
 
-    // The one write whose size is known before it happens. A sampler that runs once a minute cannot see a single 40 GB
-    // upload coming, so the announced length is checked against the volume the file system root is on.
-    try {
-      diskSpaceService.checkFileSystemWritable(contentLength);
-    } catch(InsufficientStorageException e) {
-      log.warn("Upload to {} refused: {}", path, e.getMessage());
-      return Response.status(INSUFFICIENT_STORAGE).entity(e.getMessage()).build();
-    }
-
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
 
@@ -409,6 +400,15 @@ public class FilesResource {
       return Response.status(Status.BAD_REQUEST)
           .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
           .build();
+    }
+
+    // The one write whose size is known before it happens. A sampler that runs once a minute cannot see a single 40 GB
+    // upload coming, so the announced length is checked against the volume the file system root is on.
+    try {
+      diskSpaceService.checkFileSystemWritable(contentLength);
+    } catch(InsufficientStorageException e) {
+      log.warn("Upload to {} refused: {}", path, e.getMessage());
+      return Response.status(INSUFFICIENT_STORAGE).entity(e.getMessage()).build();
     }
 
     return doUploadFiles(folderPath, folder, uploadedFiles, uriInfo);
