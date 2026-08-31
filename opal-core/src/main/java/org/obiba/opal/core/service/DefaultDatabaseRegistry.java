@@ -141,6 +141,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
+  public Iterable<DataSource> getLoadedDataSources() {
+    // asMap() is a view of what the cache holds, and reading it does not go through the CacheLoader: a database that
+    // has never been used stays closed.
+    return ImmutableList.copyOf(dataSourceCache.asMap().values());
+  }
+
+  @Override
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
     if(databaseRepository.findByName(database.getName()).isEmpty()) {

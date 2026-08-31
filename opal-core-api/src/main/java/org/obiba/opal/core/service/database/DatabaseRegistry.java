@@ -49,6 +49,13 @@ public interface DatabaseRegistry extends SystemService {
 
   DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource);
 
+  /**
+   * The data sources that are open right now, and only those. A caller that periodically visits every database — the
+   * H2 checkpointer is the one — must not be the reason a registered database gets opened: that would turn a
+   * maintenance task into "hold a connection pool on every database an administrator ever declared".
+   */
+  Iterable<DataSource> getLoadedDataSources();
+
   void unregister(@NotNull String databaseName, @Nullable String usedByDatasource);
 
   boolean hasIdentifiersDatabase();
