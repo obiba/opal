@@ -62,7 +62,7 @@ public interface RServerService {
    * @throws RServerException
    */
   default RServerSession newRServerSession(String user, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
-    return newRServerSession(user, null, profile, rContextInitiator);
+    return newRServerSession(user, null, profile, RServerSession.DEFAULT_CONTEXT, rContextInitiator);
   }
 
   /**
@@ -71,11 +71,12 @@ public interface RServerService {
    * @param user
    * @param id Session identifier or null
    * @param profile
+   * @param executionContext The context the session is opened for, known before the session starts executing anything
    * @param rContextInitiator
    * @return
    * @throws RServerException
    */
-  RServerSession newRServerSession(String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException;
+  RServerSession newRServerSession(String user, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator) throws RServerException;
 
     /**
      * Default profile.

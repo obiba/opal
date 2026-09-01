@@ -161,8 +161,8 @@ public class RTabularResourceConnector implements TabularResourceConnector, IRTa
           }
         };
       }
-      rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), rServerProfile, null);
-      rSession.setExecutionContext(String.format("View [%s.%s]", project, name));
+      rSession = rSessionManager.newSubjectRSession(getSubject().getPrincipal().toString(), rServerProfile,
+          String.format("View [%s.%s]", project, name), null);
       RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
       waiter.run();
       // prepare R env with util functions

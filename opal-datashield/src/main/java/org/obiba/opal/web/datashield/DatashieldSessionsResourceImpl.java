@@ -115,8 +115,13 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return true;
   }
 
+  @Override
+  protected String getExecutionContext() {
+    return DS_CONTEXT;
+  }
+
+  @Override
   protected void onNewRSession(RServerSession rSession) {
-    rSession.setExecutionContext(DS_CONTEXT);
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
   }

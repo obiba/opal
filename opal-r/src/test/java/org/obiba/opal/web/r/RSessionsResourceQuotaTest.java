@@ -26,6 +26,7 @@ import java.util.Date;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -63,19 +64,19 @@ public class RSessionsResourceQuotaTest {
 
     assertThat(resource.quotaChecks).isEqualTo(1);
     // nothing was allocated and then thrown away: the R server was never asked for a session
-    verify(rSessionManager, never()).newSubjectRSession(any(RServerProfile.class), any());
+    verify(rSessionManager, never()).newSubjectRSession(any(RServerProfile.class), anyString(), any());
   }
 
   @Test
   public void test_a_session_is_created_when_the_quota_allows_it() {
     RServerSession rSession = rSession();
-    when(rSessionManager.newSubjectRSession(any(RServerProfile.class), any())).thenReturn(rSession);
+    when(rSessionManager.newSubjectRSession(any(RServerProfile.class), anyString(), any())).thenReturn(rSession);
 
     Response response = resource.newRSession(null, null, "default", false);
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
     assertThat(resource.quotaChecks).isEqualTo(1);
-    verify(rSessionManager).newSubjectRSession(any(RServerProfile.class), any());
+    verify(rSessionManager).newSubjectRSession(any(RServerProfile.class), anyString(), any());
   }
 
   /**

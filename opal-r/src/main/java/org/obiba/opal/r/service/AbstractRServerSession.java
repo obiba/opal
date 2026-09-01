@@ -58,7 +58,7 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private boolean busy = false;
 
-  private String executionContext = DEFAULT_CONTEXT;
+  private String executionContext;
 
   private final String serverName;
 
@@ -91,9 +91,10 @@ public abstract class AbstractRServerSession implements RServerSession {
 
   private long startExecMillis = -1;
 
-  protected AbstractRServerSession(String serverName, String id, String user, RServerProfile profile, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
+  protected AbstractRServerSession(String serverName, String id, String user, RServerProfile profile, String executionContext, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) {
     this.id = id;
     this.user = user;
+    this.executionContext = executionContext;
     this.transactionalThreadFactory = transactionalThreadFactory;
     this.eventBus = eventBus;
     this.created = new Date();
@@ -162,6 +163,11 @@ public abstract class AbstractRServerSession implements RServerSession {
     return busy && startExecMillis > 0 ? System.currentTimeMillis() - startExecMillis : 0;
   }
 
+  /**
+   * The execution context is normally settled when the session is created: the first R operation can happen before
+   * the caller gets a chance to change it (the context initiator runs while the session is being opened), and it is
+   * that first operation which records the session activity.
+   */
   @Override
   public void setExecutionContext(String executionContext) {
     this.executionContext = executionContext;
@@ -293,7 +299,7 @@ public abstract class AbstractRServerSession implements RServerSession {
     if (busy) {
       startExecMillis = System.currentTimeMillis();
       if (executionTimeMillis == 0)
-        eventBus.post(new RServerSessionStartedEvent(id, user, executionContext, profile.getName(), created));
+        eventBus.post(new RServerSessionStartedEvent(id, user, getExecutionContext(), profile.getName(), created));
     }
     else if (startExecMillis > 0) {
       executionTimeMillis = executionTimeMillis + (System.currentTimeMillis() - startExecMillis);

@@ -79,7 +79,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
       throw new ForbiddenException("Plain R service endpoint is not enabled");
     checkAuthenticationMethod();
     checkQuota();
-    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), withInitiator());
+    RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), getExecutionContext(), withInitiator());
     onNewRSession(rSession);
     if (wait || !Strings.isNullOrEmpty(restore)) {
       RSessionStateWaiter waiter = new RSessionStateWaiter(rSession, restore) {
@@ -122,8 +122,19 @@ public class RSessionsResourceImpl implements RSessionsResource {
     return plainREnabled;
   }
 
+  /**
+   * The context the created sessions are opened for: it is provided at creation time, because the context initiator
+   * can execute R operations before this resource gets the session back, and it is the first R operation which
+   * records the session activity.
+   */
+  protected String getExecutionContext() {
+    return R_CONTEXT;
+  }
+
+  /**
+   * Called once the session is created, for whatever the sub-resource has to do with it.
+   */
   protected void onNewRSession(RServerSession rSession) {
-    rSession.setExecutionContext(R_CONTEXT);
   }
 
   protected RContextInitiator withInitiator() {

@@ -50,8 +50,8 @@ public abstract class RockSession extends AbstractRServerSession implements RSer
 
   protected RContextInitiator rContextInitiator;
 
-  protected RockSession(String serverName, String id, RServerProfile profile, RContextInitiator rContextInitiator, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, Strings.isNullOrEmpty(id) ? UUID.randomUUID().toString() : id, user, profile, transactionalThreadFactory, eventBus);
+  protected RockSession(String serverName, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, Strings.isNullOrEmpty(id) ? UUID.randomUUID().toString() : id, user, profile, executionContext, transactionalThreadFactory, eventBus);
     this.credentials = credentials;
     this.rContextInitiator = rContextInitiator;
   }

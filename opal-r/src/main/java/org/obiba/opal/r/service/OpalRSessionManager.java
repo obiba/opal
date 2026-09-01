@@ -236,7 +236,7 @@ public class OpalRSessionManager implements DisposableBean {
    * @return R session
    */
   public RServerSession newSubjectRSession(RServerProfile profile) {
-    RServerSession rSession = newSubjectRSession(getSubjectPrincipal(), profile, null);
+    RServerSession rSession = newSubjectRSession(getSubjectPrincipal(), profile, RServerSession.DEFAULT_CONTEXT, null);
     // Ensure R session is up and running
     RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
     waiter.run();
@@ -247,11 +247,12 @@ public class OpalRSessionManager implements DisposableBean {
    * Creates a new R connection in the provided profile and context initiator, stores the corresponding R session.
    *
    * @param profile
+   * @param executionContext
    * @param contextInitiator
    * @return
    */
-  public RServerSession newSubjectRSession(RServerProfile profile, RContextInitiator contextInitiator) {
-    return newSubjectRSession(getSubjectPrincipal(), profile, contextInitiator);
+  public RServerSession newSubjectRSession(RServerProfile profile, String executionContext, RContextInitiator contextInitiator) {
+    return newSubjectRSession(getSubjectPrincipal(), profile, executionContext, contextInitiator);
   }
 
   /**
@@ -392,11 +393,16 @@ public class OpalRSessionManager implements DisposableBean {
     }
   }
 
-  public RServerSession newSubjectRSession(String principal, RServerProfile profile, RContextInitiator contextInitiator) {
+  /**
+   * The execution context is provided at creation time: the context initiator is applied while the session is being
+   * opened, and its R operations are what makes the session activity be recorded. Setting the context afterwards
+   * would come too late for that record.
+   */
+  public RServerSession newSubjectRSession(String principal, RServerProfile profile, String executionContext, RContextInitiator contextInitiator) {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
       RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
-      RServerSession rSession = service.newRServerSession(principal, safeProfile, contextInitiator);
+      RServerSession rSession = service.newRServerSession(principal, null, safeProfile, executionContext, contextInitiator);
       // rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
