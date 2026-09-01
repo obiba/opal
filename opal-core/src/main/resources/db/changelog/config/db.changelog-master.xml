@@ -428,4 +428,53 @@
     </createIndex>
   </changeSet>
 
+  <!--
+    R execution time quotas (obiba/opal#3745), and the index the quota check needs.
+
+    `principal` is NOT NULL and holds an empty string for the system-wide default rather than NULL: the unique
+    constraint has to mean the same thing on both servers, and PostgreSQL counts NULLs as distinct, which would let
+    two system defaults coexist there and not on H2.
+  -->
+  <changeSet id="2-r-quotas" author="opal">
+    <createTable tableName="r_quotas">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_r_quotas"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="context" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="subject_type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="principal" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="period" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="execution_time_limit_millis" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="r_quotas" columnNames="context, subject_type, principal"
+                         constraintName="uk_r_quotas"/>
+
+    <!--
+      Summing one user's execution time in one context over a window runs on the R session creation path, so it has to
+      be an index range scan rather than a walk of that user's whole history.
+    -->
+    <createIndex tableName="r_session_activities" indexName="idx_r_session_activities_user_context_updated">
+      <column name="user_name"/>
+      <column name="context"/>
+      <column name="updated"/>
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

@@ -114,3 +114,9 @@ export interface SqlResults {
   columns: string[];
   rows: string[][];
 }
+
+/**
+ * The R execution context DataSHIELD sessions are recorded and quota-checked under. Mirrors
+ * DatashieldSessionsResourceImpl.DS_CONTEXT.
+ */
+export const DS_CONTEXT = 'DataSHIELD';

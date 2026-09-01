@@ -78,6 +78,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
     if (!createRSessionEnabled())
       throw new ForbiddenException("Plain R service endpoint is not enabled");
     checkAuthenticationMethod();
+    checkQuota();
     RServerSession rSession = opalRSessionManager.newSubjectRSession(createProfile(profile), withInitiator());
     onNewRSession(rSession);
     if (wait || !Strings.isNullOrEmpty(restore)) {
@@ -127,6 +128,14 @@ public class RSessionsResourceImpl implements RSessionsResource {
 
   protected RContextInitiator withInitiator() {
     return null;
+  }
+
+  /**
+   * Called before a session is created, and only there: an already open session is never interrupted, and the profile
+   * smoke test of {@link #testNewRSession(String)} is never refused. Plain R sessions carry no quota; DataSHIELD
+   * overrides this.
+   */
+  protected void checkQuota() throws ForbiddenException {
   }
 
   protected void checkAuthenticationMethod() throws ForbiddenException {

@@ -92,6 +92,7 @@ declare global {
   const useProfileActivityStore: typeof import('./stores/profile-activity').useProfileActivityStore
   const useProfilesStore: typeof import('./stores/profiles').useProfilesStore
   const useProjectsStore: typeof import('./stores/projects').useProjectsStore
+  const useRQuotaStore: typeof import('./stores/r-quota').useRQuotaStore
   const useRStore: typeof import('./stores/r').useRStore
   const useResourcesStore: typeof import('./stores/resources').useResourcesStore
   const useRoute: typeof import('vue-router').useRoute
@@ -220,6 +221,7 @@ declare module 'vue' {
     readonly useProfileActivityStore: UnwrapRef<typeof import('./stores/profile-activity')['useProfileActivityStore']>
     readonly useProfilesStore: UnwrapRef<typeof import('./stores/profiles')['useProfilesStore']>
     readonly useProjectsStore: UnwrapRef<typeof import('./stores/projects')['useProjectsStore']>
+    readonly useRQuotaStore: UnwrapRef<typeof import('./stores/r-quota')['useRQuotaStore']>
     readonly useRStore: UnwrapRef<typeof import('./stores/r')['useRStore']>
     readonly useResourcesStore: UnwrapRef<typeof import('./stores/resources')['useResourcesStore']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>

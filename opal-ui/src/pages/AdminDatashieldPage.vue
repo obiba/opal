@@ -43,6 +43,10 @@
       <div class="text-h5 q-mb-md">{{ t('profiles') }}</div>
       <div class="text-help q-mb-md">{{ t('datashield.profiles_info') }}</div>
       <datashield-profiles />
+
+      <div class="text-h5 q-mt-lg q-mb-md">{{ t('r_quota.title') }}</div>
+      <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
+      <r-quotas :context="DS_CONTEXT" />
     </q-page>
   </div>
 </template>
@@ -51,6 +55,8 @@
 import { baseUrl } from 'src/boot/api';
 import DatashieldClusters from 'src/components/admin/datashield/DatashieldClusters.vue';
 import DatashieldProfiles from 'src/components/admin/datashield/DatashieldProfiles.vue';
+import RQuotas from 'src/components/admin/r/RQuotas.vue';
+import { DS_CONTEXT } from 'src/components/models';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();

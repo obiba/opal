@@ -15,17 +15,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.RActivityService;
 import org.obiba.opal.r.service.RActivitySummary;
 import org.obiba.opal.r.service.RSessionActivity;
 import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -83,6 +86,59 @@ public class RServiceActivityResource {
     Date toDate = asDate(to);
     if (Strings.isNullOrEmpty(context)) throw new BadRequestException("R context is missing");
     return asSummaryDto(rActivityService.getActivitySummaries(context, user, profile, fromDate, toDate));
+  }
+
+  @GET
+  @Path("_current")
+  @NoAuthorization
+  @Operation(
+    summary = "Get the R session activities of the current user",
+    description = "Retrieves the R session activities of the authenticated user, filtered by context, profile and date range."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R session activities", useReturnTypeSchema = true),
+    @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public List<OpalR.RSessionActivityDto> getCurrentActivities(@QueryParam("context") String context,
+                                                              @QueryParam("profile") String profile,
+                                                              @QueryParam("from") String from, @QueryParam("to") String to) {
+    Date fromDate = asDate(from);
+    Date toDate = asDate(to);
+    if (Strings.isNullOrEmpty(context)) throw new BadRequestException("R context is missing");
+    return asDto(rActivityService.getActivities(context, getPrincipal(), profile, fromDate, toDate));
+  }
+
+  @GET
+  @Path("_current/_summary")
+  @NoAuthorization
+  @Operation(
+    summary = "Get the R activity summaries of the current user",
+    description = "Retrieves the summarized R activity of the authenticated user, filtered by context, profile and date range."
+  )
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved R activity summaries", useReturnTypeSchema = true),
+    @ApiResponse(responseCode = "400", description = "Missing required context parameter"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public List<OpalR.RActivitySummaryDto> getCurrentActivitySummaries(@QueryParam("context") String context,
+                                                                     @QueryParam("profile") String profile,
+                                                                     @QueryParam("from") String from, @QueryParam("to") String to) {
+    Date fromDate = asDate(from);
+    Date toDate = asDate(to);
+    if (Strings.isNullOrEmpty(context)) throw new BadRequestException("R context is missing");
+    return asSummaryDto(rActivityService.getActivitySummaries(context, getPrincipal(), profile, fromDate, toDate));
+  }
+
+  /**
+   * The subject of the request, which is the only user the {@code _current} resources will report on: they take no
+   * {@code user} parameter, so having no authorization check on them cannot be turned into reading someone else's
+   * activity.
+   */
+  private String getPrincipal() {
+    Object principal = SecurityUtils.getSubject().getPrincipal();
+    if (principal == null) throw new ForbiddenException("Not authenticated");
+    return principal.toString();
   }
 
   private Date asDate(String dateStr) {

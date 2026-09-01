@@ -106,3 +106,26 @@ message RActivitySummaryDto {
   required int64 executionTimeMillis = 6;
   required int32 sessionsCount = 7;
 }
+
+// An allowance of R execution time, for a subject and an execution context.
+message RQuotaDto {
+  optional int64 id = 1;
+  required string context = 2;
+  required string subjectType = 3; // SYSTEM | GROUP | USER
+  required string principal = 4;   // empty for SYSTEM
+  required string period = 5;      // DAILY | WEEKLY
+  required int64 executionTimeLimitMillis = 6;
+  required bool enabled = 7;
+}
+
+// What a user has consumed against the quota that applies to them. No quota means unlimited, hence the optional
+// fields: there is no window to report when nothing is being limited.
+message RQuotaUsageDto {
+  required string context = 1;
+  required string user = 2;
+  optional RQuotaDto quota = 3;
+  required int64 usedExecutionTimeMillis = 4;
+  optional string windowStartDate = 5;
+  required bool exceeded = 6;
+  optional string nextCreditDate = 7;
+}

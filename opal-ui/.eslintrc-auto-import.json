@@ -105,6 +105,7 @@
     "useProfileActivityStore": true,
     "useProfilesStore": true,
     "useProjectsStore": true,
+    "useRQuotaStore": true,
     "useRStore": true,
     "useResourcesStore": true,
     "useRoute": true,

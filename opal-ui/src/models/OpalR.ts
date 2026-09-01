@@ -104,3 +104,31 @@ export interface RActivitySummaryDto {
   executionTimeMillis: number;
   sessionsCount: number;
 }
+
+/** An allowance of R execution time, for a subject and an execution context. */
+export interface RQuotaDto {
+  id?: number | undefined;
+  context: string;
+  /** SYSTEM | GROUP | USER */
+  subjectType: string;
+  /** empty for SYSTEM */
+  principal: string;
+  /** DAILY | WEEKLY */
+  period: string;
+  executionTimeLimitMillis: number;
+  enabled: boolean;
+}
+
+/**
+ * What a user has consumed against the quota that applies to them. No quota means unlimited, hence the optional
+ * fields: there is no window to report when nothing is being limited.
+ */
+export interface RQuotaUsageDto {
+  context: string;
+  user: string;
+  quota?: RQuotaDto | undefined;
+  usedExecutionTimeMillis: number;
+  windowStartDate?: string | undefined;
+  exceeded: boolean;
+  nextCreditDate?: string | undefined;
+}

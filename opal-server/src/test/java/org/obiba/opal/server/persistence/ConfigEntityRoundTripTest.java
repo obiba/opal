@@ -25,6 +25,7 @@ import org.obiba.opal.core.domain.kubernetes.Toleration;
 import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.r.service.RQuota;
 import org.obiba.opal.r.service.RSessionActivity;
 
 import java.util.Date;
@@ -363,6 +364,52 @@ public class ConfigEntityRoundTripTest extends AbstractConfigPersistenceTest {
     assertThat(reloaded.getProfile()).isEqualTo("default");
     assertThat(reloaded.getExecutionTimeMillis()).isEqualTo(1234L);
     assertThat(reloaded.getCreated()).isNotNull();
+  }
+
+  /**
+   * The two enumerations are varchar columns written through an {@code AttributeConverter}, so what comes back has to
+   * be the constant and not a null the converter quietly produced from an unexpected string.
+   */
+  @Test
+  public void test_r_quota_keeps_its_converted_enumerations() {
+    RQuota quota = new RQuota();
+    quota.setContext("DataSHIELD");
+    quota.setSubjectType(RQuota.SubjectType.GROUP);
+    quota.setPrincipal("analysts");
+    quota.setPeriod(RQuota.Period.DAILY);
+    quota.setExecutionTimeLimitMillis(7_200_000L);
+    quota.setEnabled(true);
+
+    RQuota reloaded = roundTrip(quota);
+
+    assertThat(reloaded.getContext()).isEqualTo("DataSHIELD");
+    assertThat(reloaded.getSubjectType()).isEqualTo(RQuota.SubjectType.GROUP);
+    assertThat(reloaded.getPrincipal()).isEqualTo("analysts");
+    assertThat(reloaded.getPeriod()).isEqualTo(RQuota.Period.DAILY);
+    assertThat(reloaded.getExecutionTimeLimitMillis()).isEqualTo(7_200_000L);
+    assertThat(reloaded.isEnabled()).isTrue();
+  }
+
+  /**
+   * The system default has no subject, and stores that as an empty string rather than NULL so that the unique
+   * constraint counts two of them as duplicates on PostgreSQL as well as on H2.
+   */
+  @Test
+  public void test_the_system_r_quota_has_an_empty_principal() {
+    RQuota quota = new RQuota();
+    quota.setContext("DataSHIELD");
+    quota.setSubjectType(RQuota.SubjectType.SYSTEM);
+    quota.setPrincipal(null);
+    quota.setPeriod(RQuota.Period.WEEKLY);
+    quota.setExecutionTimeLimitMillis(0L);
+    quota.setEnabled(false);
+
+    RQuota reloaded = roundTrip(quota);
+
+    assertThat(reloaded.getPrincipal()).isEqualTo(RQuota.SYSTEM_PRINCIPAL);
+    assertThat(reloaded.getSubjectType()).isEqualTo(RQuota.SubjectType.SYSTEM);
+    assertThat(reloaded.getExecutionTimeLimitMillis()).isEqualTo(0L);
+    assertThat(reloaded.isEnabled()).isFalse();
   }
 
   @Test

@@ -16,6 +16,8 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.service.RContextInitiator;
+import org.obiba.opal.r.service.RQuotaService;
+import org.obiba.opal.r.service.RQuotaUsage;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -55,6 +57,9 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   @Autowired
   private DataShieldProfileService datashieldProfileService;
 
+  @Autowired
+  private RQuotaService rQuotaService;
+
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;
 
@@ -86,6 +91,22 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
       throw new ForbiddenException("DataSHIELD profile access is forbidden: " + profile.getName());
     }
     return profile;
+  }
+
+  /**
+   * A user who has spent their DataSHIELD execution time allowance cannot open a new session. Sessions already open are
+   * left alone, deliberately: the quota bounds routine usage, it does not interrupt work in progress.
+   * <p>
+   * The denial goes to the DataSHIELD user log too, so that a data custodian reading the audit trail can see why a
+   * user was turned away without having to correlate HTTP logs.
+   */
+  @Override
+  protected void checkQuota() throws ForbiddenException {
+    RQuotaUsage usage = rQuotaService.getUsage(DS_CONTEXT, SecurityUtils.getSubject().getPrincipal().toString());
+    if (!usage.isExceeded()) return;
+    String message = usage.asMessage();
+    DataShieldLog.userLog("", DataShieldLog.Action.QUOTA, "refused a datashield session: {}", message);
+    throw new ForbiddenException(message);
   }
 
   @Override

@@ -45,6 +45,7 @@
       :principal="props.principal"
       :profile="selectedProfile"
       :context="selectedContext"
+      :current="props.current"
     />
   </div>
 </template>
@@ -57,6 +58,11 @@ import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   principal: string | undefined;
+  /**
+   * Whether the activity of the authenticated user is being shown: reading one's own activity does not require the
+   * administration permissions that reading another subject's does.
+   */
+  current?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -135,7 +141,7 @@ watch(() => props.principal, init);
 
 function init() {
   if (props.principal) {
-    profileActivityStore.initSummaries(props.principal);
+    profileActivityStore.initSummaries(props.principal, props.current);
   }
 }
 
