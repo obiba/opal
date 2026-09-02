@@ -21,7 +21,10 @@
           />
         </div>
         <div class="col-12 col-md-6">
-          <div class="text-h5 q-mb-md">{{ t('datashield.audit') }}</div>
+          <div class="text-h5 q-mb-md">{{ t('r_quota.title') }}</div>
+          <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
+          <r-quotas :context="DS_CONTEXT" />
+          <div class="text-h5 q-mt-md q-mb-md">{{ t('datashield.audit') }}</div>
           <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
           <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
             <q-list>
@@ -40,13 +43,9 @@
         </div>
       </div>
 
-      <div class="text-h5 q-mb-md">{{ t('profiles') }}</div>
+      <div class="text-h5 q-mt-md q-mb-md">{{ t('profiles') }}</div>
       <div class="text-help q-mb-md">{{ t('datashield.profiles_info') }}</div>
       <datashield-profiles />
-
-      <div class="text-h5 q-mt-lg q-mb-md">{{ t('r_quota.title') }}</div>
-      <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
-      <r-quotas :context="DS_CONTEXT" />
     </q-page>
   </div>
 </template>

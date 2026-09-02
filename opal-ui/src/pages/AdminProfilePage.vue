@@ -19,12 +19,12 @@
       </div>
       <profile-acls :principal="principal" />
 
-      <div class="text-h6 q-mt-md q-mb-md">
+      <div class="text-h6 q-mb-md">
         {{ t('r_quota.usage_title', { context: DS_CONTEXT }) }}
       </div>
       <r-quota-usage :principal="principal" :context="DS_CONTEXT" />
 
-      <div class="text-h6 q-mt-md q-mb-md">
+      <div class="text-h6 q-mt-xl q-mb-md">
         {{ t('r_activity') }}
       </div>
       <div class="text-help q-mb-md">

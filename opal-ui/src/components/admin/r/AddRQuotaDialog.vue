@@ -17,6 +17,7 @@
             :options="subjectTypeOptions"
             :label="t('r_quota.subject_type') + ' *'"
             :hint="t('r_quota.subject_type_hint')"
+            :disable="props.defaultPrincipal !== undefined"
             class="q-mb-md"
           />
           <q-input
@@ -31,6 +32,7 @@
             @update:model-value="onSearchSubject"
             lazy-rules
             :rules="[validateRequired('r_quota.subject_required')]"
+            :disable="props.defaultPrincipal !== undefined"
           >
             <q-menu v-model="showSuggestions" no-parent-event no-focus auto-close>
               <q-list style="min-width: 100px">
