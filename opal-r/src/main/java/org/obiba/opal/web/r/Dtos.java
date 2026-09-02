@@ -138,8 +138,9 @@ public class Dtos {
         .setContext(quota.getContext())
         .setSubjectType(quota.getSubjectType().name())
         .setPrincipal(quota.getPrincipal())
+        .setMetric(quota.getMetric().name())
         .setPeriod(quota.getPeriod().name())
-        .setExecutionTimeLimitMillis(quota.getExecutionTimeLimitMillis())
+        .setLimitMillis(quota.getLimitMillis())
         .setEnabled(quota.isEnabled());
     if (quota.getId() != null) builder.setId(quota.getId());
     return builder.build();
@@ -153,8 +154,9 @@ public class Dtos {
     quota.setContext(dto.getContext());
     quota.setSubjectType(RQuota.SubjectType.valueOf(dto.getSubjectType()));
     quota.setPrincipal(dto.getPrincipal());
+    quota.setMetric(RQuota.Metric.valueOf(dto.getMetric()));
     quota.setPeriod(RQuota.Period.valueOf(dto.getPeriod()));
-    quota.setExecutionTimeLimitMillis(dto.getExecutionTimeLimitMillis());
+    quota.setLimitMillis(dto.getLimitMillis());
     quota.setEnabled(dto.getEnabled());
     return quota;
   }
@@ -163,7 +165,9 @@ public class Dtos {
     OpalR.RQuotaUsageDto.Builder builder = OpalR.RQuotaUsageDto.newBuilder()
         .setContext(usage.getContext())
         .setUser(usage.getUser())
-        .setUsedExecutionTimeMillis(usage.getUsedExecutionTimeMillis())
+        .setMetric(usage.getMetric().name())
+        .setUsedMillis(usage.getUsedMillis())
+        .setOpenSessionsCount(usage.getOpenSessionsCount())
         .setExceeded(usage.isExceeded());
     if (usage.hasQuota()) builder.setQuota(asDto(usage.getQuota()));
     if (usage.getWindowStart() != null)

@@ -47,6 +47,6 @@ public class RSessionActivity extends RActivity {
   }
 
   public long getIdleTimeMillis() {
-    return getTotalTimeMillis() - getExecutionTimeMillis();
+    return getSessionTimeMillis() - getExecutionTimeMillis();
   }
 }

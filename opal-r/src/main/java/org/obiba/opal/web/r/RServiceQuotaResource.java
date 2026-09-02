@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * A single R execution time quota.
+ * A single R usage quota.
  */
 @Component
 @Scope("request")
@@ -44,7 +44,7 @@ public class RServiceQuotaResource {
   }
 
   @GET
-  @Operation(summary = "Get a R quota", description = "Retrieves a R execution time quota.")
+  @Operation(summary = "Get a R quota", description = "Retrieves a R usage quota.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Successfully retrieved the R quota", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "404", description = "No such R quota")
@@ -54,7 +54,7 @@ public class RServiceQuotaResource {
   }
 
   @PUT
-  @Operation(summary = "Update a R quota", description = "Updates a R execution time quota.")
+  @Operation(summary = "Update a R quota", description = "Updates a R usage quota.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "R quota updated", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Invalid quota"),
@@ -65,7 +65,7 @@ public class RServiceQuotaResource {
   }
 
   @DELETE
-  @Operation(summary = "Delete a R quota", description = "Deletes a R execution time quota. Deleting the one that applied makes the subject unlimited again, unless a broader quota still matches.")
+  @Operation(summary = "Delete a R quota", description = "Deletes a R usage quota. Deleting the one that applied makes the subject unlimited again, unless a broader quota still matches.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "R quota deleted")
   })

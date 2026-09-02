@@ -20,9 +20,9 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An allowance of R execution time, for a subject and an execution context.
+ * An allowance of R usage, for a subject, an execution context and a {@link Metric}.
  * <p>
- * A quota says nothing by itself: what is consumed against it is the R execution time already recorded in
+ * A quota says nothing by itself: what is consumed against it is the usage already recorded in
  * {@link RSessionActivity}, summed over the rolling window of its {@link Period}. See {@link RQuotaService} for how one
  * is picked for a given user.
  */
@@ -42,6 +42,17 @@ public class RQuota extends AbstractTimestamped {
 
   public enum SubjectType {
     SYSTEM, GROUP, USER
+  }
+
+  /**
+   * What the allowance is spent on. The two are not comparable and neither subsumes the other: execution time bills
+   * the R server's cpu the user consumed and prices an idle session at zero, session time bills the R server they are
+   * holding whether it computes or not. A subject can be given one of each, which is why this is part of the natural
+   * key rather than an attribute of a single quota.
+   */
+  public enum Metric {
+
+    EXECUTION_TIME, SESSION_TIME
   }
 
   /**
@@ -82,6 +93,13 @@ public class RQuota extends AbstractTimestamped {
     }
   }
 
+  @Converter
+  public static class MetricConverter extends EnumNameConverter<Metric> {
+    public MetricConverter() {
+      super(Metric.class);
+    }
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -105,15 +123,20 @@ public class RQuota extends AbstractTimestamped {
 
   @NotNull
   @Column(nullable = false)
+  @Convert(converter = MetricConverter.class)
+  private Metric metric = Metric.EXECUTION_TIME;
+
+  @NotNull
+  @Column(nullable = false)
   @Convert(converter = PeriodConverter.class)
   private Period period = Period.WEEKLY;
 
   /**
-   * Zero is a meaningful value: it forbids the context altogether for this subject. "No quota" is the absence of a
-   * row, not a limit of zero.
+   * The allowance, in milliseconds of whatever the {@link #metric} names. Zero is a meaningful value: it forbids the
+   * context altogether for this subject. "No quota" is the absence of a row, not a limit of zero.
    */
-  @Column(name = "execution_time_limit_millis", nullable = false)
-  private long executionTimeLimitMillis = 0;
+  @Column(name = "limit_millis", nullable = false)
+  private long limitMillis = 0;
 
   @Column(nullable = false)
   private boolean enabled = true;
@@ -149,6 +172,14 @@ public class RQuota extends AbstractTimestamped {
     this.principal = principal == null ? SYSTEM_PRINCIPAL : principal;
   }
 
+  public Metric getMetric() {
+    return metric;
+  }
+
+  public void setMetric(Metric metric) {
+    this.metric = metric;
+  }
+
   public Period getPeriod() {
     return period;
   }
@@ -157,12 +188,12 @@ public class RQuota extends AbstractTimestamped {
     this.period = period;
   }
 
-  public long getExecutionTimeLimitMillis() {
-    return executionTimeLimitMillis;
+  public long getLimitMillis() {
+    return limitMillis;
   }
 
-  public void setExecutionTimeLimitMillis(long executionTimeLimitMillis) {
-    this.executionTimeLimitMillis = executionTimeLimitMillis;
+  public void setLimitMillis(long limitMillis) {
+    this.limitMillis = limitMillis;
   }
 
   public boolean isEnabled() {

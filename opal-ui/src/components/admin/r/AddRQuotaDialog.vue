@@ -19,6 +19,7 @@
             :hint="t('r_quota.subject_type_hint')"
             :disable="props.defaultPrincipal !== undefined"
             class="q-mb-md"
+            @update:model-value="onSubjectTypeChange"
           />
           <q-input
             v-if="subjectType !== 'SYSTEM'"
@@ -43,6 +44,16 @@
             </q-menu>
           </q-input>
           <q-select
+            v-model="metric"
+            dense
+            emit-value
+            map-options
+            :options="metricOptions"
+            :label="t('r_quota.metric') + ' *'"
+            :hint="t('r_quota.metric_hint')"
+            class="q-mb-md"
+          />
+          <q-select
             v-model="period"
             dense
             emit-value
@@ -58,11 +69,14 @@
             type="number"
             min="0"
             :label="t('r_quota.limit_minutes') + ' *'"
-            :hint="t('r_quota.limit_minutes_hint')"
+            :hint="limitHint"
             class="q-mb-md"
             lazy-rules
             :rules="[validatePositiveNumber('r_quota.limit_required')]"
           />
+          <q-banner v-if="showSessionTimeWarning" dense class="bg-warning text-white q-mb-md">
+            {{ t('r_quota.limit_below_execution_time') }}
+          </q-banner>
           <q-toggle v-model="enabled" :label="t('enabled')" />
           <div class="text-hint">{{ t('r_quota.enabled_hint') }}</div>
         </q-form>
@@ -90,6 +104,10 @@ interface DialogProps {
    * The subject a new quota is for, when the dialog is opened from that subject's page instead of from the list.
    */
   defaultPrincipal?: string;
+  /**
+   * The metric a new quota is for, when the dialog is opened from the block reporting on that metric.
+   */
+  defaultMetric?: string;
 }
 
 const props = defineProps<DialogProps>();
@@ -103,6 +121,7 @@ const formRef = ref();
 const showDialog = ref(props.modelValue);
 const subjectType = ref<string>('SYSTEM');
 const principal = ref<string | null>(null);
+const metric = ref<string>('EXECUTION_TIME');
 const period = ref<string>('WEEKLY');
 const limitMinutes = ref<number>(60);
 const enabled = ref<boolean>(true);
@@ -117,10 +136,36 @@ const subjectTypeOptions = computed(() => [
   { label: t('user'), value: 'USER' },
 ]);
 
+const metricOptions = computed(() => [
+  { label: t('r_quota.metric_execution_time'), value: 'EXECUTION_TIME' },
+  { label: t('r_quota.metric_session_time'), value: 'SESSION_TIME' },
+]);
+
 const periodOptions = computed(() => [
   { label: t('r_quota.period_daily'), value: 'DAILY' },
   { label: t('r_quota.period_weekly'), value: 'WEEKLY' },
 ]);
+
+const limitHint = computed(() =>
+  metric.value === 'SESSION_TIME' ? t('r_quota.limit_minutes_hint_session_time') : t('r_quota.limit_minutes_hint'),
+);
+
+/**
+ * A session lasts at least as long as the commands it runs, so a session time limit under the same subject's execution
+ * time limit makes the latter unreachable. Not an error - it is a way of saying which bound is the real one - but
+ * rarely what someone means to write.
+ */
+const showSessionTimeWarning = computed(() => {
+  if (metric.value !== 'SESSION_TIME') return false;
+  const executionTimeQuota = rQuotaStore.quotas.find(
+    (quota) =>
+      quota.metric === 'EXECUTION_TIME' &&
+      quota.subjectType === subjectType.value &&
+      quota.principal === (subjectType.value === 'SYSTEM' ? '' : (principal.value ?? '')),
+  );
+  if (!executionTimeQuota) return false;
+  return Math.round(limitMinutes.value) * 60000 < executionTimeQuota.limitMillis;
+});
 
 const validateRequired = (id: string) => (val: string) => (val && val.trim().length > 0) || t(`validation.${id}`);
 const validatePositiveNumber = (id: string) => (val: number) =>
@@ -136,21 +181,23 @@ watch(
   },
 );
 
-watch(subjectType, () => {
+function onSubjectTypeChange() {
   principal.value = null;
   clearSuggestions();
-});
+}
 
 function reset() {
   if (props.quota) {
     subjectType.value = props.quota.subjectType;
     principal.value = props.quota.subjectType === 'SYSTEM' ? null : props.quota.principal;
+    metric.value = props.quota.metric;
     period.value = props.quota.period;
-    limitMinutes.value = Math.round(props.quota.executionTimeLimitMillis / 60000);
+    limitMinutes.value = Math.round(props.quota.limitMillis / 60000);
     enabled.value = props.quota.enabled;
   } else {
     subjectType.value = props.defaultPrincipal ? 'USER' : 'SYSTEM';
     principal.value = props.defaultPrincipal ?? null;
+    metric.value = props.defaultMetric ?? 'EXECUTION_TIME';
     period.value = 'WEEKLY';
     limitMinutes.value = 60;
     enabled.value = true;
@@ -195,8 +242,9 @@ async function onSave() {
     context: props.context,
     subjectType: subjectType.value,
     principal: subjectType.value === 'SYSTEM' ? '' : (principal.value ?? ''),
+    metric: metric.value,
     period: period.value,
-    executionTimeLimitMillis: Math.max(0, Math.round(limitMinutes.value)) * 60000,
+    limitMillis: Math.max(0, Math.round(limitMinutes.value)) * 60000,
     enabled: enabled.value,
   };
   try {

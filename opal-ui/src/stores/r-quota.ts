@@ -33,14 +33,14 @@ export const useRQuotaStore = defineStore('rQuota', () => {
   }
 
   /**
-   * The quota that applies to a user and what they have spent against it. Reading someone else's requires
-   * administration permissions, whereas _current reports on the authenticated user and is open to them.
+   * What a user has spent, one entry per usage metric whether or not a quota applies to it. Reading someone else's
+   * requires administration permissions, whereas _current reports on the authenticated user and is open to them.
    */
-  async function getUsage(context: string, user: string): Promise<RQuotaUsageDto> {
+  async function getUsage(context: string, user: string): Promise<RQuotaUsageDto[]> {
     return api.get('/service/r/quotas/_usage', { params: { context, user } }).then((response) => response.data);
   }
 
-  async function getCurrentUsage(context: string): Promise<RQuotaUsageDto> {
+  async function getCurrentUsage(context: string): Promise<RQuotaUsageDto[]> {
     return api.get('/service/r/quotas/_current', { params: { context } }).then((response) => response.data);
   }
 

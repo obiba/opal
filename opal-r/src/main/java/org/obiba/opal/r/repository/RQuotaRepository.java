@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The R execution time quotas. A handful of rows at most: one system default per context, plus the group and user
+ * The R usage quotas. A handful of rows at most: one system default per context and metric, plus the group and user
  * overrides an administrator has bothered to write.
  */
 public interface RQuotaRepository extends JpaRepository<RQuota, Long> {
@@ -26,15 +26,18 @@ public interface RQuotaRepository extends JpaRepository<RQuota, Long> {
 
   List<RQuota> findByContextAndEnabledTrue(String context);
 
-  Optional<RQuota> findByContextAndSubjectTypeAndPrincipal(String context, RQuota.SubjectType subjectType, String principal);
+  Optional<RQuota> findByContextAndSubjectTypeAndPrincipalAndMetric(String context, RQuota.SubjectType subjectType,
+                                                                    String principal, RQuota.Metric metric);
 
   /**
-   * The natural key is the context and the subject the quota is about, so saving a second quota for the same subject
-   * replaces the first rather than adding a row the unique constraint would reject anyway.
+   * The natural key is the context, the subject the quota is about and the metric it limits, so saving a second quota
+   * for the same subject and metric replaces the first rather than adding a row the unique constraint would reject
+   * anyway. The metric belongs in the key: giving a subject a session time quota must not overwrite the execution time
+   * quota they already have.
    */
   default RQuota upsert(RQuota quota) {
-    RQuota existing = findByContextAndSubjectTypeAndPrincipal(quota.getContext(), quota.getSubjectType(), quota.getPrincipal())
-        .orElse(null);
+    RQuota existing = findByContextAndSubjectTypeAndPrincipalAndMetric(quota.getContext(), quota.getSubjectType(),
+        quota.getPrincipal(), quota.getMetric()).orElse(null);
     return save(EntityKeys.reuseKey(existing, quota));
   }
 }

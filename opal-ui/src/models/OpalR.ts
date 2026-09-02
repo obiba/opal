@@ -93,6 +93,7 @@ export interface RSessionActivityDto {
   createdDate: string;
   updatedDate: string;
   executionTimeMillis: number;
+  sessionTimeMillis?: number | undefined;
 }
 
 export interface RActivitySummaryDto {
@@ -103,9 +104,13 @@ export interface RActivitySummaryDto {
   endDate: string;
   executionTimeMillis: number;
   sessionsCount: number;
+  sessionTimeMillis?: number | undefined;
 }
 
-/** An allowance of R execution time, for a subject and an execution context. */
+/**
+ * An allowance of R usage, for a subject, an execution context and a metric. A subject may be given one quota
+ * per metric: limits of different metrics are not comparable, and are resolved independently.
+ */
 export interface RQuotaDto {
   id?: number | undefined;
   context: string;
@@ -115,20 +120,27 @@ export interface RQuotaDto {
   principal: string;
   /** DAILY | WEEKLY */
   period: string;
-  executionTimeLimitMillis: number;
+  /** milliseconds of whatever the metric names */
+  limitMillis: number;
   enabled: boolean;
+  /** EXECUTION_TIME | SESSION_TIME */
+  metric: string;
 }
 
 /**
- * What a user has consumed against the quota that applies to them. No quota means unlimited, hence the optional
- * fields: there is no window to report when nothing is being limited.
+ * What a user has consumed, for one metric, against the quota that applies to them. No quota means unlimited, hence
+ * the optional fields: there is no window to report when nothing is being limited.
  */
 export interface RQuotaUsageDto {
   context: string;
   user: string;
   quota?: RQuotaDto | undefined;
-  usedExecutionTimeMillis: number;
+  usedMillis: number;
   windowStartDate?: string | undefined;
   exceeded: boolean;
   nextCreditDate?: string | undefined;
+  /** the metric this entry reports on */
+  metric: string;
+  /** sessions still open in the context, which keep spending a session time allowance */
+  openSessionsCount?: number | undefined;
 }

@@ -44,6 +44,15 @@ public interface RSessionActivityRepository extends JpaRepository<RSessionActivi
   long sumExecutionTimeMillis(@Param("user") String user, @Param("context") String context, @Param("from") Date from);
 
   /**
+   * Session time a user has accumulated in a context since {@code from}, for the records as they stand. A session that
+   * is still open has more of it than its record says, because the record only moves when a command ends or the
+   * session closes; {@code RQuotaService} adds that live tail from the session manager.
+   */
+  @Query("select coalesce(sum(a.sessionTimeMillis), 0) from RSessionActivity a " +
+      "where a.user = :user and a.context = :context and a.updated >= :from")
+  long sumSessionTimeMillis(@Param("user") String user, @Param("context") String context, @Param("from") Date from);
+
+  /**
    * The last activity of the oldest session still inside the window, i.e. the next one to leave it.
    */
   @Query("select min(a.updated) from RSessionActivity a " +

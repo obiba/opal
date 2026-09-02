@@ -22,6 +22,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.r.service.RQuota;
 import org.obiba.opal.r.service.RQuotaService;
+import org.obiba.opal.r.service.RQuotaUsage;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * The R execution time quotas, and what has been consumed against them.
+ * The R usage quotas, and what has been consumed against them.
  */
 @Component
 @Scope("request")
@@ -52,7 +53,7 @@ public class RServiceQuotasResource {
   @GET
   @Operation(
       summary = "Get R quotas",
-      description = "Retrieves the R execution time quotas, optionally restricted to an execution context."
+      description = "Retrieves the R usage quotas, optionally restricted to an execution context."
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Successfully retrieved R quotas", useReturnTypeSchema = true)
@@ -61,7 +62,8 @@ public class RServiceQuotasResource {
     return rQuotaService.getQuotas(context).stream()
         .sorted(Comparator.comparing(RQuota::getContext)
             .thenComparing(RQuota::getSubjectType)
-            .thenComparing(RQuota::getPrincipal))
+            .thenComparing(RQuota::getPrincipal)
+            .thenComparing(RQuota::getMetric))
         .map(Dtos::asDto)
         .toList();
   }
@@ -69,7 +71,7 @@ public class RServiceQuotasResource {
   @POST
   @Operation(
       summary = "Create a R quota",
-      description = "Creates a R execution time quota for a subject: the system default, a group or a user."
+      description = "Creates a R usage quota for a subject: the system default, a group or a user. A subject can have one quota per metric."
   )
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "R quota created"),
@@ -86,16 +88,16 @@ public class RServiceQuotasResource {
   @Path("_usage")
   @Operation(
       summary = "Get the R quota usage of a user",
-      description = "Retrieves the quota that applies to a user in an execution context, and what they have consumed against it."
+      description = "Retrieves, for each usage metric, the quota that applies to a user in an execution context and what they have consumed against it."
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Successfully retrieved the R quota usage", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Missing required context or user parameter")
   })
-  public OpalR.RQuotaUsageDto getUsage(@QueryParam("context") String context, @QueryParam("user") String user) {
+  public List<OpalR.RQuotaUsageDto> getUsage(@QueryParam("context") String context, @QueryParam("user") String user) {
     if (Strings.isNullOrEmpty(context)) throw new BadRequestException("R context is missing");
     if (Strings.isNullOrEmpty(user)) throw new BadRequestException("User is missing");
-    return Dtos.asDto(rQuotaService.getUsage(context, user));
+    return asDto(rQuotaService.getUsages(context, user));
   }
 
   @GET
@@ -103,15 +105,23 @@ public class RServiceQuotasResource {
   @NoAuthorization
   @Operation(
       summary = "Get the R quota usage of the current user",
-      description = "Retrieves the quota that applies to the authenticated user in an execution context, and what they have consumed against it."
+      description = "Retrieves, for each usage metric, the quota that applies to the authenticated user in an execution context and what they have consumed against it."
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Successfully retrieved the R quota usage", useReturnTypeSchema = true),
       @ApiResponse(responseCode = "400", description = "Missing required context parameter")
   })
-  public OpalR.RQuotaUsageDto getCurrentUsage(@QueryParam("context") String context) {
+  public List<OpalR.RQuotaUsageDto> getCurrentUsage(@QueryParam("context") String context) {
     if (Strings.isNullOrEmpty(context)) throw new BadRequestException("R context is missing");
-    return Dtos.asDto(rQuotaService.getUsage(context, getPrincipal()));
+    return asDto(rQuotaService.getUsages(context, getPrincipal()));
+  }
+
+  /**
+   * Every metric is reported, whether or not a quota applies to it, so that a client never has to know how many
+   * metrics exist to render the answer: an entry without a quota is the unlimited case.
+   */
+  private List<OpalR.RQuotaUsageDto> asDto(List<RQuotaUsage> usages) {
+    return usages.stream().map(Dtos::asDto).toList();
   }
 
   /**

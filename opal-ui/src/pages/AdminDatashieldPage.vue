@@ -19,11 +19,6 @@
             :options="['DATASHIELD_USE', 'DATASHIELD_ALL']"
             :read-only="authStore.isAuditor"
           />
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="text-h5 q-mb-md">{{ t('r_quota.title') }}</div>
-          <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
-          <r-quotas :context="DS_CONTEXT" />
           <div class="text-h5 q-mt-md q-mb-md">{{ t('datashield.audit') }}</div>
           <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
           <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
@@ -40,6 +35,11 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="text-h5 q-mb-md">{{ t('r_quota.title') }}</div>
+          <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
+          <r-quotas :context="DS_CONTEXT" />
         </div>
       </div>
 

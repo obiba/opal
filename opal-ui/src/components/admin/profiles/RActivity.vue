@@ -4,6 +4,8 @@
       <div class="q-mb-md">
         <span class="text-hint">{{ t('total_execution_time') }}:</span>
         <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
+        <span class="text-hint q-ml-md">{{ t('total_session_time') }}:</span>
+        <span class="text-caption q-ml-xs">{{ getMillisLabel(totalSessionTime) }}</span>
       </div>
       <q-table
         flat
@@ -79,6 +81,10 @@ const totalExecutionTime = computed(() =>
   profileActivityStore.summaries.map((sum) => sum.executionTimeMillis).reduce((acc, val) => acc + val, 0),
 );
 
+const totalSessionTime = computed(() =>
+  profileActivityStore.summaries.map((sum) => sum.sessionTimeMillis || 0).reduce((acc, val) => acc + val, 0),
+);
+
 const columns = computed(() => {
   return [
     {
@@ -130,6 +136,15 @@ const columns = computed(() => {
       align: DefaultAlignment,
       field: 'executionTimeMillis',
       format: (val: number) => getMillisLabel(val),
+      sortable: true,
+    },
+    {
+      name: 'sessionTimeMillis',
+      required: true,
+      label: t('r_session_time'),
+      align: DefaultAlignment,
+      field: 'sessionTimeMillis',
+      format: (val: number) => getMillisLabel(val || 0) || '0 min',
       sortable: true,
     },
   ];

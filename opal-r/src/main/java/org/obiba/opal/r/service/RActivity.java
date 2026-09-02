@@ -32,6 +32,14 @@ public class RActivity extends AbstractTimestamped {
   @Column(name = "execution_time_millis", nullable = false)
   private long executionTimeMillis = 0;
 
+  /**
+   * The wall-clock life of the session, idle time included: what a session time quota is measured against. Stored
+   * rather than derived from the timestamps, because summing it over a window has to be an indexed aggregate over a
+   * numeric column and timestamp arithmetic inside an aggregate is dialect-specific.
+   */
+  @Column(name = "session_time_millis", nullable = false)
+  private long sessionTimeMillis = 0;
+
   public String getUser() {
     return user;
   }
@@ -64,8 +72,12 @@ public class RActivity extends AbstractTimestamped {
     this.executionTimeMillis = executionTimeMillis;
   }
 
-  public long getTotalTimeMillis() {
-    return getUpdated().getTime() - getCreated().getTime();
+  public long getSessionTimeMillis() {
+    return sessionTimeMillis;
+  }
+
+  public void setSessionTimeMillis(long sessionTimeMillis) {
+    this.sessionTimeMillis = sessionTimeMillis;
   }
 
 }

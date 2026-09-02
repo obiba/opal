@@ -31,11 +31,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * The two things the quota service decides on its own: which quota applies to a user, and what they have spent
- * against it over its rolling window.
+ * The two things the quota service decides on its own: which quota applies to a user, for each metric, and what they
+ * have spent against it over its rolling window.
  */
 public class RQuotaServiceTest {
 
@@ -51,6 +53,8 @@ public class RQuotaServiceTest {
 
   private SubjectProfileService subjectProfileService;
 
+  private OpalRSessionManager rSessionManager;
+
   private RQuotaService service;
 
   @Before
@@ -58,7 +62,9 @@ public class RQuotaServiceTest {
     quotaRepository = mock(RQuotaRepository.class);
     activityRepository = mock(RSessionActivityRepository.class);
     subjectProfileService = mock(SubjectProfileService.class);
-    service = new RQuotaService(quotaRepository, activityRepository, subjectProfileService);
+    rSessionManager = mock(OpalRSessionManager.class);
+    when(rSessionManager.getRSessions()).thenReturn(Lists.newArrayList());
+    service = new RQuotaService(quotaRepository, activityRepository, subjectProfileService, rSessionManager);
     withGroups();
   }
 
@@ -70,14 +76,14 @@ public class RQuotaServiceTest {
   public void test_nothing_configured_resolves_to_no_quota() {
     withQuotas();
 
-    assertThat(service.resolve(CONTEXT, USER)).isEqualTo(Optional.empty());
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME)).isEqualTo(Optional.empty());
   }
 
   @Test
   public void test_the_system_default_applies_when_nothing_else_does() {
     withQuotas(system(60));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(60 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(60 * ONE_MINUTE);
   }
 
   @Test
@@ -85,7 +91,7 @@ public class RQuotaServiceTest {
     withGroups("analysts");
     withQuotas(system(60), group("analysts", 120));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(120 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(120 * ONE_MINUTE);
   }
 
   @Test
@@ -93,7 +99,7 @@ public class RQuotaServiceTest {
     withGroups("analysts", "partners");
     withQuotas(system(60), group("analysts", 120), group("partners", 300));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(300 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(300 * ONE_MINUTE);
   }
 
   @Test
@@ -101,7 +107,7 @@ public class RQuotaServiceTest {
     withGroups("analysts");
     withQuotas(system(60), group("analysts", 120), group("partners", 300));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(120 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(120 * ONE_MINUTE);
   }
 
   @Test
@@ -109,14 +115,14 @@ public class RQuotaServiceTest {
     withGroups("analysts", "partners");
     withQuotas(system(60), group("analysts", 120), group("partners", 300), user(USER, 90));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(90 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(90 * ONE_MINUTE);
   }
 
   @Test
   public void test_a_personal_quota_of_somebody_else_is_ignored() {
     withQuotas(system(60), user("someone-else", 90));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(60 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(60 * ONE_MINUTE);
   }
 
   /**
@@ -128,7 +134,7 @@ public class RQuotaServiceTest {
   public void test_only_enabled_quotas_take_part_in_the_resolution() {
     withQuotas(system(60));
 
-    service.resolve(CONTEXT, USER);
+    service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
 
     org.mockito.Mockito.verify(quotaRepository).findByContextAndEnabledTrue(CONTEXT);
     org.mockito.Mockito.verify(quotaRepository, org.mockito.Mockito.never()).findByContext(anyString());
@@ -139,7 +145,7 @@ public class RQuotaServiceTest {
     when(subjectProfileService.getProfile(anyString())).thenThrow(new NoSuchSubjectProfileException(USER));
     withQuotas(system(60), group("analysts", 120));
 
-    assertThat(service.resolve(CONTEXT, USER).get().getExecutionTimeLimitMillis()).isEqualTo(60 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis()).isEqualTo(60 * ONE_MINUTE);
   }
 
   //
@@ -150,7 +156,7 @@ public class RQuotaServiceTest {
   public void test_no_quota_means_nothing_is_measured() {
     withQuotas();
 
-    RQuotaUsage usage = service.getUsage(CONTEXT, USER);
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
 
     assertThat(usage.hasQuota()).isFalse();
     assertThat(usage.isExceeded()).isFalse();
@@ -163,12 +169,12 @@ public class RQuotaServiceTest {
     withUsage(30 * ONE_MINUTE);
 
     Date before = new Date();
-    RQuotaUsage usage = service.getUsage(CONTEXT, USER);
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
     Date after = new Date();
 
     assertThat(usage.getWindowStart()).isNotNull();
     assertWindowStart(usage, before, after, TimeUnit.DAYS.toMillis(7));
-    assertThat(usage.getUsedExecutionTimeMillis()).isEqualTo(30 * ONE_MINUTE);
+    assertThat(usage.getUsedMillis()).isEqualTo(30 * ONE_MINUTE);
     assertThat(usage.isExceeded()).isFalse();
   }
 
@@ -180,7 +186,7 @@ public class RQuotaServiceTest {
     withUsage(30 * ONE_MINUTE);
 
     Date before = new Date();
-    RQuotaUsage usage = service.getUsage(CONTEXT, USER);
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
     Date after = new Date();
 
     assertWindowStart(usage, before, after, TimeUnit.HOURS.toMillis(24));
@@ -195,7 +201,7 @@ public class RQuotaServiceTest {
     withUsage(120 * ONE_MINUTE);
     withEarliestActivity(null);
 
-    assertThat(service.getUsage(CONTEXT, USER).isExceeded()).isTrue();
+    assertThat(service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).isExceeded()).isTrue();
   }
 
   @Test
@@ -214,7 +220,7 @@ public class RQuotaServiceTest {
     Date earliest = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(6));
     withEarliestActivity(earliest);
 
-    RQuotaUsage usage = service.getUsage(CONTEXT, USER);
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
 
     assertThat(usage.isExceeded()).isTrue();
     assertThat(usage.getNextCreditDate())
@@ -229,7 +235,154 @@ public class RQuotaServiceTest {
     withQuotas(system(120));
     withUsage(30 * ONE_MINUTE);
 
-    assertThat(service.getUsage(CONTEXT, USER).getNextCreditDate()).isNull();
+    assertThat(service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).getNextCreditDate()).isNull();
+  }
+
+  //
+  // The metrics are resolved independently, and both are enforced
+  //
+
+  /**
+   * Limits of different metrics are not comparable, so the resolution of one must not see the quotas of the other -
+   * otherwise a generous session time allowance would masquerade as the most permissive execution time quota.
+   */
+  @Test
+  public void test_a_quota_of_the_other_metric_is_invisible_to_the_resolution() {
+    withGroups("analysts");
+    withQuotas(system(60), sessionTime(RQuota.SubjectType.GROUP, "analysts", 600));
+
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME).get().getLimitMillis())
+        .isEqualTo(60 * ONE_MINUTE);
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.SESSION_TIME).get().getLimitMillis())
+        .isEqualTo(600 * ONE_MINUTE);
+  }
+
+  /**
+   * A user can be bounded on one axis and free on the other: nothing infers one metric from the other.
+   */
+  @Test
+  public void test_a_metric_without_a_quota_stays_unlimited() {
+    withQuotas(system(60));
+
+    assertThat(service.resolve(CONTEXT, USER, RQuota.Metric.SESSION_TIME)).isEqualTo(Optional.empty());
+    assertThat(service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME).hasQuota()).isFalse();
+  }
+
+  @Test
+  public void test_every_metric_is_reported_whether_or_not_a_quota_applies() {
+    withQuotas(system(60));
+    withUsage(30 * ONE_MINUTE);
+
+    List<RQuotaUsage> usages = service.getUsages(CONTEXT, USER);
+
+    assertThat(usages).hasSize(RQuota.Metric.values().length);
+    assertThat(usages.stream().filter(RQuotaUsage::hasQuota).count()).isEqualTo(1);
+  }
+
+  /**
+   * The gate refuses on the first bound the user has reached, whichever metric it belongs to.
+   */
+  @Test
+  public void test_being_over_on_either_metric_is_being_over() {
+    withQuotas(system(120), sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withUsage(30 * ONE_MINUTE);
+    withSessionTimeUsage(481 * ONE_MINUTE);
+    withEarliestActivity(null);
+
+    assertThat(service.isExceeded(CONTEXT, USER)).isTrue();
+  }
+
+  //
+  // Session time, and the live tail of sessions that are still open
+  //
+
+  @Test
+  public void test_session_time_usage_sums_the_session_time_column() {
+    withQuotas(sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withSessionTimeUsage(300 * ONE_MINUTE);
+
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME);
+
+    assertThat(usage.getUsedMillis()).isEqualTo(300 * ONE_MINUTE);
+    assertThat(usage.isExceeded()).isFalse();
+    verify(activityRepository).sumSessionTimeMillis(eq(USER), eq(CONTEXT), any(Date.class));
+    verify(activityRepository, never()).sumExecutionTimeMillis(eq(USER), eq(CONTEXT), any(Date.class));
+  }
+
+  /**
+   * A record only moves when a command ends or the session closes, so an idle open session has more session time than
+   * the table says. Without this the metric would stand still for exactly the user it is meant to catch.
+   */
+  @Test
+  public void test_an_open_session_adds_the_time_since_its_record_was_last_written() {
+    withQuotas(sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withSessionTimeUsage(300 * ONE_MINUTE);
+    withOpenSessions(new Date(System.currentTimeMillis() - 60 * ONE_MINUTE));
+
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME);
+
+    assertThat(usage.getUsedMillis()).isGreaterThanOrEqualTo(360 * ONE_MINUTE);
+    assertThat(usage.getUsedMillis()).isLessThan(361 * ONE_MINUTE);
+    assertThat(usage.getOpenSessionsCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void test_the_live_tail_is_what_pushes_a_user_over() {
+    withQuotas(sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withSessionTimeUsage(470 * ONE_MINUTE);
+    withOpenSessions(new Date(System.currentTimeMillis() - 20 * ONE_MINUTE));
+    withEarliestActivity(null);
+
+    assertThat(service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME).isExceeded()).isTrue();
+  }
+
+  /**
+   * Execution time is complete the moment a command ends, so it gets no correction - only the session count, which the
+   * message needs either way.
+   */
+  @Test
+  public void test_execution_time_is_not_corrected_by_open_sessions() {
+    withQuotas(system(120));
+    withUsage(30 * ONE_MINUTE);
+    withOpenSessions(new Date(System.currentTimeMillis() - 60 * ONE_MINUTE));
+
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.EXECUTION_TIME);
+
+    assertThat(usage.getUsedMillis()).isEqualTo(30 * ONE_MINUTE);
+    assertThat(usage.getOpenSessionsCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void test_no_open_session_means_no_extra_query() {
+    withQuotas(sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withSessionTimeUsage(300 * ONE_MINUTE);
+
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME);
+
+    assertThat(usage.getUsedMillis()).isEqualTo(300 * ONE_MINUTE);
+    assertThat(usage.getOpenSessionsCount()).isEqualTo(0);
+    verify(activityRepository, never()).findAllById(any(Iterable.class));
+  }
+
+  /**
+   * Someone else's open session is someone else's problem, and so is one in another context.
+   */
+  @Test
+  public void test_only_the_users_own_sessions_in_the_context_count() {
+    withQuotas(sessionTime(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, 480));
+    withSessionTimeUsage(300 * ONE_MINUTE);
+    RServerSession other = mock(RServerSession.class);
+    when(other.getUser()).thenReturn("someone-else");
+    when(other.getExecutionContext()).thenReturn(CONTEXT);
+    RServerSession otherContext = mock(RServerSession.class);
+    when(otherContext.getUser()).thenReturn(USER);
+    when(otherContext.getExecutionContext()).thenReturn("R");
+    when(rSessionManager.getRSessions()).thenReturn(Lists.newArrayList(other, otherContext));
+
+    RQuotaUsage usage = service.getUsage(CONTEXT, USER, RQuota.Metric.SESSION_TIME);
+
+    assertThat(usage.getUsedMillis()).isEqualTo(300 * ONE_MINUTE);
+    assertThat(usage.getOpenSessionsCount()).isEqualTo(0);
   }
 
   //
@@ -264,24 +417,57 @@ public class RQuotaServiceTest {
   }
 
   private RQuota system(long limitMinutes) {
-    return quota(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, limitMinutes);
+    return quota(RQuota.SubjectType.SYSTEM, RQuota.SYSTEM_PRINCIPAL, limitMinutes, RQuota.Metric.EXECUTION_TIME);
   }
 
   private RQuota group(String name, long limitMinutes) {
-    return quota(RQuota.SubjectType.GROUP, name, limitMinutes);
+    return quota(RQuota.SubjectType.GROUP, name, limitMinutes, RQuota.Metric.EXECUTION_TIME);
   }
 
   private RQuota user(String name, long limitMinutes) {
-    return quota(RQuota.SubjectType.USER, name, limitMinutes);
+    return quota(RQuota.SubjectType.USER, name, limitMinutes, RQuota.Metric.EXECUTION_TIME);
   }
 
-  private RQuota quota(RQuota.SubjectType subjectType, String principal, long limitMinutes) {
+  private RQuota sessionTime(RQuota.SubjectType subjectType, String principal, long limitMinutes) {
+    return quota(subjectType, principal, limitMinutes, RQuota.Metric.SESSION_TIME);
+  }
+
+  private RQuota quota(RQuota.SubjectType subjectType, String principal, long limitMinutes, RQuota.Metric metric) {
     RQuota quota = new RQuota();
     quota.setContext(CONTEXT);
     quota.setSubjectType(subjectType);
     quota.setPrincipal(principal);
+    quota.setMetric(metric);
     quota.setPeriod(RQuota.Period.WEEKLY);
-    quota.setExecutionTimeLimitMillis(limitMinutes * ONE_MINUTE);
+    quota.setLimitMillis(limitMinutes * ONE_MINUTE);
     return quota;
+  }
+
+  private void withSessionTimeUsage(long usedMillis) {
+    when(activityRepository.sumSessionTimeMillis(eq(USER), eq(CONTEXT), any(Date.class))).thenReturn(usedMillis);
+  }
+
+  /**
+   * Sessions the manager reports as open, with the moment their activity record was last written.
+   */
+  private void withOpenSessions(Date... lastUpdated) {
+    List<RServerSession> sessions = Lists.newArrayList();
+    List<RSessionActivity> activities = Lists.newArrayList();
+    for (int i = 0; i < lastUpdated.length; i++) {
+      String id = "session-" + i;
+      RServerSession session = mock(RServerSession.class);
+      when(session.getId()).thenReturn(id);
+      when(session.getUser()).thenReturn(USER);
+      when(session.getExecutionContext()).thenReturn(CONTEXT);
+      sessions.add(session);
+      RSessionActivity activity = new RSessionActivity();
+      activity.setId(id);
+      activity.setUser(USER);
+      activity.setContext(CONTEXT);
+      activity.setUpdated(lastUpdated[i]);
+      activities.add(activity);
+    }
+    when(rSessionManager.getRSessions()).thenReturn(sessions);
+    when(activityRepository.findAllById(any(Iterable.class))).thenReturn(activities);
   }
 }

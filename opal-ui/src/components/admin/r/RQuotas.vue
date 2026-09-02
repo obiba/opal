@@ -4,7 +4,7 @@
       flat
       :rows="rQuotaStore.quotas"
       :columns="columns"
-      :row-key="(row) => `${row.subjectType}:${row.principal}`"
+      :row-key="(row) => getKey(row)"
       :pagination="initialPagination"
       :hide-pagination="rQuotaStore.quotas.length <= initialPagination.rowsPerPage"
       :loading="loading"
@@ -22,7 +22,14 @@
       </template>
       <template v-slot:body-cell-subject="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <span>{{ getSubjectLabel(props.row) }}</span>
+          <router-link v-if="props.row.subjectType === 'USER'" :to="`/admin/profile/${props.row.principal}`" class="text-primary">{{ getSubjectLabel(props.row) }}</router-link>
+          <span v-else>{{ getSubjectLabel(props.row) }}</span>
+          <q-badge v-if="props.row.subjectType === 'GROUP'" color="primary" class="q-ml-sm">
+            {{ t('r_quota.group') }}
+          </q-badge>
+          <q-badge v-else-if="props.row.subjectType === 'USER'" color="accent" class="q-ml-sm">
+            {{ t('r_quota.user') }}
+          </q-badge>
           <div class="float-right" v-if="authStore.isAdministrator">
             <q-btn
               rounded
@@ -57,9 +64,9 @@
       <template v-slot:body-cell-usage="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
           <span v-if="props.row.subjectType !== 'USER'" class="text-hint">-</span>
-          <span v-else-if="usages[props.row.principal] === undefined" class="text-hint">...</span>
-          <span v-else :class="usages[props.row.principal]?.exceeded ? 'text-negative' : ''">
-            {{ getMillisLabel(usages[props.row.principal]?.usedExecutionTimeMillis || 0) || '0 min' }}
+          <span v-else-if="getUsageOf(props.row) === undefined" class="text-hint">...</span>
+          <span v-else :class="getUsageOf(props.row)?.exceeded ? 'text-negative' : ''">
+            {{ getMillisLabel(getUsageOf(props.row)?.usedMillis || 0) || '0 min' }}
           </span>
         </q-td>
       </template>
@@ -102,9 +109,9 @@ const showDelete = ref(false);
 const showEdit = ref(false);
 /**
  * Consumption only means something for a user: a group or system quota is what applies to many of them, and has no
- * single figure of its own.
+ * single figure of its own. A user has one entry per metric, so the figure a row shows is the one of its own metric.
  */
-const usages = ref<{ [principal: string]: RQuotaUsageDto }>({});
+const usages = ref<{ [principal: string]: RQuotaUsageDto[] }>({});
 
 const initialPagination = ref({
   sortBy: 'subject',
@@ -125,6 +132,14 @@ const columns = computed(() => [
     style: 'width: 30%',
   },
   {
+    name: 'metric',
+    label: t('r_quota.metric'),
+    align: DefaultAlignment,
+    field: 'metric',
+    format: (val: string) => t(`r_quota.metric_${val.toLowerCase()}`),
+    sortable: true,
+  },
+  {
     name: 'period',
     label: t('r_quota.period'),
     align: DefaultAlignment,
@@ -136,7 +151,7 @@ const columns = computed(() => [
     name: 'limit',
     label: t('r_quota.limit'),
     align: DefaultAlignment,
-    field: 'executionTimeLimitMillis',
+    field: 'limitMillis',
     format: (val: number) => getMillisLabel(val) || '0 min',
     sortable: true,
   },
@@ -172,19 +187,29 @@ async function init() {
 
 async function loadUsages() {
   usages.value = {};
-  const users = rQuotaStore.quotas.filter((quota) => quota.subjectType === 'USER');
+  // one call per user, whatever the number of metrics they have a quota for: the endpoint reports all of them
+  const principals = [
+    ...new Set(rQuotaStore.quotas.filter((quota) => quota.subjectType === 'USER').map((quota) => quota.principal)),
+  ];
   await Promise.all(
-    users.map((quota) =>
+    principals.map((principal) =>
       rQuotaStore
-        .getUsage(props.context, quota.principal)
-        .then((usage) => (usages.value[quota.principal] = usage))
+        .getUsage(props.context, principal)
+        .then((usage) => (usages.value[principal] = usage))
         .catch(() => undefined),
     ),
   );
 }
 
 function getKey(quota: RQuotaDto) {
-  return `${quota.subjectType}:${quota.principal}`;
+  return `${quota.subjectType}:${quota.principal}:${quota.metric}`;
+}
+
+/**
+ * The usage entry of the row's own metric: a user over their session time says nothing about their execution time.
+ */
+function getUsageOf(quota: RQuotaDto) {
+  return usages.value[quota.principal]?.find((usage) => usage.metric === quota.metric);
 }
 
 function getSubjectLabel(quota: RQuotaDto) {

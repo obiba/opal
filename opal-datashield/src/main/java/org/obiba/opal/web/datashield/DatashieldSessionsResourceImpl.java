@@ -94,17 +94,22 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   }
 
   /**
-   * A user who has spent their DataSHIELD execution time allowance cannot open a new session. Sessions already open are
-   * left alone, deliberately: the quota bounds routine usage, it does not interrupt work in progress.
+   * A user who has spent their DataSHIELD allowance - of execution time, of session time, or of both - cannot open a
+   * new session. Sessions already open are left alone, deliberately: the quota bounds routine usage, it does not
+   * interrupt work in progress.
+   * <p>
+   * Every spent metric is named in the refusal: a user who frees up one of them and is still turned away has learnt
+   * nothing from a message that only mentioned the other.
    * <p>
    * The denial goes to the DataSHIELD user log too, so that a data custodian reading the audit trail can see why a
    * user was turned away without having to correlate HTTP logs.
    */
   @Override
   protected void checkQuota() throws ForbiddenException {
-    RQuotaUsage usage = rQuotaService.getUsage(DS_CONTEXT, SecurityUtils.getSubject().getPrincipal().toString());
-    if (!usage.isExceeded()) return;
-    String message = usage.asMessage();
+    List<RQuotaUsage> exceeded = rQuotaService.getUsages(DS_CONTEXT, SecurityUtils.getSubject().getPrincipal().toString())
+        .stream().filter(RQuotaUsage::isExceeded).toList();
+    if (exceeded.isEmpty()) return;
+    String message = exceeded.stream().map(RQuotaUsage::asMessage).collect(Collectors.joining(" "));
     DataShieldLog.userLog("", DataShieldLog.Action.QUOTA, "refused a datashield session: {}", message);
     throw new ForbiddenException(message);
   }

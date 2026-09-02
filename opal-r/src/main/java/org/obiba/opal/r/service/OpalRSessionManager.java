@@ -12,12 +12,14 @@ package org.obiba.opal.r.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
+import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.r.service.tasks.SubjectRSessions;
@@ -84,6 +86,9 @@ public class OpalRSessionManager implements DisposableBean {
 
   @Autowired
   private CryptoService cryptoService;
+
+  @Autowired
+  private EventBus eventBus;
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
@@ -406,6 +411,11 @@ public class OpalRSessionManager implements DisposableBean {
       // rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
+      // A session that never runs a command would otherwise leave no activity record at all, and an open session that
+      // does nothing is exactly what a session time quota is about. The activity service ignores this post when the
+      // context initiator's own operations have already recorded the session.
+      eventBus.post(new RServerSessionStartedEvent(rSession.getId(), rSession.getUser(), rSession.getExecutionContext(),
+          safeProfile.getName(), rSession.getCreated()));
       return rSession;
     } catch (Exception e) {
       if (log.isDebugEnabled()) {
