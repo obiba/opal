@@ -12,12 +12,14 @@ package org.obiba.opal.r.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.service.security.CryptoService;
 import org.obiba.opal.r.service.event.RServerServiceStoppedEvent;
+import org.obiba.opal.r.service.event.RServerSessionStartedEvent;
 import org.obiba.opal.r.service.event.RServiceStoppedEvent;
 import org.obiba.opal.r.service.tasks.RSessionStateWaiter;
 import org.obiba.opal.r.service.tasks.SubjectRSessions;
@@ -84,6 +86,9 @@ public class OpalRSessionManager implements DisposableBean {
 
   @Autowired
   private CryptoService cryptoService;
+
+  @Autowired
+  private EventBus eventBus;
 
   private final Map<String, SubjectRSessions> rSessionMap = Maps.newConcurrentMap();
 
@@ -236,7 +241,7 @@ public class OpalRSessionManager implements DisposableBean {
    * @return R session
    */
   public RServerSession newSubjectRSession(RServerProfile profile) {
-    RServerSession rSession = newSubjectRSession(getSubjectPrincipal(), profile, null);
+    RServerSession rSession = newSubjectRSession(getSubjectPrincipal(), profile, RServerSession.DEFAULT_CONTEXT, null);
     // Ensure R session is up and running
     RSessionStateWaiter waiter = new RSessionStateWaiter(rSession);
     waiter.run();
@@ -247,11 +252,12 @@ public class OpalRSessionManager implements DisposableBean {
    * Creates a new R connection in the provided profile and context initiator, stores the corresponding R session.
    *
    * @param profile
+   * @param executionContext
    * @param contextInitiator
    * @return
    */
-  public RServerSession newSubjectRSession(RServerProfile profile, RContextInitiator contextInitiator) {
-    return newSubjectRSession(getSubjectPrincipal(), profile, contextInitiator);
+  public RServerSession newSubjectRSession(RServerProfile profile, String executionContext, RContextInitiator contextInitiator) {
+    return newSubjectRSession(getSubjectPrincipal(), profile, executionContext, contextInitiator);
   }
 
   /**
@@ -392,14 +398,24 @@ public class OpalRSessionManager implements DisposableBean {
     }
   }
 
-  public RServerSession newSubjectRSession(String principal, RServerProfile profile, RContextInitiator contextInitiator) {
+  /**
+   * The execution context is provided at creation time: the context initiator is applied while the session is being
+   * opened, and its R operations are what makes the session activity be recorded. Setting the context afterwards
+   * would come too late for that record.
+   */
+  public RServerSession newSubjectRSession(String principal, RServerProfile profile, String executionContext, RContextInitiator contextInitiator) {
     try {
       RServerProfile safeProfile = asSafeRServerProfile(profile);
       RServerService service = rServerManagerService.getRServer(safeProfile.getCluster());
-      RServerSession rSession = service.newRServerSession(principal, safeProfile, contextInitiator);
+      RServerSession rSession = service.newRServerSession(principal, null, safeProfile, executionContext, contextInitiator);
       // rSession.setProfile(safeProfile);
       SubjectRSessions rSessions = getRSessions(principal);
       rSessions.addRSession(rSession);
+      // A session that never runs a command would otherwise leave no activity record at all, and an open session that
+      // does nothing is exactly what a session time quota is about. The activity service ignores this post when the
+      // context initiator's own operations have already recorded the session.
+      eventBus.post(new RServerSessionStartedEvent(rSession.getId(), rSession.getUser(), rSession.getExecutionContext(),
+          safeProfile.getName(), rSession.getCreated()));
       return rSession;
     } catch (Exception e) {
       if (log.isDebugEnabled()) {

@@ -91,16 +91,23 @@ public class RActivityService implements SystemService {
     return summaries;
   }
 
+  /**
+   * The event is posted twice for the same session: once when it is created, and once when it first becomes busy,
+   * because the context initiator's R operations run before the session manager gets the session back. Whichever
+   * arrives first writes the record, and the other one has to leave it alone: inserting a second time would reset the
+   * execution time that had already been recorded.
+   */
   @Subscribe
   public void onRServerSessionStarted(RServerSessionStartedEvent event) {
     if (isOpalSystemUser(event)) return;
+    if (findActivity(event.getId()) != null) return; // already recorded, by whichever post got there first
     RSessionActivity metric = new RSessionActivity();
     metric.setId(event.getId());
     metric.setUser(event.getUser());
     metric.setContext(event.getExecutionContext());
     metric.setProfile(event.getProfile());
     metric.setCreated(event.getCreated());
-    metric.setUpdated(new Date());
+    touch(metric);
     rSessionActivityRepository.upsert(metric);
   }
 
@@ -109,7 +116,7 @@ public class RActivityService implements SystemService {
     if (isOpalSystemUser(event)) return;
     RSessionActivity metric = findActivity(event.getId());
     if (metric == null) return; // broken for some reason
-    metric.setUpdated(new Date());
+    touch(metric);
     metric.setExecutionTimeMillis(event.getExecutionTimeMillis());
     rSessionActivityRepository.upsert(metric);
   }
@@ -119,8 +126,17 @@ public class RActivityService implements SystemService {
     if (isOpalSystemUser(event)) return;
     RSessionActivity metric = findActivity(event.getId());
     if (metric == null) return; // broken for some reason
-    metric.setUpdated(new Date());
+    touch(metric);
     rSessionActivityRepository.upsert(metric);
+  }
+
+  /**
+   * The session time is the record's own span, so it is written at the only moments the span can have changed: when
+   * the end of it moves.
+   */
+  private void touch(RSessionActivity metric) {
+    metric.setUpdated(new Date());
+    metric.setSessionTimeMillis(Math.max(0, metric.getUpdated().getTime() - metric.getCreated().getTime()));
   }
 
   /**
@@ -182,6 +198,9 @@ public class RActivityService implements SystemService {
     RActivitySummary summary = new RActivitySummary();
     summary.setExecutionTimeMillis(records.stream()
         .map(RActivity::getExecutionTimeMillis)
+        .reduce(0L, Long::sum));
+    summary.setSessionTimeMillis(records.stream()
+        .map(RActivity::getSessionTimeMillis)
         .reduce(0L, Long::sum));
     summary.setCreated(records.stream()
         .map(AbstractTimestamped::getCreated)

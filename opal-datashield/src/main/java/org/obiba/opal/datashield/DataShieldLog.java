@@ -29,7 +29,8 @@ public class DataShieldLog {
     WS_SAVE,
     WS_RESTORE,
     RM,
-    LS
+    LS,
+    QUOTA
   }
 
   private static final Logger adminLog = LoggerFactory.getLogger("datashield.admin");

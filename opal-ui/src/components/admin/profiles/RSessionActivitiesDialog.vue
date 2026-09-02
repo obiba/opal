@@ -38,6 +38,7 @@ interface DialogProps {
   principal: string;
   profile: string;
   context: string;
+  current?: boolean;
 }
 
 const props = defineProps<DialogProps>();
@@ -110,7 +111,7 @@ onMounted(init);
 function init() {
   if (props.modelValue) {
     profileActivityStore
-      .getRSessionActivities(props.principal, props.context, props.profile)
+      .getRSessionActivities(props.principal, props.context, props.profile, props.current)
       .then((data: RSessionActivityDto[]) => {
         activities.value = data;
       });

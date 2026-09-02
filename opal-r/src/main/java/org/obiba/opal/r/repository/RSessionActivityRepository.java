@@ -11,7 +11,10 @@ package org.obiba.opal.r.repository;
 
 import org.obiba.opal.r.service.RSessionActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,6 +30,34 @@ public interface RSessionActivityRepository extends JpaRepository<RSessionActivi
   List<RSessionActivity> findByContextAndUser(String context, String user);
 
   List<RSessionActivity> findByContextAndUserAndProfile(String context, String user, String profile);
+
+  /**
+   * Execution time a user has accumulated in a context since {@code from}.
+   * <p>
+   * A session is counted whole, at the instant of its last command: the record carries one cumulated total and not a
+   * time series. That over-counts a session that was already running when the window opened and never under-counts,
+   * which is the direction a quota check should err in. Backed by
+   * {@code idx_r_session_activities_user_context_updated}, because this runs on the session creation path.
+   */
+  @Query("select coalesce(sum(a.executionTimeMillis), 0) from RSessionActivity a " +
+      "where a.user = :user and a.context = :context and a.updated >= :from")
+  long sumExecutionTimeMillis(@Param("user") String user, @Param("context") String context, @Param("from") Date from);
+
+  /**
+   * Session time a user has accumulated in a context since {@code from}, for the records as they stand. A session that
+   * is still open has more of it than its record says, because the record only moves when a command ends or the
+   * session closes; {@code RQuotaService} adds that live tail from the session manager.
+   */
+  @Query("select coalesce(sum(a.sessionTimeMillis), 0) from RSessionActivity a " +
+      "where a.user = :user and a.context = :context and a.updated >= :from")
+  long sumSessionTimeMillis(@Param("user") String user, @Param("context") String context, @Param("from") Date from);
+
+  /**
+   * The last activity of the oldest session still inside the window, i.e. the next one to leave it.
+   */
+  @Query("select min(a.updated) from RSessionActivity a " +
+      "where a.user = :user and a.context = :context and a.updated >= :from")
+  Date findEarliestUpdated(@Param("user") String user, @Param("context") String context, @Param("from") Date from);
 
   /**
    * The activity is stored under the R session's own identifier, so it is already the key.

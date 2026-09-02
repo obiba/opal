@@ -18,6 +18,8 @@ import org.obiba.opal.core.domain.kubernetes.PodSpec;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.r.kubernetes.RServerPodService;
 import org.obiba.opal.r.rock.RServerAppService;
+import org.obiba.opal.r.service.RQuota;
+import org.obiba.opal.r.service.RQuotaUsage;
 import org.obiba.opal.r.service.RServerClusterService;
 import org.obiba.opal.r.service.RServerService;
 import org.obiba.opal.r.service.RServerSession;
@@ -129,6 +131,50 @@ public class Dtos {
         .setContext(executionContext)
         .setSize(size)
         .build();
+  }
+
+  public static OpalR.RQuotaDto asDto(RQuota quota) {
+    OpalR.RQuotaDto.Builder builder = OpalR.RQuotaDto.newBuilder()
+        .setContext(quota.getContext())
+        .setSubjectType(quota.getSubjectType().name())
+        .setPrincipal(quota.getPrincipal())
+        .setMetric(quota.getMetric().name())
+        .setPeriod(quota.getPeriod().name())
+        .setLimitMillis(quota.getLimitMillis())
+        .setEnabled(quota.isEnabled());
+    if (quota.getId() != null) builder.setId(quota.getId());
+    return builder.build();
+  }
+
+  /**
+   * The identifier is not read from the body: an update addresses the quota by its path, and a creation has none yet.
+   */
+  public static RQuota fromDto(OpalR.RQuotaDto dto) {
+    RQuota quota = new RQuota();
+    quota.setContext(dto.getContext());
+    quota.setSubjectType(RQuota.SubjectType.valueOf(dto.getSubjectType()));
+    quota.setPrincipal(dto.getPrincipal());
+    quota.setMetric(RQuota.Metric.valueOf(dto.getMetric()));
+    quota.setPeriod(RQuota.Period.valueOf(dto.getPeriod()));
+    quota.setLimitMillis(dto.getLimitMillis());
+    quota.setEnabled(dto.getEnabled());
+    return quota;
+  }
+
+  public static OpalR.RQuotaUsageDto asDto(RQuotaUsage usage) {
+    OpalR.RQuotaUsageDto.Builder builder = OpalR.RQuotaUsageDto.newBuilder()
+        .setContext(usage.getContext())
+        .setUser(usage.getUser())
+        .setMetric(usage.getMetric().name())
+        .setUsedMillis(usage.getUsedMillis())
+        .setOpenSessionsCount(usage.getOpenSessionsCount())
+        .setExceeded(usage.isExceeded());
+    if (usage.hasQuota()) builder.setQuota(asDto(usage.getQuota()));
+    if (usage.getWindowStart() != null)
+      builder.setWindowStartDate(DateTimeType.get().valueOf(usage.getWindowStart()).toString());
+    if (usage.getNextCreditDate() != null)
+      builder.setNextCreditDate(DateTimeType.get().valueOf(usage.getNextCreditDate()).toString());
+    return builder.build();
   }
 
   public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,

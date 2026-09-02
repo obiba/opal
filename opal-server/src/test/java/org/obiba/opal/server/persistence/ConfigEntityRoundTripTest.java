@@ -10,6 +10,7 @@
 package org.obiba.opal.server.persistence;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.persistence.EntityManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.obiba.opal.core.domain.kubernetes.Toleration;
 import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
+import org.obiba.opal.r.service.RQuota;
 import org.obiba.opal.r.service.RSessionActivity;
 
 import java.util.Date;
@@ -353,6 +355,7 @@ public class ConfigEntityRoundTripTest extends AbstractConfigPersistenceTest {
     activity.setContext("R");
     activity.setProfile("default");
     activity.setExecutionTimeMillis(1234L);
+    activity.setSessionTimeMillis(56789L);
     activity.setUpdated(new Date());
 
     RSessionActivity reloaded = roundTrip(activity);
@@ -362,7 +365,91 @@ public class ConfigEntityRoundTripTest extends AbstractConfigPersistenceTest {
     assertThat(reloaded.getContext()).isEqualTo("R");
     assertThat(reloaded.getProfile()).isEqualTo("default");
     assertThat(reloaded.getExecutionTimeMillis()).isEqualTo(1234L);
+    assertThat(reloaded.getSessionTimeMillis()).isEqualTo(56789L);
+    assertThat(reloaded.getIdleTimeMillis()).isEqualTo(56789L - 1234L);
     assertThat(reloaded.getCreated()).isNotNull();
+  }
+
+  /**
+   * The three enumerations are varchar columns written through an {@code AttributeConverter}, so what comes back has
+   * to be the constant and not a null the converter quietly produced from an unexpected string.
+   */
+  @Test
+  public void test_r_quota_keeps_its_converted_enumerations() {
+    RQuota quota = new RQuota();
+    quota.setContext("DataSHIELD");
+    quota.setSubjectType(RQuota.SubjectType.GROUP);
+    quota.setPrincipal("analysts");
+    quota.setMetric(RQuota.Metric.SESSION_TIME);
+    quota.setPeriod(RQuota.Period.DAILY);
+    quota.setLimitMillis(7_200_000L);
+    quota.setEnabled(true);
+
+    RQuota reloaded = roundTrip(quota);
+
+    assertThat(reloaded.getContext()).isEqualTo("DataSHIELD");
+    assertThat(reloaded.getSubjectType()).isEqualTo(RQuota.SubjectType.GROUP);
+    assertThat(reloaded.getPrincipal()).isEqualTo("analysts");
+    assertThat(reloaded.getMetric()).isEqualTo(RQuota.Metric.SESSION_TIME);
+    assertThat(reloaded.getPeriod()).isEqualTo(RQuota.Period.DAILY);
+    assertThat(reloaded.getLimitMillis()).isEqualTo(7_200_000L);
+    assertThat(reloaded.isEnabled()).isTrue();
+  }
+
+  /**
+   * The metric is part of the natural key, and the unique constraint has to agree: a subject bounded on execution time
+   * must still be able to receive a session time allowance, since the two limit different things and neither subsumes
+   * the other.
+   */
+  @Test
+  public void test_one_subject_holds_one_r_quota_per_metric() {
+    roundTrip(quota(RQuota.Metric.EXECUTION_TIME, 7_200_000L));
+    roundTrip(quota(RQuota.Metric.SESSION_TIME, 28_800_000L));
+
+    EntityManager em = getEntityManagerFactory().createEntityManager();
+    try {
+      List<RQuota> quotas = em.createQuery("select q from RQuota q where q.principal = :principal", RQuota.class)
+          .setParameter("principal", "jsmith").getResultList();
+      assertThat(quotas).hasSize(2);
+      assertThat(quotas.stream().map(RQuota::getMetric).toList())
+          .containsOnly(RQuota.Metric.EXECUTION_TIME, RQuota.Metric.SESSION_TIME);
+    } finally {
+      em.close();
+    }
+  }
+
+  private RQuota quota(RQuota.Metric metric, long limitMillis) {
+    RQuota quota = new RQuota();
+    quota.setContext("DataSHIELD");
+    quota.setSubjectType(RQuota.SubjectType.USER);
+    quota.setPrincipal("jsmith");
+    quota.setMetric(metric);
+    quota.setPeriod(RQuota.Period.WEEKLY);
+    quota.setLimitMillis(limitMillis);
+    quota.setEnabled(true);
+    return quota;
+  }
+
+  /**
+   * The system default has no subject, and stores that as an empty string rather than NULL so that the unique
+   * constraint counts two of them as duplicates on PostgreSQL as well as on H2.
+   */
+  @Test
+  public void test_the_system_r_quota_has_an_empty_principal() {
+    RQuota quota = new RQuota();
+    quota.setContext("DataSHIELD");
+    quota.setSubjectType(RQuota.SubjectType.SYSTEM);
+    quota.setPrincipal(null);
+    quota.setPeriod(RQuota.Period.WEEKLY);
+    quota.setLimitMillis(0L);
+    quota.setEnabled(false);
+
+    RQuota reloaded = roundTrip(quota);
+
+    assertThat(reloaded.getPrincipal()).isEqualTo(RQuota.SYSTEM_PRINCIPAL);
+    assertThat(reloaded.getSubjectType()).isEqualTo(RQuota.SubjectType.SYSTEM);
+    assertThat(reloaded.getLimitMillis()).isEqualTo(0L);
+    assertThat(reloaded.isEnabled()).isFalse();
   }
 
   @Test

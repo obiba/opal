@@ -19,7 +19,12 @@
       </div>
       <profile-acls :principal="principal" />
 
-      <div class="text-h6 q-mt-md q-mb-md">
+      <div class="text-h6 q-mb-md">
+        {{ t('r_quota.usage_title', { context: DS_CONTEXT }) }}
+      </div>
+      <r-quota-usage :principal="principal" :context="DS_CONTEXT" />
+
+      <div class="text-h6 q-mt-xl q-mb-md">
         {{ t('r_activity') }}
       </div>
       <div class="text-help q-mb-md">
@@ -34,6 +39,8 @@
 import ProfileUserInfo from 'src/components/admin/profiles/ProfileUserInfo.vue';
 import ProfileAcls from 'src/components/admin/profiles/ProfileAcls.vue';
 import RActivity from 'src/components/admin/profiles/RActivity.vue';
+import RQuotaUsage from 'src/components/admin/profiles/RQuotaUsage.vue';
+import { DS_CONTEXT } from 'src/components/models';
 
 const { t } = useI18n();
 const route = useRoute();

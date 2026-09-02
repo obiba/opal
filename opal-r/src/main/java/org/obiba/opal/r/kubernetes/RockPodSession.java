@@ -34,8 +34,8 @@ public class RockPodSession extends RockSession {
 
   private CompletableFuture<Void> readyFuture;
 
-  protected RockPodSession(String serverName, String id, RServerProfile profile, RContextInitiator rContextInitiator, PodRef pod, String user, RockPodSessionHelper rockPodSessionHelper, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, id, profile, rContextInitiator, RockPodSessionHelper.DEFAULT_CREDENTIALS, user, transactionalThreadFactory, eventBus);
+  protected RockPodSession(String serverName, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator, PodRef pod, String user, RockPodSessionHelper rockPodSessionHelper, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, profile, executionContext, rContextInitiator, RockPodSessionHelper.DEFAULT_CREDENTIALS, user, transactionalThreadFactory, eventBus);
     this.pod = pod;
     this.rockPodSessionHelper = rockPodSessionHelper;
     init();

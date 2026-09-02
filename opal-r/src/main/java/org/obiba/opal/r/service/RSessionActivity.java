@@ -46,7 +46,11 @@ public class RSessionActivity extends RActivity {
     this.id = id;
   }
 
+  /**
+   * Clamped, because rows written before session time was recorded keep a session time of zero while their execution
+   * time is whatever it was: the subtraction is meaningless there, and a negative idle time is worse than none.
+   */
   public long getIdleTimeMillis() {
-    return getTotalTimeMillis() - getExecutionTimeMillis();
+    return Math.max(0, getSessionTimeMillis() - getExecutionTimeMillis());
   }
 }

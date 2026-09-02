@@ -428,4 +428,72 @@
     </createIndex>
   </changeSet>
 
+  <!--
+    R usage quotas (obiba/opal#3745): what a subject may spend of R execution time or of R session time over a rolling
+    window, plus what the quota check needs to measure it.
+
+    `principal` is NOT NULL and holds an empty string for the system-wide default rather than NULL: the unique
+    constraint has to mean the same thing on both servers, and PostgreSQL counts NULLs as distinct, which would let
+    two system defaults coexist there and not on H2.
+
+    `metric` is part of the unique constraint, not a plain attribute: a subject may be given one quota of each kind,
+    and limits of different metrics are not comparable, so they are resolved independently.
+  -->
+  <changeSet id="2-r-quotas" author="opal">
+    <createTable tableName="r_quotas">
+      <column name="created" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" primaryKeyName="pk_r_quotas"/>
+      </column>
+      <column name="updated" type="TIMESTAMP"/>
+      <column name="context" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="subject_type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="principal" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="metric" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="period" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="limit_millis" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="r_quotas" columnNames="context, subject_type, principal, metric"
+                         constraintName="uk_r_quotas"/>
+
+    <!--
+      The session time of a record is its own span, updated - created. It is stored rather than derived because summing
+      it over a window has to be an indexed aggregate over a numeric column, and timestamp arithmetic inside an
+      aggregate is dialect-specific. Rows written before this column existed keep a session time of zero: computing the
+      span here would be dialect-specific too, and the error clears on its own within one window length.
+    -->
+    <addColumn tableName="r_session_activities">
+      <column name="session_time_millis" type="BIGINT" defaultValueNumeric="0">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+    <!--
+      Summing one user's execution time in one context over a window runs on the R session creation path, so it has to
+      be an index range scan rather than a walk of that user's whole history.
+    -->
+    <createIndex tableName="r_session_activities" indexName="idx_r_session_activities_user_context_updated">
+      <column name="user_name"/>
+      <column name="context"/>
+      <column name="updated"/>
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

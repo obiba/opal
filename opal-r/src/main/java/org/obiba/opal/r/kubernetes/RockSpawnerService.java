@@ -184,9 +184,9 @@ public class RockSpawnerService implements RServerPodService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
+  public RServerSession newRServerSession(String user, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator) throws RServerException {
     PodRef pod = createRockPod(false);
-    return newRServerSession(pod, user, id, profile, rContextInitiator);
+    return newRServerSession(pod, user, id, profile, executionContext, rContextInitiator);
   }
 
   @Override
@@ -341,13 +341,13 @@ public class RockSpawnerService implements RServerPodService {
   // Private methods
   //
 
-  private RockPodSession newRServerSession(PodRef pod, String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
+  private RockPodSession newRServerSession(PodRef pod, String user, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator) throws RServerException {
     if (pod == null) {
       log.error("Pod is null, cannot get R server session");
       throw new RockServerException("Rock session creation failed because pod is null");
     }
     try {
-      RockPodSession session = new RockPodSession(getName(), id, profile, rContextInitiator, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
+      RockPodSession session = new RockPodSession(getName(), id, profile, executionContext, rContextInitiator, pod, user, rockPodSessionHelper, transactionalThreadFactory, eventBus);
       sessions.put(pod.getName(), session);
       return session;
     } catch (RestClientException e) {
@@ -373,7 +373,7 @@ public class RockSpawnerService implements RServerPodService {
 
   private void execute(PodRef pod, ROperation rop) throws RServerException {
     Object principal = SecurityUtils.getSubject().getPrincipal();
-    RockPodSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null, newRServerProfile(), null);
+    RockPodSession rSession = newRServerSession(pod, principal == null ? "opal/system" : principal.toString(), null, newRServerProfile(), RServerSession.DEFAULT_CONTEXT, null);
     // close session but not the pod that is managed externally
     rSession.setTerminatePod(false);
     // ensure session is ready

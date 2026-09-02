@@ -136,8 +136,8 @@ public class RServerCluster implements RServerClusterService {
   }
 
   @Override
-  public RServerSession newRServerSession(String user, String id, RServerProfile profile, RContextInitiator rContextInitiator) throws RServerException {
-    RServerSession session = getNextRServerService().newRServerSession(user, id, profile, rContextInitiator);
+  public RServerSession newRServerSession(String user, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator) throws RServerException {
+    RServerSession session = getNextRServerService().newRServerSession(user, id, profile, executionContext, rContextInitiator);
     return session;
   }
 

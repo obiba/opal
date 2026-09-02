@@ -27,12 +27,12 @@ public class RockAppSession extends RockSession implements RServerConnection {
 
   private final App app;
 
-  protected RockAppSession(String serverName, RServerProfile profile, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    this(serverName, null, profile, rContextInitiator, app, credentials, user, transactionalThreadFactory, eventBus);
+  protected RockAppSession(String serverName, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    this(serverName, null, profile, executionContext, rContextInitiator, app, credentials, user, transactionalThreadFactory, eventBus);
   }
 
-  protected RockAppSession(String serverName, String id, RServerProfile profile, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
-    super(serverName, id, profile, rContextInitiator, credentials, user, transactionalThreadFactory, eventBus);
+  protected RockAppSession(String serverName, String id, RServerProfile profile, String executionContext, RContextInitiator rContextInitiator, App app, AppCredentials credentials, String user, TransactionalThreadFactory transactionalThreadFactory, EventBus eventBus) throws RServerException {
+    super(serverName, id, profile, executionContext, rContextInitiator, credentials, user, transactionalThreadFactory, eventBus);
     this.app = app;
     openSession();
   }

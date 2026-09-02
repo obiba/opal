@@ -16,6 +16,8 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.service.RContextInitiator;
+import org.obiba.opal.r.service.RQuotaService;
+import org.obiba.opal.r.service.RQuotaUsage;
 import org.obiba.opal.r.service.RServerProfile;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.RScriptROperation;
@@ -55,6 +57,9 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   @Autowired
   private DataShieldProfileService datashieldProfileService;
 
+  @Autowired
+  private RQuotaService rQuotaService;
+
   @Value("${org.obiba.opal.security.password.nbHashIterations}")
   private int nbHashIterations;
 
@@ -88,14 +93,40 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
     return profile;
   }
 
+  /**
+   * A user who has spent their DataSHIELD allowance - of execution time, of session time, or of both - cannot open a
+   * new session. Sessions already open are left alone, deliberately: the quota bounds routine usage, it does not
+   * interrupt work in progress.
+   * <p>
+   * Every spent metric is named in the refusal: a user who frees up one of them and is still turned away has learnt
+   * nothing from a message that only mentioned the other.
+   * <p>
+   * The denial goes to the DataSHIELD user log too, so that a data custodian reading the audit trail can see why a
+   * user was turned away without having to correlate HTTP logs.
+   */
+  @Override
+  protected void checkQuota() throws ForbiddenException {
+    List<RQuotaUsage> exceeded = rQuotaService.getUsages(DS_CONTEXT, SecurityUtils.getSubject().getPrincipal().toString())
+        .stream().filter(RQuotaUsage::isExceeded).toList();
+    if (exceeded.isEmpty()) return;
+    String message = exceeded.stream().map(RQuotaUsage::asMessage).collect(Collectors.joining(" "));
+    DataShieldLog.userLog("", DataShieldLog.Action.QUOTA, "refused a datashield session: {}", message);
+    throw new ForbiddenException(message);
+  }
+
   @Override
   protected boolean createRSessionEnabled() {
     // Datashield service is always available
     return true;
   }
 
+  @Override
+  protected String getExecutionContext() {
+    return DS_CONTEXT;
+  }
+
+  @Override
   protected void onNewRSession(RServerSession rSession) {
-    rSession.setExecutionContext(DS_CONTEXT);
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
   }

@@ -19,9 +19,7 @@
             :options="['DATASHIELD_USE', 'DATASHIELD_ALL']"
             :read-only="authStore.isAuditor"
           />
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="text-h5 q-mb-md">{{ t('datashield.audit') }}</div>
+          <div class="text-h5 q-mt-md q-mb-md">{{ t('datashield.audit') }}</div>
           <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
           <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
             <q-list>
@@ -38,9 +36,14 @@
             </q-list>
           </q-btn-dropdown>
         </div>
+        <div class="col-12 col-md-6">
+          <div class="text-h5 q-mb-md">{{ t('r_quota.title') }}</div>
+          <div class="text-help q-mb-md">{{ t('r_quota.info') }}</div>
+          <r-quotas :context="DS_CONTEXT" />
+        </div>
       </div>
 
-      <div class="text-h5 q-mb-md">{{ t('profiles') }}</div>
+      <div class="text-h5 q-mt-md q-mb-md">{{ t('profiles') }}</div>
       <div class="text-help q-mb-md">{{ t('datashield.profiles_info') }}</div>
       <datashield-profiles />
     </q-page>
@@ -51,6 +54,8 @@
 import { baseUrl } from 'src/boot/api';
 import DatashieldClusters from 'src/components/admin/datashield/DatashieldClusters.vue';
 import DatashieldProfiles from 'src/components/admin/datashield/DatashieldProfiles.vue';
+import RQuotas from 'src/components/admin/r/RQuotas.vue';
+import { DS_CONTEXT } from 'src/components/models';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();

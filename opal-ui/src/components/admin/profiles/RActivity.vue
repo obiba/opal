@@ -4,6 +4,8 @@
       <div class="q-mb-md">
         <span class="text-hint">{{ t('total_execution_time') }}:</span>
         <span class="text-caption q-ml-xs">{{ getMillisLabel(totalExecutionTime) }}</span>
+        <span class="text-hint q-ml-md">{{ t('total_session_time') }}:</span>
+        <span class="text-caption q-ml-xs">{{ getMillisLabel(totalSessionTime) }}</span>
       </div>
       <q-table
         flat
@@ -45,6 +47,7 @@
       :principal="props.principal"
       :profile="selectedProfile"
       :context="selectedContext"
+      :current="props.current"
     />
   </div>
 </template>
@@ -57,6 +60,11 @@ import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
   principal: string | undefined;
+  /**
+   * Whether the activity of the authenticated user is being shown: reading one's own activity does not require the
+   * administration permissions that reading another subject's does.
+   */
+  current?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -71,6 +79,10 @@ const toolsVisible = ref<{ [key: string]: boolean }>({});
 
 const totalExecutionTime = computed(() =>
   profileActivityStore.summaries.map((sum) => sum.executionTimeMillis).reduce((acc, val) => acc + val, 0),
+);
+
+const totalSessionTime = computed(() =>
+  profileActivityStore.summaries.map((sum) => sum.sessionTimeMillis || 0).reduce((acc, val) => acc + val, 0),
 );
 
 const columns = computed(() => {
@@ -126,6 +138,15 @@ const columns = computed(() => {
       format: (val: number) => getMillisLabel(val),
       sortable: true,
     },
+    {
+      name: 'sessionTimeMillis',
+      required: true,
+      label: t('r_session_time'),
+      align: DefaultAlignment,
+      field: 'sessionTimeMillis',
+      format: (val: number) => getMillisLabel(val || 0) || '0 min',
+      sortable: true,
+    },
   ];
 });
 
@@ -135,7 +156,7 @@ watch(() => props.principal, init);
 
 function init() {
   if (props.principal) {
-    profileActivityStore.initSummaries(props.principal);
+    profileActivityStore.initSummaries(props.principal, props.current);
   }
 }
 

@@ -95,6 +95,7 @@ message RSessionActivityDto {
   required string createdDate = 4;
   required string updatedDate = 5;
   required int64 executionTimeMillis = 6;
+  optional int64 sessionTimeMillis = 7;
 }
 
 message RActivitySummaryDto {
@@ -105,4 +106,32 @@ message RActivitySummaryDto {
   required string endDate = 5;
   required int64 executionTimeMillis = 6;
   required int32 sessionsCount = 7;
+  optional int64 sessionTimeMillis = 8;
+}
+
+// An allowance of R usage, for a subject, an execution context and a metric. A subject may be given one quota
+// per metric: limits of different metrics are not comparable, and are resolved independently.
+message RQuotaDto {
+  optional int64 id = 1;
+  required string context = 2;
+  required string subjectType = 3; // SYSTEM | GROUP | USER
+  required string principal = 4;   // empty for SYSTEM
+  required string period = 5;      // DAILY | WEEKLY
+  required int64 limitMillis = 6;  // milliseconds of whatever the metric names
+  required bool enabled = 7;
+  required string metric = 8;      // EXECUTION_TIME | SESSION_TIME
+}
+
+// What a user has consumed, for one metric, against the quota that applies to them. No quota means unlimited, hence
+// the optional fields: there is no window to report when nothing is being limited.
+message RQuotaUsageDto {
+  required string context = 1;
+  required string user = 2;
+  optional RQuotaDto quota = 3;
+  required int64 usedMillis = 4;
+  optional string windowStartDate = 5;
+  required bool exceeded = 6;
+  optional string nextCreditDate = 7;
+  required string metric = 8;            // the metric this entry reports on
+  optional int32 openSessionsCount = 9;  // sessions still open in the context, which keep spending a session time allowance
 }
