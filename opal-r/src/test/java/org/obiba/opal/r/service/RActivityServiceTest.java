@@ -135,6 +135,19 @@ public class RActivityServiceTest {
         .isGreaterThanOrEqualTo(TimeUnit.HOURS.toMillis(4) - TimeUnit.MINUTES.toMillis(2));
   }
 
+  /**
+   * A row written before session time was recorded has a session time of zero and an execution time that is not: the
+   * difference is meaningless, and the answer to report is no idle time rather than a negative one.
+   */
+  @Test
+  public void test_a_pre_upgrade_row_reports_no_idle_time_rather_than_a_negative_one() {
+    RSessionActivity activity = new RSessionActivity();
+    activity.setExecutionTimeMillis(TimeUnit.MINUTES.toMillis(10));
+    activity.setSessionTimeMillis(0);
+
+    assertThat(activity.getIdleTimeMillis()).isEqualTo(0);
+  }
+
   private RServerSessionStartedEvent started(Date created) {
     return new RServerSessionStartedEvent(SESSION_ID, USER, CONTEXT, "default", created);
   }

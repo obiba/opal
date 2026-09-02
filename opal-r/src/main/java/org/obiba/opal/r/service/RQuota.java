@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Entity
 @Table(name = "r_quotas",
-    uniqueConstraints = @UniqueConstraint(name = "uk_r_quotas", columnNames = {"context", "subject_type", "principal"}))
+    uniqueConstraints = @UniqueConstraint(name = "uk_r_quotas", columnNames = {"context", "subject_type", "principal", "metric"}))
 public class RQuota extends AbstractTimestamped {
 
   /**
