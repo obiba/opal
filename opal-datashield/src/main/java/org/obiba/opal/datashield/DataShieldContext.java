@@ -10,6 +10,7 @@
 
 package org.obiba.opal.datashield;
 
+import io.opentelemetry.context.Context;
 import org.obiba.datashield.core.DSEnvironment;
 
 import java.util.Map;
@@ -26,12 +27,17 @@ public class DataShieldContext {
 
   private final Map<String, String> contextMap;
 
+  private final Context traceContext;
+
   public DataShieldContext(DSEnvironment environment, String rid, String profile, String rParserVersion, Map<String, String> contextMap) {
     this.environment = environment;
     this.rid = rid;
     this.profile = profile;
     this.rParserVersion = rParserVersion;
     this.contextMap = contextMap;
+    // Captured here, on the request thread, for the same reason contextMap is: an asynchronous R
+    // command runs on the session's consumer thread, where the request's trace context is gone.
+    this.traceContext = Context.current();
   }
 
   public DSEnvironment getEnvironment() {
@@ -52,5 +58,13 @@ public class DataShieldContext {
 
   public Map<String, String> getContextMap() {
     return contextMap;
+  }
+
+  /**
+   * The trace context of the request that created this one, so that a span opened on the R execution
+   * thread still hangs under the HTTP server span when one exists.
+   */
+  public Context getTraceContext() {
+    return traceContext;
   }
 }

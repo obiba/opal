@@ -33,7 +33,8 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     beforeLog(script);
     DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
     try {
-      setResult(eval(script, serialize));
+      DataShieldTracer.traced(getContext(), DataShieldLog.Action.AGGREGATE, null, script,
+          () -> setResult(eval(script, serialize)));
       beforeLog(script);
       DataShieldLog.userLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", script);
     } catch (Throwable e) {

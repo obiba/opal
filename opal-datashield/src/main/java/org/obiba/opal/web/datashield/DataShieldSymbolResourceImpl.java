@@ -15,6 +15,7 @@ import org.obiba.opal.core.service.NoSuchResourceReferenceException;
 import org.obiba.opal.core.service.ResourceAssignException;
 import org.obiba.opal.datashield.DataShieldContext;
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.DataShieldTracer;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -172,7 +173,8 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
       MDC.put("ds_symbol", symbol);
       context.getContextMap().forEach(MDC::put);
       try {
-        wrapped.doWithConnection(connection);
+        DataShieldTracer.traced(context, DataShieldLog.Action.ASSIGN, symbol, wrapped.toString(),
+            () -> wrapped.doWithConnection(connection));
         DataShieldLog.userLog(context, DataShieldLog.Action.ASSIGN, "created symbol '{}' from: '{}'", symbol, wrapped.toString());
       } catch (Exception e) {
         DataShieldLog.userErrorLog(context, DataShieldLog.Action.ASSIGN, "assignment failure from '{}': {}", wrapped.toString(), e.getMessage());

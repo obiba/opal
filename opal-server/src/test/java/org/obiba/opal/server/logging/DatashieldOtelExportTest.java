@@ -98,6 +98,22 @@ public class DatashieldOtelExportTest extends AbstractDatashieldLoggingTest {
         .doesNotContain("ds_id", "ds_profile", "ds_action", "ds_symbol", "ds_eval", "username", "ip");
   }
 
+  /**
+   * Parsing a submitted expression logs three more MDC keys than the other actions do, and they are
+   * exported like the rest - so they need renaming like the rest.
+   */
+  @Test
+  public void test_the_parse_record_exports_the_submitted_and_generated_scripts() {
+    logParseEvent();
+
+    Map<String, String> attributes = exportedAttributes();
+
+    assertThat(attributes.get("datashield.script.submitted")).isEqualTo("meanDS(D$age)");
+    assertThat(attributes.get("datashield.script.generated")).isEqualTo("base::mean(D$age)");
+    assertThat(attributes.get("datashield.script.mapping")).isEqualTo("meanDS=base::mean");
+    assertThat(attributes.keySet()).doesNotContain("ds_script_in", "ds_script_out", "ds_map");
+  }
+
   private Map<String, String> exportedAttributes() {
     assertThat(exporter.getFinishedLogRecordItems()).isNotEmpty();
     return exporter.getFinishedLogRecordItems().iterator().next().getAttributes().asMap().entrySet()

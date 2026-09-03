@@ -141,6 +141,10 @@
     <rename>ds_action=datashield.action</rename>
     <rename>ds_symbol=datashield.symbol</rename>
     <rename>ds_eval=datashield.script</rename>
+    <!-- set by AbstractRestrictedRScriptROperation when the submitted expression is parsed -->
+    <rename>ds_script_in=datashield.script.submitted</rename>
+    <rename>ds_script_out=datashield.script.generated</rename>
+    <rename>ds_map=datashield.script.mapping</rename>
     <rename>username=enduser.id</rename>
     <rename>ip=client.address</rename>
     <!-- ds_eval carries the submitted R expression, exported in full as datashield.script: it is the

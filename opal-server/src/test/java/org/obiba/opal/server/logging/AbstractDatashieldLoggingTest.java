@@ -85,6 +85,26 @@ public abstract class AbstractDatashieldLoggingTest {
         }));
   }
 
+  /**
+   * The MDC keys AbstractRestrictedRScriptROperation sets while parsing a submitted expression. They
+   * only ever appear on a PARSE record: DataShieldLog.init() clears them once it has been written.
+   */
+  protected void logParseEvent() {
+    MDC.put("ip", "10.0.0.7");
+    MDC.put("username", "administrator");
+    MDC.put("ds_id", "rsession-42");
+    MDC.put("ds_profile", "default");
+    MDC.put("ds_action", "PARSE");
+    MDC.put("ds_script_in", "meanDS(D$age)");
+    MDC.put("ds_script_out", "base::mean(D$age)");
+    MDC.put("ds_map", "meanDS=base::mean");
+    try {
+      LoggerFactory.getLogger("datashield.user").info("parsed '{}'", "base::mean(D$age)");
+    } finally {
+      MDC.clear();
+    }
+  }
+
   protected LoggerContext globalContext() {
     return (LoggerContext) LoggerFactory.getILoggerFactory();
   }

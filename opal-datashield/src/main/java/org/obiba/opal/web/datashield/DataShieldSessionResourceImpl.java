@@ -15,6 +15,7 @@ import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.DataShieldContext;
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.DataShieldTracer;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -97,7 +98,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   public Response removeRSession(String saveId) {
     beforeLog();
     try {
-      Response response = super.removeRSession(saveId);
+      Response response = DataShieldTracer.traced(profileName(), DataShieldLog.Action.CLOSE,
+          () -> super.removeRSession(saveId));
       DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.CLOSE, "closed datashield session {}", getRServerSession().getId());
       return response;
     } catch (Throwable e) {
@@ -152,7 +154,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   public Response saveWorkspace(String saveId) {
     beforeLog();
     try {
-      Response response = super.saveWorkspace(saveId);
+      Response response = DataShieldTracer.traced(profileName(), DataShieldLog.Action.WS_SAVE,
+          () -> super.saveWorkspace(saveId));
       if (response.getStatus() == Response.Status.OK.getStatusCode()) {
         DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.WS_SAVE, "workspace saved: {}", saveId);
       } else {
@@ -169,7 +172,8 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
   public Response restoreWorkspace(String workspaceId) {
     beforeLog();
     try {
-      Response response = super.restoreWorkspace(workspaceId);
+      Response response = DataShieldTracer.traced(profileName(), DataShieldLog.Action.WS_RESTORE,
+          () -> super.restoreWorkspace(workspaceId));
       if (response.getStatus() == Response.Status.OK.getStatusCode()) {
         DataShieldLog.userLog(getRServerSession().getId(), DataShieldLog.Action.WS_RESTORE, "workspace restored: {}", workspaceId);
       } else {
@@ -184,8 +188,10 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
 
   private void beforeLog() {
     DataShieldLog.init();
-    RServerSession rSession = getRServerSession();
-    DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
-    MDC.put("ds_profile", profile.getName());
+    MDC.put("ds_profile", profileName());
+  }
+
+  private String profileName() {
+    return ((DataShieldProfile) getRServerSession().getProfile()).getName();
   }
 }
