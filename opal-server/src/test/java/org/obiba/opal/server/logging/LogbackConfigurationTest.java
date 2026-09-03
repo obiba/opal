@@ -27,7 +27,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * configuration file can name properties that do not exist and still look like it works. The example
  * OpenTelemetry configuration shipped in 5.7 did exactly that - it set endpoint, resourceAttributes
  * and flushInterval on an appender that has none of them - and nothing failed until someone went
- * looking for the logs that were never exported. These files are shipped to users, so parse them and
+ * looking for the logs that were never exported. This file is shipped to users, so parse it and
  * treat any non-INFO status as a build failure.
  */
 public class LogbackConfigurationTest {
@@ -36,13 +36,8 @@ public class LogbackConfigurationTest {
   public TemporaryFolder logs = new TemporaryFolder();
 
   @Test
-  public void test_the_default_configuration_has_no_configuration_errors() {
+  public void test_the_shipped_configuration_has_no_configuration_errors() {
     assertThat(configure("src/main/conf/logback.xml")).isEmpty();
-  }
-
-  @Test
-  public void test_the_opentelemetry_configuration_has_no_configuration_errors() {
-    assertThat(configure("src/main/conf/logback.otel.xml")).isEmpty();
   }
 
   /**

@@ -11,10 +11,13 @@ docker compose -f src/test/resources/otel/docker-compose.yml up
 Then point an Opal at it:
 
 ```bash
-cp $OPAL_HOME/conf/logback.otel.xml $OPAL_HOME/conf/logback.xml
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
 $OPAL_DIST/bin/opal
 ```
+
+That one variable is the whole of it: the appenders are already in `conf/logback.xml` and inert until
+an endpoint is set, and the same variable turns on the traces and the metrics. On a permanent install
+put it in `$OPAL_HOME/conf/opal-env.sh` (tarball), `/etc/default/opal` (deb/rpm) or `-e` (Docker).
 
 Opal prints `OpenTelemetry export enabled.` at startup when the endpoint is picked up. If it does
 not, the SDK was never built and nothing at all will be exported - check the variable is exported to
@@ -47,4 +50,4 @@ if that is too long to wait:
 times out; leave a session idle past its timeout and watch it drop.
 
 Plain HTTP is fine against localhost. Anywhere else these streams carry submitted R expressions and
-usernames, so they need `https://` and the TLS settings documented in `conf/logback.otel.xml`.
+usernames, so they need `https://` and the TLS settings documented in `conf/logback.xml`.

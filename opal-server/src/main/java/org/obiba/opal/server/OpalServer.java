@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
@@ -103,11 +104,12 @@ public class OpalServer {
   }
 
   /**
-   * Install an OpenTelemetry SDK into the logback appenders declared by logback.otel.xml. Until this
-   * happens the appenders only buffer their records (and drop them once the buffer is full), so this
-   * must run before the Spring context is started.
+   * Install an OpenTelemetry into the logback appenders declared by logback.xml. Until something is
+   * installed the appenders buffer their records and then drop them, complaining to stderr, so this
+   * must run before the Spring context is started - and must run even when telemetry is off, which
+   * is what the no-op instance is for: it makes the appenders inert rather than merely quiet.
    * <p/>
-   * Opt-in: the autoconfigured SDK would otherwise default to exporting OTLP to localhost:4317, which
+   * Opt-in: an autoconfigured SDK would otherwise default to exporting OTLP to localhost:4317, which
    * on an installation that never asked for telemetry is just a stream of connection failures.
    */
   /**
@@ -125,6 +127,7 @@ public class OpalServer {
   private void configureOpenTelemetry() {
     if (!hasOtlpEndpoint(System::getenv)) {
       System.setProperty("otel.sdk.disabled", "true");
+      OpenTelemetryAppender.install(OpenTelemetry.noop());
       return;
     }
     try {
@@ -147,6 +150,7 @@ public class OpalServer {
       // telemetry is never a reason to prevent Opal from starting
       log.error("Failed to initialize OpenTelemetry, continuing without it", e);
       System.setProperty("otel.sdk.disabled", "true");
+      OpenTelemetryAppender.install(OpenTelemetry.noop());
     }
   }
 

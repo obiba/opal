@@ -14,6 +14,13 @@ then
   export JAVA_OPTS
 fi
 
+# Site settings: memory, OpenTelemetry, anything else the JVM should inherit.
+# Sourced before JAVA_OPTS is used, so it can override the default above.
+if [ -r "$OPAL_HOME/conf/opal-env.sh" ]
+then
+  . "$OPAL_HOME/conf/opal-env.sh"
+fi
+
 # The directory containing the opal shell script
 OPAL_BIN_DIR=`dirname $0`
 # resolve links - $0 may be a softlink

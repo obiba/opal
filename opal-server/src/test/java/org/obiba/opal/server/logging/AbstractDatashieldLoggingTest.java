@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * Drives a DataSHIELD audit event through the real conf/logback.otel.xml. The global logger context
+ * Drives a DataSHIELD audit event through the real conf/logback.xml. The global logger context
  * is used rather than a private one because OpenTelemetryAppender.install() looks the appenders up
  * through LoggerFactory.getILoggerFactory(); it is restored afterwards so the rest of the module's
  * tests are unaffected.
@@ -39,7 +39,7 @@ public abstract class AbstractDatashieldLoggingTest {
     logsDir = Files.createTempDirectory("opal-logs").toFile();
     System.setProperty("OPAL_LOG", logsDir.getAbsolutePath());
 
-    File config = new File("src/main/conf/logback.otel.xml");
+    File config = new File("src/main/conf/logback.xml");
     assertThat(config).exists();
 
     LoggerContext context = globalContext();

@@ -30,3 +30,39 @@ OPAL_ARGS=""
 
 # arguments to pass to java
 JAVA_ARGS="-Xms1G -Xmx2G -XX:+UseG1GC"
+#
+# OpenTelemetry
+#
+# Setting an OTLP endpoint is all that is needed: it turns on the audit log export, the DataSHIELD
+# traces and the DataSHIELD metrics together. With no endpoint set, nothing is exported.
+#
+# Opal ships the OTLP/HTTP sender only, so this is the http/protobuf endpoint - port 4318 on a
+# standard collector, not the 4317 gRPC port.
+#
+#OTEL_EXPORTER_OTLP_ENDPOINT=https://collector.example.org:4318
+
+# Name reported to the backend. Defaults to "opal".
+#OTEL_SERVICE_NAME=opal
+
+# Extra resource attributes, e.g. to tell nodes apart in a federated study.
+#OTEL_RESOURCE_ATTRIBUTES=deployment.environment=production,service.namespace=my-node
+
+# The DataSHIELD stream carries submitted R expressions, usernames and client addresses, so off
+# localhost it needs TLS.
+#OTEL_EXPORTER_OTLP_CERTIFICATE=/etc/opal/otel-ca.pem
+#OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE=/etc/opal/otel-client.pem
+#OTEL_EXPORTER_OTLP_CLIENT_KEY=/etc/opal/otel-client.key
+
+# This file is world readable, so a collector token does NOT belong here. Put it in
+# /etc/default/opal-secrets instead, which the service also reads and which can be chmod 600
+# root:root - systemd reads it as root before dropping to the opal user:
+#
+#   echo 'OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer%20...' > /etc/default/opal-secrets
+#   chmod 600 /etc/default/opal-secrets
+
+# Metrics are exported every 60s by default; lower it while trying things out.
+#OTEL_METRIC_EXPORT_INTERVAL=5000
+
+# To also trace the HTTP requests and JDBC calls around the DataSHIELD operations, add the
+# OpenTelemetry Java agent to JAVA_ARGS above. Opal needs no change for this.
+#   JAVA_ARGS="... -javaagent:/opt/opentelemetry-javaagent.jar"

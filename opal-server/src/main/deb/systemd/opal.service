@@ -8,6 +8,10 @@ After=network-online.target
 [Service]
 WorkingDirectory=/var/lib/opal
 EnvironmentFile=/etc/default/opal
+# Optional, and not shipped: for credentials that must not sit in the world readable file above,
+# such as OTEL_EXPORTER_OTLP_HEADERS. systemd reads it as root, before dropping to User=, so it can
+# be chmod 600 root:root and stay unreadable to the opal user.
+EnvironmentFile=-/etc/default/opal-secrets
 User=opal
 LimitNOFILE=16384
 StandardOutput=file:/var/log/opal/stdout.log
