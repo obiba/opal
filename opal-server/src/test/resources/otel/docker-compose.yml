@@ -3,7 +3,7 @@
 # then start Opal with conf/logback.otel.xml in place of conf/logback.xml and the environment below.
 services:
   collector:
-    image: otel/opentelemetry-collector-contrib:0.115.0
+    image: otel/opentelemetry-collector-contrib:0.140.0
     command: ["--config=/etc/otel/config.yaml"]
     volumes:
       - ./collector-config.yaml:/etc/otel/config.yaml:ro
