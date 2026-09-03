@@ -136,7 +136,7 @@ public class OpalServer {
               "otel.exporter.otlp.protocol", "http/protobuf",
               "otel.logs.exporter", "otlp",
               "otel.traces.exporter", "otlp",
-              "otel.metrics.exporter", "none"))  // enabled in phase 5
+              "otel.metrics.exporter", "otlp"))
           .setResultAsGlobal()
           .build()
           .getOpenTelemetrySdk();

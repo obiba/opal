@@ -52,15 +52,7 @@ public final class DataShieldTracer {
         .setParent(context.getTraceContext())
         .startSpan();
     describe(span, context, action, symbol, script);
-    try(Scope ignored = span.makeCurrent()) {
-      return operation.call();
-    } catch(Throwable e) {
-      span.setStatus(StatusCode.ERROR, Strings.nullToEmpty(e.getMessage()));
-      span.recordException(e);
-      throw e;
-    } finally {
-      span.end();
-    }
+    return record(span, action, context == null ? null : context.getProfile(), operation);
   }
 
   public static void traced(DataShieldContext context, DataShieldLog.Action action, String symbol, String script,
@@ -82,14 +74,26 @@ public final class DataShieldTracer {
         .startSpan();
     span.setAttribute("datashield.action", action.name());
     if(!Strings.isNullOrEmpty(profile)) span.setAttribute("datashield.profile", profile);
+    return record(span, action, profile, operation);
+  }
+
+  /**
+   * Ends the span and counts the operation. The duration is measured here rather than read back off
+   * the span so that both signals describe exactly the same interval.
+   */
+  private static <T> T record(Span span, DataShieldLog.Action action, String profile, Operation<T> operation) {
+    long startedAt = System.nanoTime();
+    boolean failed = false;
     try(Scope ignored = span.makeCurrent()) {
       return operation.call();
     } catch(Throwable e) {
+      failed = true;
       span.setStatus(StatusCode.ERROR, Strings.nullToEmpty(e.getMessage()));
       span.recordException(e);
       throw e;
     } finally {
       span.end();
+      DataShieldMetrics.recordOperation(action, profile, failed, System.nanoTime() - startedAt);
     }
   }
 

@@ -13,6 +13,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.DataShieldContexts;
+import org.obiba.opal.datashield.DataShieldMetrics;
 import org.obiba.opal.datashield.DataShieldTracer;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -51,7 +53,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   private static final Logger log = LoggerFactory.getLogger(DatashieldSessionsResourceImpl.class);
 
-  static final String DS_CONTEXT = "DataSHIELD";
+  static final String DS_CONTEXT = DataShieldContexts.DATASHIELD;
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -112,6 +114,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
         .stream().filter(RQuotaUsage::isExceeded).toList();
     if (exceeded.isEmpty()) return;
     String message = exceeded.stream().map(RQuotaUsage::asMessage).collect(Collectors.joining(" "));
+    exceeded.forEach(usage -> DataShieldMetrics.recordQuotaRejection(usage.getMetric().name()));
     DataShieldLog.userLog("", DataShieldLog.Action.QUOTA, "refused a datashield session: {}", message);
     throw new ForbiddenException(message);
   }
