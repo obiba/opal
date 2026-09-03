@@ -1,0 +1,16 @@
+{
+  "@timestamp": "not compared - see DatashieldLogFormatTest.VOLATILE_FIELDS",
+  "@version": "1",
+  "message": "evaluated 'meanDS(D$age)'",
+  "logger_name": "datashield.user",
+  "thread_name": "not compared - see DatashieldLogFormatTest.VOLATILE_FIELDS",
+  "level": "INFO",
+  "level_value": 20000,
+  "ds_symbol": "D",
+  "ds_profile": "default",
+  "ip": "10.0.0.7",
+  "ds_action": "AGGREGATE",
+  "ds_eval": "meanDS(D$age)",
+  "ds_id": "rsession-42",
+  "username": "administrator"
+}

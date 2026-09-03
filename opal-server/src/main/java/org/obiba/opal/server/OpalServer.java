@@ -12,7 +12,11 @@ package org.obiba.opal.server;
 
 import jakarta.validation.constraints.NotNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import org.obiba.opal.core.service.ApplicationContextProvider;
 import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.server.httpd.OpalJettyServer;
@@ -22,6 +26,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
@@ -39,6 +45,7 @@ public class OpalServer {
     }
     else {
       asciiArt();
+      configureOpenTelemetry();
       log.info("Starting Opal server!");
       start();
     }
@@ -93,6 +100,54 @@ public class OpalServer {
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     // add SLF4JBridgeHandler to java.util.logging's root logger
     SLF4JBridgeHandler.install();
+  }
+
+  /**
+   * Install an OpenTelemetry SDK into the logback appenders declared by logback.otel.xml. Until this
+   * happens the appenders only buffer their records (and drop them once the buffer is full), so this
+   * must run before the Spring context is started.
+   * <p/>
+   * Opt-in: the autoconfigured SDK would otherwise default to exporting OTLP to localhost:4317, which
+   * on an installation that never asked for telemetry is just a stream of connection failures.
+   */
+  /**
+   * The OTLP endpoint can be configured globally or per signal, so both spellings have to be checked
+   * before concluding that telemetry was not asked for.
+   */
+  @VisibleForTesting
+  static boolean hasOtlpEndpoint(UnaryOperator<String> env) {
+    return !Strings.isNullOrEmpty(env.apply("OTEL_EXPORTER_OTLP_ENDPOINT"))
+        || !Strings.isNullOrEmpty(env.apply("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
+        || !Strings.isNullOrEmpty(System.getProperty("otel.exporter.otlp.endpoint"))
+        || !Strings.isNullOrEmpty(System.getProperty("otel.exporter.otlp.logs.endpoint"));
+  }
+
+  private void configureOpenTelemetry() {
+    if (!hasOtlpEndpoint(System::getenv)) {
+      System.setProperty("otel.sdk.disabled", "true");
+      return;
+    }
+    try {
+      OpenTelemetrySdk sdk = AutoConfiguredOpenTelemetrySdk.builder()
+          .addPropertiesSupplier(() -> Map.of(
+              // defaults only: any OTEL_* environment variable still overrides these
+              "otel.service.name", "opal",
+              // we ship the JDK sender only, which does not speak gRPC
+              "otel.exporter.otlp.protocol", "http/protobuf",
+              "otel.logs.exporter", "otlp",
+              "otel.traces.exporter", "none",
+              "otel.metrics.exporter", "none"))
+          .setResultAsGlobal()
+          .build()
+          .getOpenTelemetrySdk();
+      OpenTelemetryAppender.install(sdk);
+      Runtime.getRuntime().addShutdownHook(new Thread(sdk::close, "otel-shutdown"));
+      logAndSystemOut("OpenTelemetry export enabled.");
+    } catch(RuntimeException e) {
+      // telemetry is never a reason to prevent Opal from starting
+      log.error("Failed to initialize OpenTelemetry, continuing without it", e);
+      System.setProperty("otel.sdk.disabled", "true");
+    }
   }
 
   private void setProperties() {

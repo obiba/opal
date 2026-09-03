@@ -1,0 +1,11 @@
+# Minimal collector for eyeballing the DataSHIELD audit stream end to end.
+#   docker compose -f src/test/resources/otel/docker-compose.yml up
+# then start Opal with conf/logback.otel.xml in place of conf/logback.xml and the environment below.
+services:
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.115.0
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./collector-config.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - "4318:4318"   # OTLP/HTTP - the protocol Opal defaults to, see OpalServer#configureOpenTelemetry

@@ -90,6 +90,8 @@ public class UpgradeCommand {
   private void prepareConfigFiles() {
     prepareOpalConfigFile();
     prepareDistConfigFile("logback.xml");
+    // reference config for OpenTelemetry export; not active until copied over logback.xml
+    prepareDistConfigFile("logback.otel.xml");
   }
 
   private void prepareDistConfigFile(String name) {
