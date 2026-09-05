@@ -110,6 +110,21 @@ other than a collector on `localhost`, configure TLS.
 The settings are documented in full under *OpenTelemetry* in the administration guide:
 <https://opaldoc.obiba.org/en/latest/admin/configuration.html#opentelemetry>.
 
+### Importing from another Opal verifies its certificate
+
+"Import from Opal" - a transient datasource of the REST kind, whether from the web interface, `opal.assign.table` or
+the identifiers import - used to accept any certificate from the remote Opal, and any host name. It now verifies the
+remote server like every other server Opal talks to: the certificate must be issued by an authority the JVM trusts or
+be among the certificates of Opal's credentials key store, and its name must match the URL.
+
+An import from an Opal with a self-signed certificate therefore fails after the upgrade, with a TLS error in the
+task's log. Either import that certificate under *Administration > Identities > Credentials* on the importing Opal, or
+set `org.obiba.opal.security.ssl.allowInvalidCertificates=true` in `conf/opal-config.properties`, which switches
+verification off for every outbound connection of that Opal, not only these.
+
+Since the credentials sent to the remote Opal were exposed to whoever sat on the network path, rotate the personal
+access tokens and passwords that were used for such imports.
+
 ### For plugin authors
 
 `org.obiba.opal.core.domain.HasUniqueProperties`, `org.obiba.opal.core.validator.Unique` and its `UniqueValidator`

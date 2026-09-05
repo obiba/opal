@@ -11,6 +11,7 @@ package org.obiba.opal.fs.security;
 
 import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
+import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
@@ -80,6 +81,20 @@ class SecuredFileObject extends DecoratedFileObject {
   @Override
   public boolean isReadable() throws FileSystemException {
     return super.isReadable() && isPermitted(getDecoratedFileObject(), "GET");
+  }
+
+  @Override
+  public FileContent getContent() throws FileSystemException {
+    return new SecuredFileContent(this, super.getContent());
+  }
+
+  /**
+   * Fails when the current subject may not read this file. Unreadable and missing files are reported the same way.
+   */
+  void checkReadable() throws FileSystemException {
+    if (!isReadable()) {
+      throw new FileSystemException("vfs.provider/read-not-readable.error", getName());
+    }
   }
 
   @Override

@@ -43,3 +43,15 @@ export function escapeHtml(str: string | null | undefined): string {
   div.appendChild(document.createTextNode(str || ''));
   return div.innerHTML;
 }
+
+/**
+ * Escapes a string for use inside a double-quoted HTML attribute. {@link escapeHtml} serializes a text node, which
+ * leaves the double quote as is: it is not enough for an attribute value.
+ */
+export function escapeAttribute(str: string | null | undefined): string {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}

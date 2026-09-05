@@ -17,6 +17,7 @@ import org.obiba.opal.datashield.DataShieldContext;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.DataShieldSessionTraces;
 import org.obiba.opal.datashield.DataShieldTracer;
+import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -37,7 +38,10 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 @Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -113,18 +117,43 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     }
   }
 
-  private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {
+  /**
+   * The form-encoded body of this inherited method is sent to the R server as scripts: each value goes through the
+   * restricted parser, like a symbol assigned by script. The interface declares no checked exception on this method,
+   * so a rejected script is turned into the response the {@link ParseExceptionMapper} would have produced.
+   */
+  @Override
+  public Response assign(MultivaluedMap<String, String> symbols) {
+    beforeLog();
+    if (symbols != null) {
+      try {
+        for (Map.Entry<String, List<String>> entry : symbols.entrySet()) {
+          for (String script : entry.getValue()) {
+            getRServerSession().execute(new RestrictedAssignmentROperation(entry.getKey(), script, newDataShieldContext(DSMethodType.ASSIGN)));
+          }
+        }
+      } catch (ParseException e) {
+        return new ParseExceptionMapper().toResponse(e);
+      }
+    }
+    return lsBinary();
+  }
+
+  private DataShieldContext newDataShieldContext(DSMethodType type) {
     RServerSession rSession = getRServerSession();
     DataShieldProfile profile = (DataShieldProfile) rSession.getProfile();
+    return new DataShieldContext(
+        profile.getEnvironment(type),
+        rSession.getId(),
+        profile.getName(),
+        datashieldProfileService.getRParserVersionOrDefault(profile),
+        MDC.getCopyOfContextMap());
+  }
+
+  private Response aggregate(boolean async, String body, RSerialize serialize) throws ParseException {
+    RServerSession rSession = getRServerSession();
     DataShieldLog.init();
-    ROperationWithResult operation = new RestrictedRScriptROperation(body,
-        new DataShieldContext(
-            profile.getEnvironment(DSMethodType.AGGREGATE),
-            rSession.getId(),
-            profile.getName(),
-            datashieldProfileService.getRParserVersionOrDefault(profile),
-            MDC.getCopyOfContextMap()),
-        serialize);
+    ROperationWithResult operation = new RestrictedRScriptROperation(body, newDataShieldContext(DSMethodType.AGGREGATE), serialize);
     if (async) {
       String id = rSession.executeAsync(operation);
       return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();

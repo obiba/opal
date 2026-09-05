@@ -15,6 +15,7 @@
 import DOMPurify from 'isomorphic-dompurify';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import { type SubjectProfileDto } from 'src/models/Opal';
+import { escapeAttribute, escapeHtml } from 'src/utils/strings';
 
 interface Props {
   profile: SubjectProfileDto;
@@ -55,6 +56,12 @@ const userInfo = computed(() => {
   }
 });
 
+/**
+ * The claims come from the identity provider as the user set them there: they are untrusted. A claim is rendered as
+ * HTML only when it is a well-formed http(s) URL or an email address, with the text and the attributes escaped
+ * separately and the assembled snippet sanitized against an allow-list. Anything else is rendered as text by the
+ * fields list.
+ */
 const items = computed<FieldItem[]>(() => {
   if (!userInfo.value) {
     return [];
@@ -64,25 +71,49 @@ const items = computed<FieldItem[]>(() => {
       field: key,
     } as FieldItem;
     const value = userInfo.value ? userInfo.value[key] : null;
-    // html sanitize value
-    if (value === null || value === undefined) {
+    if (typeof value !== 'string') {
       return item;
     }
-    const sanitizedValue = DOMPurify.sanitize(String(value));
-    if (typeof value === 'string' && value.startsWith('http')) {
+    const url = asHttpUrl(value);
+    if (url) {
       // if value is an url make it a link or an image
       if (['image', 'avatar', 'photo', 'picture'].includes(key.toLowerCase())) {
-        item.html = () => `<img src="${sanitizedValue}" alt="${DOMPurify.sanitize(key)}" style="max-width: 100px; max-height: 100px;" />`;
+        item.html = () =>
+          DOMPurify.sanitize(`<img src="${escapeAttribute(url)}" alt="${escapeAttribute(key)}" style="max-width: 100px; max-height: 100px;" />`, {
+            ALLOWED_TAGS: ['img'],
+            ALLOWED_ATTR: ['src', 'alt', 'style'],
+          });
       } else {
-        item.html = () => `<a href="${sanitizedValue}" target="_blank" rel="noopener noreferrer">${sanitizedValue}</a>`;
+        item.html = () =>
+          DOMPurify.sanitize(`<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(value)}</a>`, {
+            ALLOWED_TAGS: ['a'],
+            ALLOWED_ATTR: ['href', 'target', 'rel'],
+          });
       }
-    } else if (typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    } else if (/^[^\s@"'<>]+@[^\s@"'<>]+\.[^\s@"'<>]+$/.test(value)) {
       // if value is an email make it a mailto link
-      item.html = () => `<a href="mailto:${sanitizedValue}">${sanitizedValue}</a>`;
+      item.html = () =>
+        DOMPurify.sanitize(`<a href="mailto:${escapeAttribute(value)}">${escapeHtml(value)}</a>`, {
+          ALLOWED_TAGS: ['a'],
+          ALLOWED_ATTR: ['href'],
+        });
     }
     return item;
   });
 });
+
+/**
+ * The normalized form of the value when it is an absolute http(s) URL, null otherwise. The parser rejects a
+ * malformed value and percent-encodes the characters that could break out of an attribute.
+ */
+function asHttpUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 
 const items1 = computed(() => items.value.slice(0, Math.ceil(items.value.length / 2)));
 const items2 = computed(() => items.value.slice(Math.ceil(items.value.length / 2)));

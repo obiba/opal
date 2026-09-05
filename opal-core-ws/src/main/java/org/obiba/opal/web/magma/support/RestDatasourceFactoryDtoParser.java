@@ -17,6 +17,12 @@ import org.obiba.opal.rest.client.magma.RestDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.RestDatasourceFactoryDto;
 import org.springframework.stereotype.Component;
+import org.obiba.magma.SocketFactoryProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  *
@@ -24,16 +30,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
+  @Value("${org.obiba.opal.security.ssl.allowInvalidCertificates}")
+  private boolean allowInvalidCertificates;
+
+  @Autowired
+  private SocketFactoryProvider socketFactoryProvider;
+
   @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     RestDatasourceFactoryDto rDto = dto.getExtension(RestDatasourceFactoryDto.params);
-    if (rDto.hasToken())
-      return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getToken(),
-          rDto.getRemoteDatasource());
-    else
-      return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getUsername(), rDto.getPassword(),
-        rDto.getRemoteDatasource());
+    RestDatasourceFactory factory = rDto.hasToken()
+        ? new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getToken(), rDto.getRemoteDatasource())
+        : new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getUsername(), rDto.getPassword(), rDto.getRemoteDatasource());
+    // the remote Opal is trusted like any other server Opal talks to: JVM trust store, then the credentials key store,
+    // unless invalid certificates were explicitly allowed
+    factory.setAllowInvalidCertificates(allowInvalidCertificates);
+    SocketFactory socketFactory = socketFactoryProvider.getSocketFactory();
+    if (socketFactory instanceof SSLSocketFactory) {
+      factory.setSslSocketFactory((SSLSocketFactory) socketFactory);
+    }
+    return factory;
   }
 
   @Override

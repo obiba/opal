@@ -28,6 +28,7 @@ import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.*;
@@ -41,7 +42,10 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
@@ -49,10 +53,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,6 +87,10 @@ public class OpalJavaClient {
   private int soTimeout = DEFAULT_SO_TIMEOUT;
 
   private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+
+  private boolean allowInvalidCertificates = false;
+
+  private SSLSocketFactory sslSocketFactory;
 
   private CloseableHttpClient client;
 
@@ -141,6 +147,23 @@ public class OpalJavaClient {
 
   public void setConnectionTimeout(int connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
+  }
+
+  /**
+   * Accept any server certificate and any host name. Off by default: the remote Opal receives the credentials or the
+   * token of this client, so its identity is verified like that of any other HTTPS server.
+   */
+  public void setAllowInvalidCertificates(boolean allowInvalidCertificates) {
+    this.allowInvalidCertificates = allowInvalidCertificates;
+  }
+
+  /**
+   * The socket factory to use for HTTPS connections, in place of one built from the JVM trust store: this is how a
+   * server plugs its own trust store in. The host name is still verified. Ignored when invalid certificates are
+   * allowed.
+   */
+  public void setSslSocketFactory(@Nullable SSLSocketFactory sslSocketFactory) {
+    this.sslSocketFactory = sslSocketFactory;
   }
 
   private CloseableHttpClient getClient() {
@@ -306,7 +329,7 @@ public class OpalJavaClient {
       connectionManager.setDefaultMaxPerRoute(10);  // Maximum connections per route (endpoint)
       connectionManager.setValidateAfterInactivity(Timeout.ofSeconds(30)); // Time after which idle connections will be validated
       builder.setConnectionManager(connectionManager);
-    } catch(NoSuchAlgorithmException | KeyManagementException e) {
+    } catch(GeneralSecurityException e) {
       throw new RuntimeException(e);
     }
 
@@ -329,34 +352,51 @@ public class OpalJavaClient {
   }
 
   /**
-   * Do not check anything from the remote host (Opal server is trusted).
-   * @return
-   * @throws NoSuchAlgorithmException
-   * @throws KeyManagementException
+   * The remote server's certificate is validated against the JVM trust store, or by the socket factory the caller
+   * provided, and its host name is verified; unless invalid certificates were explicitly allowed. When a key store
+   * was given, its keys authenticate this client (mutual TLS).
    */
-  private SSLConnectionSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
-    // Accepts any SSL certificate
+  private SSLConnectionSocketFactory getSocketFactory() throws GeneralSecurityException {
+    if(allowInvalidCertificates) {
+      log.warn("Connecting to {} without validating its certificate nor its host name", opalURI);
+      return new SSLConnectionSocketFactory(trustAllContext(), NoopHostnameVerifier.INSTANCE);
+    }
+    if(sslSocketFactory != null) {
+      return new SSLConnectionSocketFactory(sslSocketFactory, new DefaultHostnameVerifier());
+    }
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    // null trust managers: the JVM default trust store
+    sslContext.init(getKeyManagers(), null, null);
+    return new SSLConnectionSocketFactory(sslContext, new DefaultHostnameVerifier());
+  }
+
+  @Nullable
+  private KeyManager[] getKeyManagers() throws GeneralSecurityException {
+    if(keyStore == null) return null;
+    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+    kmf.init(keyStore, credentials == null ? null : credentials.getPassword());
+    return kmf.getKeyManagers();
+  }
+
+  private SSLContext trustAllContext() throws GeneralSecurityException {
     TrustManager tm = new X509TrustManager() {
 
       @Override
-      public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
+      public void checkClientTrusted(X509Certificate[] arg0, String arg1) {
       }
 
       @Override
-      public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
+      public void checkServerTrusted(X509Certificate[] arg0, String arg1) {
       }
 
       @Override
       public X509Certificate[] getAcceptedIssuers() {
-        return null;
+        return new X509Certificate[0];
       }
     };
     SSLContext sslContext = SSLContext.getInstance("TLS");
-    sslContext.init(null, new TrustManager[] { tm }, null);
-
-    return new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+    sslContext.init(getKeyManagers(), new TrustManager[] { tm }, null);
+    return sslContext;
   }
 
   private CloseableHttpResponse execute(HttpUriRequest msg) throws IOException {

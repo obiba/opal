@@ -22,7 +22,6 @@ import jakarta.ws.rs.core.Response;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.security.Dtos;
-import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -70,7 +69,6 @@ public class SubjectProfileResource {
 
   @DELETE
   @Path("/otp")
-  @NoAuthorization
   @Operation(summary = "Disable subject OTP", description = "Disables one-time password authentication for a specific subject.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OTP disabled successfully")

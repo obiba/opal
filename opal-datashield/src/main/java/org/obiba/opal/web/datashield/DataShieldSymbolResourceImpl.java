@@ -24,6 +24,7 @@ import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.RServerSession;
 import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.spi.r.RServerConnection;
+import org.obiba.opal.spi.r.ResourceAssignROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -74,11 +76,19 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     return putRestrictedRScript(uri, script, async);
   }
 
+  /**
+   * A text/plain body is sent to the R server as a script, exactly like an application/x-rscript one: it goes through
+   * the same restricted parser. The interface declares no checked exception on this method, so a rejected script is
+   * turned into the response the {@link ParseExceptionMapper} would have produced.
+   */
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
     logInit();
-    MDC.put("ds_expr", String.format("\"%s\"", content));
-    return super.putString(uri, content, async);
+    try {
+      return putRestrictedRScript(uri, content, async);
+    } catch (ParseException e) {
+      return new ParseExceptionMapper().toResponse(e);
+    }
   }
 
   @Override
@@ -127,12 +137,21 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     return rClassToApply;
   }
 
+  /**
+   * Only three kinds of assignment may reach a DataSHIELD session: a script rewritten by the restricted parser, a
+   * table and a resource. Anything else carries R code the parser never saw, whatever inherited method built it, and
+   * is refused here rather than trusted to the method that built it.
+   */
   @Override
   protected ROperation wrapROperation(ROperation rop) {
-    if (!(rop instanceof RestrictedROperation)) {
+    if (rop instanceof RestrictedROperation) {
+      return super.wrapROperation(rop);
+    }
+    if (rop instanceof MagmaAssignROperation || rop instanceof ResourceAssignROperation) {
       return new DataShieldROperation(newDataShieldContext(), getName(), rop);
     }
-    return super.wrapROperation(rop);
+    DataShieldLog.userErrorLog(newDataShieldContext(), DataShieldLog.Action.ASSIGN, "refused unrestricted assignment of '{}'", getName());
+    throw new ForbiddenException("Unrestricted R operations are not allowed in a DataSHIELD session");
   }
 
   private DataShieldContext newDataShieldContext() {

@@ -128,6 +128,9 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   @Override
   public Taxonomy importFileTaxonomy(@NotNull String file, boolean override) throws FileSystemException {
     FileObject fileObj = resolveFileInFileSystem(file);
+    if (!fileObj.exists() || !fileObj.isReadable()) {
+      throw new IllegalArgumentException("File cannot be read: " + file);
+    }
 
     try {
       return importInputStreamTaxonomy(fileObj.getContent().getInputStream(), null, override);
