@@ -72,12 +72,13 @@ public class FileViewDtoExtension extends TableViewDtoExtension {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
       FileObject file = opalFileSystemService.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
-      if (file.exists()) {
+      // the view permission says nothing about the file: the file ACL does
+      if (file.exists() && file.isReadable()) {
         try (InputStream is = file.getContent().getInputStream()) {
           return makeViewFromFile(viewBuilder, fileDto, is);
         }
       }
-      throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
+      throw new RuntimeException("cannot find or read file specified '" + fileDto.getFilename() + "'");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -119,12 +120,13 @@ public class FileViewDtoExtension extends TableViewDtoExtension {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
     try {
       FileObject file = opalFileSystemService.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
-      if (file.exists()) {
+      // the view permission says nothing about the file: the file ACL does
+      if (file.exists() && file.isReadable()) {
         try (InputStream is = file.getContent().getInputStream()) {
           return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);
         }
       }
-      throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
+      throw new RuntimeException("cannot find or read file specified '" + fileDto.getFilename() + "'");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

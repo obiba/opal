@@ -31,8 +31,12 @@ public abstract class AbstractIdentifiersResource {
 
   protected File resolveLocalFile(String path) {
     try {
-      // note: does not ensure that file exists
-      return getOpalFileSystemService().getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+      FileObject file = resolveFileInFileSystem(path);
+      // a file that does not exist yet is left to the caller; an existing one must be readable by the current subject
+      if (file.exists() && !file.isReadable()) {
+        throw new IllegalArgumentException("File cannot be read: " + path);
+      }
+      return getOpalFileSystemService().getFileSystem().getLocalFile(file);
     } catch (FileSystemException e) {
       throw new IllegalArgumentException(e);
     }

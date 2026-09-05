@@ -15,6 +15,9 @@ import java.io.File;
 import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -28,12 +31,18 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
   @NotNull
   private final OpalFileSystem delegate;
 
-  private final Authorizer authorizer = new ShiroAuthorizer();
+  private final Authorizer authorizer;
 
   public SecuredOpalFileSystem(@NotNull OpalFileSystem delegate) {
+    this(delegate, new ShiroAuthorizer());
+  }
+
+  public SecuredOpalFileSystem(@NotNull OpalFileSystem delegate, @NotNull Authorizer authorizer) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(delegate != null, "delegate must not be null");
+    Preconditions.checkArgument(authorizer != null, "authorizer must not be null");
     this.delegate = delegate;
+    this.authorizer = authorizer;
   }
 
   @Override
@@ -49,12 +58,33 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
 
   @Override
   public File getLocalFile(FileObject virtualFile) {
+    checkReadable(virtualFile);
     return delegate.getLocalFile(virtualFile);
   }
 
   @Override
   public File resolveLocalFile(String virtualPath) {
-    return delegate.resolveLocalFile(virtualPath);
+    try {
+      return getLocalFile(getRoot().resolveFile(virtualPath));
+    } catch (FileSystemException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  /**
+   * A native handle escapes every later check, so an existing regular file is only handed out when the current
+   * subject may read it. Folders and files that do not exist yet are export and upload destinations: whether they
+   * may be written is for their callers to check, and there is nothing to read from them.
+   */
+  private void checkReadable(FileObject virtualFile) {
+    FileObject secured = virtualFile instanceof SecuredFileObject ? virtualFile : new SecuredFileObject(authorizer, virtualFile);
+    try {
+      if (secured.getType() == FileType.FILE && !secured.isReadable()) {
+        throw new UnauthorizedException("File cannot be read: " + secured.getName().getPath());
+      }
+    } catch (FileSystemException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   @Override

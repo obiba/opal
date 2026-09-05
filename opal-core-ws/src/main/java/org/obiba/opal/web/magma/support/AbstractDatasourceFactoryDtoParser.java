@@ -74,10 +74,18 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
     return opalFileSystemService.getFileSystem().getRoot().resolveFile(path);
   }
 
+  /**
+   * The native file of a path of the Opal file system. A file that does not exist yet is handed out, the datasource
+   * will report on it; an existing one must be readable by the current subject, whatever the datasource permission
+   * that led here.
+   */
   protected File resolveLocalFile(String path) {
     try {
-      // note: does not ensure that file exists
-      return opalFileSystemService.getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+      FileObject file = resolveFileInFileSystem(path);
+      if (file.exists() && !file.isReadable()) {
+        throw new IllegalArgumentException("File cannot be read: " + path);
+      }
+      return opalFileSystemService.getFileSystem().getLocalFile(file);
     } catch (FileSystemException e) {
       throw new IllegalArgumentException(e);
     }
