@@ -36,7 +36,12 @@
 # Metrics are exported every 60s by default; lower it while trying things out.
 #export OTEL_METRIC_EXPORT_INTERVAL=5000
 
-# To also trace the HTTP requests, JDBC calls and R client calls that surround the DataSHIELD
-# operations, add the OpenTelemetry Java agent. Opal needs no change for this - the DataSHIELD spans
-# hang under the agent's server spans on their own.
+# The OpenTelemetry Java agent adds the JDBC, Mongo and HTTP client calls made during a DataSHIELD
+# operation. They nest inside the DataSHIELD spans, so a session trace then also shows the R server
+# round trips and the SQL underneath each audited operation. Opal needs no change for this.
+#
+# Two things to expect. The agent logs a warning that GlobalOpenTelemetry.set calls are ignored:
+# that is normal, Opal keeps its own SDK for the log appenders and uses the agent's for spans and
+# metrics. And the HTTP server spans stay in traces of their own - a DataSHIELD trace is rooted on
+# the session, not on a request, so it does not nest under the request that started it.
 #export JAVA_OPTS="$JAVA_OPTS -javaagent:/path/opentelemetry-javaagent.jar"

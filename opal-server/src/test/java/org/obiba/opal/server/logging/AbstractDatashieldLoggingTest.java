@@ -86,6 +86,28 @@ public abstract class AbstractDatashieldLoggingTest {
   }
 
   /**
+   * Every MDC key a real assignment from a table carries: the DataSHIELD ones, plus the two RockSession
+   * sets around each call to the R server. This is the widest record the audit stream produces, which is
+   * what makes it the one to assert the exported attribute names against.
+   */
+  protected void logAssignFromTableEvent() {
+    MDC.put("ip", "10.0.0.7");
+    MDC.put("username", "administrator");
+    MDC.put("ds_id", "rsession-42");
+    MDC.put("ds_profile", "default");
+    MDC.put("ds_action", "ASSIGN");
+    MDC.put("ds_symbol", "x");
+    MDC.put("ds_table", "CNSIM.CNSIM1");
+    MDC.put("r_size", "4");
+    MDC.put("r_duration", "388");
+    try {
+      LoggerFactory.getLogger("datashield.user").info("created symbol '{}' from: '{}'", "x", "x <- opal[CNSIM.CNSIM1]");
+    } finally {
+      MDC.clear();
+    }
+  }
+
+  /**
    * The MDC keys AbstractRestrictedRScriptROperation sets while parsing a submitted expression. They
    * only ever appear on a PARSE record: DataShieldLog.init() clears them once it has been written.
    */

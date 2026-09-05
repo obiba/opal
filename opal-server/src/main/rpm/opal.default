@@ -63,6 +63,8 @@ JAVA_ARGS="-Xms1G -Xmx2G -XX:+UseG1GC"
 # Metrics are exported every 60s by default; lower it while trying things out.
 #OTEL_METRIC_EXPORT_INTERVAL=5000
 
-# To also trace the HTTP requests and JDBC calls around the DataSHIELD operations, add the
-# OpenTelemetry Java agent to JAVA_ARGS above. Opal needs no change for this.
+# The OpenTelemetry Java agent adds the JDBC, Mongo and HTTP client calls made during a DataSHIELD
+# operation, nested inside the DataSHIELD spans. Opal needs no change for this. Expect a warning that
+# GlobalOpenTelemetry.set calls are ignored - that is normal - and note that the HTTP server spans
+# stay in traces of their own: a DataSHIELD trace is rooted on the session, not on a request.
 #   JAVA_ARGS="... -javaagent:/opt/opentelemetry-javaagent.jar"

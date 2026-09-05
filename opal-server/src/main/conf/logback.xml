@@ -165,6 +165,11 @@
     <rename>ds_script_in=datashield.script.submitted</rename>
     <rename>ds_script_out=datashield.script.generated</rename>
     <rename>ds_map=datashield.script.mapping</rename>
+    <!-- set by DataShieldSymbolResourceImpl when a symbol is assigned from a table -->
+    <rename>ds_table=datashield.table</rename>
+    <!-- set by RockSession around every call to the R server: elapsed milliseconds, response bytes -->
+    <rename>r_duration=datashield.r.duration</rename>
+    <rename>r_size=datashield.r.size</rename>
     <rename>username=enduser.id</rename>
     <rename>ip=client.address</rename>
     <!-- ds_eval carries the submitted R expression, exported in full as datashield.script: it is the

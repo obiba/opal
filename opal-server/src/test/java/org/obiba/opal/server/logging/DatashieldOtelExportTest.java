@@ -90,12 +90,20 @@ public class DatashieldOtelExportTest extends AbstractDatashieldLoggingTest {
     assertThat(exportedAttributes().get("datashield.script")).isEqualTo(SCRIPT);
   }
 
+  /**
+   * Closed, on purpose. The previous version of this listed the raw keys that must not appear, and a
+   * list like that is only as good as the day it was written: ds_table, r_size and r_duration were
+   * exported under their raw names for a while because nobody thought to add them to it. Asserting
+   * the whole exported key set means a new MDC key fails the build until it has been named.
+   */
   @Test
-  public void test_no_raw_mdc_key_leaks_into_the_exported_attributes() {
-    logDatashieldEvent();
+  public void test_every_exported_attribute_is_a_renamed_one() {
+    logAssignFromTableEvent();
 
-    assertThat(exportedAttributes().keySet())
-        .doesNotContain("ds_id", "ds_profile", "ds_action", "ds_symbol", "ds_eval", "username", "ip");
+    assertThat(exportedAttributes().keySet()).isEqualTo(java.util.Set.of(
+        "datashield.session.id", "datashield.profile", "datashield.action", "datashield.symbol",
+        "datashield.table", "datashield.r.duration", "datashield.r.size",
+        "enduser.id", "client.address"));
   }
 
   /**
