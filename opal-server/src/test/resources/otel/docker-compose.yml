@@ -1,0 +1,11 @@
+# Minimal collector for eyeballing the DataSHIELD audit stream end to end.
+#   docker compose -f src/test/resources/otel/docker-compose.yml up
+# then start Opal with OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 in its environment.
+services:
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.140.0
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./collector-config.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - "4318:4318"   # OTLP/HTTP - the protocol Opal defaults to, see OpalServer#configureOpenTelemetry

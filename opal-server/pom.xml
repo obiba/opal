@@ -83,10 +83,49 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- OpenTelemetry: the appender only buffers until an SDK is installed into it,
+         see OpalServer#configureOpenTelemetry -->
     <dependency>
       <groupId>io.opentelemetry.instrumentation</groupId>
       <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
+    </dependency>
+
+    <!-- The default OTLP sender is okhttp, which would drag okhttp + kotlin-stdlib into every
+         distribution for a feature that is off by default. The JDK sender uses java.net.http
+         instead and adds nothing; it is HTTP-only, hence the http/protobuf default in
+         OpalServer#configureOpenTelemetry. -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.opentelemetry</groupId>
+          <artifactId>opentelemetry-exporter-sender-okhttp</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-sender-jdk</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-testing</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -121,6 +160,18 @@
 
   <build>
     <plugins>
+      <!-- obiba-password-hasher:cli is a shaded jar that bundles slf4j-nop. The assembly routes it to
+           tools/hasher/lib and keeps it out of the server's lib, so it never reaches the runtime
+           classpath - but Maven still puts it on the test classpath, where its binding competes with
+           logback and wins. Keep it out so tests log through logback like the server does. -->
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.obiba.commons:obiba-password-hasher</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

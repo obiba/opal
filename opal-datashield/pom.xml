@@ -27,6 +27,19 @@
 
   <dependencies>
 
+    <!-- Spans around the DataSHIELD operations. API only: the SDK is built by opal-server, and
+         without one GlobalOpenTelemetry.getOrNoop() hands back no-op instruments. -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Configuration entities are mapped in this module too -->
     <dependency>
       <groupId>jakarta.persistence</groupId>

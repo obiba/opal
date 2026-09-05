@@ -10,6 +10,10 @@
 package org.obiba.opal.datashield;
 
 import com.google.common.base.Strings;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,39 +57,71 @@ public class DataShieldLog {
   public static void userDebugLog(DataShieldContext context, Action action, String format, Object... arguments) {
     if (!userLog.isDebugEnabled()) return;
     prepare(context, action);
-    userLog.debug(format, arguments);
+    inSessionTrace(context.getRId(), () -> userLog.debug(format, arguments));
     init();
   }
 
   public static void userDebugLog(String id, Action action, String format, Object... arguments) {
     if (!userLog.isDebugEnabled()) return;
     prepare(id, action);
-    userLog.debug(format, arguments);
+    inSessionTrace(id, () -> userLog.debug(format, arguments));
     init();
   }
 
   public static void userLog(DataShieldContext context, Action action, String format, Object... arguments) {
     prepare(context, action);
-    userLog.info(format, arguments);
+    inSessionTrace(context.getRId(), () -> userLog.info(format, arguments));
     init();
   }
 
   public static void userLog(String id, Action action, String format, Object... arguments) {
     prepare(id, action);
-    userLog.info(format, arguments);
+    inSessionTrace(id, () -> userLog.info(format, arguments));
     init();
   }
 
   public static void userErrorLog(DataShieldContext context, Action action, String format, Object... arguments) {
     prepare(context, action);
-    userLog.error(format, arguments);
+    inSessionTrace(context.getRId(), () -> userLog.error(format, arguments));
     init();
   }
 
   public static void userErrorLog(String id, Action action, String format, Object... arguments) {
     prepare(id, action);
-    userLog.error(format, arguments);
+    inSessionTrace(id, () -> userLog.error(format, arguments));
     init();
+  }
+
+  /**
+   * Writes the record while the trace of the session it belongs to is current, so that the exported
+   * copy carries that session's trace id: the audit trail of a session and its spans are then two
+   * views of one thing rather than two unrelated streams.
+   * <p/>
+   * A caller already inside that trace keeps the span it is in, as the more precise anchor of the
+   * two. A caller inside some other trace does not: with the OpenTelemetry Java agent there is
+   * always an ambient HTTP request span, and following it would scatter the records of one session
+   * over as many traces as the session had requests - which is the thing the session trace exists
+   * to avoid.
+   * <p/>
+   * Nothing of this reaches datashield.log, whose format is fixed: the ids belong to the exported
+   * log record, not to the MDC the file encoder writes.
+   */
+  private static void inSessionTrace(String rid, Runnable record) {
+    Context session = DataShieldSessionTraces.contextOf(rid);
+    Span sessionSpan = Span.fromContextOrNull(session);
+    if (sessionSpan == null || inTraceOf(sessionSpan)) {
+      // no trace for this session, or already in it
+      record.run();
+      return;
+    }
+    try (Scope ignored = session.makeCurrent()) {
+      record.run();
+    }
+  }
+
+  private static boolean inTraceOf(Span session) {
+    SpanContext current = Span.current().getSpanContext();
+    return current.isValid() && current.getTraceId().equals(session.getSpanContext().getTraceId());
   }
 
   private static void prepare(DataShieldContext context, Action action) {

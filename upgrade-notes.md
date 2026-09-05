@@ -65,6 +65,51 @@ OrientDB folder, so the run can be repeated once the cause is dealt with. Each r
 configuration identifies it by, so a repeated run updates what is already there and adds what is missing, whether it
 starts from nothing, from a half-written table or from a complete one. Running it again is always safe.
 
+### DataSHIELD activity over OpenTelemetry
+
+Opal can now send its logs, its DataSHIELD traces and its DataSHIELD metrics to an OpenTelemetry collector. Nothing is
+exported until you set `OTEL_EXPORTER_OTLP_ENDPOINT`: an installation that never sets it builds no SDK, opens no
+connection, sends nothing and prints nothing. If this is not something you want, there is nothing to do.
+
+**The format of `${OPAL_HOME}/logs/datashield.log` has not changed.** The `ds_*` fields are renamed to OpenTelemetry
+names on the way to the collector only, in an appender placed after the file appender, and a test in the build compares
+a written line against a fixture to keep it that way. Tools that parse the file keep working, and the file remains the
+local record when the collector is unreachable.
+
+**Turning the log export on needs a change to `${OPAL_HOME}/conf/logback.xml` that the upgrade does not make for you.**
+That file belongs to your installation and you may well have edited it, so nothing writes into it - which means an Opal
+upgraded from 5.x keeps a `logback.xml` with no OpenTelemetry appenders in it. Configure an endpoint on such an
+installation and it will export its traces and its metrics and not one log record. Opal now says so at startup rather
+than leaving you to discover it:
+
+    OpenTelemetry export enabled.
+    WARNING: conf/logback.xml declares no OpenTelemetry appender, so no log record will be exported ...
+
+The fix is to copy the `otel`, `otelrest`, `otelraw` and `otelds` appenders - and the `appender-ref` entries that use
+them - from the distribution's `logback.xml` into yours. Where that copy is depends on the packaging:
+
+  - zip: `<dist>/conf/logback.xml`
+  - deb: `/usr/share/opal-server-<version>/conf/logback.xml`
+  - rpm: there is no `conf` directory under `/usr/share`; `/etc/opal` is installed `noreplace`, so the upgrade leaves
+    the new file beside yours as `/etc/opal/logback.xml.rpmnew`
+  - docker: `/usr/share/opal/conf/logback.xml`
+
+**A new file, `conf/opal-env.sh`,** is sourced by `bin/opal` when it is present. It is where `JAVA_OPTS` and the `OTEL_*`
+variables belong on a zip installation: it sits in `OPAL_HOME`, so the next upgrade will not replace it the way it
+replaces `bin/opal`. It ships in the distribution's `conf` directory and nothing copies it into an existing
+`OPAL_HOME`, so copy it across yourself if you want it.
+
+On the deb and rpm packages those variables go in `/etc/default/opal` instead. A credential for the collector does not:
+that file is world readable, so put it in the new `/etc/default/opal-secrets`, which the service also reads and which
+can be `chmod 600` and owned by root - systemd reads it before dropping to the `opal` user.
+
+**The DataSHIELD stream is sensitive.** It carries the R expressions users submit, their user names and their client
+addresses - that is what makes it worth auditing, and it also makes the collector a processor of that content. Anywhere
+other than a collector on `localhost`, configure TLS.
+
+The settings are documented in full under *OpenTelemetry* in the administration guide:
+<https://opaldoc.obiba.org/en/latest/admin/configuration.html#opentelemetry>.
+
 ### For plugin authors
 
 `org.obiba.opal.core.domain.HasUniqueProperties`, `org.obiba.opal.core.validator.Unique` and its `UniqueValidator`

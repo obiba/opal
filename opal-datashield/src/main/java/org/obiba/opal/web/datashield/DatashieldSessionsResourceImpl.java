@@ -13,6 +13,10 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
+import org.obiba.opal.datashield.DataShieldContexts;
+import org.obiba.opal.datashield.DataShieldMetrics;
+import org.obiba.opal.datashield.DataShieldSessionTraces;
+import org.obiba.opal.datashield.DataShieldTracer;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.r.service.RContextInitiator;
@@ -35,6 +39,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +54,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   private static final Logger log = LoggerFactory.getLogger(DatashieldSessionsResourceImpl.class);
 
-  static final String DS_CONTEXT = "DataSHIELD";
+  static final String DS_CONTEXT = DataShieldContexts.DATASHIELD;
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -110,8 +115,23 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
         .stream().filter(RQuotaUsage::isExceeded).toList();
     if (exceeded.isEmpty()) return;
     String message = exceeded.stream().map(RQuotaUsage::asMessage).collect(Collectors.joining(" "));
+    exceeded.forEach(usage -> DataShieldMetrics.recordQuotaRejection(usage.getMetric().name()));
     DataShieldLog.userLog("", DataShieldLog.Action.QUOTA, "refused a datashield session: {}", message);
     throw new ForbiddenException(message);
+  }
+
+  /**
+   * Opening a DataSHIELD session starts an R server session, applies the profile options and seeds
+   * it, which is the slowest thing a user waits for and is invisible in the audit log. The span also
+   * records a refusal by {@link #checkQuota()}, which is thrown from inside.
+   * <p>
+   * It opens the trace the rest of the session hangs under as well - see
+   * {@link DataShieldSessionTraces} - which is why the OPEN span is nested rather than a root.
+   */
+  @Override
+  public Response newRSession(UriInfo info, String restore, String profile, boolean wait) {
+    return DataShieldSessionTraces.opening(() -> DataShieldTracer.traced(null, profile, DataShieldLog.Action.OPEN,
+        () -> super.newRSession(info, restore, profile, wait)));
   }
 
   @Override
@@ -127,6 +147,8 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   @Override
   protected void onNewRSession(RServerSession rSession) {
+    DataShieldTracer.describeCurrentSession(rSession.getId());
+    DataShieldSessionTraces.bind(rSession.getId(), rSession.getProfile().getName());
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
   }

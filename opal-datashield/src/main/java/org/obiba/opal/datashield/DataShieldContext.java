@@ -10,6 +10,7 @@
 
 package org.obiba.opal.datashield;
 
+import io.opentelemetry.context.Context;
 import org.obiba.datashield.core.DSEnvironment;
 
 import java.util.Map;
@@ -26,12 +27,18 @@ public class DataShieldContext {
 
   private final Map<String, String> contextMap;
 
+  private final Context traceContext;
+
   public DataShieldContext(DSEnvironment environment, String rid, String profile, String rParserVersion, Map<String, String> contextMap) {
     this.environment = environment;
     this.rid = rid;
     this.profile = profile;
     this.rParserVersion = rParserVersion;
     this.contextMap = contextMap;
+    // Looked up by session id rather than taken from the current context: the operations of a
+    // session are spread over several requests and run on the session's consumer thread, so there
+    // is no ambient context that spans them. The id is what does.
+    this.traceContext = DataShieldSessionTraces.contextOf(rid);
   }
 
   public DSEnvironment getEnvironment() {
@@ -52,5 +59,13 @@ public class DataShieldContext {
 
   public Map<String, String> getContextMap() {
     return contextMap;
+  }
+
+  /**
+   * The trace context of the DataSHIELD session, so that a span opened on the R execution thread
+   * still hangs under the session it belongs to. See {@link DataShieldSessionTraces}.
+   */
+  public Context getTraceContext() {
+    return traceContext;
   }
 }
