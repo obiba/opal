@@ -92,7 +92,7 @@
     <opentelemetry.logback-appender.version>2.23.0-alpha</opentelemetry.logback-appender.version>
     <lucene.version>9.11.1</lucene.version>
     <public-datasources.version>1.2.0</public-datasources.version>
-    <magma.version>5.5.0</magma.version>
+    <magma.version>5.5-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mariadb-connector-java.version>3.5.9</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
