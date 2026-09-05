@@ -11,6 +11,8 @@ package org.obiba.opal.datashield;
 
 import com.google.common.base.Strings;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
@@ -93,21 +95,33 @@ public class DataShieldLog {
   /**
    * Writes the record while the trace of the session it belongs to is current, so that the exported
    * copy carries that session's trace id: the audit trail of a session and its spans are then two
-   * views of one thing rather than two unrelated streams. Most of these records are written just
-   * after the span of the operation has been closed, hence the lookup by session id - but a caller
-   * that is still inside a span keeps it, as the more precise of the two.
+   * views of one thing rather than two unrelated streams.
+   * <p/>
+   * A caller already inside that trace keeps the span it is in, as the more precise anchor of the
+   * two. A caller inside some other trace does not: with the OpenTelemetry Java agent there is
+   * always an ambient HTTP request span, and following it would scatter the records of one session
+   * over as many traces as the session had requests - which is the thing the session trace exists
+   * to avoid.
    * <p/>
    * Nothing of this reaches datashield.log, whose format is fixed: the ids belong to the exported
    * log record, not to the MDC the file encoder writes.
    */
   private static void inSessionTrace(String rid, Runnable record) {
-    if (Span.current().getSpanContext().isValid()) {
+    Context session = DataShieldSessionTraces.contextOf(rid);
+    Span sessionSpan = Span.fromContextOrNull(session);
+    if (sessionSpan == null || inTraceOf(sessionSpan)) {
+      // no trace for this session, or already in it
       record.run();
       return;
     }
-    try (Scope ignored = DataShieldSessionTraces.contextOf(rid).makeCurrent()) {
+    try (Scope ignored = session.makeCurrent()) {
       record.run();
     }
+  }
+
+  private static boolean inTraceOf(Span session) {
+    SpanContext current = Span.current().getSpanContext();
+    return current.isValid() && current.getTraceId().equals(session.getSpanContext().getTraceId());
   }
 
   private static void prepare(DataShieldContext context, Action action) {

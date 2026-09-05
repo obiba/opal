@@ -12,6 +12,7 @@ package org.obiba.opal.datashield;
 import com.google.common.base.Strings;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.ContextKey;
@@ -58,9 +59,12 @@ public final class DataShieldSessionTraces {
    * span the creation is traced with becomes its first child.
    */
   public static <T> T opening(Supplier<T> creation) {
-    Span session = GlobalOpenTelemetry.getTracer(SCOPE).spanBuilder("datashield.session")
-        .setNoParent()
-        .startSpan();
+    SpanBuilder builder = GlobalOpenTelemetry.getTracer(SCOPE).spanBuilder("datashield.session")
+        .setNoParent();
+    // the trace is the session's, not the request's - but the request that opened it is worth being
+    // able to reach, so it is linked when something has traced it
+    DataShieldTracer.linkToCallingRequest(builder, Context.root());
+    Span session = builder.startSpan();
     Opening opening = new Opening(session);
     try(Scope ignored = Context.root().with(OPENING, opening).with(session).makeCurrent()) {
       return creation.get();

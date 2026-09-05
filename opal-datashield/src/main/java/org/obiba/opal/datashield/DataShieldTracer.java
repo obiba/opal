@@ -13,6 +13,8 @@ import com.google.common.base.Strings;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Scope;
 import org.obiba.datashield.r.expr.ParseException;
@@ -57,10 +59,7 @@ public final class DataShieldTracer {
    */
   public static <T> T traced(DataShieldContext context, DataShieldLog.Action action, String symbol, String script,
       Operation<T> operation) {
-    Span span = GlobalOpenTelemetry.getTracer(SCOPE)
-        .spanBuilder("datashield." + action.name().toLowerCase())
-        .setParent(context.getTraceContext())
-        .startSpan();
+    Span span = operationSpan(action, context.getTraceContext()).startSpan();
     describe(span, context, action, symbol, script);
     return record(span, action, context == null ? null : context.getProfile(), operation);
   }
@@ -80,10 +79,7 @@ public final class DataShieldTracer {
    */
   public static <T> T tracedParse(DataShieldContext context, String script, ParsingOperation<T> operation)
       throws ParseException {
-    Span span = GlobalOpenTelemetry.getTracer(SCOPE)
-        .spanBuilder("datashield.parse")
-        .setParent(context.getTraceContext())
-        .startSpan();
+    Span span = operationSpan(DataShieldLog.Action.PARSE, context.getTraceContext()).startSpan();
     describe(span, context, DataShieldLog.Action.PARSE, null, script);
     long startedAt = System.nanoTime();
     Throwable failure = null;
@@ -104,14 +100,41 @@ public final class DataShieldTracer {
    * made the session span current, and {@link #describeCurrentSession(String)} names it afterwards.
    */
   public static <T> T traced(String rid, String profile, DataShieldLog.Action action, Operation<T> operation) {
-    SpanBuilder builder = GlobalOpenTelemetry.getTracer(SCOPE)
-        .spanBuilder("datashield." + action.name().toLowerCase());
-    if(!Strings.isNullOrEmpty(rid)) builder.setParent(DataShieldSessionTraces.contextOf(rid));
+    SpanBuilder builder = Strings.isNullOrEmpty(rid)
+        // the session is what is being created: the caller has made the session span current
+        ? GlobalOpenTelemetry.getTracer(SCOPE).spanBuilder("datashield." + action.name().toLowerCase())
+        : operationSpan(action, DataShieldSessionTraces.contextOf(rid));
     Span span = builder.startSpan();
     span.setAttribute("datashield.action", action.name());
     if(!Strings.isNullOrEmpty(rid)) span.setAttribute("datashield.session.id", rid);
     if(!Strings.isNullOrEmpty(profile)) span.setAttribute("datashield.profile", profile);
     return record(span, action, profile, operation);
+  }
+
+  private static SpanBuilder operationSpan(DataShieldLog.Action action, Context parent) {
+    SpanBuilder builder = GlobalOpenTelemetry.getTracer(SCOPE)
+        .spanBuilder("datashield." + action.name().toLowerCase())
+        .setParent(parent);
+    linkToCallingRequest(builder, parent);
+    return builder;
+  }
+
+  /**
+   * Links the span to the request that asked for the operation, when that request is in a trace of
+   * its own.
+   * <p/>
+   * It is whenever something else instruments the HTTP layer - the OpenTelemetry Java agent, say -
+   * because a DataSHIELD trace is deliberately rooted on the session rather than on a request, so
+   * the two traces would otherwise have no way to find each other. Nothing instruments the HTTP
+   * layer by default, and then there is no request span and no link.
+   */
+  static void linkToCallingRequest(SpanBuilder builder, Context parent) {
+    SpanContext caller = Span.current().getSpanContext();
+    if(!caller.isValid()) return;
+    SpanContext parentSpan = Span.fromContext(parent).getSpanContext();
+    // already in the same trace: the parent relationship says it, a link would only repeat it
+    if(parentSpan.isValid() && caller.getTraceId().equals(parentSpan.getTraceId())) return;
+    builder.addLink(caller);
   }
 
   /**

@@ -14,6 +14,7 @@ import ch.qos.logback.core.AppenderBase;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -229,6 +230,109 @@ public class DataShieldSessionTracesTest {
 
     assertThat(appended).hasSize(1);
     assertThat(appended.get(0).isValid()).isFalse();
+  }
+
+  /**
+   * Nothing instruments Opal's HTTP layer by default, so a DataSHIELD trace normally stands alone.
+   * Under the OpenTelemetry Java agent it does not: there is a request span, in a trace of its own,
+   * and the two would have no way to find each other. A link is how they do.
+   */
+  @Test
+  public void test_the_session_links_to_the_request_that_opened_it() {
+    Span request = GlobalOpenTelemetry.getTracer("test").spanBuilder("POST /ws/datashield/sessions").startSpan();
+    try(Scope ignored = request.makeCurrent()) {
+      open();
+    }
+    request.end();
+    close();
+
+    SpanData session = byName().get("datashield.session");
+    // still a root of its own trace: the session is the trace, the request is only reachable from it
+    assertThat(session.getParentSpanId()).isEqualTo("0000000000000000");
+    assertThat(session.getTraceId()).isNotEqualTo(request.getSpanContext().getTraceId());
+    assertThat(session.getLinks()).hasSize(1);
+    assertThat(session.getLinks().get(0).getSpanContext().getSpanId())
+        .isEqualTo(request.getSpanContext().getSpanId());
+  }
+
+  @Test
+  public void test_an_operation_links_to_the_request_that_asked_for_it() {
+    open();
+    Span request = GlobalOpenTelemetry.getTracer("test").spanBuilder("POST /ws/datashield/session/x/aggregate")
+        .startSpan();
+    try(Scope ignored = request.makeCurrent()) {
+      aggregate("dsBase::colnamesDS(\"x\")");
+    }
+    request.end();
+
+    SpanData aggregate = byName().get("datashield.aggregate");
+    assertThat(aggregate.getTraceId()).isEqualTo(sessionTraceId());
+    assertThat(aggregate.getLinks()).hasSize(1);
+    assertThat(aggregate.getLinks().get(0).getSpanContext().getSpanId())
+        .isEqualTo(request.getSpanContext().getSpanId());
+  }
+
+  /**
+   * The ordinary case, with nothing instrumenting the HTTP layer: no request span exists, so there
+   * is nothing to link and no link is made. A span already inside the session's trace is not linked
+   * to it either - the parent relationship already says so.
+   */
+  @Test
+  public void test_no_link_is_made_when_the_request_is_not_traced() {
+    open();
+    aggregate("dsBase::colnamesDS(\"x\")");
+    close();
+
+    assertThat(byName().get("datashield.session").getLinks()).isEmpty();
+    assertThat(byName().get("datashield.open").getLinks()).isEmpty();
+    assertThat(byName().get("datashield.aggregate").getLinks()).isEmpty();
+  }
+
+  /**
+   * Under the agent every audit record is written with an HTTP request span current. Following it
+   * would scatter one session's records over as many traces as the session had requests, which is
+   * the thing the session trace exists to prevent.
+   */
+  @Test
+  public void test_an_audit_record_joins_its_session_trace_from_another_trace() {
+    login();
+    List<SpanContext> appended = attachAuditAppender();
+    open();
+
+    Span request = GlobalOpenTelemetry.getTracer("test").spanBuilder("POST /ws/datashield/session/x/aggregate")
+        .startSpan();
+    try(Scope ignored = request.makeCurrent()) {
+      DataShieldLog.userLog(context(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", "dsBase::colnamesDS(\"x\")");
+    }
+    request.end();
+
+    assertThat(appended).hasSize(1);
+    assertThat(appended.get(0).getTraceId()).isEqualTo(sessionTraceId());
+    assertThat(appended.get(0).getTraceId()).isNotEqualTo(request.getSpanContext().getTraceId());
+  }
+
+  /**
+   * A record written from inside one of the session's own spans keeps it: same trace either way, and
+   * the operation is the more precise of the two anchors.
+   */
+  @Test
+  public void test_an_audit_record_written_inside_an_operation_keeps_that_span() {
+    login();
+    List<SpanContext> appended = attachAuditAppender();
+    open();
+
+    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> {
+      DataShieldLog.userLog(context(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", "meanDS(D$age)");
+      return null;
+    });
+
+    assertThat(appended).hasSize(1);
+    assertThat(appended.get(0).getSpanId())
+        .isEqualTo(byName().get("datashield.aggregate").getSpanContext().getSpanId());
+  }
+
+  private String sessionTraceId() {
+    return Span.fromContext(DataShieldSessionTraces.contextOf(RID)).getSpanContext().getTraceId();
   }
 
   private void open() {
