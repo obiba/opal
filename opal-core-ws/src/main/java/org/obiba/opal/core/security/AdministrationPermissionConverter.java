@@ -66,6 +66,7 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
             toRest("/project/*/permissions/resources", "GET"),
             toRest("/project/*/permissions/resource/*", "GET"),
             toRest("/authz-subject/*", "GET"),
+            toRest("/service/r/quotas", "GET"),
             toRest("/service/r/clusters", "GET"),
             toRest("/service/r/activity/_summary", "GET"),
             toRest("/system/subject-profile", "GET:GET/GET"),

@@ -44,6 +44,7 @@ public class AdministrationPermissionConverterTest
         "rest:/project/*/permissions/resources:GET",
         "rest:/project/*/permissions/resource/*:GET",
         "rest:/authz-subject/*:GET",
+        "rest:/service/r/quotas:GET",
         "rest:/service/r/clusters:GET",
         "rest:/service/r/activity/_summary:GET",
         "rest:/system/subject-profile:GET:GET/GET",
