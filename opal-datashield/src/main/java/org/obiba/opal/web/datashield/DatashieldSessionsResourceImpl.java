@@ -15,6 +15,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.DataShieldContexts;
 import org.obiba.opal.datashield.DataShieldMetrics;
+import org.obiba.opal.datashield.DataShieldSessionTraces;
 import org.obiba.opal.datashield.DataShieldTracer;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
@@ -123,11 +124,14 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
    * Opening a DataSHIELD session starts an R server session, applies the profile options and seeds
    * it, which is the slowest thing a user waits for and is invisible in the audit log. The span also
    * records a refusal by {@link #checkQuota()}, which is thrown from inside.
+   * <p>
+   * It opens the trace the rest of the session hangs under as well - see
+   * {@link DataShieldSessionTraces} - which is why the OPEN span is nested rather than a root.
    */
   @Override
   public Response newRSession(UriInfo info, String restore, String profile, boolean wait) {
-    return DataShieldTracer.traced(profile, DataShieldLog.Action.OPEN,
-        () -> super.newRSession(info, restore, profile, wait));
+    return DataShieldSessionTraces.opening(() -> DataShieldTracer.traced(null, profile, DataShieldLog.Action.OPEN,
+        () -> super.newRSession(info, restore, profile, wait)));
   }
 
   @Override
@@ -144,6 +148,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   @Override
   protected void onNewRSession(RServerSession rSession) {
     DataShieldTracer.describeCurrentSession(rSession.getId());
+    DataShieldSessionTraces.bind(rSession.getId(), rSession.getProfile().getName());
     MDC.put("ds_profile", rSession.getProfile().getName());
     DataShieldLog.userLog(rSession.getId(), DataShieldLog.Action.OPEN, "created a datashield session {}", rSession.getId());
   }

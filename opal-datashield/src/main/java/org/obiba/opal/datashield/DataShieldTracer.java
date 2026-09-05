@@ -12,12 +12,14 @@ package org.obiba.opal.datashield;
 import com.google.common.base.Strings;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Scope;
+import org.obiba.datashield.r.expr.ParseException;
 
 /**
  * Spans around the DataSHIELD operations, carrying the same attribute names the audit logs are
- * exported under - see the otelds appender in conf/logback.otel.xml.
+ * exported under - see the otelds appender in conf/logback.xml.
  * <p/>
  * The logs say what was submitted and whether it was refused; the spans say how long the R server
  * took, which is the question the log file cannot answer.
@@ -38,6 +40,14 @@ public final class DataShieldTracer {
 
   public interface Operation<T> {
     T call();
+  }
+
+  /**
+   * Parsing is the one traced operation that reports a checked failure, and the one whose failure
+   * matters most: a script refused by the parser is a restriction doing its job.
+   */
+  public interface ParsingOperation<T> {
+    T call() throws ParseException;
   }
 
   /**
@@ -64,15 +74,42 @@ public final class DataShieldTracer {
   }
 
   /**
-   * For the operations that run on the request thread - opening and closing a session, saving and
-   * restoring a workspace - where the current context is already the right parent. The session id is
-   * not always known up front; {@link #describeCurrentSession(String)} fills it in afterwards.
+   * Traces the parsing of a submitted expression, which happens on the request thread before the R
+   * command it produces is queued - so it is a span of its own, alongside the evaluation rather than
+   * around it, exactly as the audit log records it.
    */
-  public static <T> T traced(String profile, DataShieldLog.Action action, Operation<T> operation) {
+  public static <T> T tracedParse(DataShieldContext context, String script, ParsingOperation<T> operation)
+      throws ParseException {
     Span span = GlobalOpenTelemetry.getTracer(SCOPE)
-        .spanBuilder("datashield." + action.name().toLowerCase())
+        .spanBuilder("datashield.parse")
+        .setParent(context.getTraceContext())
         .startSpan();
+    describe(span, context, DataShieldLog.Action.PARSE, null, script);
+    long startedAt = System.nanoTime();
+    Throwable failure = null;
+    try(Scope ignored = span.makeCurrent()) {
+      return operation.call();
+    } catch(Throwable e) {
+      failure = e;
+      throw e;
+    } finally {
+      finish(span, DataShieldLog.Action.PARSE, context.getProfile(), startedAt, failure);
+    }
+  }
+
+  /**
+   * For the operations that run on the request thread - opening and closing a session, saving and
+   * restoring a workspace. They are parented by session id like every other operation, except when
+   * {@code rid} is unknown because the session is what is being created: the caller has then already
+   * made the session span current, and {@link #describeCurrentSession(String)} names it afterwards.
+   */
+  public static <T> T traced(String rid, String profile, DataShieldLog.Action action, Operation<T> operation) {
+    SpanBuilder builder = GlobalOpenTelemetry.getTracer(SCOPE)
+        .spanBuilder("datashield." + action.name().toLowerCase());
+    if(!Strings.isNullOrEmpty(rid)) builder.setParent(DataShieldSessionTraces.contextOf(rid));
+    Span span = builder.startSpan();
     span.setAttribute("datashield.action", action.name());
+    if(!Strings.isNullOrEmpty(rid)) span.setAttribute("datashield.session.id", rid);
     if(!Strings.isNullOrEmpty(profile)) span.setAttribute("datashield.profile", profile);
     return record(span, action, profile, operation);
   }
@@ -83,18 +120,25 @@ public final class DataShieldTracer {
    */
   private static <T> T record(Span span, DataShieldLog.Action action, String profile, Operation<T> operation) {
     long startedAt = System.nanoTime();
-    boolean failed = false;
+    Throwable failure = null;
     try(Scope ignored = span.makeCurrent()) {
       return operation.call();
     } catch(Throwable e) {
-      failed = true;
-      span.setStatus(StatusCode.ERROR, Strings.nullToEmpty(e.getMessage()));
-      span.recordException(e);
+      failure = e;
       throw e;
     } finally {
-      span.end();
-      DataShieldMetrics.recordOperation(action, profile, failed, System.nanoTime() - startedAt);
+      finish(span, action, profile, startedAt, failure);
     }
+  }
+
+  private static void finish(Span span, DataShieldLog.Action action, String profile, long startedAt,
+      Throwable failure) {
+    if(failure != null) {
+      span.setStatus(StatusCode.ERROR, Strings.nullToEmpty(failure.getMessage()));
+      span.recordException(failure);
+    }
+    span.end();
+    DataShieldMetrics.recordOperation(action, profile, failure != null, System.nanoTime() - startedAt);
   }
 
   /**

@@ -12,8 +12,13 @@ package org.obiba.opal.server;
 
 import jakarta.validation.constraints.NotNull;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.spi.AppenderAttachable;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -21,6 +26,7 @@ import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import org.obiba.opal.core.service.ApplicationContextProvider;
 import org.obiba.opal.core.service.event.OpalStartedEvent;
 import org.obiba.opal.server.httpd.OpalJettyServer;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -53,6 +59,36 @@ public class OpalServer {
   }
 
   // http://patorjk.com/software/taag/#p=display&f=Big&t=%3E%20%3E%20%3E%20OPAL
+  /**
+   * conf/logback.xml belongs to the installation - it is edited there, and an upgrade never
+   * overwrites it. An Opal upgraded from before the OpenTelemetry appenders existed therefore
+   * exports its traces and its metrics and not one log record, which is a confusing thing to be
+   * told nothing about right after being told that export is enabled.
+   */
+  private void warnIfNoLogAppender() {
+    if(hasOpenTelemetryAppender()) return;
+    logAndSystemOut("WARNING: conf/logback.xml declares no OpenTelemetry appender, so no log record"
+        + " will be exported - traces and metrics are unaffected. Merge the appenders of"
+        + " $OPAL_DIST/conf/logback.xml into it to export the audit logs as well.");
+  }
+
+  @VisibleForTesting
+  static boolean hasOpenTelemetryAppender() {
+    ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+    if(!(factory instanceof LoggerContext context)) return true; // not logback: not ours to judge
+    return context.getLoggerList().stream()
+        .flatMap(logger -> Streams.stream(logger.iteratorForAppenders()))
+        .anyMatch(OpalServer::isOrWraps);
+  }
+
+  private static boolean isOrWraps(Appender<ILoggingEvent> appender) {
+    if(appender instanceof OpenTelemetryAppender) return true;
+    // the DataSHIELD stream reaches the exporter through MdcRenamingAppender, which nests it
+    return appender instanceof AppenderAttachable<?> attachable && Streams
+        .stream(((AppenderAttachable<ILoggingEvent>) attachable).iteratorForAppenders())
+        .anyMatch(OpalServer::isOrWraps);
+  }
+
   private void asciiArt() {
     System.out.println(" __    __    __      ____  _____        _      \n" +
         " \\ \\   \\ \\   \\ \\    / __ \\|  __ \\ /\\   | |     \n" +
@@ -146,6 +182,7 @@ public class OpalServer {
       OpenTelemetryAppender.install(sdk);
       Runtime.getRuntime().addShutdownHook(new Thread(sdk::close, "otel-shutdown"));
       logAndSystemOut("OpenTelemetry export enabled.");
+      warnIfNoLogAppender();
     } catch(RuntimeException e) {
       // telemetry is never a reason to prevent Opal from starting
       log.error("Failed to initialize OpenTelemetry, continuing without it", e);

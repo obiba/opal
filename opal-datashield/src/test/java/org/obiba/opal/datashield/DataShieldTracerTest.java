@@ -18,6 +18,7 @@ import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import org.obiba.datashield.r.expr.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ public class DataShieldTracerTest {
 
   @After
   public void removeSdk() {
+    DataShieldSessionTraces.endAll();
     if(sdk != null) sdk.close();
     GlobalOpenTelemetry.resetForTest();
   }
@@ -97,18 +99,14 @@ public class DataShieldTracerTest {
   }
 
   /**
-   * An asynchronous DataSHIELD command runs on the R session's consumer thread, where the request's
-   * trace context is gone. DataShieldContext captures it at construction so the span still lands in
-   * the right trace.
+   * An asynchronous DataSHIELD command runs on the R session's consumer thread, where no request
+   * context is left. The session id is what the context is looked up by, so the thread does not
+   * matter - which is the whole point of keying the trace on the session.
    */
   @Test
-  public void test_a_span_opened_on_another_thread_stays_in_the_requests_trace() throws Exception {
-    Span request = GlobalOpenTelemetry.getTracer("test").spanBuilder("PUT /datashield/session").startSpan();
-    DataShieldContext context;
-    try(Scope ignored = request.makeCurrent()) {
-      context = context();
-    }
-    request.end();
+  public void test_a_span_opened_on_another_thread_stays_in_the_sessions_trace() throws Exception {
+    Span session = openSession("rsession-42");
+    DataShieldContext context = context();
 
     ExecutorService rConsumerThread = Executors.newSingleThreadExecutor();
     try {
@@ -121,18 +119,71 @@ public class DataShieldTracerTest {
 
     SpanData aggregate = exporter.getFinishedSpanItems().stream()
         .filter(s -> "datashield.aggregate".equals(s.getName())).findFirst().orElseThrow();
-    assertThat(aggregate.getTraceId()).isEqualTo(request.getSpanContext().getTraceId());
-    assertThat(aggregate.getParentSpanId()).isEqualTo(request.getSpanContext().getSpanId());
+    assertThat(aggregate.getTraceId()).isEqualTo(session.getSpanContext().getTraceId());
+    assertThat(aggregate.getParentSpanId()).isEqualTo(session.getSpanContext().getSpanId());
+  }
+
+  /**
+   * Parsing happens on the request thread, before the R command it produces is queued, so it is a
+   * sibling of the evaluation rather than its parent - as the audit log records it.
+   */
+  @Test
+  public void test_a_parse_is_traced_in_the_sessions_trace() throws Exception {
+    Span session = openSession("rsession-42");
+
+    DataShieldTracer.tracedParse(context(), "colnamesDS(\"x\")", () -> "dsBase::colnamesDS(\"x\")");
+
+    SpanData parse = onlySpan();
+    assertThat(parse.getName()).isEqualTo("datashield.parse");
+    assertThat(parse.getTraceId()).isEqualTo(session.getSpanContext().getTraceId());
+    assertThat(parse.getParentSpanId()).isEqualTo(session.getSpanContext().getSpanId());
+    assertThat(attributes(parse).get("datashield.script")).isEqualTo("colnamesDS(\"x\")");
+  }
+
+  /**
+   * A script the parser turns down is the restriction doing its job, and the reason an auditor opens
+   * the trace at all.
+   */
+  @Test
+  public void test_a_refused_script_is_reported_as_an_error() {
+    openSession("rsession-42");
+
+    try {
+      DataShieldTracer.tracedParse(context(), "system(\"rm -rf /\")", () -> {
+        throw new ParseException("system is not an allowed function");
+      });
+      throw new AssertionError("the parse failure should have propagated");
+    } catch(ParseException expected) {
+      // the checked failure must reach the caller unchanged
+    }
+
+    SpanData parse = onlySpan();
+    assertThat(parse.getStatus().getStatusCode()).isEqualTo(StatusCode.ERROR);
+    assertThat(parse.getStatus().getDescription()).isEqualTo("system is not an allowed function");
   }
 
   @Test
   public void test_the_session_id_can_be_added_once_the_session_exists() {
-    DataShieldTracer.traced("default", DataShieldLog.Action.OPEN, () -> {
+    DataShieldTracer.traced(null, "default", DataShieldLog.Action.OPEN, () -> {
       DataShieldTracer.describeCurrentSession("rsession-99");
       return null;
     });
 
     assertThat(attributes(onlySpan()).get("datashield.session.id")).isEqualTo("rsession-99");
+  }
+
+  /**
+   * Opens a session trace the way the REST resource does, and hands back its span so that the trace
+   * the operations are expected to join can be named.
+   */
+  private Span openSession(String rid) {
+    DataShieldSessionTraces.opening(() -> {
+      DataShieldSessionTraces.bind(rid, "default");
+      return null;
+    });
+    Span session = Span.fromContext(DataShieldSessionTraces.contextOf(rid));
+    exporter.reset();
+    return session;
   }
 
   /**

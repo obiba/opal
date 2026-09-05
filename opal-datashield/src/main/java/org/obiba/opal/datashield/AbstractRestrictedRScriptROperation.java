@@ -44,7 +44,10 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     this.context = context;
     MDC.put("ds_script_in", script);
     try {
-      this.rScriptGenerator = RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script);
+      // traced here, on the request thread: the restriction is applied before anything reaches R,
+      // and a refusal is the one thing an auditor wants to find in the session's trace
+      this.rScriptGenerator = DataShieldTracer.tracedParse(context, script,
+          () -> RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script));
       String toScript = rScriptGenerator.toScript();
       String mapped = Joiner.on(";").join(rScriptGenerator.getMappedFunctions().entrySet().stream()
           .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))

@@ -35,9 +35,10 @@ public class DataShieldContext {
     this.profile = profile;
     this.rParserVersion = rParserVersion;
     this.contextMap = contextMap;
-    // Captured here, on the request thread, for the same reason contextMap is: an asynchronous R
-    // command runs on the session's consumer thread, where the request's trace context is gone.
-    this.traceContext = Context.current();
+    // Looked up by session id rather than taken from the current context: the operations of a
+    // session are spread over several requests and run on the session's consumer thread, so there
+    // is no ambient context that spans them. The id is what does.
+    this.traceContext = DataShieldSessionTraces.contextOf(rid);
   }
 
   public DSEnvironment getEnvironment() {
@@ -61,8 +62,8 @@ public class DataShieldContext {
   }
 
   /**
-   * The trace context of the request that created this one, so that a span opened on the R execution
-   * thread still hangs under the HTTP server span when one exists.
+   * The trace context of the DataSHIELD session, so that a span opened on the R execution thread
+   * still hangs under the session it belongs to. See {@link DataShieldSessionTraces}.
    */
   public Context getTraceContext() {
     return traceContext;
