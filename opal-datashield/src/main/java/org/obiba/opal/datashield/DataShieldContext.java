@@ -34,7 +34,8 @@ public class DataShieldContext {
     this.rid = rid;
     this.profile = profile;
     this.rParserVersion = rParserVersion;
-    this.contextMap = contextMap;
+    // MDC.getCopyOfContextMap() is null when nothing was put yet: never let that reach the log
+    this.contextMap = contextMap == null ? Map.of() : contextMap;
     // Looked up by session id rather than taken from the current context: the operations of a
     // session are spread over several requests and run on the session's consumer thread, so there
     // is no ambient context that spans them. The id is what does.
