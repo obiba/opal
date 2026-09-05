@@ -31,7 +31,8 @@ public class DataShieldContext {
     this.rid = rid;
     this.profile = profile;
     this.rParserVersion = rParserVersion;
-    this.contextMap = contextMap;
+    // MDC.getCopyOfContextMap() is null when nothing was put yet: never let that reach the log
+    this.contextMap = contextMap == null ? Map.of() : contextMap;
   }
 
   public DSEnvironment getEnvironment() {
