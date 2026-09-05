@@ -108,6 +108,33 @@ public abstract class AbstractDatashieldLoggingTest {
   }
 
   /**
+   * The other two assignment sources, from a resource and from a string expression, each carry a
+   * key of their own that the table assignment does not.
+   */
+  protected void logAssignFromResourceEvent() {
+    logAssignEvent("ds_resource", "CNSIM.CNSIM1-resource");
+  }
+
+  protected void logAssignFromStringEvent() {
+    logAssignEvent("ds_expr", "\"hello\"");
+  }
+
+  private void logAssignEvent(String sourceKey, String source) {
+    MDC.put("ip", "10.0.0.7");
+    MDC.put("username", "administrator");
+    MDC.put("ds_id", "rsession-42");
+    MDC.put("ds_profile", "default");
+    MDC.put("ds_action", "ASSIGN");
+    MDC.put("ds_symbol", "x");
+    MDC.put(sourceKey, source);
+    try {
+      LoggerFactory.getLogger("datashield.user").info("created symbol '{}' from: '{}'", "x", source);
+    } finally {
+      MDC.clear();
+    }
+  }
+
+  /**
    * The MDC keys AbstractRestrictedRScriptROperation sets while parsing a submitted expression. They
    * only ever appear on a PARSE record: DataShieldLog.init() clears them once it has been written.
    */

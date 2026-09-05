@@ -165,8 +165,11 @@
     <rename>ds_script_in=datashield.script.submitted</rename>
     <rename>ds_script_out=datashield.script.generated</rename>
     <rename>ds_map=datashield.script.mapping</rename>
-    <!-- set by DataShieldSymbolResourceImpl when a symbol is assigned from a table -->
+    <!-- set by DataShieldSymbolResourceImpl when a symbol is assigned from a table, a resource or a
+         string expression -->
     <rename>ds_table=datashield.table</rename>
+    <rename>ds_resource=datashield.resource</rename>
+    <rename>ds_expr=datashield.expression</rename>
     <!-- set by RockSession around every call to the R server: elapsed milliseconds, response bytes -->
     <rename>r_duration=datashield.r.duration</rename>
     <rename>r_size=datashield.r.size</rename>

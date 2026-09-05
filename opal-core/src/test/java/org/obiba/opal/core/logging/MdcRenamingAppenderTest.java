@@ -83,6 +83,9 @@ public class MdcRenamingAppenderTest {
     assertThat(forwarded.get("ds_id")).isEqualTo("rsession-42");
   }
 
+  /**
+   * The cap bounds what is exported, so it is a hard one: the ellipsis counts towards it.
+   */
   @Test
   public void test_values_are_truncated_before_being_renamed() {
     appender.addRename("ds_eval=datashield.script");
@@ -91,7 +94,15 @@ public class MdcRenamingAppenderTest {
 
     Map<String, String> forwarded = forward(mdc("ds_eval", "meanDS(D$age)"));
 
-    assertThat(forwarded.get("datashield.script")).isEqualTo("meanDS...");
+    assertThat(forwarded.get("datashield.script")).isEqualTo("mea...");
+  }
+
+  @Test
+  public void test_a_limit_too_short_for_an_ellipsis_still_holds() {
+    appender.addTruncate("ds_eval=2");
+    appender.start();
+
+    assertThat(forward(mdc("ds_eval", "meanDS(D$age)")).get("ds_eval")).isEqualTo("me");
   }
 
   @Test

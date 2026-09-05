@@ -53,13 +53,14 @@ public final class DataShieldTracer {
   }
 
   /**
-   * Runs {@code operation} inside a span named after the action, parented to the context captured
-   * when {@code context} was built - the request thread, which is not the thread an asynchronous R
-   * command runs on.
+   * Runs {@code operation} inside a span named after the action, parented to the trace of the
+   * session {@code context} belongs to - looked up by session id when the context was built, so it
+   * holds on the R session's consumer thread as well as on the request thread.
    */
   public static <T> T traced(DataShieldContext context, DataShieldLog.Action action, String symbol, String script,
       Operation<T> operation) {
-    Span span = operationSpan(action, context.getTraceContext()).startSpan();
+    Context parent = context == null ? Context.root() : context.getTraceContext();
+    Span span = operationSpan(action, parent).startSpan();
     describe(span, context, action, symbol, script);
     return record(span, action, context == null ? null : context.getProfile(), operation);
   }

@@ -43,6 +43,8 @@ import java.util.Set;
 public class MdcRenamingAppender extends UnsynchronizedAppenderBase<ILoggingEvent>
     implements AppenderAttachable<ILoggingEvent> {
 
+  private static final String ELLIPSIS = "...";
+
   private final AppenderAttachableImpl<ILoggingEvent> aai = new AppenderAttachableImpl<>();
 
   private final Map<String, String> renames = new LinkedHashMap<>();
@@ -71,7 +73,9 @@ public class MdcRenamingAppender extends UnsynchronizedAppenderBase<ILoggingEven
   }
 
   /**
-   * {@code <truncate>ds_eval=512</truncate>}: cap the value length, applied before the rename.
+   * {@code <truncate>ds_eval=512</truncate>}: cap the value length, applied before the rename. The
+   * cap is a hard one - a truncated value is exactly that long, ellipsis included - since the point
+   * of setting it is to bound the size of what is exported.
    */
   public void addTruncate(String spec) {
     int idx = spec.indexOf('=');
@@ -111,11 +115,17 @@ public class MdcRenamingAppender extends UnsynchronizedAppenderBase<ILoggingEven
       String value = entry.getValue();
       Integer max = truncations.get(key);
       if(max != null && value != null && value.length() > max) {
-        value = value.substring(0, max) + "...";
+        value = truncate(value, max);
       }
       rewritten.put(renames.getOrDefault(key, key), value);
     }
     return rewritten;
+  }
+
+  private static String truncate(String value, int max) {
+    return max > ELLIPSIS.length()
+        ? value.substring(0, max - ELLIPSIS.length()) + ELLIPSIS
+        : value.substring(0, max);
   }
 
   @Override

@@ -35,6 +35,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.Map;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
@@ -43,11 +44,20 @@ public class OpalServer {
 
   private OpalJettyServer jettyServer;
 
+  /**
+   * The SDK built at startup, or null when telemetry is off. Kept so that {@link #shutdown()} can
+   * close it after the Spring context, not concurrently with it.
+   */
+  private OpenTelemetrySdk openTelemetrySdk;
+
   private OpalServer(boolean upgrade) {
     setProxy();
     setProperties();
     configureSLF4JBridgeHandler();
     if (upgrade) {
+      // the throwaway upgrade JVM exports nothing, but it loads the same logback.xml: without an
+      // install its appenders buffer the migration log and complain to stderr when the buffer fills
+      disableOpenTelemetry();
       upgrade();
     }
     else {
@@ -140,6 +150,21 @@ public class OpalServer {
   }
 
   /**
+   * The OTLP endpoint can be configured globally or per signal - logs, traces or metrics - as an
+   * environment variable or as a system property. Any one of them is the operator asking for
+   * telemetry: a signal-specific endpoint on its own is valid OpenTelemetry configuration, and a gate
+   * that only recognised the global one would silently refuse to build the SDK for it.
+   */
+  @VisibleForTesting
+  static boolean hasOtlpEndpoint(UnaryOperator<String> env) {
+    return Stream.of("", "logs", "traces", "metrics").anyMatch(signal -> {
+      String variable = "OTEL_EXPORTER_OTLP_" + (signal.isEmpty() ? "" : signal.toUpperCase() + "_") + "ENDPOINT";
+      String property = "otel.exporter.otlp." + (signal.isEmpty() ? "" : signal + ".") + "endpoint";
+      return !Strings.isNullOrEmpty(env.apply(variable)) || !Strings.isNullOrEmpty(System.getProperty(property));
+    });
+  }
+
+  /**
    * Install an OpenTelemetry into the logback appenders declared by logback.xml. Until something is
    * installed the appenders buffer their records and then drop them, complaining to stderr, so this
    * must run before the Spring context is started - and must run even when telemetry is off, which
@@ -148,22 +173,9 @@ public class OpalServer {
    * Opt-in: an autoconfigured SDK would otherwise default to exporting OTLP to localhost:4317, which
    * on an installation that never asked for telemetry is just a stream of connection failures.
    */
-  /**
-   * The OTLP endpoint can be configured globally or per signal, so both spellings have to be checked
-   * before concluding that telemetry was not asked for.
-   */
-  @VisibleForTesting
-  static boolean hasOtlpEndpoint(UnaryOperator<String> env) {
-    return !Strings.isNullOrEmpty(env.apply("OTEL_EXPORTER_OTLP_ENDPOINT"))
-        || !Strings.isNullOrEmpty(env.apply("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
-        || !Strings.isNullOrEmpty(System.getProperty("otel.exporter.otlp.endpoint"))
-        || !Strings.isNullOrEmpty(System.getProperty("otel.exporter.otlp.logs.endpoint"));
-  }
-
   private void configureOpenTelemetry() {
     if (!hasOtlpEndpoint(System::getenv)) {
-      System.setProperty("otel.sdk.disabled", "true");
-      OpenTelemetryAppender.install(OpenTelemetry.noop());
+      disableOpenTelemetry();
       return;
     }
     try {
@@ -180,15 +192,21 @@ public class OpalServer {
           .build()
           .getOpenTelemetrySdk();
       OpenTelemetryAppender.install(sdk);
-      Runtime.getRuntime().addShutdownHook(new Thread(sdk::close, "otel-shutdown"));
+      // closed by shutdown(), once the Spring context is gone: the beans that end the open
+      // DataSHIELD session spans on @PreDestroy need a live SDK to export them through
+      openTelemetrySdk = sdk;
       logAndSystemOut("OpenTelemetry export enabled.");
       warnIfNoLogAppender();
     } catch(RuntimeException e) {
       // telemetry is never a reason to prevent Opal from starting
       log.error("Failed to initialize OpenTelemetry, continuing without it", e);
-      System.setProperty("otel.sdk.disabled", "true");
-      OpenTelemetryAppender.install(OpenTelemetry.noop());
+      disableOpenTelemetry();
     }
+  }
+
+  private static void disableOpenTelemetry() {
+    System.setProperty("otel.sdk.disabled", "true");
+    OpenTelemetryAppender.install(OpenTelemetry.noop());
   }
 
   private void setProperties() {
@@ -231,6 +249,12 @@ public class OpalServer {
       jettyServer.stop();
     } catch(Exception e) {
       log.warn("Exception during HTTPd server shutdown", e);
+    }
+    // last: stopping Jetty closes the Spring context, and the spans and log records its beans emit
+    // on the way down are only exported if the SDK is still open to take them. A shutdown hook of
+    // its own would run concurrently with this one and race it.
+    if (openTelemetrySdk != null) {
+      openTelemetrySdk.close();
     }
   }
 

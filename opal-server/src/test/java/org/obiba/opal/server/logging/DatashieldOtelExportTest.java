@@ -107,6 +107,30 @@ public class DatashieldOtelExportTest extends AbstractDatashieldLoggingTest {
   }
 
   /**
+   * A symbol is also assigned from a resource, or from a string expression, and each of those carries
+   * a key the table assignment above does not.
+   */
+  @Test
+  public void test_an_assignment_from_a_resource_exports_the_resource_under_its_own_name() {
+    logAssignFromResourceEvent();
+
+    Map<String, String> attributes = exportedAttributes();
+
+    assertThat(attributes.get("datashield.resource")).isEqualTo("CNSIM.CNSIM1-resource");
+    assertThat(attributes.keySet()).doesNotContain("ds_resource");
+  }
+
+  @Test
+  public void test_an_assignment_from_a_string_exports_the_expression_under_its_own_name() {
+    logAssignFromStringEvent();
+
+    Map<String, String> attributes = exportedAttributes();
+
+    assertThat(attributes.get("datashield.expression")).isEqualTo("\"hello\"");
+    assertThat(attributes.keySet()).doesNotContain("ds_expr");
+  }
+
+  /**
    * Parsing a submitted expression logs three more MDC keys than the other actions do, and they are
    * exported like the rest - so they need renaming like the rest.
    */

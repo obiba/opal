@@ -44,7 +44,9 @@ public class DataShieldSessionTraceReaper {
    */
   @Scheduled(fixedDelay = 60 * 1000)
   public void endTracesOfGoneSessions() {
-    DataShieldSessionTraces.retain(opalRSessionManager.getRSessions().stream()
+    // a supplier, so that the open traces are listed before the manager is asked: a session opened
+    // in between is then not taken for gone
+    DataShieldSessionTraces.retain(() -> opalRSessionManager.getRSessions().stream()
         .map(RServerSession::getId)
         .collect(Collectors.toSet()));
   }

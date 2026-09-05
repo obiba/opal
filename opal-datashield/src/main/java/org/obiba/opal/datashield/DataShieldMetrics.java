@@ -19,6 +19,8 @@ import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 
+import java.util.List;
+
 /**
  * The DataSHIELD instruments.
  * <p/>
@@ -38,6 +40,15 @@ public final class DataShieldMetrics {
   private static final AttributeKey<String> OUTCOME = AttributeKey.stringKey("datashield.outcome");
 
   private static final AttributeKey<String> QUOTA_METRIC = AttributeKey.stringKey("datashield.quota.metric");
+
+  /**
+   * The SDK's default histogram boundaries are laid out for milliseconds: 0, 5, 10 ... 10000. On a
+   * histogram in seconds every R operation under five seconds would land in the first bucket. These
+   * are the boundaries the semantic conventions recommend for a duration in seconds, extended past
+   * ten seconds because a large assignment can take a while.
+   */
+  static final List<Double> DURATION_BUCKETS_SECONDS = List.of(
+      0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1d, 2.5, 5d, 7.5, 10d, 30d, 60d, 300d);
 
   /**
    * Rebuilt when the global OpenTelemetry changes, so that instruments resolved before the SDK was
@@ -105,6 +116,7 @@ public final class DataShieldMetrics {
       this.duration = meter.histogramBuilder("datashield.operation.duration")
           .setDescription("Time the R server spent on a DataSHIELD operation")
           .setUnit("s")
+          .setExplicitBucketBoundariesAdvice(DURATION_BUCKETS_SECONDS)
           .build();
       this.quotaRejections = meter.counterBuilder("datashield.quota.rejection")
           .setDescription("DataSHIELD sessions refused because a usage quota was spent")

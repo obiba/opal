@@ -20,6 +20,7 @@ import io.opentelemetry.context.Scope;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.MDC;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,7 +122,19 @@ public final class DataShieldSessionTraces {
    * root.
    */
   public static void retain(Set<String> liveSessionIds) {
-    SESSIONS.keySet().stream().filter(rid -> !liveSessionIds.contains(rid)).toList().forEach(DataShieldSessionTraces::end);
+    retain(() -> liveSessionIds);
+  }
+
+  /**
+   * As {@link #retain(Set)}, but the open traces are listed <em>before</em> the live sessions are
+   * asked for. The manager holds a session before its trace is bound, so a trace bound between the
+   * two snapshots is not listed and cannot be mistaken for the trace of a session that is gone - the
+   * other order would end it, and orphan every operation the session goes on to run.
+   */
+  public static void retain(Supplier<Set<String>> liveSessionIds) {
+    List<String> open = List.copyOf(SESSIONS.keySet());
+    Set<String> live = liveSessionIds.get();
+    open.stream().filter(rid -> !live.contains(rid)).forEach(DataShieldSessionTraces::end);
   }
 
   /**

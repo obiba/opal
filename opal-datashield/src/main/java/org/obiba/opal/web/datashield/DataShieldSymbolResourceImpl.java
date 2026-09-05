@@ -172,12 +172,14 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     public void doWithConnection(RServerConnection connection) {
       MDC.put("ds_symbol", symbol);
       context.getContextMap().forEach(MDC::put);
+      // once: the span, the audit record and the error record must describe the same thing
+      String script = wrapped.toString();
       try {
-        DataShieldTracer.traced(context, DataShieldLog.Action.ASSIGN, symbol, wrapped.toString(),
+        DataShieldTracer.traced(context, DataShieldLog.Action.ASSIGN, symbol, script,
             () -> wrapped.doWithConnection(connection));
-        DataShieldLog.userLog(context, DataShieldLog.Action.ASSIGN, "created symbol '{}' from: '{}'", symbol, wrapped.toString());
+        DataShieldLog.userLog(context, DataShieldLog.Action.ASSIGN, "created symbol '{}' from: '{}'", symbol, script);
       } catch (Exception e) {
-        DataShieldLog.userErrorLog(context, DataShieldLog.Action.ASSIGN, "assignment failure from '{}': {}", wrapped.toString(), e.getMessage());
+        DataShieldLog.userErrorLog(context, DataShieldLog.Action.ASSIGN, "assignment failure from '{}': {}", script, e.getMessage());
         throw e;
       }
     }

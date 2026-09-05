@@ -31,6 +31,8 @@ public class OpalServerTest {
   public void clearSystemProperties() {
     System.clearProperty("otel.exporter.otlp.endpoint");
     System.clearProperty("otel.exporter.otlp.logs.endpoint");
+    System.clearProperty("otel.exporter.otlp.traces.endpoint");
+    System.clearProperty("otel.exporter.otlp.metrics.endpoint");
   }
 
   @Test
@@ -63,6 +65,26 @@ public class OpalServerTest {
   @Test
   public void test_the_logs_specific_endpoint_system_property_enables_telemetry() {
     System.setProperty("otel.exporter.otlp.logs.endpoint", "https://collector:4318/v1/logs");
+    assertThat(OpalServer.hasOtlpEndpoint(NO_ENV)).isTrue();
+  }
+
+  /**
+   * A deployment that only wants the traces, or only the metrics, configures that one endpoint and
+   * nothing else. It has asked for telemetry all the same.
+   */
+  @Test
+  public void test_the_traces_specific_endpoint_enables_telemetry() {
+    assertThat(OpalServer.hasOtlpEndpoint(env("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "https://collector:4318/v1/traces")))
+        .isTrue();
+    System.setProperty("otel.exporter.otlp.traces.endpoint", "https://collector:4318/v1/traces");
+    assertThat(OpalServer.hasOtlpEndpoint(NO_ENV)).isTrue();
+  }
+
+  @Test
+  public void test_the_metrics_specific_endpoint_enables_telemetry() {
+    assertThat(OpalServer.hasOtlpEndpoint(env("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", "https://collector:4318/v1/metrics")))
+        .isTrue();
+    System.setProperty("otel.exporter.otlp.metrics.endpoint", "https://collector:4318/v1/metrics");
     assertThat(OpalServer.hasOtlpEndpoint(NO_ENV)).isTrue();
   }
 

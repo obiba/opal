@@ -100,9 +100,6 @@ public class DataShieldSessionTracesTest {
   }
 
   /**
-   * The trace is searched by the id the log file carries, so the root has to hold it.
-   */
-  /**
    * The trace is searched by what the log file carries: the session id, and the two questions an
    * auditor starts from - who, and from where.
    */
@@ -153,6 +150,22 @@ public class DataShieldSessionTracesTest {
 
     assertThat(byName()).containsKey("datashield.session");
     assertThat(DataShieldSessionTraces.openTraceCount()).isEqualTo(0);
+  }
+
+  /**
+   * The reaper lists the open traces first and asks the manager second. A session opened in between
+   * is bound after the listing, so it is not a candidate - whatever the manager's answer says about
+   * it. The other order would end the trace of a session that has only just started.
+   */
+  @Test
+  public void test_a_session_opened_while_the_reaper_runs_is_left_alone() {
+    DataShieldSessionTraces.retain(() -> {
+      open();
+      return Set.of();
+    });
+
+    assertThat(DataShieldSessionTraces.openTraceCount()).isEqualTo(1);
+    assertThat(byName()).doesNotContainKey("datashield.session");
   }
 
   @Test

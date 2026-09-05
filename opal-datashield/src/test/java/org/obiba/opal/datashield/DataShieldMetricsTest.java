@@ -70,6 +70,20 @@ public class DataShieldMetricsTest {
     assertThat(pointCount("datashield.operation.duration")).isEqualTo(1);
   }
 
+  /**
+   * The histogram is in seconds, and the SDK's default buckets are not: they start at five. Without
+   * boundaries of its own every R operation would land in the first bucket and the histogram would
+   * say nothing.
+   */
+  @Test
+  public void test_the_duration_histogram_has_buckets_fit_for_seconds() {
+    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> null);
+
+    List<Double> boundaries = metric("datashield.operation.duration").getHistogramData().getPoints()
+        .iterator().next().getBoundaries();
+    assertThat(boundaries).isEqualTo(DataShieldMetrics.DURATION_BUCKETS_SECONDS);
+  }
+
   @Test
   public void test_a_failing_operation_is_counted_as_an_error() {
     try {

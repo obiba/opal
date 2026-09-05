@@ -33,10 +33,15 @@ Now open a DataSHIELD session and run an aggregation. Three things should show u
 The `PARSE` record carries `datashield.script.submitted`, `.generated` and `.mapping` instead - what
 the user wrote, what it was rewritten to, and the function mapping in between.
 
-**Traces**, on the `org.obiba.opal.datashield` scope: `datashield.aggregate`, `datashield.assign`,
-`datashield.open`, `datashield.close`, `datashield.ws_save`, `datashield.ws_restore`. A failed
-operation carries status ERROR and the recorded exception. Spans are roots here; run Opal under the
-OpenTelemetry Java agent and they hang under the HTTP server span instead, with no change to Opal.
+**Traces**, on the `org.obiba.opal.datashield` scope: one trace per DataSHIELD session, rooted on a
+`datashield.session` span that stays open for as long as the session does, with `datashield.open`,
+`datashield.assign`, `datashield.parse`, `datashield.aggregate`, `datashield.ws_save`,
+`datashield.ws_restore` and `datashield.close` underneath it. The operations are exported as they
+end, so the trace is readable while the session is still open; the root arrives when the session is
+closed, expires, or Opal shuts down. A failed operation carries status ERROR and the recorded
+exception - `datashield.parse` in particular, for a script the restriction refused. Run Opal under
+the OpenTelemetry Java agent and the session trace stays a trace of its own, linked to the HTTP
+request spans that asked for each operation.
 
 **Metrics**, same scope, exported every 60s by default - export `OTEL_METRIC_EXPORT_INTERVAL=5000`
 if that is too long to wait:
