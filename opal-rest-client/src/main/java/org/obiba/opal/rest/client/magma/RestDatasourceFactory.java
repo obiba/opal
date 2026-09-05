@@ -16,6 +16,8 @@ import org.obiba.magma.MagmaRuntimeException;
 import jakarta.validation.constraints.NotNull;
 import java.security.KeyStore;
 
+import javax.net.ssl.SSLSocketFactory;
+
 /**
  * Factory of a datasource that connects to Opal using its RESTful services.
  */
@@ -36,6 +38,10 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
   private Integer soTimeout;
 
   private Integer connectionTimeout;
+
+  private boolean allowInvalidCertificates = false;
+
+  private SSLSocketFactory sslSocketFactory;
 
   /**
    * Authenticate by username/password.
@@ -98,6 +104,20 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     this.connectionTimeout = connectionTimeout;
   }
 
+  /**
+   * See {@link OpalJavaClient#setAllowInvalidCertificates(boolean)}.
+   */
+  public void setAllowInvalidCertificates(boolean allowInvalidCertificates) {
+    this.allowInvalidCertificates = allowInvalidCertificates;
+  }
+
+  /**
+   * See {@link OpalJavaClient#setSslSocketFactory(SSLSocketFactory)}.
+   */
+  public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+    this.sslSocketFactory = sslSocketFactory;
+  }
+
   private OpalJavaClient createOpalJavaClient() throws Exception {
     if(url == null || url.isEmpty()) throw new IllegalStateException("Opal url cannot be empty.");
 
@@ -119,6 +139,8 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
       client.setConnectionTimeout(connectionTimeout);
     }
 
+    client.setAllowInvalidCertificates(allowInvalidCertificates);
+    client.setSslSocketFactory(sslSocketFactory);
     return client;
   }
 
