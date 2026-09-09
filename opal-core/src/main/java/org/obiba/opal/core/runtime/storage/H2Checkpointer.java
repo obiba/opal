@@ -53,7 +53,7 @@ public class H2Checkpointer implements SystemService {
    */
   private static final String CHECKPOINT_SYNC = "CHECKPOINT SYNC";
 
-  @Value("${org.obiba.opal.storage.checkpoint.interval}")
+  @Value("${storage.checkpoint.interval}")
   private long interval;
 
   @Autowired
@@ -77,7 +77,7 @@ public class H2Checkpointer implements SystemService {
   @Override
   public void start() {
     if(interval <= 0) {
-      log.info("H2 checkpointing is disabled (org.obiba.opal.storage.checkpoint.interval={})", interval);
+      log.info("H2 checkpointing is disabled (storage.checkpoint.interval={})", interval);
       return;
     }
     task = scheduler.scheduleWithFixedDelay(this::checkpoint, Duration.ofMillis(interval));

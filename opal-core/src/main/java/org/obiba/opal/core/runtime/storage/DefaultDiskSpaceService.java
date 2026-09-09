@@ -63,26 +63,26 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
   @Value("${OPAL_HOME}/logs")
   private File logsFolder;
 
-  @Value("${org.obiba.opal.storage.disk.interval}")
+  @Value("${storage.disk.interval}")
   private long interval;
 
-  @Value("${org.obiba.opal.storage.disk.enforce}")
+  @Value("${storage.disk.enforce}")
   private boolean enforce;
 
-  @Value("${org.obiba.opal.storage.disk.warn.bytes}")
+  @Value("${storage.disk.warn.bytes}")
   private long warnBytes;
 
-  @Value("${org.obiba.opal.storage.disk.degraded.bytes}")
+  @Value("${storage.disk.degraded.bytes}")
   private long degradedBytes;
 
-  @Value("${org.obiba.opal.storage.disk.critical.bytes}")
+  @Value("${storage.disk.critical.bytes}")
   private long criticalBytes;
 
   /**
    * How much more room than the announced size a write is asked to leave. An upload is written through a temporary
    * file and a multipart envelope is bigger than its payload, so the announced length is a lower bound.
    */
-  @Value("${org.obiba.opal.storage.disk.upload.safetyFactor}")
+  @Value("${storage.disk.upload.safetyFactor}")
   private double safetyFactor;
 
   @Autowired
@@ -114,7 +114,7 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
   public void start() {
     sample();
     if(interval <= 0) {
-      log.info("Disk space monitoring is disabled (org.obiba.opal.storage.disk.interval={})", interval);
+      log.info("Disk space monitoring is disabled (storage.disk.interval={})", interval);
       return;
     }
     sampler = scheduler.scheduleWithFixedDelay(this::sample, Duration.ofMillis(interval));
@@ -254,7 +254,7 @@ public class DefaultDiskSpaceService implements DiskSpaceService {
       if(status.getTotalSpace() <= 0 || status.getTotalSpace() > warnBytes) continue;
       if(oversizedThreshold.add(status.getPath())) {
         log.warn("Volume {} ({}) holds {} bytes in total, less than the {} bytes of the WARN threshold: it can never " +
-                "report OK. Lower org.obiba.opal.storage.disk.warn.bytes, or give Opal a larger volume.",
+                "report OK. Lower storage.disk.warn.bytes, or give Opal a larger volume.",
             status.getName(), status.getPath(), status.getTotalSpace(), warnBytes);
       }
     }

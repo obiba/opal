@@ -39,11 +39,11 @@ the upgraded installation has been verified, the folder can be deleted; nothing 
 The configuration database does not have to be the embedded one. To keep it on a PostgreSQL server, create an empty
 database and add to `${OPAL_HOME}/conf/opal-config.properties`:
 
-    org.obiba.opal.config.datasource.url=jdbc:postgresql://localhost:5432/opal_config
-    org.obiba.opal.config.datasource.driverClass=org.postgresql.Driver
-    org.obiba.opal.config.datasource.username=opal
-    org.obiba.opal.config.datasource.password=secret
-    org.obiba.opal.config.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+    config.datasource.url=jdbc:postgresql://localhost:5432/opal_config
+    config.datasource.driverClass=org.postgresql.Driver
+    config.datasource.username=opal
+    config.datasource.password=secret
+    config.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 Opal creates the schema itself on first start. An external database needs a password here: the generated one applies to
 the embedded database only. Set this before the first start of the upgraded Opal, so that the migration writes there

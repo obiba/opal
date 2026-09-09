@@ -46,7 +46,7 @@ import java.util.Properties;
  * {@code <databasePassword>} of {@code ${OPAL_HOME}/data/opal-config.xml}, generated on first boot and stored there
  * encrypted under the {@code <secretKey>} of that same file. Nothing new for an administrator to configure, and no
  * password in a properties file. An external database is different: there Opal is a guest, the password is the
- * server's, and it has to be given as {@code org.obiba.opal.config.datasource.password}.
+ * server's, and it has to be given as {@code config.datasource.password}.
  * <p>
  * <b>It is built after {@link OpalConfigurationService} has started.</b> The password is not known until the
  * configuration file has been read and, on a fresh installation, written back with a freshly generated one. Injecting
@@ -102,19 +102,19 @@ public class ConfigDatabaseConfiguration {
   @Value("${OPAL_HOME}/data/config")
   private File configFolder;
 
-  @Value("${org.obiba.opal.config.datasource.url:}")
+  @Value("${config.datasource.url:}")
   private String url;
 
-  @Value("${org.obiba.opal.config.datasource.driverClass:}")
+  @Value("${config.datasource.driverClass:}")
   private String driverClass;
 
-  @Value("${org.obiba.opal.config.datasource.username:}")
+  @Value("${config.datasource.username:}")
   private String username;
 
-  @Value("${org.obiba.opal.config.datasource.password:}")
+  @Value("${config.datasource.password:}")
   private String password;
 
-  @Value("${org.obiba.opal.config.hibernate.dialect:}")
+  @Value("${config.hibernate.dialect:}")
   private String dialect;
 
   @Bean
@@ -213,7 +213,7 @@ public class ConfigDatabaseConfiguration {
     if(!embedded) {
       throw new ConfigDatabaseException(
           "No password for the Opal configuration database at " + url + ". An external configuration database needs " +
-              "org.obiba.opal.config.datasource.password in opal-config.properties; only the embedded database uses " +
+              "config.datasource.password in opal-config.properties; only the embedded database uses " +
               "the password Opal generates for itself.");
     }
     String encrypted = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
