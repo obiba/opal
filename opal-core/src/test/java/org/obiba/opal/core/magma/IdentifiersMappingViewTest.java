@@ -211,6 +211,10 @@ public class IdentifiersMappingViewTest {
     }
 
     @Override
+    public void resetDatasource() {
+    }
+
+    @Override
     public boolean hasDatasource() {
       return false;
     }

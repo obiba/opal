@@ -57,11 +57,16 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public void stop() {
+    resetDatasource();
+  }
+
+  @Override
+  public void resetDatasource() {
     if(datasource == null) return;
     try {
       Disposables.dispose(datasource);
     } catch(RuntimeException e) {
-      log.debug("Ignoring exception during shutdown sequence.", e);
+      log.debug("Ignoring exception while releasing the identifiers datasource.", e);
     }
     datasource = null;
   }

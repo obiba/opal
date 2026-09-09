@@ -15,6 +15,7 @@ import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -169,6 +170,17 @@ public final class H2DatabaseUrls {
       throw new InvalidH2DatabaseException("Cannot create the H2 databases folder: " + h2Root.getAbsolutePath());
     }
     return FILE_PREFIX + new File(h2Root, name).getAbsolutePath();
+  }
+
+  /**
+   * The files H2 keeps for a registered database: the store and whatever it writes beside it - a trace file, a lock
+   * file, the temporary files of a compaction. Matched on the name followed by a dot, so that the files of
+   * {@code opal} are not those of {@code opal-data}.
+   */
+  public static List<File> databaseFiles(@Nullable String url, File h2Root) {
+    String prefix = getDatabaseName(url) + ".";
+    File[] files = h2Root.listFiles(file -> file.isFile() && file.getName().startsWith(prefix));
+    return files == null ? List.of() : List.of(files);
   }
 
   /**

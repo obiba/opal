@@ -68,6 +68,15 @@ public interface DatabaseRegistry extends SystemService {
       throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException;
 
   /**
+   * @param deleteFiles also remove the files of an H2 database. An H2 database is a file Opal created in its own
+   * folder, and the file outlives the registration: it keeps the credentials it was created with, so a database
+   * registered again at the same URL with a different password cannot open it. Deleting the files is therefore
+   * offered, and never implied - what an operator declared may hold data nobody meant to lose.
+   */
+  void delete(@NotNull Database database, boolean deleteFiles)
+      throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException;
+
+  /**
    * Delete a database Opal owns: the row, and the files under the H2 folder. Called when its project is deleted, and
    * named apart from {@link #delete(Database)} rather than defeating that method's guard by an implicit ordering.
    */

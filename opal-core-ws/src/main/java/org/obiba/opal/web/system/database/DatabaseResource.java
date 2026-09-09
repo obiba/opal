@@ -89,7 +89,9 @@ public class DatabaseResource {
   @DELETE
   @Operation(
     summary = "Delete database",
-    description = "Removes a database from the system configuration."
+    description = "Removes a database from the system configuration. An H2 database is a file Opal created in its own "
+        + "folder, and that file outlives the registration, keeping the credentials it was created with: pass "
+        + "deleteFiles to remove it as well."
   )
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Database successfully deleted", useReturnTypeSchema = true),
@@ -97,9 +99,9 @@ public class DatabaseResource {
     @ApiResponse(responseCode = "409", description = "Database belongs to a project that still exists"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response delete() {
+  public Response delete(@QueryParam("deleteFiles") @DefaultValue("false") boolean deleteFiles) {
     Database database = getDatabase();
-    databaseRegistry.delete(database);
+    databaseRegistry.delete(database, deleteFiles);
     return Response.ok().build();
   }
 

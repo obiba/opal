@@ -48,8 +48,8 @@ export const useSystemStore = defineStore('system', () => {
     return api.post(`/system/database/${name}/connections`);
   }
 
-  async function deleteDatabase(name: string) {
-    return api.delete(`/system/database/${name}`);
+  async function deleteDatabase(name: string, deleteFiles = false) {
+    return api.delete(`/system/database/${name}`, { params: deleteFiles ? { deleteFiles: true } : {} });
   }
 
   async function saveDatabase(database: DatabaseDto, update: boolean) {

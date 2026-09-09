@@ -69,6 +69,9 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
   @Autowired
   private ProjectRepository projectRepository;
 
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
+
   @Value("${OPAL_HOME}/data/h2")
   private File h2Root;
 
@@ -80,6 +83,10 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     projectRepository.deleteAll();
     // OPAL_HOME is shared by every test class in the JVM, so start from an empty H2 folder
     cleanH2Root();
+    // the mock is shared by every test of this class, and one of them replaces its expectations
+    reset(identifiersTableService);
+    expect(identifiersTableService.getDatasourceName()).andReturn("opal-identifiers").anyTimes();
+    replay(identifiersTableService);
   }
 
   private void cleanH2Root() throws IOException {
@@ -374,6 +381,56 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
   }
 
+  /**
+   * An H2 file outlives the registration and keeps the credentials it was created with, so a database registered
+   * again at the same URL with a different password could never open it. Removing the files is offered, never
+   * implied: what an operator declared may hold data nobody meant to lose.
+   */
+  @Test
+  public void test_h2_files_are_kept_unless_the_deletion_asks_for_them() throws IOException {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+    File store = givenH2FilesExist("opal");
+
+    databaseRegistry.delete(database);
+
+    assertThat(store.isFile()).isTrue();
+  }
+
+  @Test
+  public void test_h2_files_go_when_the_deletion_asks_for_them() throws IOException {
+    Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
+    databaseRegistry.create(database);
+    File store = givenH2FilesExist("opal");
+    // the files of another database whose name this one is a prefix of
+    File other = new File(h2Root, "opal-data.mv.db");
+    assertThat(other.createNewFile()).isTrue();
+
+    databaseRegistry.delete(database, true);
+
+    assertThat(store.exists()).isFalse();
+    assertThat(new File(h2Root, "opal.trace.db").exists()).isFalse();
+    assertThat(other.isFile()).isTrue();
+  }
+
+  @Test
+  public void test_deleting_the_files_of_a_database_that_is_not_h2_does_nothing() {
+    Database database = createSqlDatabase();
+    databaseRegistry.create(database);
+
+    databaseRegistry.delete(database, true);
+
+    assertThat(databaseRegistry.list()).isEmpty();
+  }
+
+  private File givenH2FilesExist(String name) throws IOException {
+    h2Root.mkdirs();
+    File store = new File(h2Root, name + ".mv.db");
+    assertThat(store.createNewFile()).isTrue();
+    assertThat(new File(h2Root, name + ".trace.db").createNewFile()).isTrue();
+    return store;
+  }
+
   @Test
   public void test_h2_database_can_be_updated_in_place() {
     Database database = createH2Database(Usage.STORAGE, "jdbc:h2:file:opal");
@@ -475,6 +532,62 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     } catch(IllegalArgumentException ignored) {
     }
     assertThat(databaseRegistry.list()).isEmpty();
+  }
+
+  /**
+   * The identifiers database is the one Opal names in the reserved namespace itself, so the reservation is not what
+   * keeps it out.
+   */
+  @Test
+  public void test_create_accepts_the_identifiers_database() {
+    Database database = createSqlDatabase();
+    database.setName("_identifiers");
+    database.setUsedForIdentifiers(true);
+    database.setDefaultStorage(false);
+
+    databaseRegistry.create(database);
+
+    assertThat(databaseRegistry.getIdentifiersDatabase().getName()).isEqualTo("_identifiers");
+  }
+
+  @Test
+  public void test_create_rejects_a_project_database_name_even_for_identifiers() {
+    Database database = createSqlDatabase();
+    database.setName("_project_CLSA");
+    database.setUsedForIdentifiers(true);
+    try {
+      databaseRegistry.create(database);
+      fail("Expected an IllegalArgumentException for a name reserved for a project's database");
+    } catch(IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("CLSA");
+    }
+    assertThat(databaseRegistry.hasIdentifiersDatabase()).isFalse();
+  }
+
+  /**
+   * The identifiers datasource is built once and kept for the life of the server, so deleting the identifiers
+   * database has to drop it: it would otherwise go on answering from the database that was there before, through a
+   * connection pool this registry has already closed - which is what a re-registration with new credentials runs into.
+   */
+  @Test
+  public void test_delete_of_the_identifiers_database_forgets_its_datasource() {
+    Database database = createSqlDatabase();
+    database.setName("_identifiers");
+    database.setUsedForIdentifiers(true);
+    database.setDefaultStorage(false);
+    databaseRegistry.create(database);
+
+    reset(identifiersTableService);
+    expect(identifiersTableService.getDatasourceName()).andReturn("opal-identifiers").anyTimes();
+    expect(identifiersTableService.hasEntities()).andReturn(false).anyTimes();
+    identifiersTableService.resetDatasource();
+    expectLastCall().atLeastOnce();
+    replay(identifiersTableService);
+
+    databaseRegistry.delete(database);
+
+    verify(identifiersTableService);
+    assertThat(databaseRegistry.hasIdentifiersDatabase()).isFalse();
   }
 
   @Test

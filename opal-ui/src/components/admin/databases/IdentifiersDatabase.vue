@@ -2,7 +2,15 @@
   <div>
     <div v-if="hasDatabase">
       <div class="row">
-        <q-btn v-if="authStore.isAdministrator" :label="t('edit')" icon="edit" color="primary" size="sm" class="on-left" @click="onShowEdit" />
+        <q-btn
+          v-if="authStore.isAdministrator"
+          :label="t('edit')"
+          icon="edit"
+          color="primary"
+          size="sm"
+          class="on-left"
+          @click="onShowEdit"
+        />
         <q-btn
           v-if="authStore.isAdministrator"
           outline
@@ -13,7 +21,15 @@
           class="on-left"
           @click="onTest"
         />
-        <q-btn v-if="authStore.isAdministrator" outline color="red" icon="delete" size="sm" :disable="database?.hasDatasource" @click="onShowDelete" />
+        <q-btn
+          v-if="authStore.isAdministrator"
+          outline
+          color="red"
+          icon="delete"
+          size="sm"
+          :disable="database?.hasDatasource"
+          @click="onShowDelete"
+        />
       </div>
       <div class="row q-mt-md">
         <div class="col-6">
@@ -56,7 +72,14 @@
       :title="t('unregister')"
       :text="t('db.unregister_confirm', { name: database?.name })"
       @confirm="onDelete"
-    />
+    >
+      <template v-if="isH2">
+        <div>
+          <q-checkbox v-model="deleteFiles" dense class="q-mt-md" :label="t('db.delete_files')" />
+          <div class="text-help q-mt-sm">{{ t('db.delete_files_hint') }}</div>
+        </div>
+      </template>
+    </confirm-dialog>
     <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
   </div>
 </template>
@@ -74,9 +97,16 @@ const { t } = useI18n();
 const database = ref<DatabaseDto>();
 const showEdit = ref(false);
 const showDelete = ref(false);
+const deleteFiles = ref(false);
 const selected = ref();
 
 const hasDatabase = computed(() => database.value?.name);
+/**
+ * H2 is embedded: its database is a file Opal created in its own folder, and that file outlives the registration -
+ * keeping the credentials it was created with, so a database registered again at the same URL with a different
+ * password cannot open it. Removing it is offered here, and never implied.
+ */
+const isH2 = computed(() => database.value?.sqlSettings?.driverClass === 'org.h2.Driver');
 
 onMounted(() => {
   refresh();
@@ -94,6 +124,7 @@ function refresh() {
 }
 
 function onShowDelete() {
+  deleteFiles.value = false;
   showDelete.value = true;
 }
 
@@ -101,9 +132,15 @@ function onDelete() {
   if (!database.value?.name) {
     return;
   }
-  systemStore.deleteDatabase(database.value.name).then(() => {
-    refresh();
-  });
+  systemStore
+    .deleteDatabase(database.value.name, deleteFiles.value)
+    .then(() => {
+      refresh();
+    })
+    .catch((error) => {
+      notifyError(error);
+      refresh();
+    });
 }
 
 function onTest() {

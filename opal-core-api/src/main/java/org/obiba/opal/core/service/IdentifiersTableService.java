@@ -40,6 +40,13 @@ public interface IdentifiersTableService extends SystemService {
   boolean hasDatasource();
 
   /**
+   * Forget the identifiers datasource, so that the next use builds one from the database as it now stands. The
+   * datasource is otherwise cached for the life of the server: deleting the identifiers database, or changing its
+   * settings, would leave a datasource holding a connection pool onto a database that is no longer the registered one.
+   */
+  void resetDatasource();
+
+  /**
    * Check if any identifiers table exists for the given entity type.
    *
    * @param entityType

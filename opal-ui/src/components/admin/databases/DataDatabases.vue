@@ -92,7 +92,14 @@
       :title="t(isOwned(selected) ? 'delete' : 'unregister')"
       :text="t(isOwned(selected) ? 'db.delete_internal_confirm' : 'db.unregister_confirm', { name: selected?.name })"
       @confirm="onDelete"
-    />
+    >
+      <template v-if="canDeleteFiles">
+        <div>
+          <q-checkbox v-model="deleteFiles" dense class="q-mt-md" :label="t('db.delete_files')" />
+          <div class="text-help q-mt-sm">{{ t('db.delete_files_hint') }}</div>
+        </div>
+      </template>
+    </confirm-dialog>
     <edit-database-dialog v-model="showEdit" :database="selected" :read-only="isManaged(selected)" @save="onSave" />
   </div>
 </template>
@@ -117,6 +124,9 @@ const initialPagination = ref({
 });
 const showEdit = ref(false);
 const showDelete = ref(false);
+const deleteFiles = ref(false);
+// a database a project owned takes its files with it in any case, so there is nothing to choose there
+const canDeleteFiles = computed(() => isH2(selected.value) && !isOwned(selected.value));
 const selected = ref();
 
 const columns = computed(() => [
@@ -141,6 +151,15 @@ function refresh() {
   systemStore.getDatabasesWithSettings().then((data) => {
     databases.value = data;
   });
+}
+
+/**
+ * H2 is embedded: its database is a file Opal created in its own folder, and that file outlives the registration -
+ * keeping the credentials it was created with, so a database registered again at the same URL with a different
+ * password cannot open it. Removing it is offered here, and never implied.
+ */
+function isH2(row: DatabaseDto | undefined) {
+  return row?.sqlSettings?.driverClass === 'org.h2.Driver';
 }
 
 /** Whether this database belongs to a project at all, whether or not that project still exists. */
@@ -184,12 +203,13 @@ function onShowEdit(row: DatabaseDto) {
 
 function onShowDelete(row: DatabaseDto) {
   selected.value = row;
+  deleteFiles.value = false;
   showDelete.value = true;
 }
 
 function onDelete() {
   systemStore
-    .deleteDatabase(selected.value.name)
+    .deleteDatabase(selected.value.name, deleteFiles.value)
     .then(() => {
       refresh();
     })

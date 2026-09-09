@@ -9,6 +9,7 @@
 
       <q-card-section>
         <span>{{ props.text }}</span>
+        <slot />
       </q-card-section>
 
       <q-separator />
