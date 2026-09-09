@@ -14,6 +14,8 @@ import jakarta.annotation.Nullable;
 import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -28,6 +30,13 @@ import java.util.regex.Pattern;
  * a remote URL included — every time the connection is opened. The same setting can be passed as a connection
  * property, so {@link #validateProperties(String)} rejects it there too, along with the two settings that would take
  * away the fsync H2 performs when the database is closed.
+ * <p>
+ * A database owned by a project takes a second form, {@code jdbc:h2:file:<project name>/data}: a folder of its own
+ * under the H2 folder, holding one database. The folder is what makes the two kinds coexist - a folder {@code Foo/}
+ * and a file {@code Foo.mv.db} are not the same name - and what makes deletion a folder removal rather than a guess at
+ * which files beside {@code Foo.mv.db} belong to it. The folder name is a project name, which
+ * {@code ProjectsResource.createProject} has already constrained to letters, digits, underscore, space and hyphen:
+ * no separator, no parent reference, no {@code ;}.
  */
 public final class H2DatabaseUrls {
 
@@ -40,6 +49,19 @@ public final class H2DatabaseUrls {
    * settings separator.
    */
   private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-][A-Za-z0-9._-]*");
+
+  /**
+   * A project name, as {@code ProjectsResource.createProject} enforces it. Repeated here rather than referenced
+   * because this class is what turns the name into a path: the two must be read together, and a loosening of the
+   * REST-side rule has to fail here before it reaches the file system.
+   */
+  private static final Pattern PROJECT_NAME_PATTERN = Pattern.compile("[\\w _-]+");
+
+  /**
+   * The name of the one database inside a project's folder. Fixed, so that the folder name carries the project name
+   * and nothing else has to be parsed.
+   */
+  private static final String PROJECT_FILE = "data";
 
   /**
    * H2 setting that runs SQL statements when a connection is opened.
@@ -148,5 +170,109 @@ public final class H2DatabaseUrls {
       throw new InvalidH2DatabaseException("Cannot create the H2 databases folder: " + h2Root.getAbsolutePath());
     }
     return FILE_PREFIX + new File(h2Root, name).getAbsolutePath();
+  }
+
+  /**
+   * The files H2 keeps for a registered database: the store and whatever it writes beside it - a trace file, a lock
+   * file, the temporary files of a compaction. Matched on the name followed by a dot, so that the files of
+   * {@code opal} are not those of {@code opal-data}.
+   */
+  public static List<File> databaseFiles(@Nullable String url, File h2Root) {
+    String prefix = getDatabaseName(url) + ".";
+    File[] files = h2Root.listFiles(file -> file.isFile() && file.getName().startsWith(prefix));
+    return files == null ? List.of() : List.of(files);
+  }
+
+  /**
+   * The URL of the database owned by a project: a folder named after the project, holding one database.
+   *
+   * @throws InvalidH2DatabaseException if the project name cannot be a folder name
+   */
+  public static String projectUrl(String projectName) {
+    return FILE_PREFIX + validProjectName(projectName) + "/" + PROJECT_FILE;
+  }
+
+  /**
+   * Extract the project name from a {@code jdbc:h2:file:<project name>/data} URL.
+   *
+   * @throws InvalidH2DatabaseException if the URL is not of the expected form
+   */
+  public static String getProjectName(@Nullable String url) {
+    if(Strings.isNullOrEmpty(url) || !url.startsWith(FILE_PREFIX)) {
+      throw new InvalidH2DatabaseException(
+          "The URL of a project database must be of the form " + FILE_PREFIX + "<project name>/" + PROJECT_FILE);
+    }
+    String path = url.substring(FILE_PREFIX.length());
+    int idx = path.lastIndexOf('/');
+    if(idx < 0 || !PROJECT_FILE.equals(path.substring(idx + 1))) {
+      throw new InvalidH2DatabaseException(
+          "The URL of a project database must end with '/" + PROJECT_FILE + "': '" + path + "'");
+    }
+    return validProjectName(path.substring(0, idx));
+  }
+
+  /**
+   * The folder holding a project's database, whether or not it exists.
+   *
+   * @throws InvalidH2DatabaseException if the project name cannot be a folder name, or if the folder would not sit
+   * inside the H2 folder
+   */
+  public static File projectFolder(String projectName, File h2Root) {
+    File folder = new File(h2Root, validProjectName(projectName));
+    assertInside(folder, h2Root);
+    return folder;
+  }
+
+  /**
+   * Verify that the URL names a project database that the H2 driver shipped by Opal can open. Reachable only from a
+   * hand-edited configuration: Opal writes this URL itself.
+   *
+   * @throws InvalidH2DatabaseException if the URL is not of the expected form, or names an H2 1.x database
+   */
+  public static void validateProject(@Nullable String url, File h2Root) {
+    File folder = projectFolder(getProjectName(url), h2Root);
+    if(new File(folder, PROJECT_FILE + LEGACY_SUFFIX).exists() &&
+        !new File(folder, PROJECT_FILE + SUFFIX).exists()) {
+      throw new InvalidH2DatabaseException(
+          "H2 database '" + folder.getName() + "' is in the H2 1.x format and must be migrated to H2 2.x");
+    }
+  }
+
+  /**
+   * Turn {@code jdbc:h2:file:<project name>/data} into an absolute URL in the H2 folder. The project folder is created
+   * if missing, as H2 does not create it.
+   */
+  public static String expandProject(@Nullable String url, File h2Root) {
+    File folder = projectFolder(getProjectName(url), h2Root);
+    if(!folder.exists() && !folder.mkdirs() && !folder.exists()) {
+      throw new InvalidH2DatabaseException("Cannot create the project database folder: " + folder.getAbsolutePath());
+    }
+    return FILE_PREFIX + new File(folder, PROJECT_FILE).getAbsolutePath();
+  }
+
+  private static String validProjectName(@Nullable String projectName) {
+    if(projectName == null || !PROJECT_NAME_PATTERN.matcher(projectName).matches()) {
+      throw new InvalidH2DatabaseException(
+          "A project database folder is named after its project, made of letters, digits, '_', ' ' or '-': '" +
+              projectName + "'");
+    }
+    return projectName;
+  }
+
+  /**
+   * The pattern makes this unreachable in practice. It is here so that a future loosening of the project name rule
+   * cannot turn into a path traversal without a test failing first.
+   */
+  private static void assertInside(File folder, File h2Root) {
+    try {
+      String root = h2Root.getCanonicalPath();
+      String path = folder.getCanonicalPath();
+      if(!path.startsWith(root.endsWith(File.separator) ? root : root + File.separator)) {
+        throw new InvalidH2DatabaseException(
+            "A project database folder must sit inside " + root + ": " + path);
+      }
+    } catch(IOException e) {
+      throw new InvalidH2DatabaseException("Cannot resolve the project database folder: " + e.getMessage());
+    }
   }
 }

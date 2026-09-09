@@ -55,12 +55,7 @@ public class Dtos {
         .setArchived(project.isArchived());
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
-    if (project.hasDatabase()) {
-      builder.setDatabase(project.getDatabase());
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
-    } else {
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
-    }
+    setStorage(builder, project, projectService);
     if (project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
     if (project.hasExportFolder()) builder.setExportFolder(project.getExportFolder());
     if (project.hasIdentifiersMappings()) {
@@ -93,22 +88,42 @@ public class Dtos {
     if (project.hasDescription()) builder.setDescription(project.getDescription());
     if (project.hasTags()) builder.addAllTags(project.getTags());
     builder.setTimestamps(asTimestampsDto(project));
-    if (project.hasDatabase()) {
-      builder.setDatabase(project.getDatabase());
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
-    } else {
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
-    }
+    setStorage(builder, project, projectService);
 
     return builder.build();
   }
 
+  /**
+   * A database the project owns is reported as {@code internalDatabase}, and {@code database} is left unset: its name
+   * is an implementation detail of this API, and the databases API is where that row is named. The datasource status
+   * is resolved from the project having storage at all, which internal storage is.
+   * <p>
+   * The service is asked rather than the name read, because a database registered before {@code _project_} was
+   * reserved may carry that prefix: reporting an operator's database as Opal's own would hide its name from the page
+   * that is meant to manage it.
+   */
+  private static void setStorage(ProjectDto.Builder builder, Project project, ProjectService projectService) {
+    switch (projectService.getStorage(project).kind()) {
+      case INTERNAL -> builder.setInternalDatabase(true);
+      case REGISTERED -> builder.setDatabase(project.getDatabase());
+      default -> {
+        builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
+        return;
+      }
+    }
+    builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
+  }
+
+  /**
+   * The project's metadata only: storage is not read from here. A client that predates internal storage sends back the
+   * project it read, in which an internal database is not named - copying that {@code database} into the project would
+   * detach it, and detaching an internal database deletes a file. The resources resolve storage explicitly.
+   */
   public static Project fromDto(ProjectDto projectDto) {
     Project.Builder builder = Project.Builder.create() //
         .name(projectDto.getName()) //
         .title(projectDto.getTitle()) //
         .description(projectDto.getDescription()) //
-        .database(projectDto.getDatabase()) //
         .vcfStoreService(projectDto.getVcfStoreService()) //
         .exportFolder(projectDto.getExportFolder()) //
         .archived(projectDto.getArchived()) //
@@ -135,7 +150,6 @@ public class Dtos {
         .name(projectFactoryDto.getName()) //
         .title(projectFactoryDto.getTitle()) //
         .description(projectFactoryDto.getDescription()) //
-        .database(projectFactoryDto.getDatabase()) //
         .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
         .exportFolder(projectFactoryDto.getExportFolder()) //
         .tags(projectFactoryDto.getTagsList()) //

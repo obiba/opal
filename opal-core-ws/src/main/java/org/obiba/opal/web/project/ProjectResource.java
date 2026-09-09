@@ -136,8 +136,26 @@ public class ProjectResource implements BaseResource {
     if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-    projectService.save(Dtos.fromDto(projectDto));
+    projectService.save(Dtos.fromDto(projectDto), storageOf(projectDto));
     return Response.ok().build();
+  }
+
+  /**
+   * What the payload asks the project's storage to be. A payload that says nothing about it leaves it as it is: a
+   * client that predates internal storage sends back the project it read, in which an internal database is not named,
+   * and reading that as "no storage" would delete the project's data. Detaching a project from its storage is
+   * therefore something to ask for - an empty database name - rather than something to leave out. Saying nothing is
+   * passed on as nothing rather than resolved here, so that storage the resource cannot name is storage it cannot
+   * get wrong.
+   */
+  private ProjectService.ProjectStorage storageOf(Projects.ProjectDto projectDto) {
+    if(projectDto.getInternalDatabase()) return ProjectService.ProjectStorage.internal();
+    if(projectDto.hasDatabase()) {
+      return projectDto.getDatabase().isEmpty()
+          ? ProjectService.ProjectStorage.none()
+          : ProjectService.ProjectStorage.registered(projectDto.getDatabase());
+    }
+    return ProjectService.ProjectStorage.unchanged();
   }
 
   @DELETE

@@ -11,6 +11,7 @@ package org.obiba.opal.core.service;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -42,6 +43,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -61,6 +64,8 @@ public class ProjectsServiceImpl implements ProjectService {
   private final ProjectRepository projectRepository;
 
   private final DatabaseRegistry databaseRegistry;
+
+  private final ProjectDatabaseService projectDatabaseService;
 
   private final ProjectsKeyStoreService projectsKeyStoreService;
 
@@ -82,6 +87,7 @@ public class ProjectsServiceImpl implements ProjectService {
   public ProjectsServiceImpl(OpalFileSystemService opalFileSystemService,
                              ProjectRepository projectRepository,
                              DatabaseRegistry databaseRegistry,
+                             ProjectDatabaseService projectDatabaseService,
                              ProjectsKeyStoreService projectsKeyStoreService,
                              IdentifiersTableService identifiersTableService,
                              ViewManager viewManager,
@@ -91,6 +97,7 @@ public class ProjectsServiceImpl implements ProjectService {
     this.opalFileSystemService = opalFileSystemService;
     this.projectRepository = projectRepository;
     this.databaseRegistry = databaseRegistry;
+    this.projectDatabaseService = projectDatabaseService;
     this.projectsKeyStoreService = projectsKeyStoreService;
     this.identifiersTableService = identifiersTableService;
     this.viewManager = viewManager;
@@ -112,6 +119,10 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Override
   public void initialize() {
+    // finish what an interrupted project deletion began, and say what is left over that nothing refers to
+    projectDatabaseService.deletePendingFolders();
+    reportOrphanProjectDatabaseFolders();
+
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
     // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
     // Add all project datasources to MagmaEngine
@@ -144,6 +155,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @Override
   public void delete(@NotNull String name, boolean archive) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
+    boolean internal = projectDatabaseService.isInternal(project);
 
     projectRepository.deleteByKey(project);
 
@@ -161,54 +173,156 @@ public class ProjectsServiceImpl implements ProjectService {
     if (!archive) {
       // remove all views
       viewManager.removeAllViews(datasource.getName());
-      // remove datasource
-      if (datasource.canDrop()) datasource.drop();
+      if (internal) {
+        // the file is about to go, and dropping its tables one by one would be minutes of work for no effect
+        projectDatabaseService.deleteInternalDatabase(name);
+      } else if (datasource.canDrop()) {
+        // an operator declared this database, so only what the project put in it goes
+        datasource.drop();
+      }
       // remove project folder
       deleteFolder(getProjectDirectory(project));
       // remove keystore
       projectsKeyStoreService.deleteKeyStore(project);
     }
+    // an archived deletion keeps the data: the database the project owned stays, referred to by nobody, and an
+    // operator can see it in the databases page and delete it there
+  }
+
+  @NotNull
+  @Override
+  public ProjectStorage getStorage(@NotNull Project project) {
+    if(projectDatabaseService.isInternal(project)) return ProjectStorage.internal();
+    return project.hasDatabase() ? ProjectStorage.registered(project.getDatabase()) : ProjectStorage.none();
   }
 
   @Override
   @Transactional(propagation = Propagation.NEVER)
   public void save(@NotNull final Project project) throws ConstraintViolationException {
+    save(project, ProjectStorage.unchanged());
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.NEVER)
+  public void save(@NotNull final Project project, @NotNull ProjectStorage storage)
+      throws ConstraintViolationException {
+    String name = project.getName();
+    Project original = projectRepository.findByName(name).orElse(null);
+    String originalDb = original == null ? "" : nullToEmpty(original.getDatabase());
+    boolean wasInternal = original != null && projectDatabaseService.isInternal(original);
+    String newDb = nullToEmpty(storageDatabaseName(project, original, storage));
+    boolean storageChanges = original != null && !newDb.equals(originalDb);
+
+    // both refusals run before anything is created, so a refused save leaves nothing behind. Only when the storage is
+    // actually being set: a project is saved again on every table change, and that is not the moment to query for it.
+    if (storage.kind() == ProjectStorage.Kind.REGISTERED && (original == null || storageChanges)) {
+      assertNotOwnedByAnotherProject(name, storage.databaseName());
+    }
+    if (storageChanges) assertHasNoData(name);
+
+    boolean ownedDatabaseExisted = projectDatabaseService.getInternalDatabase(name).isPresent();
+    if (storage.kind() == ProjectStorage.Kind.INTERNAL) projectDatabaseService.ensureInternalDatabase(name);
+    project.setDatabase(newDb.isEmpty() ? null : newDb);
+
     try {
-      Project original = getProject(project.getName());
-      String originalDb = nullToEmpty(original.getDatabase());
-      String newDb = nullToEmpty(project.getDatabase());
-      if (!newDb.equals(originalDb)) {
-        if (MagmaEngine.get().hasDatasource(project.getName())) {
-          transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-              Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
-              MagmaEngine.get().removeDatasource(datasource);
-              viewManager.unregisterDatasource(datasource.getName());
-              if (datasource.canDrop()) {
-                try {
-                  datasource.drop();
-                } catch (Exception e) {
-                  log.warn("Project's datasource drop failed: {}", project.getName(), e);
-                }
-              }
-            }
-          });
-        }
-        databaseRegistry.unregister(originalDb, project.getName());
+      if (original == null) {
+        registerDatasource(project);
+      } else if (storageChanges) {
+        dropDatasource(name);
+        databaseRegistry.unregister(originalDb, name);
         registerDatasource(project);
       }
-    } catch (NoSuchProjectException e) {
-      registerDatasource(project);
+
+      synchronized (this) {
+        projectRepository.upsert(project);
+        try {
+          getProjectDirectory(project);
+        } catch (FileSystemException e) {
+          log.warn("Project's directory is not accessible: {}", name, e);
+        }
+      }
+    } catch (RuntimeException e) {
+      // a database created here, and not there before, goes away again: a failed creation leaves no folder behind
+      if (storage.kind() == ProjectStorage.Kind.INTERNAL && !ownedDatabaseExisted) {
+        projectDatabaseService.deleteInternalDatabase(name);
+      }
+      throw e;
     }
 
-    synchronized (this) {
-      projectRepository.upsert(project);
-      try {
-        getProjectDirectory(project);
-      } catch (FileSystemException e) {
-        log.warn("Project's directory is not accessible: {}", project.getName(), e);
+    // leaving internal storage: the database the project owned is empty by now, and nothing else can use it
+    if (storageChanges && storage.kind() != ProjectStorage.Kind.INTERNAL && wasInternal) {
+      projectDatabaseService.deleteInternalDatabase(name);
+    }
+  }
+
+  /**
+   * The name of the database the project would hold. A project-owned one is named after the project, so asking for it
+   * costs nothing and does not create it: the refusals below run first.
+   */
+  private String storageDatabaseName(Project project, @Nullable Project original, ProjectStorage storage) {
+    return switch (storage.kind()) {
+      // a project being created says what it holds; one being saved again keeps what it held
+      case UNCHANGED -> original == null ? project.getDatabase() : original.getDatabase();
+      case NONE -> null;
+      case REGISTERED -> storage.databaseName();
+      case INTERNAL -> ProjectDatabaseService.INTERNAL_PREFIX + project.getName();
+    };
+  }
+
+  /**
+   * Changing where a project stores its data drops what it holds, and for a database the project owns it deletes a
+   * file. The administration UI has always refused it on a project with tables; nothing on the server did.
+   */
+  private void assertHasNoData(String projectName) {
+    if (!MagmaEngine.get().hasDatasource(projectName)) return;
+    if (!MagmaEngine.get().getDatasource(projectName).getValueTables().isEmpty()) {
+      throw InvalidProjectStorageException.hasData(projectName);
+    }
+  }
+
+  /**
+   * Now that project-owned databases are listed, a client can name one: two projects in one of them is precisely what
+   * internal storage exists to prevent. Checked here because the UI filter that hides them is cosmetic.
+   */
+  private void assertNotOwnedByAnotherProject(String projectName, String databaseName) {
+    if (nullToEmpty(databaseName).isEmpty() || !databaseRegistry.hasDatabase(databaseName)) return;
+    String owner = databaseRegistry.getDatabase(databaseName).getOwnerProject();
+    if (owner != null && !owner.equals(projectName)) {
+      throw InvalidProjectStorageException.ownedByAnotherProject(projectName, databaseName, owner);
+    }
+  }
+
+  private void dropDatasource(String projectName) {
+    if (!MagmaEngine.get().hasDatasource(projectName)) return;
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        Datasource datasource = MagmaEngine.get().getDatasource(projectName);
+        MagmaEngine.get().removeDatasource(datasource);
+        viewManager.unregisterDatasource(datasource.getName());
+        if (datasource.canDrop()) {
+          try {
+            datasource.drop();
+          } catch (Exception e) {
+            log.warn("Project's datasource drop failed: {}", projectName, e);
+          }
+        }
       }
+    });
+  }
+
+  /**
+   * A folder under the H2 folder that no database refers to: the leftovers of an archiving deletion whose row an
+   * operator has since removed, or a bug in this feature. Reported, never deleted - it may be somebody's data.
+   */
+  private void reportOrphanProjectDatabaseFolders() {
+    try {
+      for (File folder : projectDatabaseService.listOrphanFolders()) {
+        log.warn("Orphan project database folder, no database refers to it: {} ({})", folder.getAbsolutePath(),
+            FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(folder)));
+      }
+    } catch (Exception e) {
+      log.warn("Cannot list the project database folders: {}", e.getMessage());
     }
   }
 

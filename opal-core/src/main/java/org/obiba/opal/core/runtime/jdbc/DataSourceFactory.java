@@ -48,8 +48,11 @@ public class DataSourceFactory {
     String driverClass = sqlSettings.getDriverClass();
     factoryBean.setDriverClass(driverClass);
     if(H2DatabaseUrls.isH2(driverClass)) {
-      // H2 databases are registered by name only, the file lives in the Opal H2 folder
-      factoryBean.setUrl(H2DatabaseUrls.expand(sqlSettings.getUrl(), h2Root));
+      // H2 databases hold a name only, the files live in the Opal H2 folder: a file for a registered database, a
+      // folder of its own for the one a project owns
+      factoryBean.setUrl(database.isProjectOwned()
+          ? H2DatabaseUrls.expandProject(sqlSettings.getUrl(), h2Root)
+          : H2DatabaseUrls.expand(sqlSettings.getUrl(), h2Root));
       // the settings are rejected when the database is registered, check them again on the way to the driver
       H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
     } else {

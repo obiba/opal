@@ -16,6 +16,7 @@ import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
@@ -130,6 +131,101 @@ public class H2DatabaseUrlsTest {
   @Test
   public void test_validate_accepts_a_new_database() throws IOException {
     H2DatabaseUrls.validate("jdbc:h2:file:opal", temporaryFolder.newFolder("h2"));
+  }
+
+  @Test
+  public void test_project_url_round_trip() {
+    assertThat(H2DatabaseUrls.projectUrl("CLSA")).isEqualTo("jdbc:h2:file:CLSA/data");
+    assertThat(H2DatabaseUrls.getProjectName("jdbc:h2:file:CLSA/data")).isEqualTo("CLSA");
+    // a space is legal in a project name, in a folder name and in an H2 file URL
+    assertThat(H2DatabaseUrls.projectUrl("My Study")).isEqualTo("jdbc:h2:file:My Study/data");
+    assertThat(H2DatabaseUrls.getProjectName("jdbc:h2:file:My Study/data")).isEqualTo("My Study");
+  }
+
+  @Test
+  public void test_project_name_must_be_a_project_name() {
+    // the name becomes a folder name, so nothing that could reach outside the H2 folder is a project name
+    for(String projectName : new String[] { "..", "../escape", "sub/project", "sub\\project", "/var/lib/opal",
+        "opal;DB_CLOSE_DELAY=-1", ".hidden", "with.dot", "", null }) {
+      try {
+        H2DatabaseUrls.projectUrl(projectName);
+        fail("Expected an InvalidH2DatabaseException for project name: " + projectName);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+  }
+
+  @Test
+  public void test_project_url_must_name_the_project_database() {
+    for(String url : new String[] { "jdbc:h2:file:CLSA", "jdbc:h2:file:CLSA/other", "jdbc:h2:file:CLSA/data/more",
+        "jdbc:h2:file:/CLSA/data", "jdbc:h2:file:../CLSA/data", "jdbc:h2:mem:CLSA/data", "jdbc:h2:file:", null }) {
+      try {
+        H2DatabaseUrls.getProjectName(url);
+        fail("Expected an InvalidH2DatabaseException for URL: " + url);
+      } catch(InvalidH2DatabaseException ignored) {
+      }
+    }
+  }
+
+  @Test
+  public void test_a_project_url_is_not_a_database_name() {
+    // the two forms cannot be mistaken for one another: a registered database is a plain file name
+    try {
+      H2DatabaseUrls.getDatabaseName("jdbc:h2:file:CLSA/data");
+      fail("Expected an InvalidH2DatabaseException");
+    } catch(InvalidH2DatabaseException ignored) {
+    }
+  }
+
+  @Test
+  public void test_expand_project() throws IOException {
+    File root = temporaryFolder.newFolder("h2");
+    assertThat(H2DatabaseUrls.expandProject("jdbc:h2:file:My Study/data", root))
+        .isEqualTo("jdbc:h2:file:" + new File(root, "My Study/data").getAbsolutePath());
+  }
+
+  @Test
+  public void test_expand_project_creates_the_project_folder() {
+    File root = new File(temporaryFolder.getRoot(), "data/h2");
+    H2DatabaseUrls.expandProject("jdbc:h2:file:CLSA/data", root);
+    assertThat(new File(root, "CLSA").isDirectory()).isTrue();
+  }
+
+  @Test
+  public void test_project_folder_of_a_symlinked_h2_folder_is_inside_it() throws IOException {
+    // canonicalising both sides is what makes a symlinked H2 folder pass a containment check that compares paths
+    File real = temporaryFolder.newFolder("real-h2");
+    File link = new File(temporaryFolder.getRoot(), "h2");
+    Files.createSymbolicLink(link.toPath(), real.toPath());
+
+    assertThat(H2DatabaseUrls.projectFolder("CLSA", link).getCanonicalPath())
+        .isEqualTo(new File(real, "CLSA").getCanonicalPath());
+  }
+
+  @Test
+  public void test_validate_project_rejects_a_legacy_database() throws IOException {
+    File root = temporaryFolder.newFolder("h2");
+    assertThat(new File(root, "CLSA").mkdir()).isTrue();
+    assertThat(new File(root, "CLSA/data.h2.db").createNewFile()).isTrue();
+    try {
+      H2DatabaseUrls.validateProject("jdbc:h2:file:CLSA/data", root);
+      fail("Expected an InvalidH2DatabaseException");
+    } catch(InvalidH2DatabaseException ignored) {
+    }
+  }
+
+  @Test
+  public void test_validate_project_accepts_a_migrated_database() throws IOException {
+    File root = temporaryFolder.newFolder("h2");
+    assertThat(new File(root, "CLSA").mkdir()).isTrue();
+    assertThat(new File(root, "CLSA/data.h2.db").createNewFile()).isTrue();
+    assertThat(new File(root, "CLSA/data.mv.db").createNewFile()).isTrue();
+    H2DatabaseUrls.validateProject("jdbc:h2:file:CLSA/data", root);
+  }
+
+  @Test
+  public void test_validate_project_accepts_a_new_database() throws IOException {
+    H2DatabaseUrls.validateProject("jdbc:h2:file:CLSA/data", temporaryFolder.newFolder("h2"));
   }
 
   private void assertPropertiesRejected(String properties) {

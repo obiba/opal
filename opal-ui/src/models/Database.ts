@@ -36,6 +36,10 @@ export interface DatabaseDto {
   usedForIdentifiers?: boolean | undefined;
   sqlSettings?: SqlSettingsDto | undefined;
   mongoDbSettings?: MongoDbSettingsDto | undefined;
+  /** The project this database belongs to, unset for the ones an operator registered. Read only. */
+  ownerProject?: string | undefined;
+  /** Whether that project still exists, which is what says whether an operator may edit or delete it. Read only. */
+  ownerProjectExists?: boolean | undefined;
 }
 
 export enum DatabaseDto_Usage {

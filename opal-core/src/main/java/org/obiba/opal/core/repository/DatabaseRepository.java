@@ -33,6 +33,12 @@ public interface DatabaseRepository extends JpaRepository<Database, Long> {
 
   Optional<Database> findByUsedForIdentifiers(boolean usedForIdentifiers);
 
+  /** The database a project owns, if it has one. */
+  Optional<Database> findByOwnerProject(String ownerProject);
+
+  /** Owner names that differ only in case would be one folder on a case-insensitive file system. */
+  Optional<Database> findByOwnerProjectIgnoreCase(String ownerProject);
+
   /**
    * Delete the stored Database identified by its natural key, whether or not the object handed in is the one that was
    * loaded. {@code delete} alone would not: given an object built by a caller, it has no primary key to delete by and

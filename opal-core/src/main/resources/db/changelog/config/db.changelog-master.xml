@@ -72,8 +72,16 @@
       <column name="usage" type="VARCHAR(255)"/>
       <column name="mongo_db_settings" type="CLOB"/>
       <column name="sql_settings" type="CLOB"/>
+      <!--
+        The project this database belongs to, NULL for the ones an operator registered. Not a foreign key to
+        `projects`: the row outlives the project when the project is archived, and re-attaches when a project of that
+        name is created again.
+      -->
+      <column name="owner_project" type="VARCHAR(255)"/>
     </createTable>
     <addUniqueConstraint tableName="databases" columnNames="name" constraintName="uk_databases_name"/>
+    <addUniqueConstraint tableName="databases" columnNames="owner_project"
+                         constraintName="uk_databases_owner_project"/>
 
     <createTable tableName="datashield_profiles">
       <column name="enabled" type="BOOLEAN">

@@ -28,11 +28,13 @@ import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.repository.DatabaseRepository;
+import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.event.DatasourceDeletedEvent;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.H2DatabaseUrls;
+import org.obiba.opal.core.runtime.jdbc.H2ProjectFolders;
 import org.obiba.opal.core.service.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @SuppressWarnings("OverlyCoupledClass")
@@ -58,11 +62,29 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
 
+  /**
+   * Names beginning with this are Opal's own, so that a database it creates for a project can never collide with one
+   * an operator registered. Opal already presents the identifiers database as {@code _identifiers}; what changes is
+   * that the reservation is now enforced. Only new names are constrained: an installation that already holds a
+   * database named this way keeps working, and stays editable.
+   * <p>
+   * The identifiers database is the one Opal names itself in this namespace, so it is not what this keeps out.
+   */
+  private static final String RESERVED_NAME_PREFIX = "_";
+
   @Autowired
   private DataSourceFactory dataSourceFactory;
 
   @Autowired
   private DatabaseRepository databaseRepository;
+
+  /**
+   * Read to answer one question - does the project owning this database still exist - which decides whether an
+   * operator may edit or delete it. A repository and not {@code ProjectService}, because the dependency runs the other
+   * way round: the service that creates project databases is built on this registry.
+   */
+  @Autowired
+  private ProjectRepository projectRepository;
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
@@ -117,9 +139,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return databaseRepository.findByUsedForIdentifiersAndMongoDbSettingsIsNotNullOrderByName(false);
   }
 
+  /**
+   * The one listing that filters: this answers "has an operator provided storage", and drives the setup prompts. A
+   * database Opal made for a project is not an answer to that - it would report storage on a server where none has
+   * been configured at all. Every other listing includes project-owned databases, which is what the upgrade steps,
+   * the Hibernate 5 sequence fix and the H2 checkpointer need.
+   */
   @Override
   public boolean hasDatabases(@Nullable Database.Usage usage) {
-    return !Iterables.isEmpty(list(usage));
+    return Iterables.any(list(usage), database -> !database.isProjectOwned());
   }
 
   @Override
@@ -150,6 +178,41 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
+    assertNameIsNotReserved(database);
+    if(database.isProjectOwned()) {
+      // ownership is Opal's to give, never something a payload can claim
+      throw new IllegalArgumentException("A database cannot be registered as owned by a project");
+    }
+    createDatabase(database);
+    forgetIdentifiersDatasource(database);
+  }
+
+  @Override
+  public void createProjectOwned(@NotNull Database database) throws ConstraintViolationException {
+    Preconditions.checkArgument(database.isProjectOwned(), "Not a project-owned database: " + database.getName());
+    createDatabase(database);
+  }
+
+  /**
+   * The identifiers database is exempt: {@code _identifiers} is the name Opal itself gives it, and refusing that would
+   * be refusing to create the one database this reservation exists to keep company with. What it may not be called is
+   * a project's database, which is the name this actually protects.
+   */
+  private void assertNameIsNotReserved(Database database) {
+    String name = database.getName();
+    if(name == null) return;
+
+    if(name.startsWith(ProjectDatabaseService.INTERNAL_PREFIX)) {
+      throw new IllegalArgumentException("Database name '" + name + "' is reserved for the database of project '" +
+          name.substring(ProjectDatabaseService.INTERNAL_PREFIX.length()) + "'");
+    }
+    if(!database.isUsedForIdentifiers() && name.startsWith(RESERVED_NAME_PREFIX)) {
+      throw new IllegalArgumentException("Database name '" + name + "' is reserved: names starting with '" +
+          RESERVED_NAME_PREFIX + "' are Opal's own");
+    }
+  }
+
+  private void createDatabase(Database database) {
     if(databaseRepository.findByName(database.getName()).isEmpty()) {
       persist(database);
     } else {
@@ -160,11 +223,37 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void update(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
-    Preconditions.checkArgument(databaseRepository.findByName(database.getName()).isPresent(),
-        "Cannot update non existing Database " + database.getName());
+    Database stored = databaseRepository.findByName(database.getName())
+        .orElseThrow(() -> new IllegalArgumentException("Cannot update non existing Database " + database.getName()));
+    assertNotOwnedByALivingProject(stored);
+    // an owner survives an update: a row left behind by an archived deletion re-attaches when a project of that name
+    // is created again, and an operator editing it in the meantime does not silently take that away
+    if(!database.isProjectOwned()) database.setOwnerProject(stored.getOwnerProject());
 
     destroyCache(database.getName());
     persist(database);
+    forgetIdentifiersDatasource(database);
+  }
+
+  /**
+   * The identifiers datasource is built once and kept for the life of the server, so registering, editing or deleting
+   * the identifiers database has to drop it: it would otherwise go on answering from the database that was there
+   * before, through a connection pool this registry has already closed.
+   */
+  private void forgetIdentifiersDatasource(Database database) {
+    if(database.isUsedForIdentifiers()) identifiersTableService.resetDatasource();
+  }
+
+  /**
+   * @throws DatabaseOwnedByProjectException if a project owns this database and still exists. A project that failed to
+   * load still exists: what makes a leftover row an operator's to act on is the project being gone, not its datasource
+   * being absent.
+   */
+  private void assertNotOwnedByALivingProject(Database database) {
+    String ownerProject = database.getOwnerProject();
+    if(ownerProject != null && projectRepository.findByName(ownerProject).isPresent()) {
+      throw new DatabaseOwnedByProjectException(database.getName(), ownerProject);
+    }
   }
 
   private void persist(Database database) {
@@ -196,8 +285,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(database.getUsage() != Database.Usage.STORAGE) {
       throw new InvalidH2DatabaseException("H2 databases can only be used for storage");
     }
-    H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
     H2DatabaseUrls.validateProperties(sqlSettings.getProperties());
+
+    if(database.isProjectOwned()) {
+      // a project database is a folder of its own, named after the project: it collides with nothing, and the one
+      // name it could collide with - another project's - is refused where projects are named
+      H2DatabaseUrls.validateProject(sqlSettings.getUrl(), h2Root);
+      return;
+    }
+    H2DatabaseUrls.validate(sqlSettings.getUrl(), h2Root);
     validUniqueH2DatabaseFile(database, H2DatabaseUrls.getDatabaseName(sqlSettings.getUrl()));
   }
 
@@ -210,6 +306,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     // the identifiers database is an H2 candidate too, so look at every SQL database and not just the listed ones
     for(Database other : databaseRepository.findBySqlSettingsIsNotNull()) {
       if(other.getName().equals(database.getName())) continue;
+      // a project database is a folder, not a file directly under the H2 folder, so it is not what this compares
+      if(other.isProjectOwned()) continue;
       SqlSettings otherSettings = other.getSqlSettings();
       if(otherSettings == null || !H2DatabaseUrls.isH2(otherSettings.getDriverClass())) continue;
       if(name.equalsIgnoreCase(H2DatabaseUrls.getDatabaseName(otherSettings.getUrl()))) {
@@ -264,6 +362,16 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Transactional(propagation = Propagation.NEVER)
   public void delete(@NotNull Database database)
       throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException {
+    delete(database, false);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.NEVER)
+  public void delete(@NotNull Database database, boolean deleteFiles)
+      throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException {
+    Database stored = databaseRepository.findByName(database.getName()).orElse(database);
+    assertNotOwnedByALivingProject(stored);
+
     if(database.isUsedForIdentifiers()) {
       if(hasEntities(database)) {
         throw new CannotDeleteDatabaseWithDataException(database.getName());
@@ -277,6 +385,45 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     }
     databaseRepository.deleteByKey(database);
     destroyCache(database.getName());
+    forgetIdentifiersDatasource(database);
+    // nobody owns it any more, so its files are nobody's: an archived deletion is reclaimed here, files and all
+    if(stored.isProjectOwned()) deleteProjectFiles(stored);
+    else if(deleteFiles) deleteRegisteredFiles(stored);
+  }
+
+  /**
+   * The files of a registered H2 database, on an operator saying so. Nothing else is deleted: for every other driver
+   * the database lives outside Opal and its lifetime is not Opal's business.
+   */
+  private void deleteRegisteredFiles(Database database) {
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings == null || !H2DatabaseUrls.isH2(sqlSettings.getDriverClass())) return;
+
+    List<String> failed = new ArrayList<>();
+    for(File file : H2DatabaseUrls.databaseFiles(sqlSettings.getUrl(), h2Root)) {
+      if(!file.delete() && file.exists()) failed.add(file.getName());
+    }
+    if(!failed.isEmpty()) {
+      throw new CannotDeleteDatabaseFilesException(h2Root.getAbsolutePath(),
+          "the database was unregistered but these files could not be removed: " + String.join(", ", failed));
+    }
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.NEVER)
+  public void deleteProjectOwned(@NotNull Database database) {
+    Preconditions.checkArgument(database.isProjectOwned(), "Not a project-owned database: " + database.getName());
+
+    // closing the last connection is what closes the H2 store and releases the file lock, so the cache goes first
+    destroyCache(database.getName());
+    databaseRepository.deleteByKey(database);
+    deleteProjectFiles(database);
+  }
+
+  private void deleteProjectFiles(Database database) {
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings == null || !H2DatabaseUrls.isH2(sqlSettings.getDriverClass())) return;
+    H2ProjectFolders.delete(H2DatabaseUrls.projectFolder(database.getOwnerProject(), h2Root));
   }
 
   private void destroyCache(String name) {
