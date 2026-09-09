@@ -65,6 +65,76 @@ OrientDB folder, so the run can be repeated once the cause is dealt with. Each r
 configuration identifies it by, so a repeated run updates what is already there and adds what is missing, whether it
 starts from nothing, from a half-written table or from a complete one. Running it again is always safe.
 
+### A project can own its database
+
+Until now a project could only store its data in a database an operator had registered beforehand. That is right for
+MySQL, MariaDB, PostgreSQL and MongoDB, where the database exists on a server outside Opal and its lifetime is not
+Opal's business. It was never right for H2, where the database is a file Opal creates in its own folder: registering it
+by hand bought nothing, and left nobody owning the file.
+
+Creating a project now offers a third choice, beside a registered database and no storage at all: an **internal
+database**, which Opal creates for that project alone, in a folder of its own:
+
+    ${OPAL_HOME}/data/h2/<project name>/data.mv.db
+
+Nothing changes for the projects you have. This is a choice at creation, and an existing project keeps the database it
+was given. Moving a project's data into a database of its own is a copy rather than a setting, and Opal already has the
+tool for it: create a project with internal storage and copy the tables into it.
+
+**Deleting a project deletes its internal database and everything in it. Deleting a project stored in a registered
+database does not** - there, Opal drops the tables the project put in the database and leaves the database itself
+alone, as it always has. This is the difference to know before choosing, and the project creation dialog says which of
+the two you are choosing as you choose it.
+
+Deleting a project *and keeping its data* is still `DELETE /project/{name}?archive=true`, and it keeps the internal
+database too: the row and the folder stay behind, belonging to nobody. They show in the databases page with the former
+project named and nothing using them, and an operator can delete them there - which is the one place a project's
+database is an operator's to remove, and which removes its files as well. Creating a project of that name again takes
+the data back. The web interface always deletes without archiving.
+
+**These databases are listed like every other one.** They appear under *Administration > Databases* with the owning
+project named beside them, because an operator is accountable for the disk and a store holding 40 GB must not be
+invisible in the one page that shows what Opal keeps. What is different is who manages them: while the owning project
+exists they cannot be edited or deleted from that page - the attempt is refused - and the settings dialog opens
+read only. Testing the connection works as it does for any database.
+
+**A project creator now provisions storage.** Whoever may create projects can give one a place to put its tables,
+where before that needed system administration as well. Nothing else changes: it gives no access to the H2 folder or to
+another project's database.
+
+**Back up `${OPAL_HOME}/data/h2` as project data.** It already held the H2 databases an operator registered; it now
+also holds a folder per project that has one. A backup that copies the folder is complete; one that lists the files it
+knows about is not.
+
+### Unregistering an H2 database can now delete its files
+
+An H2 database is a file in `${OPAL_HOME}/data/h2`, and that file used to outlive the registration: unregistering the
+database left it there, and nothing in Opal ever removed it. That is a trap, because H2 keeps the user name and
+password inside the file. Register a database again at the same URL with a different password and it cannot be opened -
+the credentials that count are the ones the file was created with, not the ones you have just typed.
+
+Unregistering an H2 database therefore now offers to delete its files, as a checkbox in the confirmation, or as
+`DELETE /system/database/{name}?deleteFiles=true`. It is never implied: left unticked, the behaviour is what it has
+always been, and what an operator declared may hold data nobody meant to lose. For a database a project owns, the files
+go in any case, so there is nothing to choose.
+
+### If you are running a 6.0 snapshot
+
+Skip this if you are upgrading from Opal 5.x - it applies only to an installation that has already started a 6.0
+snapshot build, such as a test server or a CI job.
+
+The `owner_project` column that carries the ownership above was added to the initial changeset of the configuration
+schema rather than as a migration of its own, because 6.0 is unreleased and every installation creates that schema from
+scratch on its way to it. That changes the changeset's checksum, and Liquibase refuses to start rather than ignore it.
+An installation that has already run the previous schema therefore has to build it again:
+
+    rm -rf ${OPAL_HOME}/data/config
+
+The OrientDB migration then runs on the next start, as it did the first time. Nothing else is needed, and nothing is
+lost that was not already in `${OPAL_HOME}/data/orientdb` - but any configuration change made since that migration ran
+is, so if the snapshot holds configuration nobody wants to re-migrate, take a copy of `data/config` first and ask
+before deleting it.
+
 ### DataSHIELD activity over OpenTelemetry
 
 Opal can now send its logs, its DataSHIELD traces and its DataSHIELD metrics to an OpenTelemetry collector. Nothing is
