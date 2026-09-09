@@ -35,6 +35,13 @@ message DatabaseDto {
   optional bool usedForIdentifiers = 5;
   optional SqlSettingsDto sqlSettings = 6;
   optional MongoDbSettingsDto mongoDbSettings = 7;
+  // The project this database belongs to, unset for the ones an operator registered. Output only: ownership is never
+  // set from a payload.
+  optional string ownerProject = 8;
+  // Whether that project still exists, which is what decides whether an operator may edit or delete this database: a
+  // project that failed to load still exists, while an archiving deletion leaves an owned database whose project is
+  // gone and which an operator may now remove.
+  optional bool ownerProjectExists = 9 [default = false];
 }
 
 message SqlSettingsDto {

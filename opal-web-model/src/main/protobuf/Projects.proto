@@ -27,6 +27,9 @@ message ProjectDto {
   optional string exportFolder = 12;
   repeated IdentifiersMappingDto idMappings = 13;
   optional ProjectDatasourceStatusDto datasourceStatus = 14;
+  // Whether the project stores its data in a database it owns. `database` is then left unset: the name of that
+  // database is an implementation detail of this API, and the databases API is where it is named.
+  optional bool internalDatabase = 15 [default = false];
 }
 
 enum ProjectDatasourceStatusDto {
@@ -45,6 +48,8 @@ message ProjectFactoryDto {
   repeated string tags = 5;
   optional string vcfStoreService = 6;
   optional string exportFolder = 7;
+  // Give the project a database of its own, created with it and deleted with it. `database` is then ignored.
+  optional bool internalDatabase = 8 [default = false];
 }
 
 message EntityTypeCountDto {

@@ -11,7 +11,10 @@
 package org.obiba.opal.web.system.database;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +28,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -44,6 +48,9 @@ public class DatabasesResource {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
+
+  @Autowired
+  private ProjectService projectService;
 
 @GET
 @NoAuthorization
@@ -98,11 +105,32 @@ public DatabaseDto getIdentifiersDatabase() {
 }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases, boolean withSettings) {
+    Set<String> projectNames = projectNamesOf(databases);
     List<DatabaseDto> dtos = new ArrayList<>();
     for(Database database : databases) {
-      dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), withSettings));
+      dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), withSettings,
+          projectNames.contains(database.getOwnerProject())));
     }
     return dtos;
+  }
+
+  /**
+   * The names of the existing projects, read once for the whole listing rather than once per row - and not read at
+   * all when no listed database belongs to a project, which is every server that uses registered storage only.
+   */
+  private Set<String> projectNamesOf(Iterable<? extends Database> databases) {
+    boolean anyOwned = false;
+    for(Database database : databases) {
+      if(database.isProjectOwned()) {
+        anyOwned = true;
+        break;
+      }
+    }
+    if(!anyOwned) return Collections.emptySet();
+
+    Set<String> names = new HashSet<>();
+    projectService.getProjects().forEach(project -> names.add(project.getName()));
+    return names;
   }
 
 @POST

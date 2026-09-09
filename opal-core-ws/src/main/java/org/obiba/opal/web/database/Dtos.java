@@ -126,16 +126,30 @@ public class Dtos {
   }
 
   public static DatabaseDto asDto(Database db, boolean hasDatasource) {
-    return asDto(db, hasDatasource, true);
+    return asDto(db, hasDatasource, true, false);
   }
 
   public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean withSettings) {
+    return asDto(db, hasDatasource, withSettings, false);
+  }
+
+  /**
+   * @param ownerProjectExists whether the project that owns this database still exists, which is what tells a client
+   * it may not act on it. Resolved by the caller, which reads the project names once for a whole listing.
+   */
+  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean withSettings,
+      boolean ownerProjectExists) {
     DatabaseDto.Builder builder = DatabaseDto.newBuilder();
     builder.setName(db.getName());
     builder.setDefaultStorage(db.isDefaultStorage());
     builder.setHasDatasource(hasDatasource);
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
+    // output only, in both directions: fromDto ignores them, ownership is never set from a payload
+    if(db.isProjectOwned()) {
+      builder.setOwnerProject(db.getOwnerProject());
+      builder.setOwnerProjectExists(ownerProjectExists);
+    }
 
     if(withSettings) {
       SqlSettings sqlSettings = db.getSqlSettings();

@@ -20,6 +20,7 @@ import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.core.service.database.NoSuchDatabaseException;
@@ -56,6 +57,9 @@ public class DatabaseResource {
   @Autowired
   private SocketFactoryProvider socketFactoryProvider;
 
+  @Autowired
+  private ProjectService projectService;
+
   @PathParam("name")
   private String name;
 
@@ -71,7 +75,15 @@ public class DatabaseResource {
   })
   public DatabaseDto get() {
     Database database = getDatabase();
-    return Dtos.asDto(database, databaseRegistry.hasDatasource(database));
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), true, ownerProjectExists(database));
+  }
+
+  /**
+   * Whether the project owning this database still exists, which is what decides whether an operator may act on it. A
+   * project that failed to load still exists; an archiving deletion leaves an owned database whose project is gone.
+   */
+  private boolean ownerProjectExists(Database database) {
+    return database.isProjectOwned() && projectService.hasProject(database.getOwnerProject());
   }
 
   @DELETE
@@ -82,6 +94,7 @@ public class DatabaseResource {
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Database successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "409", description = "Database belongs to a project that still exists"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response delete() {
@@ -99,6 +112,7 @@ public class DatabaseResource {
     @ApiResponse(responseCode = "200", description = "Database successfully updated", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid database configuration"),
     @ApiResponse(responseCode = "404", description = "Database not found"),
+    @ApiResponse(responseCode = "409", description = "Database belongs to a project that still exists"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {

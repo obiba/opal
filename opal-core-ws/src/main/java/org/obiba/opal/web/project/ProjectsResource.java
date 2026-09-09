@@ -85,14 +85,25 @@ public class ProjectsResource implements BaseResource {
     // verify project does not exists
     if (projectService.hasProject(project.getName())) throw new IllegalArgumentException("Project already exists");
 
+    // this is also what makes the folder name of an internal database safe, so it stays in front of the storage
     if (!Pattern.compile("^[\\w _-]+$").matcher(project.getName()).matches())
       throw new IllegalArgumentException("Project nome invalid: only words, blank space, underscore and hyphen characters are valid");
 
-    projectService.save(project);
+    projectService.save(project, storageOf(projectFactoryDto));
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
     return Response.created(projectUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL))
         .build();
+  }
+
+  /**
+   * What the payload asks the new project's storage to be: a database of its own, one an operator registered, or none.
+   */
+  private ProjectService.ProjectStorage storageOf(Projects.ProjectFactoryDto projectFactoryDto) {
+    if (projectFactoryDto.getInternalDatabase()) return ProjectService.ProjectStorage.internal();
+    return projectFactoryDto.hasDatabase() && !projectFactoryDto.getDatabase().isEmpty()
+        ? ProjectService.ProjectStorage.registered(projectFactoryDto.getDatabase())
+        : ProjectService.ProjectStorage.none();
   }
 
   private boolean isReadable(String project) {
