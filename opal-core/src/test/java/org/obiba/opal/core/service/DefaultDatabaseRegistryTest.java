@@ -27,7 +27,13 @@ import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasour
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
+import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.repository.ProjectRepository;
+import org.obiba.opal.core.runtime.jdbc.H2DatabaseUrls;
+import org.obiba.opal.core.runtime.jdbc.H2ProjectFolders;
+import org.obiba.opal.core.service.database.DatabaseOwnedByProjectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +43,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,11 +66,18 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
   @Autowired
   private DataSourceFactory dataSourceFactory;
 
+  @Autowired
+  private ProjectRepository projectRepository;
+
+  @Value("${OPAL_HOME}/data/h2")
+  private File h2Root;
+
   @Override
   public void startDB() throws Exception {
     super.startDB();
     databaseRegistry.stop();
     databaseRepository.deleteAll();
+    projectRepository.deleteAll();
   }
 
   @Override
@@ -411,6 +426,215 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     }
   }
 
+  //
+  // Project-owned databases
+  //
+
+  @Test
+  public void test_a_project_owned_database_is_listed_like_any_other() {
+    createProjectOwnedDatabase("CLSA");
+
+    assertThat(databaseRegistry.list()).hasSize(1);
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+    assertThat(databaseRegistry.list(Usage.STORAGE)).hasSize(1);
+    assertThat(databaseRegistry.getDatabase("_project_CLSA").getOwnerProject()).isEqualTo("CLSA");
+    assertThat(databaseRegistry.hasDatabase("_project_CLSA")).isTrue();
+  }
+
+  /**
+   * "Has an operator provided storage" is what drives the setup prompts, and a database Opal made for a project is
+   * not an answer to it.
+   */
+  @Test
+  public void test_a_project_owned_database_is_not_storage_an_operator_provided() {
+    createProjectOwnedDatabase("CLSA");
+    assertThat(databaseRegistry.hasDatabases(Usage.STORAGE)).isFalse();
+    assertThat(databaseRegistry.hasDatabases(null)).isFalse();
+
+    databaseRegistry.create(createH2Database(Usage.STORAGE, "jdbc:h2:file:opal-data"));
+    assertThat(databaseRegistry.hasDatabases(Usage.STORAGE)).isTrue();
+  }
+
+  @Test
+  public void test_create_rejects_a_reserved_name() {
+    Database database = createSqlDatabase();
+    database.setName("_project_CLSA");
+    try {
+      databaseRegistry.create(database);
+      fail("Expected an IllegalArgumentException for a name starting with '_'");
+    } catch(IllegalArgumentException ignored) {
+    }
+    assertThat(databaseRegistry.list()).isEmpty();
+  }
+
+  @Test
+  public void test_create_rejects_an_ownership_it_was_handed() {
+    // ownership is Opal's to give: a payload naming an owner project would otherwise take a database out of an
+    // operator's hands
+    Database database = createSqlDatabase();
+    database.setOwnerProject("CLSA");
+    try {
+      databaseRegistry.create(database);
+      fail("Expected an IllegalArgumentException for a payload-supplied owner project");
+    } catch(IllegalArgumentException ignored) {
+    }
+    assertThat(databaseRegistry.list()).isEmpty();
+  }
+
+  @Test
+  public void test_update_is_refused_while_the_owner_project_exists() {
+    Database database = createProjectOwnedDatabase("CLSA");
+
+    database.getSqlSettings().setUsername("someone-else");
+    try {
+      databaseRegistry.update(database);
+      fail("Expected a DatabaseOwnedByProjectException");
+    } catch(DatabaseOwnedByProjectException e) {
+      assertThat(e.getProject()).isEqualTo("CLSA");
+    }
+    assertThat(databaseRegistry.getDatabase("_project_CLSA").getSqlSettings().getUsername()).isEqualTo("opal");
+  }
+
+  @Test
+  public void test_update_of_a_leftover_keeps_its_owner() {
+    // the row an archiving deletion left behind re-attaches when a project of that name is created again, so editing
+    // it in the meantime must not silently take its owner away
+    Database database = createProjectOwnedDatabase("CLSA");
+    projectRepository.deleteAll();
+
+    database.setOwnerProject(null);
+    database.getSqlSettings().setUsername("someone-else");
+    databaseRegistry.update(database);
+
+    assertThat(databaseRegistry.getDatabase("_project_CLSA").getOwnerProject()).isEqualTo("CLSA");
+  }
+
+  @Test
+  public void test_delete_is_refused_while_the_owner_project_exists() {
+    Database database = createProjectOwnedDatabase("CLSA");
+    File folder = projectFolder("CLSA");
+
+    try {
+      databaseRegistry.delete(database);
+      fail("Expected a DatabaseOwnedByProjectException");
+    } catch(DatabaseOwnedByProjectException e) {
+      assertThat(e.getProject()).isEqualTo("CLSA");
+    }
+    assertThat(databaseRegistry.list()).hasSize(1);
+    assertThat(folder.isDirectory()).isTrue();
+  }
+
+  /**
+   * A project that failed to load still exists: what makes a leftover an operator's to remove is the project being
+   * gone, not its datasource being absent.
+   */
+  @Test
+  public void test_delete_of_a_leftover_takes_its_files_with_it() {
+    Database database = createProjectOwnedDatabase("CLSA");
+    File folder = projectFolder("CLSA");
+    projectRepository.deleteAll();
+
+    databaseRegistry.delete(database);
+
+    assertThat(databaseRegistry.list()).isEmpty();
+    assertThat(folder.exists()).isFalse();
+    assertThat(pendingDeletionCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void test_delete_project_owned_takes_row_and_files_whatever_the_project_is_doing() {
+    Database database = createProjectOwnedDatabase("CLSA");
+    File folder = projectFolder("CLSA");
+
+    databaseRegistry.deleteProjectOwned(database);
+
+    assertThat(databaseRegistry.list()).isEmpty();
+    assertThat(folder.exists()).isFalse();
+    assertThat(pendingDeletionCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void test_delete_project_owned_of_a_database_with_no_files_yet() {
+    // the folder is only created at the first connection, so a project deleted right after it was created has a row
+    // and nothing on disk
+    Database database = createProjectOwnedDatabase("Untouched", false);
+    assertThat(projectFolder("Untouched").exists()).isFalse();
+
+    databaseRegistry.deleteProjectOwned(database);
+
+    assertThat(databaseRegistry.list()).isEmpty();
+  }
+
+  /**
+   * A project database is a folder, a registered one a file beside it: the two coexist, so the check that stops two
+   * registrations naming one file must not look at project-owned rows - nor try to read a name out of their URL.
+   */
+  @Test
+  public void test_a_project_may_be_named_after_a_registered_database() {
+    databaseRegistry.create(createH2Database(Usage.STORAGE, "jdbc:h2:file:opal-data"));
+
+    createProjectOwnedDatabase("opal-data");
+
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(2);
+  }
+
+  @Test
+  public void test_a_registered_database_may_be_named_after_a_project() {
+    createProjectOwnedDatabase("opal-data");
+
+    databaseRegistry.create(createH2Database(Usage.STORAGE, "jdbc:h2:file:opal-data"));
+
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(2);
+  }
+
+  private Database createProjectOwnedDatabase(String projectName) {
+    return createProjectOwnedDatabase(projectName, true);
+  }
+
+  private Database createProjectOwnedDatabase(String projectName, boolean withFiles) {
+    Project project = new Project(projectName);
+    project.setTitle(projectName);
+    projectRepository.save(project);
+
+    Database database = Database.Builder.create() //
+        .name("_project_" + projectName) //
+        .ownerProject(projectName) //
+        .usage(Usage.STORAGE) //
+        .defaultStorage(false) //
+        .usedForIdentifiers(false) //
+        .sqlSettings(SqlSettings.Builder.create() //
+            .sqlSchema(SqlSettings.SqlSchema.JDBC) //
+            .driverClass(H2DatabaseUrls.DRIVER_CLASS) //
+            .url(H2DatabaseUrls.projectUrl(projectName)) //
+            .username("opal") //
+            .password("generated")) //
+        .build();
+    databaseRegistry.createProjectOwned(database);
+
+    if(!withFiles) return database;
+
+    // what H2 would leave in the folder it creates at the first connection
+    File folder = projectFolder(projectName);
+    folder.mkdirs();
+    try {
+      new File(folder, "data.mv.db").createNewFile();
+      new File(folder, "data.trace.db").createNewFile();
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+    assertThat(new File(folder, "data.mv.db").isFile()).isTrue();
+    return database;
+  }
+
+  private File projectFolder(String projectName) {
+    return H2DatabaseUrls.projectFolder(projectName, h2Root);
+  }
+
+  private int pendingDeletionCount() {
+    File[] folders = h2Root.listFiles(H2ProjectFolders::isPendingDeletion);
+    return folders == null ? 0 : folders.length;
+  }
+
   private Database createH2Database(Usage usage, String url) {
     return createDatabase().usage(usage).defaultStorage(false).sqlSettings(SqlSettings.Builder.create() //
         .sqlSchema(SqlSettings.SqlSchema.JDBC) //
@@ -515,7 +739,12 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
 
     @Bean
     public IdentifiersTableService identifiersTableService() {
-      return EasyMock.createMock(IdentifiersTableService.class);
+      // nice and replayed rather than left recording: the tests that delete a database all reach getDatasourceName(),
+      // and a recording mock only tolerates the first of them
+      IdentifiersTableService mock = EasyMock.createNiceMock(IdentifiersTableService.class);
+      EasyMock.expect(mock.getDatasourceName()).andReturn("opal-identifiers").anyTimes();
+      EasyMock.replay(mock);
+      return mock;
     }
 
     @Bean
