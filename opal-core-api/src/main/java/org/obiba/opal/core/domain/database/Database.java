@@ -25,8 +25,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 @Entity
-@Table(name = "databases",
-    uniqueConstraints = @UniqueConstraint(name = "uk_databases_name", columnNames = "name"))
+@Table(name = "databases", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_databases_name", columnNames = "name"),
+    @UniqueConstraint(name = "uk_databases_owner_project", columnNames = "owner_project")})
 public class Database extends AbstractTimestamped {
 
   public enum Usage {
@@ -67,6 +68,15 @@ public class Database extends AbstractTimestamped {
   @Convert(converter = MongoDbSettingsConverter.class)
   @Column(name = "mongo_db_settings")
   private MongoDbSettings mongoDbSettings;
+
+  /**
+   * The project this database belongs to, or null when an operator registered it. A project-owned database is created
+   * with its project and deleted - row and file - with it; it is listed like any other, but Opal, not the operator, is
+   * what edits and removes it for as long as the project exists.
+   */
+  @Nullable
+  @Column(name = "owner_project")
+  private String ownerProject;
 
   public boolean isDefaultStorage() {
     return defaultStorage;
@@ -128,6 +138,19 @@ public class Database extends AbstractTimestamped {
     return mongoDbSettings != null;
   }
 
+  @Nullable
+  public String getOwnerProject() {
+    return ownerProject;
+  }
+
+  public void setOwnerProject(@Nullable String ownerProject) {
+    this.ownerProject = ownerProject;
+  }
+
+  public boolean isProjectOwned() {
+    return ownerProject != null;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hashCode(name);
@@ -144,7 +167,7 @@ public class Database extends AbstractTimestamped {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("usage", usage)
-        .add("usedForIdentifiers", usedForIdentifiers).toString();
+        .add("usedForIdentifiers", usedForIdentifiers).add("ownerProject", ownerProject).toString();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
@@ -202,6 +225,11 @@ public class Database extends AbstractTimestamped {
 
     public Builder sqlSettings(SqlSettings.Builder sqlSettingsBuilder) {
       this.sqlSettingsBuilder = sqlSettingsBuilder;
+      return this;
+    }
+
+    public Builder ownerProject(String ownerProject) {
+      database.ownerProject = ownerProject;
       return this;
     }
 

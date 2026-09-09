@@ -28,6 +28,7 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.core.service.database.InvalidH2DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -37,6 +38,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.net.ssl.SSLSocketFactory;
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.*;
@@ -371,6 +373,42 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     } catch(InvalidH2DatabaseException ignored) {
     }
     assertThat(databaseRegistry.getDatabase(database.getName()).getUsage()).isEqualTo(Usage.STORAGE);
+  }
+
+  @Test
+  public void test_owner_project_is_persisted_and_found() {
+    Database registered = createSqlDatabase();
+    databaseRegistry.create(registered);
+
+    Database owned = createH2Database(Usage.STORAGE, "jdbc:h2:file:CLSA/data");
+    owned.setName("_project_CLSA");
+    owned.setDefaultStorage(false);
+    owned.setOwnerProject("CLSA");
+    databaseRepository.save(owned);
+
+    assertThat(databaseRepository.findByName("_project_CLSA").get().isProjectOwned()).isTrue();
+    assertThat(databaseRepository.findByName(registered.getName()).get().isProjectOwned()).isFalse();
+
+    assertThat(databaseRepository.findByOwnerProject("CLSA").get().getName()).isEqualTo("_project_CLSA");
+    assertThat(databaseRepository.findByOwnerProject("clsa")).isEqualTo(Optional.empty());
+    assertThat(databaseRepository.findByOwnerProjectIgnoreCase("clsa").get().getName()).isEqualTo("_project_CLSA");
+  }
+
+  @Test
+  public void test_a_project_owns_at_most_one_database() {
+    Database first = createH2Database(Usage.STORAGE, "jdbc:h2:file:CLSA/data");
+    first.setName("_project_CLSA");
+    first.setOwnerProject("CLSA");
+    databaseRepository.save(first);
+
+    Database second = createH2Database(Usage.STORAGE, "jdbc:h2:file:CLSA2/data");
+    second.setName("_project_CLSA_2");
+    second.setOwnerProject("CLSA");
+    try {
+      databaseRepository.saveAndFlush(second);
+      fail("Expected uk_databases_owner_project to be violated");
+    } catch(DataIntegrityViolationException ignored) {
+    }
   }
 
   private Database createH2Database(Usage usage, String url) {
