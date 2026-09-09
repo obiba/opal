@@ -19,6 +19,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.BytesRef;
 import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.service.SearchException;
 import org.obiba.opal.search.service.SearchQueryExecutor;
@@ -29,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ContentQueryExecutor implements SearchQueryExecutor {
 
@@ -133,16 +136,16 @@ public class ContentQueryExecutor implements SearchQueryExecutor {
     // Parse a query
     Query query = parser.parse(querySettings.getQuery());
     if (querySettings.hasFilterReferences()) {
-      // at least one table-ref must match
-      BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
-      for (String tableRef : querySettings.getFilterReferences()) {
-        queryBuilder.add(new TermQuery(new Term("table-ref", tableRef)), BooleanClause.Occur.SHOULD);
-      }
-      Query termsQuery = queryBuilder.build();
+      // at least one table-ref must match: a term set query is not subject to the
+      // boolean max clause count limit, which the number of tables can easily exceed
+      List<BytesRef> tableRefs = querySettings.getFilterReferences().stream()
+          .map(BytesRef::new)
+          .collect(Collectors.toList());
+      Query termsQuery = new TermInSetQuery("table-ref", tableRefs);
 
-      queryBuilder = new BooleanQuery.Builder();
+      BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
       queryBuilder.add(new BooleanClause(query, BooleanClause.Occur.MUST));
-      queryBuilder.add(new BooleanClause(termsQuery, BooleanClause.Occur.MUST));
+      queryBuilder.add(new BooleanClause(termsQuery, BooleanClause.Occur.FILTER));
       query = queryBuilder.build();
     }
     return query;
