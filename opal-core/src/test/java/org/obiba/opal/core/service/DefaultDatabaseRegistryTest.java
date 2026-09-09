@@ -78,6 +78,16 @@ public class DefaultDatabaseRegistryTest extends AbstractConfigDbTest {
     databaseRegistry.stop();
     databaseRepository.deleteAll();
     projectRepository.deleteAll();
+    // OPAL_HOME is shared by every test class in the JVM, so start from an empty H2 folder
+    cleanH2Root();
+  }
+
+  private void cleanH2Root() throws IOException {
+    File[] files = h2Root.listFiles();
+    if(files == null) return;
+    for(File file : files) {
+      org.obiba.core.util.FileUtil.delete(file);
+    }
   }
 
   @Override

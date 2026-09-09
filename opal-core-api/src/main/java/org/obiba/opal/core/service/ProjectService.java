@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.service;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
 
@@ -31,7 +32,50 @@ public interface ProjectService extends SystemService {
 
   boolean hasProject(@NotNull String name);
 
+  /**
+   * What a project's data is stored in: nothing, a database an operator registered, or one the project owns.
+   */
+  record ProjectStorage(@NotNull Kind kind, @Nullable String databaseName) {
+
+    public enum Kind {
+      NONE, REGISTERED, INTERNAL
+    }
+
+    public static ProjectStorage none() {
+      return new ProjectStorage(Kind.NONE, null);
+    }
+
+    public static ProjectStorage registered(@Nullable String databaseName) {
+      return new ProjectStorage(Kind.REGISTERED, databaseName);
+    }
+
+    public static ProjectStorage internal() {
+      return new ProjectStorage(Kind.INTERNAL, null);
+    }
+
+    /**
+     * The storage a project already has, read back from the database name it holds. What {@link #save(Project)} passes
+     * on, so that saving a project for any other reason - a table was added, an identifiers mapping was removed - does
+     * not touch its storage.
+     */
+    public static ProjectStorage of(@Nullable String databaseName) {
+      if(databaseName == null || databaseName.isEmpty()) return none();
+      return databaseName.startsWith(ProjectDatabaseService.INTERNAL_PREFIX) ? internal() : registered(databaseName);
+    }
+  }
+
+  /**
+   * Save a project, leaving its storage as it is.
+   */
   void save(@NotNull Project project) throws ConstraintViolationException;
+
+  /**
+   * Save a project and give it the storage asked for: create the database it owns, or delete the one it is leaving.
+   *
+   * @throws InvalidProjectStorageException if the project holds data, or if the database named belongs to another
+   * project
+   */
+  void save(@NotNull Project project, @NotNull ProjectStorage storage) throws ConstraintViolationException;
 
   void delete(@NotNull String name, boolean archive) throws NoSuchProjectException, FileSystemException;
 
