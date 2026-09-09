@@ -226,7 +226,7 @@ const hasAdminPermission = computed(
 );
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);
-const hasDatabase = computed(() => project.value.database !== undefined);
+const hasDatabase = computed(() => project.value.database !== undefined || project.value.internalDatabase === true);
 const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 
 const properties: FieldItem[] = [
@@ -256,6 +256,8 @@ const dsProperties: FieldItem[] = [
   {
     field: 'database',
     label: 'database',
+    // a database the project owns is not named here: it is Opal's, and the databases page is where it is named
+    html: (val) => (val.internalDatabase ? t('internal_database') : escapeHtml(val.database ?? '')),
   },
   {
     field: 'datasource.type',

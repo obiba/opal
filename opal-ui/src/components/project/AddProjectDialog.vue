@@ -33,10 +33,11 @@
           >
           </q-input>
           <q-select
-            v-model="newProject.database"
-            :options="databases"
+            v-model="storage"
+            :options="storageOptions"
             dense
             :label="t('database')"
+            :hint="storageHint"
             :disable="hasTables"
             class="q-mb-md q-pt-md"
             emit-value
@@ -129,6 +130,10 @@ const pluginsStore = usePluginsStore();
 const { t } = useI18n();
 
 const formRef = ref();
+// The value of the internal storage option. The server reserves names beginning with an underscore for its own
+// databases, so this cannot be one an operator registered.
+const INTERNAL_STORAGE = '_project_';
+const storage = ref<string>(INTERNAL_STORAGE);
 const databases = ref<{ label: string; value: string; defaultStorage: boolean }[]>([]);
 const vcfStores = ref<{ label: string; value: string }[]>([]);
 const showDialog = ref(props.modelValue);
@@ -142,6 +147,16 @@ const submitCaption = computed(() => (editMode.value ? t('update') : t('add')));
 const dialogTitle = computed(() => (editMode.value ? t('edit_project') : t('add_project')));
 const hasTables = computed(() => (newProject.value?.datasource?.table ?? []).length > 0);
 const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
+const storageOptions = computed(() => [
+  { label: t('internal_database'), value: INTERNAL_STORAGE, defaultStorage: false },
+  ...databases.value,
+  { label: t('none_value'), value: '', defaultStorage: false },
+]);
+// What deletion means is the whole difference between the two, and worth saying out loud
+const storageHint = computed(() => {
+  if (storage.value === INTERNAL_STORAGE) return t('internal_database_hint');
+  return storage.value === '' ? '' : t('registered_database_hint');
+});
 
 // Validators
 const validateRequiredField = (val: string) => (val && val.trim().length > 0) || t('validation.name_required');
@@ -192,6 +207,7 @@ watch(
     if (value) {
       if (props.project) {
         newProject.value = { ...props.project };
+        storage.value = props.project.internalDatabase ? INTERNAL_STORAGE : (props.project.database ?? '');
         if (props.project.exportFolder) {
           filesStore.getFile(props.project.exportFolder).then((file) => {
             exportFolder.value = file;
@@ -199,8 +215,10 @@ watch(
         }
       } else {
         newProject.value = { ...emptyProject };
+        // an operator marking a database as the default storage says where project data is meant to go on this
+        // server, and internal storage does not overrule that
         const defaultDb = databases.value.find((db) => db.defaultStorage);
-        newProject.value.database = (defaultDb || databases.value[0] || {}).value;
+        storage.value = defaultDb ? defaultDb.value : INTERNAL_STORAGE;
         const defaultVcfStore = vcfStores.value.find((vcf) => vcf.value === '');
         if (hasVcfStores) newProject.value.vcfStoreService = (defaultVcfStore || vcfStores.value[0] || {}).value;
       }
@@ -211,6 +229,21 @@ watch(
     }
   },
 );
+
+/**
+ * An internal database is asked for by name of kind, not by name of database. No storage at all is asked for with an
+ * empty database name: leaving the field out is what a client that cannot name an internal database does, and the
+ * server reads it as "leave the storage alone".
+ */
+function applyStorage() {
+  if (storage.value === INTERNAL_STORAGE) {
+    newProject.value.internalDatabase = true;
+    delete newProject.value.database;
+  } else {
+    newProject.value.internalDatabase = false;
+    newProject.value.database = storage.value;
+  }
+}
 
 function onUpdateFolder() {
   newProject.value.exportFolder = exportFolder.value?.path;
@@ -223,6 +256,7 @@ async function onAddProject() {
       if (newProject.value.title === '') {
         newProject.value.title = newProject.value.name;
       }
+      applyStorage();
 
       if (editMode.value) await projectsStore.updateProject(newProject.value as ProjectDto);
       else await projectsStore.addProject(newProject.value as ProjectDto);
@@ -241,14 +275,16 @@ onMounted(() => {
     }
 
     systemStore.getDatabases(DatabaseDto_Usage.STORAGE).then((dbs: DatabaseDto[]) => {
-      databases.value = (dbs || []).map((db) => {
-        return {
-          label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
-          value: db.name,
-          defaultStorage: db.defaultStorage,
-        };
-      });
-      databases.value.push({ label: t('none_value'), value: '', defaultStorage: false });
+      // a database another project owns is not a choice; the server refuses it too
+      databases.value = (dbs || [])
+        .filter((db) => !db.ownerProject)
+        .map((db) => {
+          return {
+            label: db.defaultStorage ? `${db.name} (${t('default_storage').toLocaleLowerCase()})` : db.name,
+            value: db.name,
+            defaultStorage: db.defaultStorage,
+          };
+        });
     });
 
     pluginsStore.initVcfStorePlugins().then(() => {

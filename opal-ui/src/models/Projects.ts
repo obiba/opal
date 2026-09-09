@@ -41,6 +41,8 @@ export interface ProjectDto {
   exportFolder?: string | undefined;
   idMappings: ProjectDto_IdentifiersMappingDto[];
   datasourceStatus?: ProjectDatasourceStatusDto | undefined;
+  /** The project stores its data in a database it owns; `database` is then unset. */
+  internalDatabase?: boolean | undefined;
 }
 
 export interface ProjectDto_IdentifiersMappingDto {
@@ -57,6 +59,8 @@ export interface ProjectFactoryDto {
   tags: string[];
   vcfStoreService?: string | undefined;
   exportFolder?: string | undefined;
+  /** Give the project a database of its own, created with it and deleted with it. */
+  internalDatabase?: boolean | undefined;
 }
 
 export interface EntityTypeCountDto {
