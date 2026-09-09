@@ -49,13 +49,13 @@
                 flat
                 size="sm"
                 color="secondary"
-                :icon="toolsVisible[props.row.name] ? 'edit' : 'none'"
-                :title="t('edit')"
+                :icon="toolsVisible[props.row.name] ? (isManaged(props.row) ? 'visibility' : 'edit') : 'none'"
+                :title="t(isManaged(props.row) ? 'view' : 'edit')"
                 class="q-ml-xs"
                 @click="onShowEdit(props.row)"
               />
               <q-btn
-                v-if="authStore.isAdministrator && !props.row.hasDatasource"
+                v-if="authStore.isAdministrator && !props.row.hasDatasource && !isManaged(props.row)"
                 rounded
                 dense
                 flat
@@ -67,6 +67,9 @@
                 @click="onShowDelete(props.row)"
               />
             </div>
+          </q-td>
+          <q-td key="ownerProject" :props="props" class="text-caption">
+            {{ props.row.ownerProject }}
           </q-td>
           <q-td key="hasDatasource" :props="props">
             <q-icon
@@ -86,11 +89,11 @@
     </q-table>
     <confirm-dialog
       v-model="showDelete"
-      :title="t('unregister')"
-      :text="t('db.unregister_confirm', { name: selected?.name })"
+      :title="t(isOwned(selected) ? 'delete' : 'unregister')"
+      :text="t(isOwned(selected) ? 'db.delete_internal_confirm' : 'db.unregister_confirm', { name: selected?.name })"
       @confirm="onDelete"
     />
-    <edit-database-dialog v-model="showEdit" :database="selected" @save="onSave" />
+    <edit-database-dialog v-model="showEdit" :database="selected" :read-only="isManaged(selected)" @save="onSave" />
   </div>
 </template>
 
@@ -118,6 +121,13 @@ const selected = ref();
 
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },
+  {
+    name: 'ownerProject',
+    label: t('db.owner_project'),
+    align: DefaultAlignment,
+    field: 'ownerProject',
+    sortable: true,
+  },
   { name: 'hasDatasource', label: t('db.in_use'), align: DefaultAlignment, field: 'hasDatasource' },
   { name: 'url', label: 'URL', align: DefaultAlignment, field: 'url' },
   { name: 'usage', label: t('usage'), align: DefaultAlignment, field: 'usage' },
@@ -131,6 +141,21 @@ function refresh() {
   systemStore.getDatabasesWithSettings().then((data) => {
     databases.value = data;
   });
+}
+
+/** Whether this database belongs to a project at all, whether or not that project still exists. */
+function isOwned(row: DatabaseDto | undefined) {
+  return Boolean(row?.ownerProject);
+}
+
+/**
+ * Whether Opal, and not the operator, is what edits and deletes this database. That is decided by the owner project
+ * still existing rather than by the database being in use: a project that failed to load has no datasource but is
+ * still there, and offering a delete button that comes back with a conflict is worse than not offering one. The
+ * server has the last word - the page can be stale, and a project can be created between the listing and the click.
+ */
+function isManaged(row: DatabaseDto | undefined) {
+  return Boolean(row?.ownerProjectExists);
 }
 
 function onOverRow(row: DatabaseDto) {
@@ -163,9 +188,15 @@ function onShowDelete(row: DatabaseDto) {
 }
 
 function onDelete() {
-  systemStore.deleteDatabase(selected.value.name).then(() => {
-    refresh();
-  });
+  systemStore
+    .deleteDatabase(selected.value.name)
+    .then(() => {
+      refresh();
+    })
+    .catch((error) => {
+      notifyError(error);
+      refresh();
+    });
 }
 
 function onShowAddSQLDB() {

@@ -2,7 +2,10 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ t(editMode ? 'edit' : 'register') }}</div>
+        <div class="text-h6">{{ t(readOnly ? 'view' : editMode ? 'edit' : 'register') }}</div>
+        <div v-if="readOnly && database.ownerProject" class="text-help">
+          {{ t('db.owner_project_hint') }}
+        </div>
       </q-card-section>
       <q-separator />
       <q-card-section>
@@ -11,7 +14,7 @@
           v-model="database.name"
           :label="t('name')"
           :hint="t('db.name_hint')"
-          :disable="editMode"
+          :disable="readOnly || editMode"
           dense
           class="q-mb-md"
         />
@@ -21,7 +24,7 @@
           :options="usageOptions"
           :label="t('usage')"
           :hint="t('db.usage_hint')"
-          :disable="hasDatasource"
+          :disable="readOnly || hasDatasource"
           dense
           emit-value
           map-options
@@ -30,6 +33,7 @@
         <q-toggle
           v-if="!database.usedForIdentifiers && database.usage === DatabaseDto_Usage.STORAGE"
           v-model="database.defaultStorage"
+          :disable="readOnly"
           :label="t('default_storage')"
           dense
           class="q-mb-md"
@@ -37,6 +41,7 @@
         <div v-if="database.sqlSettings">
           <q-select
             v-model="database.sqlSettings.driverClass"
+            :disable="readOnly"
             :options="driverOptions"
             :label="t('db.driver')"
             :hint="t('db.driver_hint')"
@@ -48,6 +53,7 @@
           />
           <q-input
             v-model="database.sqlSettings.url"
+            :disable="readOnly"
             label="URL"
             :hint="selectedDriver?.jdbcUrlTemplate"
             dense
@@ -56,11 +62,12 @@
           <q-form ref="formRef">
             <div class="row q-col-gutter-md q-mb-md">
               <div class="col">
-                <q-input v-model="database.sqlSettings.username" :label="t('username')" dense />
+                <q-input v-model="database.sqlSettings.username" :disable="readOnly" :label="t('username')" dense />
               </div>
               <div class="col">
                 <q-input
                   v-model="database.sqlSettings.password"
+                  :disable="readOnly"
                   autocomplete="new-password"
                   type="password"
                   :label="t('password')"
@@ -74,6 +81,7 @@
           <div v-if="database.usage !== DatabaseDto_Usage.STORAGE">
             <q-input
               v-model="jdbcDatasourceSettings.defaultEntityType"
+              :disable="readOnly"
               :label="t('db.default_entity_type')"
               :hint="t('db.default_entity_type_hint')"
               dense
@@ -81,6 +89,7 @@
             />
             <q-input
               v-model="jdbcDatasourceSettings.defaultEntityIdColumnName"
+              :disable="readOnly"
               :label="t('db.default_id_column')"
               :hint="t('db.default_id_column_hint')"
               dense
@@ -88,6 +97,7 @@
             />
             <q-input
               v-model="jdbcDatasourceSettings.defaultUpdatedTimestampColumnName"
+              :disable="readOnly"
               :label="t('db.default_updated_column')"
               :hint="t('db.default_updated_column_hint')"
               dense
@@ -96,6 +106,7 @@
             <div v-if="database.usage === DatabaseDto_Usage.EXPORT" class="q-mt-lg">
               <q-toggle
                 v-model="jdbcDatasourceSettings.useMetadataTables"
+                :disable="readOnly"
                 :label="t('db.use_metadata_tables')"
                 dense
                 class="q-mb-sm"
@@ -115,6 +126,7 @@
             >
               <q-input
                 v-model="jdbcDatasourceSettings.batchSize"
+                :disable="readOnly"
                 :label="t('db.batch_size')"
                 :hint="t('db.batch_size_hint')"
                 dense
@@ -122,6 +134,7 @@
               />
               <q-input
                 v-model="database.sqlSettings.properties"
+                :disable="readOnly"
                 :label="t('options')"
                 placeholder="key=value"
                 dense
@@ -132,14 +145,14 @@
           </q-list>
         </div>
         <div v-if="database.mongoDbSettings">
-          <q-input v-model="database.mongoDbSettings.url" label="URL" dense class="q-mb-md" />
+          <q-input v-model="database.mongoDbSettings.url" :disable="readOnly" label="URL" dense class="q-mb-md" />
           <q-form ref="formRef">
             <div class="row q-col-gutter-md q-mb-md">
               <div class="col">
-                <q-input v-model="database.mongoDbSettings.username" :label="t('username')" dense />
+                <q-input v-model="database.mongoDbSettings.username" :disable="readOnly" :label="t('username')" dense />
               </div>
               <div class="col">
-                <q-input v-model="database.mongoDbSettings.password" :label="t('password')" dense />
+                <q-input v-model="database.mongoDbSettings.password" :disable="readOnly" :label="t('password')" dense />
               </div>
             </div>
           </q-form>
@@ -152,6 +165,7 @@
             >
               <q-input
                 v-model="database.mongoDbSettings.batchSize"
+                :disable="readOnly"
                 :label="t('db.batch_size')"
                 :hint="t('db.batch_size_hint')"
                 dense
@@ -159,6 +173,7 @@
               />
               <q-input
                 v-model="database.mongoDbSettings.properties"
+                :disable="readOnly"
                 :label="t('options')"
                 placeholder="key=value"
                 dense
@@ -171,8 +186,15 @@
       </q-card-section>
       <q-separator />
       <q-card-actions align="right" class="bg-grey-3">
-        <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="t('save')" color="primary" :disable="!database.name || !hasUrl" @click="onSubmit" />
+        <q-btn flat :label="t(readOnly ? 'close' : 'cancel')" color="secondary" v-close-popup />
+        <q-btn
+          v-if="!readOnly"
+          flat
+          :label="t('save')"
+          color="primary"
+          :disable="!database.name || !hasUrl"
+          @click="onSubmit"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -187,10 +209,13 @@ import type { JdbcDriverDto } from 'src/models/Database';
 interface DialogProps {
   modelValue: boolean;
   database: DatabaseDto;
+  /** Show the settings without offering to change them: a database a project owns is Opal's to manage. */
+  readOnly?: boolean;
 }
 
 const props = withDefaults(defineProps<DialogProps>(), {
   database: () => ({}) as DatabaseDto,
+  readOnly: false,
 });
 
 const emit = defineEmits(['update:modelValue', 'save']);
