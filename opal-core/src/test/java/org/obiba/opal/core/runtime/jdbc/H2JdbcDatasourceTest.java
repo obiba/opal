@@ -89,17 +89,66 @@ public class H2JdbcDatasourceTest {
     assertThat((byte[]) value.getValue()).isEqualTo(bytes);
   }
 
+  /**
+   * A project-owned database is one store in a folder named after the project - a folder H2 does not create itself,
+   * and a name that may hold a space where a registered database's may not.
+   */
+  @Test
+  public void test_a_project_database_is_a_store_in_the_project_folder() throws Exception {
+    File h2Root = temporaryFolder.newFolder("h2");
+
+    writeATable(H2DatabaseUrls.expandProject(H2DatabaseUrls.projectUrl("My Study"), h2Root), "owned");
+
+    assertThat(new File(h2Root, "My Study/data.mv.db").isFile()).isTrue();
+  }
+
+  /**
+   * A folder {@code CLSA/} coexists with a registered database's file {@code CLSA.mv.db}: that is what lets a project
+   * be named whatever an operator called a database.
+   */
+  @Test
+  public void test_a_project_database_and_a_registered_one_of_the_same_name_coexist() throws Exception {
+    File h2Root = temporaryFolder.newFolder("h2");
+
+    writeATable(H2DatabaseUrls.expandProject(H2DatabaseUrls.projectUrl("CLSA"), h2Root), "owned");
+    writeATable(H2DatabaseUrls.expand("jdbc:h2:file:CLSA", h2Root), "registered");
+
+    assertThat(new File(h2Root, "CLSA/data.mv.db").isFile()).isTrue();
+    assertThat(new File(h2Root, "CLSA.mv.db").isFile()).isTrue();
+  }
+
+  private void writeATable(String url, String tableName) throws Exception {
+    BasicDataSource dataSource = createDataSource(url);
+    try {
+      JdbcDatasource datasource = createDatasource(dataSource);
+      try(ValueTableWriter writer = datasource.createWriter(tableName, "Participant");
+          ValueTableWriter.VariableWriter variableWriter = writer.writeVariables()) {
+        variableWriter.writeVariable(Variable.Builder.newVariable("myvar", TextType.get(), "Participant").build());
+      }
+      assertThat(datasource.getValueTable(tableName).getVariable("myvar").getValueType()).isEqualTo(TextType.get());
+      datasource.dispose();
+    } finally {
+      // closing the last connection is what closes the H2 store and writes it to disk
+      dataSource.close();
+    }
+  }
+
   private JdbcDatasource createDatasource() throws Exception {
-    JdbcDatasource datasource = new JdbcDatasource("test", createDataSource(), JdbcDatasourceSettings //
+    return createDatasource(createDataSource(
+        H2DatabaseUrls.expand("jdbc:h2:file:opal", temporaryFolder.newFolder("h2"))));
+  }
+
+  private JdbcDatasource createDatasource(BasicDataSource dataSource) {
+    JdbcDatasource datasource = new JdbcDatasource("test", dataSource, JdbcDatasourceSettings //
         .newSettings("Participant").useMetadataTables(true).multipleDatasources(true).build());
     Initialisables.initialise(datasource);
     return datasource;
   }
 
-  private BasicDataSource createDataSource() throws Exception {
+  private BasicDataSource createDataSource(String url) {
     BasicDataSource dataSource = new BasicDataSource();
     dataSource.setDriverClassName(H2DatabaseUrls.DRIVER_CLASS);
-    dataSource.setUrl(H2DatabaseUrls.expand("jdbc:h2:file:opal", temporaryFolder.newFolder("h2")));
+    dataSource.setUrl(url);
     dataSource.setUsername("sa");
     dataSource.setPassword("password");
     dataSource.setDefaultAutoCommit(false);
