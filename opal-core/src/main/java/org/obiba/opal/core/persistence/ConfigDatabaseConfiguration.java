@@ -38,7 +38,7 @@ import java.util.Properties;
 /**
  * The Opal configuration database: projects, permissions, users, registered databases and the rest of the
  * configuration Opal keeps for itself. It is an embedded H2 database by default, and can be pointed at an external
- * server (PostgreSQL) through {@code org.obiba.opal.config.datasource.*} in {@code opal-config.properties}.
+ * server (PostgreSQL) through {@code config.datasource.*} in {@code opal-config.properties}.
  * <p>
  * Three things about this wiring are deliberate.
  * <p>
