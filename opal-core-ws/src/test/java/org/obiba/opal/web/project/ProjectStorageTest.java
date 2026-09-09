@@ -68,24 +68,17 @@ public class ProjectStorageTest {
 
   /**
    * The sharpest edge of internal storage: this payload is what a 5.x client PUTs back, and reading it as "no
-   * storage" would delete the project's database and its data.
+   * storage" would delete the project's database and its data. It is passed on as "not said" rather than resolved
+   * here, so that whatever the project holds is what it keeps holding - the resource never has to name it.
    */
   @Test
-  public void test_a_put_that_says_nothing_leaves_an_internal_database_alone() {
+  public void test_a_put_that_says_nothing_leaves_the_storage_alone() {
     assertThat(storageOfUpdate(project("CLSA", "_project_CLSA"), legacyDto("CLSA")).kind())
-        .isEqualTo(ProjectStorage.Kind.INTERNAL);
-  }
-
-  @Test
-  public void test_a_put_that_says_nothing_leaves_a_registered_database_alone() {
-    ProjectStorage resolved = storageOfUpdate(project("CLSA", "opal-data"), legacyDto("CLSA"));
-    assertThat(resolved.kind()).isEqualTo(ProjectStorage.Kind.REGISTERED);
-    assertThat(resolved.databaseName()).isEqualTo("opal-data");
-  }
-
-  @Test
-  public void test_a_put_that_says_nothing_leaves_a_project_without_storage_alone() {
-    assertThat(storageOfUpdate(project("CLSA", null), legacyDto("CLSA")).kind()).isEqualTo(ProjectStorage.Kind.NONE);
+        .isEqualTo(ProjectStorage.Kind.UNCHANGED);
+    assertThat(storageOfUpdate(project("CLSA", "opal-data"), legacyDto("CLSA")).kind())
+        .isEqualTo(ProjectStorage.Kind.UNCHANGED);
+    assertThat(storageOfUpdate(project("CLSA", null), legacyDto("CLSA")).kind())
+        .isEqualTo(ProjectStorage.Kind.UNCHANGED);
   }
 
   @Test

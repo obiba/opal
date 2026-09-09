@@ -43,6 +43,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -188,10 +189,17 @@ public class ProjectsServiceImpl implements ProjectService {
     // operator can see it in the databases page and delete it there
   }
 
+  @NotNull
+  @Override
+  public ProjectStorage getStorage(@NotNull Project project) {
+    if(projectDatabaseService.isInternal(project)) return ProjectStorage.internal();
+    return project.hasDatabase() ? ProjectStorage.registered(project.getDatabase()) : ProjectStorage.none();
+  }
+
   @Override
   @Transactional(propagation = Propagation.NEVER)
   public void save(@NotNull final Project project) throws ConstraintViolationException {
-    save(project, ProjectStorage.of(project.getDatabase()));
+    save(project, ProjectStorage.unchanged());
   }
 
   @Override
@@ -201,7 +209,8 @@ public class ProjectsServiceImpl implements ProjectService {
     String name = project.getName();
     Project original = projectRepository.findByName(name).orElse(null);
     String originalDb = original == null ? "" : nullToEmpty(original.getDatabase());
-    String newDb = nullToEmpty(storageDatabaseName(name, storage));
+    boolean wasInternal = original != null && projectDatabaseService.isInternal(original);
+    String newDb = nullToEmpty(storageDatabaseName(project, original, storage));
     boolean storageChanges = original != null && !newDb.equals(originalDb);
 
     // both refusals run before anything is created, so a refused save leaves nothing behind. Only when the storage is
@@ -241,8 +250,7 @@ public class ProjectsServiceImpl implements ProjectService {
     }
 
     // leaving internal storage: the database the project owned is empty by now, and nothing else can use it
-    if (storageChanges && storage.kind() != ProjectStorage.Kind.INTERNAL &&
-        originalDb.startsWith(ProjectDatabaseService.INTERNAL_PREFIX)) {
+    if (storageChanges && storage.kind() != ProjectStorage.Kind.INTERNAL && wasInternal) {
       projectDatabaseService.deleteInternalDatabase(name);
     }
   }
@@ -251,11 +259,13 @@ public class ProjectsServiceImpl implements ProjectService {
    * The name of the database the project would hold. A project-owned one is named after the project, so asking for it
    * costs nothing and does not create it: the refusals below run first.
    */
-  private String storageDatabaseName(String projectName, ProjectStorage storage) {
+  private String storageDatabaseName(Project project, @Nullable Project original, ProjectStorage storage) {
     return switch (storage.kind()) {
+      // a project being created says what it holds; one being saved again keeps what it held
+      case UNCHANGED -> original == null ? project.getDatabase() : original.getDatabase();
       case NONE -> null;
       case REGISTERED -> storage.databaseName();
-      case INTERNAL -> ProjectDatabaseService.INTERNAL_PREFIX + projectName;
+      case INTERNAL -> ProjectDatabaseService.INTERNAL_PREFIX + project.getName();
     };
   }
 

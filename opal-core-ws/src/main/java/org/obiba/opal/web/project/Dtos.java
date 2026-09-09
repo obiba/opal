@@ -16,7 +16,6 @@ import org.obiba.magma.*;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.*;
-import org.obiba.opal.core.service.ProjectDatabaseService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.spi.resource.Resource;
@@ -99,21 +98,20 @@ public class Dtos {
    * is an implementation detail of this API, and the databases API is where that row is named. The datasource status
    * is resolved from the project having storage at all, which internal storage is.
    * <p>
-   * A test on the name rather than a call to {@code ProjectDatabaseService}: this runs for every project of every
-   * listing, and the prefix is reserved and backed by a unique constraint on the owner column, so the cheap test and
-   * the authoritative column cannot disagree.
+   * The service is asked rather than the name read, because a database registered before {@code _project_} was
+   * reserved may carry that prefix: reporting an operator's database as Opal's own would hide its name from the page
+   * that is meant to manage it.
    */
   private static void setStorage(ProjectDto.Builder builder, Project project, ProjectService projectService) {
-    if (project.hasDatabase()) {
-      if (project.getDatabase().startsWith(ProjectDatabaseService.INTERNAL_PREFIX)) {
-        builder.setInternalDatabase(true);
-      } else {
-        builder.setDatabase(project.getDatabase());
+    switch (projectService.getStorage(project).kind()) {
+      case INTERNAL -> builder.setInternalDatabase(true);
+      case REGISTERED -> builder.setDatabase(project.getDatabase());
+      default -> {
+        builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
+        return;
       }
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
-    } else {
-      builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.NONE);
     }
+    builder.setDatasourceStatus(Projects.ProjectDatasourceStatusDto.valueOf(projectService.getProjectState(project)));
   }
 
   /**

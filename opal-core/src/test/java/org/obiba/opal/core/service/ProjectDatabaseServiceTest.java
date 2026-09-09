@@ -141,9 +141,31 @@ public class ProjectDatabaseServiceTest extends AbstractConfigDbTest {
 
   @Test
   public void test_is_internal_is_read_from_the_project() {
+    projectDatabaseService.ensureInternalDatabase("CLSA");
+
     assertThat(projectDatabaseService.isInternal(project("CLSA", "_project_CLSA"))).isTrue();
     assertThat(projectDatabaseService.isInternal(project("CLSA", "opal-data"))).isFalse();
     assertThat(projectDatabaseService.isInternal(project("CLSA", null))).isFalse();
+  }
+
+  /**
+   * The prefix became Opal's in 6.0, so an upgraded server can hold a database an operator registered under it. It is
+   * theirs: Opal did not make it, has no owner row for it, and must not delete it with the project or hide its name.
+   */
+  @Test
+  public void test_a_database_registered_before_the_prefix_was_reserved_is_not_internal() {
+    // straight to the store: the registry refuses this name now, which is exactly why only an upgrade can hold one
+    databaseRepository.upsert(Database.Builder.create() //
+        .name("_project_CLSA") //
+        .usage(Database.Usage.STORAGE) //
+        .sqlSettings(SqlSettings.Builder.create() //
+            .sqlSchema(SqlSettings.SqlSchema.JDBC) //
+            .driverClass(H2DatabaseUrls.DRIVER_CLASS) //
+            .url("jdbc:h2:file:legacy") //
+            .username("sa").password("sa")) //
+        .build());
+
+    assertThat(projectDatabaseService.isInternal(project("CLSA", "_project_CLSA"))).isFalse();
   }
 
   /**

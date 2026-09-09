@@ -87,7 +87,7 @@ public class ProjectsResource implements BaseResource {
 
     // this is also what makes the folder name of an internal database safe, so it stays in front of the storage
     if (!Pattern.compile("^[\\w _-]+$").matcher(project.getName()).matches())
-      throw new IllegalArgumentException("Project nome invalid: only words, blank space, underscore and hyphen characters are valid");
+      throw new IllegalArgumentException("Project name invalid: only words, blank space, underscore and hyphen characters are valid");
 
     projectService.save(project, storageOf(projectFactoryDto));
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();

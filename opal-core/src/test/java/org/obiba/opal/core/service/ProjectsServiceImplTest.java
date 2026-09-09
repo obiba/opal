@@ -124,13 +124,16 @@ public class ProjectsServiceImplTest extends AbstractConfigDbTest {
   @Test
   public void test_saving_a_project_again_leaves_its_storage_alone() {
     projectService.save(project("CLSA"), ProjectStorage.internal());
+    String password = projectDatabaseService.getInternalDatabase("CLSA").get().getSqlSettings().getPassword();
 
     Project stored = projectService.getProject("CLSA");
     stored.setTitle("A new title");
     projectService.save(stored);
 
     assertThat(projectService.getProject("CLSA").getDatabase()).isEqualTo("_project_CLSA");
-    assertThat(projectDatabaseService.getInternalDatabase("CLSA").isPresent()).isTrue();
+    // the same database, not a second one made because the first went unrecognised
+    assertThat(projectDatabaseService.getInternalDatabase("CLSA").get().getSqlSettings().getPassword())
+        .isEqualTo(password);
   }
 
   @Test
@@ -267,6 +270,29 @@ public class ProjectsServiceImplTest extends AbstractConfigDbTest {
     assertThat(projectDatabaseService.getInternalDatabase("CLSA").isPresent()).isTrue();
     // an operator's database is left exactly as it is
     assertThat(databaseRegistry.hasDatabase("opal-data")).isTrue();
+  }
+
+  /**
+   * {@code _project_} became Opal's in 6.0, so an upgraded server can hold a project stored in a database an operator
+   * registered under that name. It is theirs: saving the project must not try to make Opal's own database of that
+   * name, and the project must not be reported as owning one.
+   */
+  @Test
+  public void test_a_project_stored_in_a_database_registered_before_the_prefix_was_reserved() {
+    databaseRepository.upsert(registeredDatabase("_project_CLSA"));
+    Project project = project("CLSA");
+    project.setDatabase("_project_CLSA");
+    projectRepository.upsert(project);
+
+    Project stored = projectService.getProject("CLSA");
+    stored.setTitle("CLSA, again");
+    projectService.save(stored);
+
+    assertThat(projectService.getProject("CLSA").getDatabase()).isEqualTo("_project_CLSA");
+    assertThat(projectService.getStorage(projectService.getProject("CLSA")).kind())
+        .isEqualTo(ProjectStorage.Kind.REGISTERED);
+    // Opal never took ownership of it, so it is not Opal's to delete with the project
+    assertThat(projectDatabaseService.getInternalDatabase("CLSA").isPresent()).isFalse();
   }
 
   //

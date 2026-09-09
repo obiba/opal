@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.ProjectService.ProjectStorage;
 import org.obiba.opal.web.model.Projects;
 
 import static org.easymock.EasyMock.*;
@@ -44,7 +45,8 @@ public class ProjectDtosTest {
    */
   @Test
   public void test_an_internal_database_is_reported_as_such_and_not_named() {
-    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", "_project_CLSA"), projectService("READY"));
+    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", "_project_CLSA"),
+        projectService("READY", ProjectStorage.internal()));
 
     assertThat(dto.getInternalDatabase()).isTrue();
     assertThat(dto.hasDatabase()).isFalse();
@@ -53,16 +55,31 @@ public class ProjectDtosTest {
 
   @Test
   public void test_a_registered_database_is_named() {
-    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", "opal-data"), projectService("READY"));
+    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", "opal-data"),
+        projectService("READY", ProjectStorage.registered("opal-data")));
 
     assertThat(dto.getInternalDatabase()).isFalse();
     assertThat(dto.getDatabase()).isEqualTo("opal-data");
     assertThat(dto.getDatasourceStatus()).isEqualTo(Projects.ProjectDatasourceStatusDto.READY);
   }
 
+  /**
+   * The storage comes from the service, not from the name: a database registered before {@code _project_} was
+   * reserved carries the prefix and is still the operator's, so the page that manages it has to be told its name.
+   */
+  @Test
+  public void test_a_registered_database_that_carries_the_reserved_prefix_is_still_named() {
+    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", "_project_CLSA"),
+        projectService("READY", ProjectStorage.registered("_project_CLSA")));
+
+    assertThat(dto.getInternalDatabase()).isFalse();
+    assertThat(dto.getDatabase()).isEqualTo("_project_CLSA");
+  }
+
   @Test
   public void test_a_project_without_storage() {
-    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", null), projectService("READY"));
+    Projects.ProjectDto dto = Dtos.asDtoDigest(project("CLSA", null),
+        projectService("READY", ProjectStorage.none()));
 
     assertThat(dto.getInternalDatabase()).isFalse();
     assertThat(dto.hasDatabase()).isFalse();
@@ -97,9 +114,10 @@ public class ProjectDtosTest {
     return project;
   }
 
-  private ProjectService projectService(String state) {
+  private ProjectService projectService(String state, ProjectService.ProjectStorage storage) {
     ProjectService mock = EasyMock.createNiceMock(ProjectService.class);
     expect(mock.getProjectState(anyObject(Project.class))).andReturn(state).anyTimes();
+    expect(mock.getStorage(anyObject(Project.class))).andReturn(storage).anyTimes();
     replay(mock);
     return mock;
   }

@@ -34,9 +34,9 @@ public interface ProjectDatabaseService {
   String INTERNAL_PREFIX = "_project_";
 
   /**
-   * Whether the project stores its data in a database it owns. A test on the name, not a query: it is asked for every
-   * project in every listing. The prefix is reserved and the unique constraint on the owner column backs it, so the
-   * cheap test and the authoritative column cannot disagree.
+   * Whether the project stores its data in a database it owns. The reserved prefix answers "no" without a query,
+   * which is most projects and every listing; only a name that carries it is looked up, because the prefix was
+   * reserved in 6.0 and a database registered before that may carry it and be nobody's.
    */
   boolean isInternal(@NotNull Project project);
 

@@ -63,7 +63,12 @@ public class ProjectDatabaseServiceImpl implements ProjectDatabaseService {
 
   @Override
   public boolean isInternal(@NotNull Project project) {
-    return project.hasDatabase() && project.getDatabase().startsWith(INTERNAL_PREFIX);
+    // the prefix settles the common case without a query, and the owner column settles the rest: a database an
+    // operator registered before that prefix was reserved may carry it and belong to no project at all
+    if(!project.hasDatabase() || !project.getDatabase().startsWith(INTERNAL_PREFIX)) return false;
+    return getInternalDatabase(project.getName()) //
+        .map(database -> database.getName().equals(project.getDatabase())) //
+        .orElse(false);
   }
 
   @Override

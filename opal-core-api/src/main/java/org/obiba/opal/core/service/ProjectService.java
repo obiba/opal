@@ -38,7 +38,15 @@ public interface ProjectService extends SystemService {
   record ProjectStorage(@NotNull Kind kind, @Nullable String databaseName) {
 
     public enum Kind {
-      NONE, REGISTERED, INTERNAL
+      /**
+       * Not said, so not touched. What a payload that predates internal storage amounts to, and what saving a project
+       * for any other reason - a table was added, an identifiers mapping was removed - asks for.
+       */
+      UNCHANGED, NONE, REGISTERED, INTERNAL
+    }
+
+    public static ProjectStorage unchanged() {
+      return new ProjectStorage(Kind.UNCHANGED, null);
     }
 
     public static ProjectStorage none() {
@@ -52,17 +60,14 @@ public interface ProjectService extends SystemService {
     public static ProjectStorage internal() {
       return new ProjectStorage(Kind.INTERNAL, null);
     }
-
-    /**
-     * The storage a project already has, read back from the database name it holds. What {@link #save(Project)} passes
-     * on, so that saving a project for any other reason - a table was added, an identifiers mapping was removed - does
-     * not touch its storage.
-     */
-    public static ProjectStorage of(@Nullable String databaseName) {
-      if(databaseName == null || databaseName.isEmpty()) return none();
-      return databaseName.startsWith(ProjectDatabaseService.INTERNAL_PREFIX) ? internal() : registered(databaseName);
-    }
   }
+
+  /**
+   * The storage a project has. Authoritative, unlike the name it holds: a database registered before
+   * {@code _project_} was reserved may carry that prefix and belong to no project.
+   */
+  @NotNull
+  ProjectStorage getStorage(@NotNull Project project);
 
   /**
    * Save a project, leaving its storage as it is.
