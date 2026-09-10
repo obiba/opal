@@ -20,6 +20,13 @@
 #
 #export OTEL_EXPORTER_OTLP_ENDPOINT=https://collector.example.org:4318
 
+# A per-signal endpoint, for when the signals do not all go to the same collector. Any one of them
+# turns the export on by itself, exactly as the global endpoint does - set only the traces one and
+# only the traces are exported.
+#export OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=https://collector.example.org:4318/v1/logs
+#export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://collector.example.org:4318/v1/traces
+#export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://collector.example.org:4318/v1/metrics
+
 # Name reported to the backend. Defaults to "opal".
 #export OTEL_SERVICE_NAME=opal
 
@@ -35,6 +42,18 @@
 
 # Metrics are exported every 60s by default; lower it while trying things out.
 #export OTEL_METRIC_EXPORT_INTERVAL=5000
+
+# The protocol has to stay http/protobuf: Opal bundles the HTTP sender only, so grpc makes the SDK
+# fail to build. Opal logs "Failed to initialize OpenTelemetry, continuing without it", starts, and
+# exports nothing.
+#export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+
+# An endpoint turns the three signals on together. Set one exporter to "none" to drop that signal
+# and keep the other two, or disable the SDK outright without having to unset the endpoint.
+#export OTEL_LOGS_EXPORTER=none
+#export OTEL_TRACES_EXPORTER=none
+#export OTEL_METRICS_EXPORTER=none
+#export OTEL_SDK_DISABLED=true
 
 # The OpenTelemetry Java agent adds the JDBC, Mongo and HTTP client calls made during a DataSHIELD
 # operation. They nest inside the DataSHIELD spans, so a session trace then also shows the R server
