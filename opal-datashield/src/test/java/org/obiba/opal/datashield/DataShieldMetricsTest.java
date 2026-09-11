@@ -62,12 +62,34 @@ public class DataShieldMetricsTest {
 
   @Test
   public void test_a_successful_operation_is_counted_and_timed() {
-    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> null);
+    aggregate();
 
     assertThat(pointCount("datashield.operation.count")).isEqualTo(1);
     assertThat(attributesOf("datashield.operation.count")).isEqualTo(
         Map.of("datashield.action", "AGGREGATE", "datashield.profile", "default", "datashield.outcome", "ok"));
     assertThat(pointCount("datashield.operation.duration")).isEqualTo(1);
+  }
+
+  /**
+   * The check and the evaluation each count under their own action; the operation that holds them
+   * counts nothing, or the histogram would fold the queue wait into what is meant to be R time.
+   */
+  @Test
+  public void test_the_check_and_the_evaluation_are_counted_apart() throws Exception {
+    DataShieldTracer.Operation operation =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)");
+    operation.parse("meanDS(D$age)", () -> "dsBase::meanDS(D$age)", java.util.function.Function.identity());
+    operation.evaluate("dsBase::meanDS(D$age)", () -> null);
+    DataShieldTracer.Operation assignment =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.ASSIGN, "D", "D <- opal[CNSIM.CNSIM1]");
+    assignment.resolve("datashield.table", "CNSIM.CNSIM1", () -> null);
+    assignment.evaluate("D <- opal[CNSIM.CNSIM1]", () -> null);
+
+    Set<String> actions = points("datashield.operation.count").stream()
+        .map(p -> p.getAttributes().get(io.opentelemetry.api.common.AttributeKey.stringKey("datashield.action")))
+        .collect(Collectors.toSet());
+    assertThat(actions).isEqualTo(Set.of("PARSE", "AGGREGATE", "RESOLVE", "ASSIGN"));
+    assertThat(pointCount("datashield.operation.count")).isEqualTo(4);
   }
 
   /**
@@ -77,7 +99,7 @@ public class DataShieldMetricsTest {
    */
   @Test
   public void test_the_duration_histogram_has_buckets_fit_for_seconds() {
-    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> null);
+    aggregate();
 
     List<Double> boundaries = metric("datashield.operation.duration").getHistogramData().getPoints()
         .iterator().next().getBoundaries();
@@ -87,7 +109,7 @@ public class DataShieldMetricsTest {
   @Test
   public void test_a_failing_operation_is_counted_as_an_error() {
     try {
-      DataShieldTracer.traced(context(), DataShieldLog.Action.ASSIGN, "D", "boom()", () -> {
+      DataShieldTracer.begin(context(), DataShieldLog.Action.ASSIGN, "D", "boom()").evaluate("boom()", () -> {
         throw new IllegalStateException("disclosure risk");
       });
     } catch(IllegalStateException expected) {
@@ -99,10 +121,16 @@ public class DataShieldMetricsTest {
 
   @Test
   public void test_the_operation_metrics_carry_no_unbounded_attribute() {
-    DataShieldTracer.traced(context(), DataShieldLog.Action.ASSIGN, "someUserChosenSymbol", "cbind(x)", () -> null);
+    DataShieldTracer.Operation assignment =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.ASSIGN, "someUserChosenSymbol", "cbind(x)");
+    assignment.resolve("datashield.table", "someProject.someTable", () -> null);
+    assignment.evaluate("base::cbind(x)", () -> null);
 
-    Set<String> keys = attributesOf("datashield.operation.count").keySet();
-    assertThat(keys).doesNotContain("datashield.session.id", "datashield.symbol", "datashield.script", "enduser.id");
+    points("datashield.operation.count").forEach(point -> {
+      Set<String> keys = point.getAttributes().asMap().keySet().stream().map(k -> k.getKey()).collect(Collectors.toSet());
+      assertThat(keys).doesNotContain("datashield.session.id", "datashield.symbol", "datashield.script", "enduser.id",
+          "datashield.table", "datashield.resource");
+    });
   }
 
   @Test
@@ -149,6 +177,11 @@ public class DataShieldMetricsTest {
     when(session.getExecutionContext()).thenReturn(executionContext);
     when(session.getProfile()).thenReturn(profile);
     return session;
+  }
+
+  private void aggregate() {
+    DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)")
+        .evaluate("dsBase::meanDS(D$age)", () -> null);
   }
 
   private DataShieldContext context() {

@@ -30,6 +30,7 @@ public class DataShieldLog {
     ASSIGN,
     CLOSE,
     PARSE,
+    RESOLVE,
     WS_SAVE,
     WS_RESTORE,
     RM,

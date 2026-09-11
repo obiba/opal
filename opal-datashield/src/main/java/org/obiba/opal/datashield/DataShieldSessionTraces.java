@@ -20,6 +20,7 @@ import io.opentelemetry.context.Scope;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.MDC;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,10 @@ import java.util.function.Supplier;
  * <p/>
  * The span stays open for the whole session and so is only exported when the session ends, which is
  * why {@link #retain(Set)} exists: a session is not always closed by its user.
+ * <p/>
+ * The operations of a session are registered here too, from the moment they are begun on the request
+ * thread until they end on the consumer thread. A command that is queued and never run - the session
+ * closes or expires first, and its queue is dropped - would otherwise hold a span nobody ends.
  */
 public final class DataShieldSessionTraces {
 
@@ -51,6 +56,10 @@ public final class DataShieldSessionTraces {
   private static final ContextKey<Opening> OPENING = ContextKey.named("opal-datashield-session-opening");
 
   private static final Map<String, Span> SESSIONS = new ConcurrentHashMap<>();
+
+  private static final Map<String, Set<DataShieldTracer.Operation>> OPERATIONS = new ConcurrentHashMap<>();
+
+  private static final String NO_SESSION = "";
 
   private DataShieldSessionTraces() {
   }
@@ -106,11 +115,27 @@ public final class DataShieldSessionTraces {
     return session == null ? Context.root() : Context.root().with(session);
   }
 
+  static void register(String rid, DataShieldTracer.Operation operation) {
+    OPERATIONS.computeIfAbsent(key(rid), k -> ConcurrentHashMap.newKeySet()).add(operation);
+  }
+
+  static void unregister(String rid, DataShieldTracer.Operation operation) {
+    OPERATIONS.computeIfPresent(key(rid), (k, open) -> {
+      open.remove(operation);
+      return open.isEmpty() ? null : open;
+    });
+  }
+
   /**
    * Closes the trace of a session. Called after the CLOSE span has ended, so that it is part of it.
+   * <p/>
+   * An operation still open at this point was queued and never run: it is ended first, as failed,
+   * so that it is exported - with its true start and the session's end - rather than lost.
    */
   public static void end(String rid) {
     if(Strings.isNullOrEmpty(rid)) return;
+    Set<DataShieldTracer.Operation> open = OPERATIONS.remove(key(rid));
+    if(open != null) open.forEach(operation -> operation.abandon("session ended before the command ran"));
     Span session = SESSIONS.remove(rid);
     if(session != null) session.end();
   }
@@ -132,9 +157,11 @@ public final class DataShieldSessionTraces {
    * other order would end it, and orphan every operation the session goes on to run.
    */
   public static void retain(Supplier<Set<String>> liveSessionIds) {
-    List<String> open = List.copyOf(SESSIONS.keySet());
+    Set<String> open = new HashSet<>(SESSIONS.keySet());
+    open.addAll(OPERATIONS.keySet());
+    open.remove(NO_SESSION);
     Set<String> live = liveSessionIds.get();
-    open.stream().filter(rid -> !live.contains(rid)).forEach(DataShieldSessionTraces::end);
+    List.copyOf(open).stream().filter(rid -> !live.contains(rid)).forEach(DataShieldSessionTraces::end);
   }
 
   /**
@@ -164,6 +191,15 @@ public final class DataShieldSessionTraces {
 
   static int openTraceCount() {
     return SESSIONS.size();
+  }
+
+  static int openOperationCount(String rid) {
+    Set<DataShieldTracer.Operation> open = OPERATIONS.get(key(rid));
+    return open == null ? 0 : open.size();
+  }
+
+  private static String key(String rid) {
+    return Strings.isNullOrEmpty(rid) ? NO_SESSION : rid;
   }
 
   private static final class Opening {

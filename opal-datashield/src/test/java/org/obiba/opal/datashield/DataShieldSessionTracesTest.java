@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -40,10 +41,11 @@ import org.slf4j.MDC;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
- * One DataSHIELD session is one trace. A session is a sequence of requests - open, assign, parse,
- * evaluate, close - which the audit log ties together by its id and nothing else does, so the trace
- * has to be tied together the same way. Anything less produces a trace per operation, which repeats
- * what a log line already says.
+ * One DataSHIELD session is one trace. A session is a sequence of requests - open, assign, aggregate,
+ * close - which the audit log ties together by its id and nothing else does, so the trace has to be
+ * tied together the same way. Anything less produces a trace per operation, which repeats what a log
+ * line already says. Under the session, each assignment and aggregation is a subtree of its own: the
+ * check of what was submitted, then its evaluation.
  */
 public class DataShieldSessionTracesTest {
 
@@ -77,26 +79,85 @@ public class DataShieldSessionTracesTest {
 
   /**
    * The session of the documented audit trail, played back in order: it has to come out as one trace
-   * rooted on the session, with the five operations underneath it.
+   * rooted on the session, the four operations under it, and under the assignment and the aggregation
+   * their check and their evaluation.
    */
   @Test
-  public void test_a_whole_session_is_one_trace_rooted_on_the_session() throws Exception {
+  public void test_a_whole_session_is_one_tree_rooted_on_the_session() throws Exception {
     open();
-    assign("x", "x <- opal[CNSIM.CNSIM1]");
-    parse("colnamesDS(\"x\")");
-    aggregate("dsBase::colnamesDS(\"x\")");
+    assignTable("x", "CNSIM.CNSIM1");
+    aggregate("colnamesDS(\"x\")", "dsBase::colnamesDS(\"x\")");
     close();
 
-    Map<String, SpanData> spans = byName();
-    assertThat(spans.keySet()).isEqualTo(Set.of("datashield.session", "datashield.open", "datashield.assign",
-        "datashield.parse", "datashield.aggregate", "datashield.close"));
+    List<SpanData> spans = exporter.getFinishedSpanItems();
+    assertThat(spans.stream().map(SpanData::getName).collect(java.util.stream.Collectors.toList())).isEqualTo(List.of(
+        "datashield.open",
+        "datashield.resolve", "datashield.eval", "datashield.assign",
+        "datashield.parse", "datashield.eval", "datashield.aggregate",
+        "datashield.close", "datashield.session"));
 
-    SpanData session = spans.get("datashield.session");
+    SpanData session = byName().get("datashield.session");
     assertThat(session.getParentSpanId()).isEqualTo("0000000000000000");
-    spans.values().stream().filter(span -> span != session).forEach(span -> {
-      assertThat(span.getTraceId()).isEqualTo(session.getTraceId());
-      assertThat(span.getParentSpanId()).isEqualTo(session.getSpanContext().getSpanId());
-    });
+    spans.forEach(span -> assertThat(span.getTraceId()).isEqualTo(session.getTraceId()));
+    for(String operation : List.of("datashield.open", "datashield.assign", "datashield.aggregate", "datashield.close")) {
+      assertThat(byName().get(operation).getParentSpanId()).isEqualTo(session.getSpanContext().getSpanId());
+    }
+    String assign = byName().get("datashield.assign").getSpanContext().getSpanId();
+    String aggregate = byName().get("datashield.aggregate").getSpanContext().getSpanId();
+    assertThat(spans.get(1).getParentSpanId()).isEqualTo(assign);      // resolve
+    assertThat(spans.get(2).getParentSpanId()).isEqualTo(assign);      // eval
+    assertThat(spans.get(4).getParentSpanId()).isEqualTo(aggregate);   // parse
+    assertThat(spans.get(5).getParentSpanId()).isEqualTo(aggregate);   // eval
+  }
+
+  /**
+   * A command is checked on the request thread and queued; the session may close, expire or lose its
+   * R server before the consumer gets to it, and then the queue is dropped. The operation's span would
+   * stay open forever - and its check, already exported, would point at a parent that never arrives.
+   */
+  @Test
+  public void test_an_operation_never_run_is_ended_with_its_session() throws Exception {
+    open();
+    DataShieldTracer.Operation queued =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, "colnamesDS(\"x\")");
+    queued.parse("colnamesDS(\"x\")", () -> "dsBase::colnamesDS(\"x\")", Function.identity());
+    assertThat(DataShieldSessionTraces.openOperationCount(RID)).isEqualTo(1);
+
+    close();
+
+    SpanData aggregate = byName().get("datashield.aggregate");
+    assertThat(aggregate.getStatus().getStatusCode()).isEqualTo(io.opentelemetry.api.trace.StatusCode.ERROR);
+    assertThat(aggregate.getStatus().getDescription()).isEqualTo("session ended before the command ran");
+    assertThat(aggregate.getParentSpanId()).isEqualTo(byName().get("datashield.session").getSpanContext().getSpanId());
+    assertThat(DataShieldSessionTraces.openOperationCount(RID)).isEqualTo(0);
+    assertThat(queued.isEnded()).isTrue();
+  }
+
+  @Test
+  public void test_an_operation_never_run_is_ended_by_the_reaper() {
+    open();
+    DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, "colnamesDS(\"x\")");
+
+    DataShieldSessionTraces.retain(Set.of("some-other-session"));
+
+    assertThat(byName()).containsKey("datashield.aggregate");
+    assertThat(byName()).containsKey("datashield.session");
+    assertThat(DataShieldSessionTraces.openOperationCount(RID)).isEqualTo(0);
+  }
+
+  /**
+   * An operation of a session that was never traced is a trace of its own, and so is its straggler:
+   * the reaper ends it like any other, keyed on the session id it was begun with.
+   */
+  @Test
+  public void test_a_straggler_of_an_untraced_session_is_ended_by_the_reaper() {
+    DataShieldTracer.begin(new DataShieldContext(null, "never-opened", "default", "v2", Map.of()),
+        DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)");
+
+    DataShieldSessionTraces.retain(Set.of());
+
+    assertThat(byName().get("datashield.aggregate").getParentSpanId()).isEqualTo("0000000000000000");
+    assertThat(DataShieldSessionTraces.openOperationCount("never-opened")).isEqualTo(0);
   }
 
   /**
@@ -205,10 +266,12 @@ public class DataShieldSessionTracesTest {
    */
   @Test
   public void test_an_operation_of_an_unknown_session_is_its_own_trace() {
-    DataShieldTracer.traced(new DataShieldContext(null, "never-opened", "default", "v2", Map.of()),
-        DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> null);
+    DataShieldTracer.begin(new DataShieldContext(null, "never-opened", "default", "v2", Map.of()),
+        DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)").evaluate("dsBase::meanDS(D$age)", () -> null);
 
     assertThat(byName().get("datashield.aggregate").getParentSpanId()).isEqualTo("0000000000000000");
+    assertThat(byName().get("datashield.eval").getParentSpanId())
+        .isEqualTo(byName().get("datashield.aggregate").getSpanContext().getSpanId());
   }
 
   /**
@@ -326,22 +389,31 @@ public class DataShieldSessionTracesTest {
 
   /**
    * A record written from inside one of the session's own spans keeps it: same trace either way, and
-   * the operation is the more precise of the two anchors.
+   * the operation is the more precise of the two anchors. The records of an operation are written
+   * with the operation current - before and after its check, before and after its evaluation - and
+   * so all land on the operation, not on the session root.
    */
   @Test
-  public void test_an_audit_record_written_inside_an_operation_keeps_that_span() {
+  public void test_the_audit_records_of_an_operation_are_anchored_on_it() throws Exception {
     login();
     List<SpanContext> appended = attachAuditAppender();
     open();
 
-    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)", () -> {
-      DataShieldLog.userLog(context(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", "meanDS(D$age)");
-      return null;
-    });
+    DataShieldTracer.Operation operation =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, "meanDS(D$age)");
+    try(Scope ignored = operation.makeCurrent()) {
+      operation.parse("meanDS(D$age)", () -> "dsBase::meanDS(D$age)", Function.identity());
+      DataShieldLog.userLog(context(), DataShieldLog.Action.PARSE, "parsed '{}'", "dsBase::meanDS(D$age)");
+    }
+    try(Scope ignored = operation.makeCurrent()) {
+      operation.evaluate("dsBase::meanDS(D$age)", () -> null);
+      DataShieldLog.userLog(context(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", "dsBase::meanDS(D$age)");
+    }
 
-    assertThat(appended).hasSize(1);
-    assertThat(appended.get(0).getSpanId())
-        .isEqualTo(byName().get("datashield.aggregate").getSpanContext().getSpanId());
+    assertThat(appended).hasSize(2);
+    String aggregate = byName().get("datashield.aggregate").getSpanContext().getSpanId();
+    assertThat(appended.get(0).getSpanId()).isEqualTo(aggregate);
+    assertThat(appended.get(1).getSpanId()).isEqualTo(aggregate);
   }
 
   private String sessionTraceId() {
@@ -356,16 +428,21 @@ public class DataShieldSessionTracesTest {
     }));
   }
 
-  private void assign(String symbol, String script) {
-    DataShieldTracer.traced(context(), DataShieldLog.Action.ASSIGN, symbol, script, () -> null);
-  }
-
-  private void parse(String script) throws Exception {
-    DataShieldTracer.tracedParse(context(), script, () -> null);
+  private void assignTable(String symbol, String table) {
+    DataShieldTracer.Operation operation =
+        DataShieldTracer.begin(context(), DataShieldLog.Action.ASSIGN, symbol, symbol + " <- opal[" + table + "]");
+    operation.resolve("datashield.table", table, () -> null);
+    operation.evaluate(symbol + " <- opal[" + table + "]", () -> null);
   }
 
   private void aggregate(String script) {
-    DataShieldTracer.traced(context(), DataShieldLog.Action.AGGREGATE, null, script, () -> null);
+    DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, script).evaluate(script, () -> null);
+  }
+
+  private void aggregate(String submitted, String generated) throws Exception {
+    DataShieldTracer.Operation operation = DataShieldTracer.begin(context(), DataShieldLog.Action.AGGREGATE, null, submitted);
+    operation.parse(submitted, () -> generated, Function.identity());
+    operation.evaluate(generated, () -> null);
   }
 
   private void close() {
@@ -412,8 +489,12 @@ public class DataShieldSessionTracesTest {
         .buildSubject());
   }
 
+  /**
+   * The spans by name, the first of a name winning: an operation's evaluation is always named the
+   * same, and the tests that need to tell two apart walk the exported list in order instead.
+   */
   private Map<String, SpanData> byName() {
     return exporter.getFinishedSpanItems().stream()
-        .collect(java.util.stream.Collectors.toMap(SpanData::getName, span -> span));
+        .collect(java.util.stream.Collectors.toMap(SpanData::getName, span -> span, (first, second) -> first));
   }
 }

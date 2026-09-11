@@ -11,7 +11,6 @@ package org.obiba.opal.datashield;
 
 import org.obiba.datashield.r.expr.ParseException;
 import org.obiba.opal.spi.r.RSerialize;
-import org.slf4j.MDC;
 
 /**
  * Parses a restricted R script, executes it and stores the result.
@@ -21,7 +20,7 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
   private final RSerialize serialize;
 
   public RestrictedRScriptROperation(String script, DataShieldContext context, RSerialize serialize) throws ParseException {
-    super(script, context);
+    super(script, context, DataShieldLog.Action.AGGREGATE, null);
     this.serialize = serialize;
   }
 
@@ -30,23 +29,6 @@ public class RestrictedRScriptROperation extends AbstractRestrictedRScriptROpera
     super.doWithConnection();
     setResult(null);
     String script = restrictedScript();
-    beforeLog(script);
-    DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluating '{}'", script);
-    try {
-      DataShieldTracer.traced(getContext(), DataShieldLog.Action.AGGREGATE, null, script,
-          () -> setResult(eval(script, serialize)));
-      beforeLog(script);
-      DataShieldLog.userLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluated '{}'", script);
-    } catch (Throwable e) {
-      beforeLog(script);
-      DataShieldLog.userErrorLog(getContext(), DataShieldLog.Action.AGGREGATE, "evaluation failure '{}'", script);
-      throw e;
-    }
-  }
-
-  private void beforeLog(String script) {
-    MDC.put("ds_eval", script);
-    MDC.put("ds_profile", getContext().getProfile());
-    getContext().getContextMap().forEach(MDC::put);
+    evaluate(() -> setResult(eval(script, serialize)));
   }
 }

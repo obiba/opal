@@ -84,6 +84,10 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     this.resourceReferenceService = resourceReferenceService;
   }
 
+  protected ResourceReferenceService getResourceReferenceService() {
+    return resourceReferenceService;
+  }
+
   @Override
   public String getName() {
     return name;

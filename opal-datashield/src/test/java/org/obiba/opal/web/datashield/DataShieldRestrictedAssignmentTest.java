@@ -26,6 +26,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.obiba.datashield.core.DSMethodType;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.core.service.NoSuchResourceReferenceException;
+import org.obiba.opal.core.service.ResourceReferenceService;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.datashield.cfg.DataShieldProfileService;
 import org.obiba.opal.datashield.cfg.RestrictedROperation;
@@ -37,6 +43,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -45,6 +52,9 @@ import static org.mockito.Mockito.*;
 /**
  * Every way of writing a symbol into a DataSHIELD session with client-supplied R code must go through the restricted
  * parser: the text/plain symbol PUT and the form-encoded symbols POST used to reach the R server verbatim.
+ * <p/>
+ * A table or a resource is not R code, but it is checked all the same, on the request thread: what does not exist or
+ * may not be read is refused before anything is queued, exactly as a script the parser turns down.
  */
 public class DataShieldRestrictedAssignmentTest {
 
@@ -58,9 +68,16 @@ public class DataShieldRestrictedAssignmentTest {
 
   private DataShieldSessionResourceImpl sessionResource;
 
+  private ResourceReferenceService resourceReferenceService;
+
   @Before
   public void setUp() {
     login(); // the audit log names the user behind every parsed script
+    if (MagmaEngine.isInstantiated()) MagmaEngine.get().shutdown();
+    StaticDatasource datasource = new StaticDatasource("CNSIM");
+    datasource.addValueTable(new StaticValueTable(datasource, "CNSIM1", List.of("1", "2"), "Participant"));
+    new MagmaEngine().addDatasource(datasource);
+    resourceReferenceService = mock(ResourceReferenceService.class);
     DataShieldProfile profile = new DataShieldProfile("default");
     profile.getEnvironment(DSMethodType.ASSIGN).addOrUpdate(new DefaultDSMethod("c", "base::c"));
     session = mock(RServerSession.class);
@@ -74,6 +91,7 @@ public class DataShieldRestrictedAssignmentTest {
     symbolResource.setName("x");
     symbolResource.setRServerSession(session);
     inject(symbolResource, "datashieldProfileService", profileService);
+    symbolResource.setResourceReferenceService(resourceReferenceService);
 
     sessionResource = new DataShieldSessionResourceImpl();
     sessionResource.setRServerSession(session);
@@ -125,6 +143,54 @@ public class DataShieldRestrictedAssignmentTest {
     assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
   }
 
+  @Test
+  public void putTableRefusesATableThatCannotBeResolvedBeforeReachingTheSession() {
+    try {
+      symbolResource.putTable(uriInfo(), "CNSIM.SECRET", null, true, null, null, null, true);
+      throw new AssertionError("the refusal should have propagated");
+    } catch (NoSuchValueTableException expected) {
+      // the lookup's exception reaches the REST layer, and its mapper, unchanged
+    }
+
+    verify(session, never()).execute(any(ROperation.class));
+    verify(session, never()).executeAsync(any(ROperation.class));
+  }
+
+  @Test
+  public void putTableQueuesATableThatResolves() {
+    Response response = symbolResource.putTable(uriInfo(), "CNSIM.CNSIM1", null, true, null, null, null, false);
+
+    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+    assertThat(onlyExecutedOperation().toString()).isEqualTo("x <- opal[CNSIM.CNSIM1]");
+  }
+
+  @Test
+  public void putTableRefusesAVariableFilterThatDoesNotCompile() {
+    try {
+      symbolResource.putTable(uriInfo(), "CNSIM.CNSIM1", "name().matches(", true, null, null, null, false);
+      throw new AssertionError("the refusal should have propagated");
+    } catch (RuntimeException expected) {
+      // whatever the JavaScript engine reports, before the session is touched
+    }
+
+    verify(session, never()).execute(any(ROperation.class));
+  }
+
+  @Test
+  public void putResourceRefusesAResourceThatCannotBeResolvedBeforeReachingTheSession() {
+    when(resourceReferenceService.getResourceReference("proj", "secret"))
+        .thenThrow(new NoSuchResourceReferenceException("proj", "secret"));
+
+    try {
+      symbolResource.putResource(uriInfo(), "proj.secret", true);
+      throw new AssertionError("the refusal should have propagated");
+    } catch (NoSuchResourceReferenceException expected) {
+      // the lookup's exception reaches the REST layer, and its mapper, unchanged
+    }
+
+    verify(session, never()).executeAsync(any(ROperation.class));
+  }
+
   @Test(expected = ForbiddenException.class)
   public void unrestrictedStringAssignmentIsRefusedBeforeReachingTheSession() {
     symbolResource.wrapROperation(new StringAssignROperation("x", FORBIDDEN_SCRIPT));
@@ -137,6 +203,7 @@ public class DataShieldRestrictedAssignmentTest {
 
   @After
   public void logout() {
+    MagmaEngine.get().shutdown();
     ThreadContext.unbindSubject();
     ThreadContext.unbindSecurityManager();
     SecurityUtils.setSecurityManager(null);
