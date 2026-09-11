@@ -152,6 +152,7 @@ export default {
     Conflict: 'Conflit détecté',
     BannedUser: "Trop d'erreurs d'identification, l'utilisateur {0} est banni pour une durée de {1} secondes",
     InvalidCredentials: "Nom d'utilisateur ou mot de passe incorrect, veuillez réessayer",
+    InvalidOtp: 'Code invalide ou expiré, veuillez réessayer',
     TableAlreadyExists: 'La table existe déjà',
     MagmaRuntimeException: 'Erreur de traitement des données: {0}',
     DuplicateIDProvider: "Le fournisseur d'identité existe déjà",

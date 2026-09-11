@@ -163,16 +163,19 @@ async function onSubmit() {
     }
   } catch (err) {
     const error = err as AxiosError;
-    authMethod.value = error.response?.headers['www-authenticate'];
+    const challenge = error.response?.headers['www-authenticate'];
     const data = error.response?.data as AuthResponse;
-    if (authMethod.value) {
+    if (challenge) {
+      authMethod.value = challenge;
       withToken.value = true;
       if (data?.image) {
         qr.value = data.image;
       }
       email.value = data?.email || false;
     } else if (error.response?.status === 403 && data?.status === undefined) {
-      notifyError('error.InvalidCredentials');
+      // the password was already accepted to get to the token step: only the code can be wrong
+      notifyError(withToken.value ? 'error.InvalidOtp' : 'error.InvalidCredentials');
+      token.value = '';
     } else {
       notifyError(err);
     }

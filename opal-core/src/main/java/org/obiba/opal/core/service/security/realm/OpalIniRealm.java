@@ -11,6 +11,9 @@
 package org.obiba.opal.core.service.security.realm;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.realm.text.IniRealm;
@@ -31,6 +34,9 @@ public class OpalIniRealm extends IniRealm {
   private static final String SHIRO2_PREFIX = "$shiro2$";
 
   @Autowired
+  private OpalOtpRealmHelper otpHelper;
+
+  @Autowired
   public OpalIniRealm(RolePermissionResolver rolePermissionResolver) {
     super("classpath:shiro.ini");
     setPermissionResolver(new OpalPermissionResolver());
@@ -41,6 +47,15 @@ public class OpalIniRealm extends IniRealm {
   @Override
   public String getName() {
     return INI_REALM;
+  }
+
+  /**
+   * Password first, one-time password second.
+   */
+  @Override
+  protected void assertCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) throws AuthenticationException {
+    super.assertCredentialsMatch(token, info);
+    otpHelper.checkOtp(token, info.getPrincipals().getPrimaryPrincipal().toString());
   }
 
   /**
