@@ -152,6 +152,7 @@ export default {
     Conflict: 'Conflicting entry detected',
     BannedUser: 'Too many sign in failures, user {0} is banned for {1} seconds',
     InvalidCredentials: 'Invalid credentials, please try again',
+    InvalidOtp: 'Invalid or expired code, please try again',
     TableAlreadyExists: 'The table already exists',
     MagmaRuntimeException: 'An error occurred while processing the data: {0}',
     DuplicateIDProvider: 'The identity provider already exists',
