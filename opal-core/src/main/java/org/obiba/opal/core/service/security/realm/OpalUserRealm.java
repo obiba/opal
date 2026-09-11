@@ -38,6 +38,9 @@ public class OpalUserRealm extends OpalBaseRealm implements InitializingBean {
   @Autowired
   private OpalConfigurationService opalConfigurationService;
 
+  @Autowired
+  private OpalOtpRealmHelper otpHelper;
+
   private String salt;
 
   @Override
@@ -74,6 +77,15 @@ public class OpalUserRealm extends OpalBaseRealm implements InitializingBean {
         getName());
     authInfo.setCredentialsSalt(new SimpleByteSource(salt));
     return authInfo;
+  }
+
+  /**
+   * Password first, one-time password second.
+   */
+  @Override
+  protected void assertCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) throws AuthenticationException {
+    super.assertCredentialsMatch(token, info);
+    otpHelper.checkOtp(token, info.getPrincipals().getPrimaryPrincipal().toString());
   }
 
 }
