@@ -12,6 +12,7 @@ package org.obiba.opal.datashield;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import io.opentelemetry.context.Scope;
 import org.obiba.datashield.core.DSEnvironment;
 import org.obiba.datashield.core.impl.DefaultDSMethod;
 import org.obiba.datashield.r.expr.ParseException;
@@ -34,20 +35,33 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
 
   private final DataShieldContext context;
 
+  private final DataShieldLog.Action action;
+
+  /**
+   * The operation's trace: begun here, on the request thread, and ended by {@link #evaluate} on the
+   * session's consumer thread - or here, when the parser refuses the script.
+   */
+  private final DataShieldTracer.Operation trace;
+
   @SuppressWarnings("ConstantConditions")
-  public AbstractRestrictedRScriptROperation(String script, DataShieldContext context) throws ParseException {
+  public AbstractRestrictedRScriptROperation(String script, DataShieldContext context, DataShieldLog.Action action,
+      String symbol) throws ParseException {
     Preconditions.checkArgument(script != null, "script cannot be null");
     Preconditions.checkArgument(context.getEnvironment() != null, "environment cannot be null");
     Preconditions.checkArgument(context.getRParserVersion() != null, "R parser version cannot be null");
 
     this.script = script;
     this.context = context;
+    this.action = action;
+    this.trace = DataShieldTracer.begin(context, action, symbol, script);
     MDC.put("ds_script_in", script);
-    try {
-      // traced here, on the request thread: the restriction is applied before anything reaches R,
+    // the operation is current while the parse is logged, so that the record is anchored on it
+    try (Scope ignored = trace.makeCurrent()) {
+      // parsed here, on the request thread: the restriction is applied before anything reaches R,
       // and a refusal is the one thing an auditor wants to find in the session's trace
-      this.rScriptGenerator = DataShieldTracer.tracedParse(context, script,
-          () -> RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script));
+      this.rScriptGenerator = trace.parse(script,
+          () -> RScriptGeneratorFactory.make(context.getRParserVersion(), context.getEnvironment(), script),
+          RScriptGenerator::toScript);
       String toScript = rScriptGenerator.toScript();
       String mapped = Joiner.on(";").join(rScriptGenerator.getMappedFunctions().entrySet().stream()
           .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
@@ -57,6 +71,8 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
       DataShieldLog.userLog(context, DataShieldLog.Action.PARSE, "parsed '{}'", toScript);
     } catch (Throwable e) {
       DataShieldLog.userErrorLog(context, DataShieldLog.Action.PARSE, "Script failed validation: {}", e.getMessage());
+      // a no-op when the parse itself failed: it has already ended the operation
+      trace.refuse(e);
       if (e instanceof ParseException)
         throw e;
       throw new ParseException(e.getMessage(), e);
@@ -66,6 +82,37 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
   @Override
   protected void doWithConnection() {
     prepareOps(context.getEnvironment()).forEach(op -> op.doWithConnection(getConnection()));
+  }
+
+  /**
+   * Runs the evaluation of the restricted script as the last step of the operation's trace, with the
+   * audit records around it anchored on the operation.
+   */
+  protected void evaluate(Runnable evaluation) {
+    String restricted = restrictedScript();
+    try (Scope ignored = trace.makeCurrent()) {
+      beforeLog(restricted);
+      DataShieldLog.userDebugLog(context, action, "evaluating '{}'", restricted);
+      try {
+        trace.evaluate(restricted, evaluation);
+        beforeLog(restricted);
+        DataShieldLog.userLog(context, action, "evaluated '{}'", restricted);
+      } catch (Throwable e) {
+        beforeLog(restricted);
+        DataShieldLog.userErrorLog(context, action, "evaluation failure '{}'", restricted);
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * The MDC keys the evaluation records carry, put back before each record because writing one
+   * clears them.
+   */
+  protected void beforeLog(String restricted) {
+    MDC.put("ds_eval", restricted);
+    MDC.put("ds_profile", context.getProfile());
+    context.getContextMap().forEach(MDC::put);
   }
 
   @Override

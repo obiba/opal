@@ -21,8 +21,7 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
   private final String symbol;
 
   public RestrictedAssignmentROperation(String symbol, String script, DataShieldContext context) throws ParseException {
-    super(script, context);
-    Preconditions.checkArgument(symbol != null, "symbol cannot be null");
+    super(script, context, DataShieldLog.Action.ASSIGN, requireSymbol(symbol));
     this.symbol = symbol;
   }
 
@@ -31,19 +30,13 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     super.doWithConnection();
     setResult(null);
     String script = restrictedScript();
-    beforeLog(script);
-    DataShieldLog.userDebugLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluating '{}'", script);
-    try {
-      String escapedSymbol = symbol.replace("'", "\\'");
-      DataShieldTracer.traced(getContext(), DataShieldLog.Action.ASSIGN, symbol, script,
-          () -> setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", escapedSymbol, script))));
-      beforeLog(script);
-      DataShieldLog.userLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluated '{}'", script);
-    } catch (Throwable e) {
-      beforeLog(script);
-      DataShieldLog.userErrorLog(getContext(), DataShieldLog.Action.ASSIGN, "evaluation failure '{}'", script);
-      throw e;
-    }
+    String escapedSymbol = symbol.replace("'", "\\'");
+    evaluate(() -> setResult(eval(String.format("is.null(base::assign('%s', value={%s}))", escapedSymbol, script))));
+  }
+
+  private static String requireSymbol(String symbol) {
+    Preconditions.checkArgument(symbol != null, "symbol cannot be null");
+    return symbol;
   }
 
   @Override
@@ -51,10 +44,9 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     return true;
   }
 
-  private void beforeLog(String script) {
-    MDC.put("ds_eval", script);
-    MDC.put("ds_profile", getContext().getProfile());
+  @Override
+  protected void beforeLog(String restricted) {
+    super.beforeLog(restricted);
     MDC.put("ds_symbol", symbol);
-    getContext().getContextMap().forEach(MDC::put);
   }
 }
