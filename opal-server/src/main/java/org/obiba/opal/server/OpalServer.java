@@ -215,6 +215,11 @@ public class OpalServer {
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
     System.setProperty("com.atomikos.icatch.registered", "true");
+    // Disable Liquibase analytics: without this it fetches config.liquibase.com at startup to decide whether to
+    // report usage. Its "analytics is disabled" notice is logged at Level.OFF, which liquibase-slf4j maps to ERROR,
+    // so also route it to debug.
+    System.setProperty("liquibase.analytics.enabled", "false");
+    System.setProperty("liquibase.analytics.logLevel", "FINE");
   }
 
   private void upgrade() {
