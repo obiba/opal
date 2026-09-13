@@ -14,7 +14,8 @@
   to generate it, so every table and column an entity expects has to be declared here.
 
   Changesets stay database-agnostic - no H2 or PostgreSQL specific types - because the same changelog has to apply to
-  an external PostgreSQL server.
+  an external PostgreSQL server. The one exception is the binary column, through the `blob.type` property below:
+  Liquibase's own BLOB is an `oid` large object on PostgreSQL, and `bytea` is what a binary column is there.
 -->
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
@@ -22,10 +23,14 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+  <property name="blob.type" value="bytea" dbms="postgresql"/>
+  <property name="blob.type" value="BLOB"/>
+
   <!--
     The configuration model, as it stood when it left OrientDB. Column types are the generic ones so the same
     changelog applies to an external PostgreSQL server: CLOB becomes `text` there and `clob` on H2, BOOLEAN and
-    TIMESTAMP are native to both.
+    TIMESTAMP are native to both. Hibernate would expect `oid` for both @Lob kinds on PostgreSQL, and is told
+    otherwise by PostgreSQLLobTypes.
 
     Enumerations are varchar columns holding the constant's name, written through an AttributeConverter rather than
     @Enumerated. No check constraint is declared for them on purpose: it would turn adding a constant into a schema
@@ -114,7 +119,7 @@
       <column name="name" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="key_store" type="BLOB"/>
+      <column name="key_store" type="${blob.type}"/>
     </createTable>
     <addUniqueConstraint tableName="keystore_states" columnNames="name" constraintName="uk_keystore_states_name"/>
 

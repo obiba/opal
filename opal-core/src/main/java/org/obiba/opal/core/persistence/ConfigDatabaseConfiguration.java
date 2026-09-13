@@ -33,7 +33,8 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The Opal configuration database: projects, permissions, users, registered databases and the rest of the
@@ -157,32 +158,44 @@ public class ConfigDatabaseConfiguration {
     factoryBean.setPersistenceUnitName("opal-config");
     factoryBean.setPackagesToScan(ENTITY_PACKAGES);
     factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+    factoryBean.setJpaPropertyMap(hibernateProperties(dialect));
+    return factoryBean;
+  }
 
-    Properties properties = new Properties();
+  /**
+   * The Hibernate settings of the configuration persistence unit. Public and static so that the persistence tests in
+   * opal-server build their factory with the settings the server runs with, rather than with a copy of them.
+   *
+   * @param dialect a dialect class name, or empty to let Hibernate recognise the server from the connection
+   */
+  public static Map<String, Object> hibernateProperties(String dialect) {
+    Map<String, Object> properties = new HashMap<>();
     // Liquibase owns the schema. Validating rather than updating means an entity that has drifted from the changelog
     // fails at startup, instead of Hibernate quietly reshaping a database that holds the only copy of a
     // configuration.
-    properties.setProperty(AvailableSettings.HBM2DDL_AUTO, "validate");
+    properties.put(AvailableSettings.HBM2DDL_AUTO, "validate");
     // Atomikos is on the classpath for the Magma datasources, and Hibernate will bind itself to it on sight -
     // "Using JTA platform [AtomikosJtaPlatform]". That is the opposite of what this persistence unit is for: it is
     // driven by its own JpaTransactionManager over plain JDBC, and must stay out of the transactions that import,
     // export and copy data.
-    properties.setProperty(AvailableSettings.JTA_PLATFORM, NoJtaPlatform.class.getName());
-    properties.setProperty(AvailableSettings.TRANSACTION_COORDINATOR_STRATEGY, "jdbc");
+    properties.put(AvailableSettings.JTA_PLATFORM, NoJtaPlatform.class.getName());
+    properties.put(AvailableSettings.TRANSACTION_COORDINATOR_STRATEGY, "jdbc");
     // A backstop, not the mechanism: the enumerations in the configuration model go through an EnumNameConverter,
     // because this setting alone does not keep them out of a native type - for @Enumerated(STRING) Hibernate consults
     // the dialect's inline ENUM descriptor before ever reading it, which is how H2 ends up with
     // `enum ('EXPORT','IMPORT','STORAGE')`. What it does prevent is a future @Enumerated field silently acquiring a
     // `create type ... as enum` of its own on PostgreSQL.
-    properties.setProperty(AvailableSettings.PREFER_NATIVE_ENUM_TYPES, "false");
+    properties.put(AvailableSettings.PREFER_NATIVE_ENUM_TYPES, "false");
     // Only the entities with an application-assigned key can actually be batched - an identity column has to be read
     // back per row - but that is the R session activity, which is the one table large enough for it to matter.
-    properties.setProperty(AvailableSettings.STATEMENT_BATCH_SIZE, "50");
+    properties.put(AvailableSettings.STATEMENT_BATCH_SIZE, "50");
+    // Not here: @Lob is text and bytea on PostgreSQL rather than oid, but that is PostgreSQLLobTypes, registered as a
+    // service in META-INF/services. A contributor handed over as a setting runs before the dialect registers its own
+    // types and is overwritten by it; a service runs after.
     if(!Strings.isNullOrEmpty(dialect)) {
-      properties.setProperty(AvailableSettings.DIALECT, dialect);
+      properties.put(AvailableSettings.DIALECT, dialect);
     }
-    factoryBean.setJpaProperties(properties);
-    return factoryBean;
+    return properties;
   }
 
   @Bean
