@@ -63,7 +63,7 @@
     <h2.version>2.4.240</h2.version>
     <hibernate.version>7.4.6.Final</hibernate.version>
     <httpclient.version>5.6.3</httpclient.version>
-    <jackson.version>2.22.1</jackson.version>
+    <jackson.version>2.22.2</jackson.version>
     <jackson-annotations.version>2.22</jackson-annotations.version>
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.32.0-GA</javassist.version>
