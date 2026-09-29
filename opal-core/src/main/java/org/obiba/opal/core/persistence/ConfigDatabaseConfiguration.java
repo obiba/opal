@@ -12,6 +12,7 @@ package org.obiba.opal.core.persistence;
 import com.google.common.base.Strings;
 import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -89,6 +90,8 @@ public class ConfigDatabaseConfiguration {
   private static final String DEFAULT_USERNAME = "opal";
 
   private static final String DATABASE_NAME = "opal-config";
+
+  private static final int DATABASE_PASSWORD_LENGTH = 15;
 
   /**
    * SQL state for an invalid authorization specification, which every JDBC driver reports the same way. H2 gives no
@@ -235,7 +238,22 @@ public class ConfigDatabaseConfiguration {
           "No <databasePassword> in the Opal configuration file. It is generated on first startup, so an empty one " +
               "means the file was edited or truncated.");
     }
-    return cryptoService.decrypt(encrypted);
+    try {
+      return cryptoService.decrypt(encrypted);
+    } catch(RuntimeException e) {
+      // Opal 5 generated this password but never read it, so a value encrypted under a secret key that has since
+      // changed went unnoticed. As long as the database does not exist, nothing depends on it: make a new one.
+      if(new File(configFolder, DATABASE_NAME + ".mv.db").exists()) {
+        throw new ConfigDatabaseException("Cannot decrypt the <databasePassword> of " +
+            configFolder.getParentFile().getAbsolutePath() + File.separator + "opal-config.xml with the <secretKey> " +
+            "of that same file, and the Opal configuration database at " + configFolder.getAbsolutePath() +
+            " was created with it.", e);
+      }
+      log.warn("Cannot decrypt the configuration database password, generating a new one");
+      String generated = new SecureRandomNumberGenerator().nextBytes(DATABASE_PASSWORD_LENGTH).toString();
+      opalConfigurationService.modifyConfiguration(config -> config.setDatabasePassword(cryptoService.encrypt(generated)));
+      return generated;
+    }
   }
 
   /**

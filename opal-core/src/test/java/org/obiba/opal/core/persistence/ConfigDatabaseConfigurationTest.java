@@ -118,6 +118,24 @@ public class ConfigDatabaseConfigurationTest {
     }
   }
 
+  @Test
+  public void test_undecryptable_password_is_regenerated_until_the_database_exists() {
+    // What an Opal 5 installation may carry: a <databasePassword> that was never read, under a replaced secret key.
+    try(AnnotationConfigApplicationContext context = openEncrypted("not-decryptable")) {
+      assertThat(context.getBean(DataSource.class)).isNotNull();
+      String regenerated = context.getBean(TestOpalConfigurationService.class).getOpalConfiguration().getDatabasePassword();
+      assertThat(regenerated).startsWith("enc:");
+    }
+
+    try(AnnotationConfigApplicationContext ignored = openEncrypted("not-decryptable")) {
+      fail("Expected an undecryptable password to be refused once the database exists");
+    } catch(Exception e) {
+      ConfigDatabaseException cause = findConfigDatabaseException(e);
+      assertThat(cause).isNotNull();
+      assertThat(cause.getMessage()).contains("Cannot decrypt the <databasePassword>");
+    }
+  }
+
   private ConfigDatabaseException findConfigDatabaseException(Throwable throwable) {
     for(Throwable t = throwable; t != null; t = t.getCause()) {
       if(t instanceof ConfigDatabaseException) return (ConfigDatabaseException) t;
@@ -126,12 +144,16 @@ public class ConfigDatabaseConfigurationTest {
   }
 
   private AnnotationConfigApplicationContext open(String password) {
+    return openEncrypted("enc:" + password);
+  }
+
+  private AnnotationConfigApplicationContext openEncrypted(String encryptedPassword) {
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
     Map<String, Object> properties = new HashMap<>();
     properties.put("OPAL_HOME", opalHome.getAbsolutePath());
     context.getEnvironment().getPropertySources().addFirst(new MapPropertySource("test", properties));
     context.registerBean(PropertySourcesPlaceholderConfigurer.class);
-    context.registerBean(TestOpalConfigurationService.class, () -> new TestOpalConfigurationService(password));
+    context.registerBean(TestOpalConfigurationService.class, () -> new TestOpalConfigurationService(encryptedPassword));
     context.register(ConfigDatabaseConfiguration.class);
     context.refresh();
     return context;
@@ -145,9 +167,9 @@ public class ConfigDatabaseConfigurationTest {
 
     private final OpalConfiguration configuration = new OpalConfiguration();
 
-    private TestOpalConfigurationService(String password) {
+    private TestOpalConfigurationService(String encryptedPassword) {
       configuration.setSecretKey("testsecretkey1234");
-      configuration.setDatabasePassword(encrypt(password));
+      configuration.setDatabasePassword(encryptedPassword);
     }
 
     @Override
@@ -184,6 +206,7 @@ public class ConfigDatabaseConfigurationTest {
 
     @Override
     public String decrypt(String encrypted) {
+      if(!encrypted.startsWith("enc:")) throw new IllegalArgumentException("Cannot decrypt " + encrypted);
       return encrypted.substring("enc:".length());
     }
 
