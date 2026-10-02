@@ -455,19 +455,23 @@ function onShowDownload() {
 
 async function onDownload() {
   const valid = await formRef.value.validate();
-  if (!valid || readables.value.length === 0) return;
+  // In the single file view, nothing is selected: download the file itself
+  const isFileView = props.file.type === FileDto_FileType.FILE;
+  const items = isFileView ? [props.file] : readables.value;
+  if (!valid || items.length === 0) return;
   const password = encryptContent.value ? encryptPassword.value : undefined;
 
   // If only one file and no need to zip or encrypt, download directly without creating a bundle
   // Check the file is not a folder, as direct download of folders would require zipping
-  if (readables.value.length === 1 && readables.value[0] && readables.value[0].type === FileDto_FileType.FILE && password === undefined) {
-    filesStore.downloadFiles(props.file.path, readables.value, undefined);
+  if (items.length === 1 && items[0] && items[0].type === FileDto_FileType.FILE && password === undefined) {
+    if (isFileView) filesStore.downloadFile(props.file.path);
+    else filesStore.downloadFiles(props.file.path, items, undefined);
     showDownload.value = false;
     return;
   }
 
-  // Collect the paths of all readable selected items, falling back to the current file/folder.
-  const bundlePaths = readables.value.map((f) => f.path);
+  // Collect the paths of all readable selected items, or the current file.
+  const bundlePaths = items.map((f) => f.path);
   downloadLoading.value = true;
 
   filesStore
