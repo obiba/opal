@@ -1329,6 +1329,7 @@ export default {
   r_activity_info: 'Temps effectif passé à exécuter des commandes R/DataSHIELD.',
   r_activity: 'Activité R/DataSHIELD',
   r_execution_time: "Temps d'exécution R",
+  r_session_time: 'Temps de session R',
   r_func: 'Fonction',
   r_packages_management_forbidden: "La gestion des paquets R (installation, mise à jour, suppression) n'est pas autorisée : il est recommandé d'utiliser des images Docker validées des serveurs R, pour garantir la reproductibilité de l'environnement d'analyse R. En tant que développeur de paquets R, vous pouvez modifier les paramètres système pour activer cette fonctionnalité.",
   r_packages_readonly: 'Les paquets R sont en lecture seule, vous ne pouvez pas les installer, les mettre à jour ou les supprimer.',
