@@ -16,4 +16,9 @@ public interface OpalAuth {
 
   String CREDENTIALS_HEADER = "X-Opal-Auth";
 
+  /**
+   * Session ID header, alternative to the session cookie.
+   */
+  String SESSION_HEADER = "X-Opal-Session";
+
 }
