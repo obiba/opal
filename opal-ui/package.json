@@ -26,7 +26,7 @@
     "plotly.js-dist": "^2.35.3",
     "quasar": "^2.27.0",
     "ts-proto": "^1.181.2",
-    "vue": "^3.5.40",
+    "vue": "^3.5.43",
     "vue-i18n": "^11.4.7",
     "vue-router": "^5.3.0",
     "vue3-ace-editor": "^2.2.4"
