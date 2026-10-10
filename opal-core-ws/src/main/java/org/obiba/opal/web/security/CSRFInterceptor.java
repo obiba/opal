@@ -69,6 +69,8 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
   @Override
   public void preProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext) {
     if (!productionMode || csrfAllowed.contains("*")) return;
+    // session by header (see OpalSessionHeaderFilter): cookies were dropped, so no ambient credentials
+    if (httpServletRequest.getAttribute(OpalAuth.SESSION_HEADER_ATTRIBUTE) != null) return;
 
     String method = requestContext.getMethod();
     if (!SAFE_METHODS.contains(method)) {

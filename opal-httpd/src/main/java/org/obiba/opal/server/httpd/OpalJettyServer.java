@@ -34,6 +34,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
+import org.obiba.opal.web.security.OpalAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -251,9 +252,11 @@ public class OpalJettyServer {
   private CrossOriginHandler makeCrossOriginHandler(Set<String> origins) {
     CrossOriginHandler corsHandler = new CrossOriginHandler();
     corsHandler.setAllowedOriginPatterns(origins);
-    corsHandler.setAllowedHeaders(Set.of("Content-Type", "Access-Control-Allow-Origin", "X-File-Key", "X-Opal-TOTP", "X-Obiba-TOTP"));
+    corsHandler.setAllowedHeaders(Set.of("Content-Type", "Access-Control-Allow-Origin", "X-File-Key", "X-Opal-TOTP", "X-Obiba-TOTP",
+        "Authorization", OpalAuth.CREDENTIALS_HEADER, OpalAuth.SESSION_HEADER));
     corsHandler.setAllowedMethods(Set.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    corsHandler.setExposedHeaders(Set.of("X-Opal-Version", "Location", "X-TOTP", "Content-Disposition", "Allow", "WWW-Authenticate"));
+    corsHandler.setExposedHeaders(Set.of("X-Opal-Version", "Location", "X-TOTP", "Content-Disposition", "Allow", "WWW-Authenticate",
+        OpalAuth.SESSION_HEADER));
     corsHandler.setAllowCredentials(true);
     return corsHandler;
   }
@@ -275,6 +278,8 @@ public class OpalJettyServer {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
 
     initOIDCFilter(properties);
+
+    servletContextHandler.addFilter(OpalSessionHeaderFilter.class, "/ws/*", EnumSet.of(REQUEST));
 
     FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
     authenticationFilterHolder.setName("authenticationFilter");

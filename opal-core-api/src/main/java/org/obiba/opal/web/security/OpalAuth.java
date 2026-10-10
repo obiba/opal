@@ -16,4 +16,14 @@ public interface OpalAuth {
 
   String CREDENTIALS_HEADER = "X-Opal-Auth";
 
+  /**
+   * Session ID header, alternative to the session cookie.
+   */
+  String SESSION_HEADER = "X-Opal-Session";
+
+  /**
+   * Request attribute set when the session header replaced the request cookies.
+   */
+  String SESSION_HEADER_ATTRIBUTE = "org.obiba.opal.sessionHeader";
+
 }
