@@ -53,6 +53,8 @@ public class OpalSessionHeaderFilter extends HttpFilter {
       filterChain.doFilter(request, response);
       return;
     }
+    // tells the CSRF check that the request carries no cookies
+    request.setAttribute(OpalAuth.SESSION_HEADER_ATTRIBUTE, Boolean.TRUE);
     filterChain.doFilter(new SessionRequest(request, sessionId.trim()), new SessionResponse(response));
   }
 

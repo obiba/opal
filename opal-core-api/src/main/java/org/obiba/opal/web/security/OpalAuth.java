@@ -21,4 +21,9 @@ public interface OpalAuth {
    */
   String SESSION_HEADER = "X-Opal-Session";
 
+  /**
+   * Request attribute set when the session header replaced the request cookies.
+   */
+  String SESSION_HEADER_ATTRIBUTE = "org.obiba.opal.sessionHeader";
+
 }

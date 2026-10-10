@@ -44,6 +44,7 @@ public class OpalSessionHeaderFilterTest {
     assertEquals("abc", seen.get().getCookies()[0].getValue());
     assertEquals("opalsid=abc", seen.get().getHeader("Cookie"));
     assertEquals("def", response.getHeader("X-Opal-Session"));
+    assertEquals(Boolean.TRUE, seen.get().getAttribute("org.obiba.opal.sessionHeader"));
   }
 
   @Test
@@ -74,6 +75,7 @@ public class OpalSessionHeaderFilterTest {
         ((HttpServletResponse) res).addHeader("Set-Cookie", "opalsid=def;Version=1;Path=/"));
 
     assertNull(response.getHeader("X-Opal-Session"));
+    assertNull(request.getAttribute("org.obiba.opal.sessionHeader"));
   }
 
 }
