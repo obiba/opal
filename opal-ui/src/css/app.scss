@@ -1,4 +1,21 @@
-// app global css in SCSS form
+// app global css in SCSS form, OBiBa design system
+.text-h1,
+.text-h2,
+.text-h3,
+.text-h4,
+.text-h5,
+.text-h6,
+.brand-title {
+  font-family: 'Sora Variable', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.q-header .brand-mark {
+  height: 28px;
+  width: 28px;
+}
+
 a {
   color: $primary;
   text-decoration: none;
@@ -19,10 +36,10 @@ p:last-of-type {
 
 .q-table {
   th {
-    background-color: $blue-grey-1;
+    background-color: #f2f7f6;
   }
   tr:nth-child(even) {
-    background-color: $grey-2;
+    background-color: #f2f7f6;
   }
   tr:nth-child(odd) {
     background-color: white;
@@ -31,7 +48,7 @@ p:last-of-type {
 
 .fields-list {
   .q-item:nth-child(even) {
-    background-color: $grey-2;
+    background-color: #f2f7f6;
   }
   .q-item:nth-child(odd) {
     background-color: white;
@@ -39,12 +56,12 @@ p:last-of-type {
 }
 
 code {
-  color: crimson;
-  background-color: #f7f7f9;
+  color: $primary;
+  background-color: #f2f7f6;
   font-size: smaller;
   padding: 2px 4px;
-  border-radius: 5px;
-  border: 1px solid #e1e1e8;
+  border-radius: 4px;
+  border: 1px solid #dbe6e4;
   white-space: nowrap;
 }
 
@@ -63,7 +80,7 @@ code {
 
 .box-warning {
   background-color: $warning;
-  color: $grey-10;
+  color: $dark;
   padding: 0.5em;
 }
 
@@ -80,11 +97,11 @@ code {
 }
 
 .text-help {
-  color: $grey-7;
+  color: $secondary;
 }
 
 .text-hint {
-  color: $grey-7;
+  color: $secondary;
   font-size: 0.8em;
 }
 
