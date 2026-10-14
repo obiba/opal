@@ -119,7 +119,7 @@
     <slf4j.version>2.0.17</slf4j.version>
     <snakeyaml.version>2.2</snakeyaml.version>
     <spring-data.version>4.1.0</spring-data.version>
-    <spring.version>7.0.8</spring.version>
+    <spring.version>7.0.9</spring.version>
     <spring-batch.version>5.2.2</spring-batch.version>
     <totp.version>1.7.1</totp.version>
     <truezip.version>6.6</truezip.version>
