@@ -1,9 +1,10 @@
 <template>
   <q-layout v-show="authStore.isAuthenticated" view="lHh Lpr lFf">
-    <q-header elevated class="bg-dark text-white">
+    <q-header class="bg-dark text-white">
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
-        <q-btn flat to="/" no-caps size="lg">
+        <q-btn flat to="/" no-caps size="lg" class="brand-title">
+          <img :src="opalMark" alt="" class="brand-mark q-mr-sm" />
           {{ appName }}
         </q-btn>
         <q-space />
@@ -119,6 +120,7 @@ import { Cookies } from 'quasar';
 import { locales } from 'boot/i18n';
 
 import MainDrawer from 'src/components/MainDrawer.vue';
+import opalMark from 'src/assets/opal-mark-negative.svg';
 import ProjectDrawer from 'src/components/ProjectDrawer.vue';
 import FilesDrawer from 'src/components/FilesDrawer.vue';
 import TaxonomiesDrawer from 'src/components/TaxonomiesDrawer.vue';
