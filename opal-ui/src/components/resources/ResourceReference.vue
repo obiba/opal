@@ -78,8 +78,7 @@ import { copyToClipboard } from 'quasar';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import SchemaForm from 'src/components/SchemaForm.vue';
 import { notifyInfo } from 'src/utils/notify';
-import DOMPurify from 'isomorphic-dompurify';
-import { escapeHtml } from 'src/utils/strings';
+import { escapeAttribute, escapeHtml } from 'src/utils/strings';
 
 const route = useRoute();
 const resourcesStore = useResourcesStore();
@@ -154,7 +153,7 @@ const itemsReference: FieldItem[] = [
     label: 'URL',
     html: (val) =>
       val.resource && val.resource?.url.startsWith('http')
-        ? `<a href="${DOMPurify.sanitize(val.resource?.url || '')}" target="_blank">${escapeHtml(val.resource?.url)}</a>`
+        ? `<a href="${escapeAttribute(val.resource?.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(val.resource?.url)}</a>`
         : escapeHtml(val.resource?.url),
   },
   {
