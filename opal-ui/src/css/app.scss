@@ -36,7 +36,8 @@ p:last-of-type {
 
 .q-table {
   th {
-    background-color: #f2f7f6;
+    background-color: $grey-4;
+    font-weight: bold;
   }
   tr:nth-child(even) {
     background-color: #f2f7f6;
