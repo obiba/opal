@@ -182,6 +182,7 @@
           </div>
         </q-card-section>
       </q-card>
+        <file-content-view :file="props.file" class="q-mt-md" />
     </div>
 
     <extract-archive-dialog v-if="selectedSingle" v-model="showExtract" :file="selectedSingle" />
@@ -274,6 +275,7 @@ import EditFileNameDialog from 'src/components/files/EditFileNameDialog.vue';
 import UploadFileDialog from 'src/components/files/UploadFileDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import ExtractArchiveDialog from 'src/components/files/ExtractArchiveDialog.vue';
+import FileContentView from 'src/components/files/FileContentView.vue';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import { CommandStateDto_Status } from 'src/models/Commands';
 import { getSizeLabel, getIconName } from 'src/utils/files';

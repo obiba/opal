@@ -41,6 +41,10 @@ export const useFilesStore = defineStore('files',
       });
     }
 
+    async function getFileContent(path: string): Promise<Blob> {
+      return api.get(`/files${path}`, { responseType: 'blob' }).then((response) => response.data as Blob);
+    }
+
     function downloadFile(path: string) {
       downloadFiles(path, [], undefined);
     }
@@ -285,6 +289,7 @@ export const useFilesStore = defineStore('files',
       refreshFiles,
       loadFiles,
       downloadFile,
+      getFileContent,
       downloadFiles,
       createFileBundle,
       getCommand,
