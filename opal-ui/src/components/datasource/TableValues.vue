@@ -50,7 +50,7 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
             <span>{{ col.label }}</span>
-            <div v-if="col.variable" class="text-grey-5 text-caption">
+            <div v-if="col.variable" class="text-grey-7 text-caption">
               <span>{{ col.variable.valueType }}</span>
               <q-badge v-if="col.variable.isRepeatable && col.variable.occurrenceGroup" color="grey-6 on-right">
                 {{ col.variable.occurrenceGroup }}
