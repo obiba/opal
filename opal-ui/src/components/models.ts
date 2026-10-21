@@ -12,6 +12,7 @@ import type {
   RHavenDatasourceFactoryDto,
   PluginDatasourceFactoryDto,
   RestDatasourceFactoryDto,
+  AmberDatasourceFactoryDto,
   AttributeDto,
   JdbcDatasourceFactoryDto,
 } from 'src/models/Magma';
@@ -55,6 +56,7 @@ export interface DatasourceFactory extends DatasourceFactoryDto {
   'Magma.RHavenDatasourceFactoryDto.params'?: RHavenDatasourceFactoryDto;
   'Magma.PluginDatasourceFactoryDto.params'?: PluginDatasourceFactoryDto;
   'Magma.RestDatasourceFactoryDto.params'?: RestDatasourceFactoryDto;
+  'Magma.AmberDatasourceFactoryDto.params'?: AmberDatasourceFactoryDto;
   'Magma.StaticDatasourceFactoryDto.params'?: StaticDatasourceFactoryDto;
   'Magma.ExcelDatasourceFactoryDto.params'?: ExcelDatasourceFactoryDto;
   'Magma.JdbcDatasourceFactoryDto.params'?: JdbcDatasourceFactoryDto;

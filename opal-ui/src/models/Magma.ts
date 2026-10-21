@@ -5,7 +5,7 @@
 // source: Magma.proto
 
 /* eslint-disable */
-import { type IdentifiersMappingConfigDto } from './Identifiers';
+import type { IdentifiersMappingConfigDto } from './Identifiers';
 
 export const protobufPackage = 'Magma';
 
@@ -169,6 +169,27 @@ export interface PluginDatasourceFactoryDto {
   name: string;
   /** user parameters */
   parameters?: string | undefined;
+}
+
+export interface AmberDatasourceFactoryDto {
+  /** Amber API url */
+  url: string;
+  /** Amber API key, sent as x-api-key */
+  token: string;
+  /** "case_report" | "interview" */
+  source: string;
+  /** study name */
+  study: string;
+  /** case report form name | interview design name */
+  form: string;
+  /** records state, e.g. "completed" */
+  state?: string | undefined;
+  /** records updated from (ISO date) */
+  from?: string | undefined;
+  /** records updated until (ISO date) */
+  to?: string | undefined;
+  /** overrides the entity type of the tables */
+  entityType?: string | undefined;
 }
 
 export interface DatasourceParsingErrorDto {
