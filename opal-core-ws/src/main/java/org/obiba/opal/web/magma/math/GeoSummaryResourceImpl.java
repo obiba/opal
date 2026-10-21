@@ -13,7 +13,6 @@ import jakarta.ws.rs.core.Response;
 
 import org.obiba.magma.math.summary.GeoVariableSummary;
 import org.obiba.magma.math.summary.GeoVariableSummaryFactory;
-import org.obiba.magma.type.PointType;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math;
@@ -29,7 +28,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Transactional
 public class GeoSummaryResourceImpl extends AbstractSummaryResource implements GeoSummaryResource {
 
-  // H3 cells counting fewer points are hidden from users who cannot see the values
+  // H3 cells counting fewer points, and the bounding box and centroid, are hidden from users who cannot see the values
   private static final int MIN_CELL_COUNT = 5;
 
   private boolean viewValuesPermitted;
@@ -56,7 +55,7 @@ public class GeoSummaryResourceImpl extends AbstractSummaryResource implements G
     }
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(Math.GeoSummaryDto.geoSummary, Dtos.asDto(summary, getVariable().getValueType() == PointType.get(), viewValuesPermitted ? 1 : MIN_CELL_COUNT).build());
+        .setExtension(Math.GeoSummaryDto.geoSummary, Dtos.asDto(summary, viewValuesPermitted ? 1 : MIN_CELL_COUNT, viewValuesPermitted).build());
     if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //

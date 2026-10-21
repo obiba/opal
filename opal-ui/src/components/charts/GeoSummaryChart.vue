@@ -1,14 +1,14 @@
 <template>
   <div>
     <default-summary-chart :variable="variable" :data="data" />
-    <div v-if="data.centroid" class="row q-col-gutter-md q-mt-md">
+    <div v-if="data.centroid || data.cells?.length" class="row q-col-gutter-md q-mt-md">
       <div class="col-md-8 col-xs-12">
         <vue-plotly :data="mapData" :layout="layout" :config="config" />
         <div v-if="data.cells?.length" class="text-hint q-mt-sm">
           {{ t('geo_summary.h3_cells') }}: {{ t('geo_summary.h3_cells_hint') }}
         </div>
       </div>
-      <div class="col-md-4 col-xs-12">
+      <div v-if="data.centroid" class="col-md-4 col-xs-12">
         <q-markup-table flat bordered dense>
           <thead>
             <tr>
@@ -32,14 +32,6 @@
               <td>{{ t('geo_summary.centroid') }}</td>
               <td class="text-right">{{ format(data.centroid?.lat) }}</td>
               <td class="text-right">{{ format(data.centroid?.lon) }}</td>
-            </tr>
-            <tr>
-              <td>{{ t('non_missings') }}</td>
-              <td colspan="2" class="text-right">{{ nonMissingCount }}</td>
-            </tr>
-            <tr>
-              <td>{{ t('missings') }}</td>
-              <td colspan="2" class="text-right">{{ missingCount }}</td>
             </tr>
           </tbody>
         </q-markup-table>
@@ -69,16 +61,8 @@ const config = {
   scrollZoom: true,
 };
 
-const nonMissingCount = computed(() =>
-  props.data.frequencies.filter((f) => !f.missing).reduce((acc, f) => acc + f.freq, 0),
-);
-const missingCount = computed(() =>
-  props.data.frequencies.filter((f) => f.missing).reduce((acc, f) => acc + f.freq, 0),
-);
-
 const mapData = computed(() => {
   const { min, max, centroid, cells } = props.data;
-  if (!min || !max || !centroid) return [];
   const traces: object[] = [];
   if (cells?.length) {
     traces.push({
@@ -101,6 +85,8 @@ const mapData = computed(() => {
       hovertemplate: '%{z}<extra></extra>',
     });
   }
+  // the bounding box and centroid are not sent to users who cannot see the values
+  if (!min || !max || !centroid) return traces;
   traces.push({
     type: 'scattermap',
     mode: 'lines',
@@ -122,10 +108,23 @@ const mapData = computed(() => {
   return traces;
 });
 
+// bounding box, or the extent of the cells when it is not sent
+const extent = computed(() => {
+  const { min, max, cells } = props.data;
+  if (min && max) return { min, max };
+  const points = (cells ?? []).flatMap((cell) => cell.boundary);
+  const lats = points.map((p) => p.lat);
+  const lons = points.map((p) => p.lon);
+  return {
+    min: { lat: Math.min(...lats), lon: Math.min(...lons) },
+    max: { lat: Math.max(...lats), lon: Math.max(...lons) },
+  };
+});
+
 const layout = computed(() => {
-  const { min, max, centroid } = props.data;
+  const { min, max } = extent.value;
   // ponytail: rough zoom to fit the bounding box, ignores the latitude distortion
-  const span = min && max ? Math.max(max.lon - min.lon, (max.lat - min.lat) * 2) : 360;
+  const span = Math.max(max.lon - min.lon, (max.lat - min.lat) * 2);
   const zoom = span > 0 ? Math.min(12, Math.max(0, Math.log2(360 / span) - 0.5)) : 10;
   return {
     height: 500,
@@ -133,7 +132,7 @@ const layout = computed(() => {
     showlegend: false,
     map: {
       style: 'carto-positron',
-      center: { lat: centroid?.lat ?? 0, lon: centroid?.lon ?? 0 },
+      center: props.data.centroid ?? { lat: (min.lat + max.lat) / 2, lon: (min.lon + max.lon) / 2 },
       zoom,
     },
   };
