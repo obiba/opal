@@ -449,6 +449,8 @@ export default {
     case_reports: 'Case reports',
     interviews: 'Interviews',
     study: 'Study',
+    campaign: 'Campaign',
+    campaign_hint: 'Optional, the name of the campaign of the interviews',
     case_report_form: 'Case report form',
     interview_design: 'Interview design',
     state: 'State',

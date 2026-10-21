@@ -190,6 +190,8 @@ export interface AmberDatasourceFactoryDto {
   to?: string | undefined;
   /** overrides the entity type of the tables */
   entityType?: string | undefined;
+  /** campaign name, interviews only */
+  campaign?: string | undefined;
 }
 
 export interface DatasourceParsingErrorDto {

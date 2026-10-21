@@ -45,6 +45,16 @@
       :debounce="500"
       @update:model-value="onUpdate"
     />
+    <q-input
+      v-if="source === 'interview'"
+      v-model="campaign"
+      :label="t('amber.campaign')"
+      :hint="t('amber.campaign_hint')"
+      dense
+      class="q-mb-md"
+      :debounce="500"
+      @update:model-value="onUpdate"
+    />
     <q-select
       v-model="state"
       :options="stateOptions"
@@ -115,6 +125,7 @@ const state = ref<string | null>(params?.state ?? 'completed');
 const from = ref<string | null>(params?.from ?? null);
 const to = ref<string | null>(params?.to ?? null);
 const entityType = ref<string>(params?.entityType ?? '');
+const campaign = ref<string>(params?.campaign ?? '');
 
 const bounds = [
   { key: 'from', value: from },
@@ -153,6 +164,7 @@ function onUpdate() {
       from: from.value ? `${from.value}T00:00:00.000Z` : undefined,
       to: to.value ? `${to.value}T23:59:59.999Z` : undefined,
       entityType: entityType.value || undefined,
+      campaign: (source.value === 'interview' && campaign.value) || undefined,
     },
   } as DatasourceFactory);
 }

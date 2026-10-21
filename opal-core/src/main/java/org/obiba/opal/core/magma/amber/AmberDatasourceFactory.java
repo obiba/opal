@@ -61,6 +61,8 @@ public class AmberDatasourceFactory extends AbstractDatasourceFactory {
 
   private String entityType;
 
+  private String campaign;
+
   private boolean allowInvalidCertificates = false;
 
   private SSLSocketFactory sslSocketFactory;
@@ -90,6 +92,10 @@ public class AmberDatasourceFactory extends AbstractDatasourceFactory {
     this.entityType = entityType;
   }
 
+  public void setCampaign(String campaign) {
+    this.campaign = campaign;
+  }
+
   public void setAllowInvalidCertificates(boolean allowInvalidCertificates) {
     this.allowInvalidCertificates = allowInvalidCertificates;
   }
@@ -111,6 +117,8 @@ public class AmberDatasourceFactory extends AbstractDatasourceFactory {
       query.put("$limit", EXPORT_LIMIT);
       query.put("study", studyId);
       query.put(interview ? "interviewDesign" : "caseReportForm", formId);
+      if (interview && !Strings.isNullOrEmpty(campaign))
+        query.put("campaign", findId("campaign", "campaign", Map.of("study", studyId, "interviewDesign", formId, "name", campaign)));
       if (!Strings.isNullOrEmpty(state)) query.put("state", state);
       if (!Strings.isNullOrEmpty(from)) query.put("updatedAt[$gte]", from);
       if (!Strings.isNullOrEmpty(to)) query.put("updatedAt[$lte]", to);

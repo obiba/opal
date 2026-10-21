@@ -43,6 +43,7 @@ public class AmberDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDt
     if (aDto.hasFrom()) factory.setFrom(aDto.getFrom());
     if (aDto.hasTo()) factory.setTo(aDto.getTo());
     if (aDto.hasEntityType()) factory.setEntityType(aDto.getEntityType());
+    if (aDto.hasCampaign()) factory.setCampaign(aDto.getCampaign());
     // Amber is trusted like any other server Opal talks to (see RestDatasourceFactoryDtoParser)
     factory.setAllowInvalidCertificates(allowInvalidCertificates);
     SocketFactory socketFactory = socketFactoryProvider.getSocketFactory();

@@ -216,6 +216,7 @@ message AmberDatasourceFactoryDto {
   optional string from = 7;          // records updated from (ISO date)
   optional string to = 8;            // records updated until (ISO date)
   optional string entityType = 9;    // overrides the entity type of the tables
+  optional string campaign = 10;     // campaign name, interviews only
   extend DatasourceFactoryDto {
     optional AmberDatasourceFactoryDto params = 1016;
   }

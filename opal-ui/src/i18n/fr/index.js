@@ -449,6 +449,8 @@ export default {
     case_reports: 'Rapports de cas',
     interviews: 'Entretiens',
     study: 'Étude',
+    campaign: 'Campagne',
+    campaign_hint: 'Optionnel, le nom de la campagne des entretiens',
     case_report_form: 'Formulaire de rapport de cas',
     interview_design: "Conception d'entretien",
     state: 'État',
