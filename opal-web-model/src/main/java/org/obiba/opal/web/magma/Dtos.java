@@ -24,7 +24,13 @@ import org.obiba.opal.web.model.Magma.*;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
+import com.uber.h3core.H3Core;
+import com.uber.h3core.util.LatLng;
 import jakarta.annotation.Nullable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -422,18 +428,70 @@ public final class Dtos {
     return dtoBuilder;
   }
 
-  public static Math.GeoSummaryDto.Builder asDto(GeoSummary summary) {
+  /**
+   * @param withCells count the coordinates by H3 cell, for point variables
+   * @param minCellCount cells that count fewer coordinates are left out
+   */
+  public static Math.GeoSummaryDto.Builder asDto(GeoSummary summary, boolean withCells, int minCellCount) {
     Math.GeoSummaryDto.Builder dtoBuilder = Math.GeoSummaryDto.newBuilder() //
         .setN(summary.getN());
     for (Frequency frequency : summary.getFrequencies()) {
       dtoBuilder.addFrequencies(asDto(frequency));
     }
 
-    for (Coordinate coord : summary.getCoordinates()) {
-      dtoBuilder.addPoints(Math.PointDto.newBuilder().setLon(coord.getLongitude()).setLat(coord.getLatitude()).build());
+    List<Coordinate> coords = summary.getCoordinates();
+    if (coords == null || coords.isEmpty()) return dtoBuilder;
+
+    double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE, maxLat = -Double.MAX_VALUE, maxLon = -Double.MAX_VALUE;
+    double sumLat = 0, sumLon = 0;
+    Map<Long, Long> cellCounts = new HashMap<>();
+    for (Coordinate coord : coords) {
+      minLat = java.lang.Math.min(minLat, coord.getLatitude());
+      minLon = java.lang.Math.min(minLon, coord.getLongitude());
+      maxLat = java.lang.Math.max(maxLat, coord.getLatitude());
+      maxLon = java.lang.Math.max(maxLon, coord.getLongitude());
+      sumLat += coord.getLatitude();
+      sumLon += coord.getLongitude();
+      if (withCells) cellCounts.merge(H3.CORE.latLngToCell(coord.getLatitude(), coord.getLongitude(), H3_RESOLUTION), 1L, Long::sum);
     }
+    // ponytail: arithmetic mean, wrong across the antimeridian, and the mean of the vertices for lines and polygons
+    dtoBuilder.setMin(asPointDto(minLat, minLon)) //
+        .setMax(asPointDto(maxLat, maxLon)) //
+        .setCentroid(asPointDto(sumLat / coords.size(), sumLon / coords.size()));
+
+    cellCounts.forEach((cell, count) -> {
+      if (count < minCellCount) return;
+      Math.H3CellDto.Builder cellBuilder = Math.H3CellDto.newBuilder() //
+          .setIndex(H3.CORE.h3ToString(cell)) //
+          .setCount(count);
+      for (LatLng vertex : H3.CORE.cellToBoundary(cell)) {
+        cellBuilder.addBoundary(asPointDto(vertex.lat, vertex.lng));
+      }
+      dtoBuilder.addCells(cellBuilder);
+    });
 
     return dtoBuilder;
+  }
+
+  private static Math.PointDto asPointDto(double lat, double lon) {
+    return Math.PointDto.newBuilder().setLat(lat).setLon(lon).build();
+  }
+
+  private static final int H3_RESOLUTION = 7;
+
+  /**
+   * Loads the H3 native library on first use.
+   */
+  private static class H3 {
+    private static final H3Core CORE;
+
+    static {
+      try {
+        CORE = H3Core.newInstance();
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
   }
 
   private static void addTimestamps(DatasourceDto.Builder builder, Timestamped datasource) {

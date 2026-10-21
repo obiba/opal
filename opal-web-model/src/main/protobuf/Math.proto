@@ -68,7 +68,14 @@ message TextSummaryDto {
 message GeoSummaryDto {
   required int64 n = 2;
   repeated FrequencyDto frequencies = 3;
-  repeated PointDto points = 4;
+  // was the raw coordinates, replaced by the H3 cells
+  reserved 4;
+  // bounding box and centroid of all the coordinates
+  optional PointDto min = 5;
+  optional PointDto max = 6;
+  optional PointDto centroid = 7;
+  // points only, counted by H3 cell
+  repeated H3CellDto cells = 8;
 
   extend SummaryStatisticsDto {
     optional GeoSummaryDto geoSummary = 1005;
@@ -78,6 +85,12 @@ message GeoSummaryDto {
 message PointDto {
   required double lat = 1;
   required double lon = 2;
+}
+
+message H3CellDto {
+  required string index = 1;
+  required int64 count = 2;
+  repeated PointDto boundary = 3;
 }
 
 message FrequencyDto {

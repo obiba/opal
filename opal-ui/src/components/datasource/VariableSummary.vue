@@ -57,6 +57,9 @@
       <div v-else-if="defaultData">
         <default-summary-chart :variable="variable" :data="defaultData" class="q-mt-md" />
       </div>
+      <div v-else-if="geoData">
+        <geo-summary-chart :variable="variable" :data="geoData" class="q-mt-md" />
+      </div>
       <div v-else-if="total > 0">
         <pre>{{ summary }}</pre>
       </div>
@@ -72,6 +75,7 @@ import type { VariableDto } from 'src/models/Magma';
 import DefaultSummaryChart from 'src/components/charts/DefaultSummaryChart.vue';
 import CategoricalSummaryChart from 'src/components/charts/CategoricalSummaryChart.vue';
 import ContinuousSummaryChart from 'src/components/charts/ContinuousSummaryChart.vue';
+import GeoSummaryChart from 'src/components/charts/GeoSummaryChart.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -85,6 +89,8 @@ const textData = computed(() => (summary.value as any)['Math.TextSummaryDto.text
 const continuousData = computed(() => (summary.value as any)['Math.ContinuousSummaryDto.continuous']);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultData = computed(() => (summary.value as any)['Math.DefaultSummaryDto.defaultSummary']);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const geoData = computed(() => (summary.value as any)['Math.GeoSummaryDto.geoSummary']);
 
 interface VariableSummaryProps {
   variable: VariableDto;

@@ -82,6 +82,7 @@
     <json-smart.version>2.6.0</json-smart.version>
     <jsr305.version>3.0.2</jsr305.version>
     <junit.version>4.13.2</junit.version>
+    <h3.version>4.5.0</h3.version>
     <kubernetes.version>7.2.0</kubernetes.version>
     <liquibase.version>5.0.3</liquibase.version>
     <liquibase-slf4j.version>5.0.0</liquibase-slf4j.version>
@@ -689,6 +690,12 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-math3</artifactId>
         <version>${commons-math.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.uber</groupId>
+        <artifactId>h3</artifactId>
+        <version>${h3.version}</version>
       </dependency>
 
       <dependency>

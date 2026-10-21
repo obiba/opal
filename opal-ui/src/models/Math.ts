@@ -44,12 +44,23 @@ export interface TextSummaryDto {
 export interface GeoSummaryDto {
   n: number;
   frequencies: FrequencyDto[];
-  points: PointDto[];
+  /** bounding box and centroid of all the coordinates */
+  min?: PointDto | undefined;
+  max?: PointDto | undefined;
+  centroid?: PointDto | undefined;
+  /** points only, counted by H3 cell */
+  cells: H3CellDto[];
 }
 
 export interface PointDto {
   lat: number;
   lon: number;
+}
+
+export interface H3CellDto {
+  index: string;
+  count: number;
+  boundary: PointDto[];
 }
 
 export interface FrequencyDto {

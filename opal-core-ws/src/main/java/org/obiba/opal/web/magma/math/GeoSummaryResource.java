@@ -31,4 +31,6 @@ public interface GeoSummaryResource extends SummaryResource {
       @QueryParam("fullIfCached") @DefaultValue("false") boolean fullIfCached, //
       @QueryParam("resetCache") @DefaultValue("false") boolean resetCache);
 
+  void setViewValuesPermitted(boolean viewValuesPermitted);
+
 }
