@@ -417,6 +417,69 @@ public class DefaultCommandJobServiceTest {
     assertThat(isDeletable).isFalse();
   }
 
+  @Test
+  public void testStart_RestoresTheOtherTasksWhenOneFails() {
+    TaskState failing = createTaskState(3, Status.IN_PROGRESS, new Date());
+    TaskState succeeded = createTaskState(12, Status.SUCCEEDED, new Date());
+
+    TaskStateRepository repository = createMock(TaskStateRepository.class);
+    expect(repository.findAll()).andReturn(List.of(failing, succeeded));
+    expect(repository.save(failing)).andThrow(new RuntimeException("boom"));
+    repository.deleteAll(List.of());
+    expectLastCall().once();
+    replay(repository);
+
+    DefaultCommandJobService service = new DefaultCommandJobService();
+    service.setTaskStateRepository(repository);
+    service.start();
+    service.start();
+
+    verify(repository);
+    assertThat(service.getTerminatedJobs()).hasSize(1);
+    assertThat(service.getTerminatedJobs().get(0).getCommandJob().getId()).isEqualTo(12);
+    assertThat(service.nextJobId()).isEqualTo(13);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testDeleteCommand_ThrowsIllegalStateExceptionIfFinishedJobNotYetTerminated() {
+    // The status reads as finished while the job is still in the started list: deleting it then would be undone by
+    // the save made as it moves to the terminated one.
+    initCommandJob(Status.SUCCEEDED);
+    jobsTerminated = new ArrayList<>();
+    TaskStateRepository repository = createMock(TaskStateRepository.class);
+    replay(repository);
+    sut.setTaskStateRepository(repository);
+
+    sut.deleteCommand(commandJob.getId());
+  }
+
+  @Test
+  public void testCancelIfPending_ClosesAJobCanceledBeforeItStarted() {
+    commandJob.setStatus(Status.CANCEL_PENDING);
+
+    commandJob.cancelIfPending();
+
+    assertThat(commandJob.getStatus()).isEqualTo(Status.CANCELED);
+    assertThat(commandJob.getEndTime()).isNotNull();
+  }
+
+  @Test
+  public void testDeleteExpiredCommands() {
+    FutureCommandJob expired = new FutureCommandJob(mockSubject, createCommandJob(1, new Date(0), Status.SUCCEEDED));
+    FutureCommandJob recent = new FutureCommandJob(mockSubject, createCommandJob(2, new Date(), Status.SUCCEEDED));
+    jobsTerminated = new ArrayList<>(List.of(expired, recent));
+    TaskStateRepository repository = createMock(TaskStateRepository.class);
+    repository.deleteById(1);
+    expectLastCall().once();
+    replay(repository);
+    sut.setTaskStateRepository(repository);
+
+    sut.deleteExpiredCommands();
+
+    verify(repository);
+    assertThat(jobsTerminated).containsOnly(recent);
+  }
+
   //
   // Helper Methods
   //

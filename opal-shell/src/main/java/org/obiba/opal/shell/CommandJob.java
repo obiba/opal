@@ -104,9 +104,11 @@ public class CommandJob implements OpalShell, Runnable {
    * Rebuilds a job from its stored state, for the history only: its command cannot be run.
    */
   public static CommandJob restore(TaskState state) {
-    CommandJob job = new CommandJob(state.getName(), new RestoredCommand(state.getCommand(), state.getCommandArgs()));
+    // the DTO is a protobuf message, whose setters refuse a null
+    CommandJob job = new CommandJob(Strings.nullToEmpty(state.getName()),
+        new RestoredCommand(Strings.nullToEmpty(state.getCommand()), state.getCommandArgs()));
     job.id = state.getId();
-    job.owner = state.getOwner();
+    job.owner = Strings.nullToEmpty(state.getOwner());
     job.project = state.getProject();
     job.rCluster = state.getRCluster();
     job.status = state.getStatus();
@@ -115,7 +117,7 @@ public class CommandJob implements OpalShell, Runnable {
     job.endTime = state.getEndTime() == null ? null : state.getEndTime().getTime();
     if(state.getMessages() != null) {
       state.getMessages().forEach(m -> job.messages.add(
-          Message.newBuilder().setMsg(m.getMsg()).setTimestamp(m.getTimestamp()).build()));
+          Message.newBuilder().setMsg(Strings.nullToEmpty(m.getMsg())).setTimestamp(m.getTimestamp()).build()));
     }
     return job;
   }
@@ -238,6 +240,17 @@ public class CommandJob implements OpalShell, Runnable {
   //
   // Methods
   //
+
+  /**
+   * Closes a job that was canceled before it started: its {@link #run()} is then never called, and it would otherwise
+   * stay pending for good.
+   */
+  public void cancelIfPending() {
+    if(status != Status.CANCEL_PENDING) return;
+    status = Status.CANCELED;
+    printCompletion();
+    endTime = getCurrentTime();
+  }
 
   public Integer getId() {
     return id;

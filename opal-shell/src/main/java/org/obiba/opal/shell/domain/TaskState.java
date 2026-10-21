@@ -15,6 +15,7 @@ import jakarta.persistence.*;
 import org.obiba.opal.core.domain.converter.EnumNameConverter;
 import org.obiba.opal.core.domain.converter.JsonAttributeConverter;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
+import org.springframework.data.domain.Persistable;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -33,7 +34,7 @@ import java.util.List;
         @Index(name = "idx_tasks_owner", columnList = "owner"),
         @Index(name = "idx_tasks_project", columnList = "project")
     })
-public class TaskState {
+public class TaskState implements Persistable<Integer> {
 
   /**
    * Assigned by the task service, which keeps counting from the largest one stored.
@@ -75,8 +76,24 @@ public class TaskState {
   @Convert(converter = TaskMessageListConverter.class)
   private List<TaskMessage> messages;
 
+  /**
+   * The id is assigned, so without this a save could not tell an insert from an update and would read the row first.
+   */
+  @Transient
+  private boolean isNew;
+
+  @Override
   public Integer getId() {
     return id;
+  }
+
+  @Override
+  public boolean isNew() {
+    return isNew;
+  }
+
+  public void setNew(boolean isNew) {
+    this.isNew = isNew;
   }
 
   public void setId(Integer id) {
