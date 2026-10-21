@@ -278,12 +278,15 @@ class ResourceVectorSummarySource implements VectorSummarySource {
           if (missings.contains(value))
             summary.addFrequency(new DefaultFrequency(value, count, count * 1F / freqSum, missings.contains(value)));
           else {
-            addCoordinates(coords, resourceVariableValueSource.getVariable().getValueType().valueOf(value));
+            // each distinct value is counted as many times as it is observed
+            List<Coordinate> valueCoords = Lists.newArrayList();
+            addCoordinates(valueCoords, resourceVariableValueSource.getVariable().getValueType().valueOf(value));
+            for (int i = 0; i < count; i++) coords.addAll(valueCoords);
             notNullCount += count;
           }
         }
       }
-      summary.addCoordinates(coords);
+      summary.addExtentAndCells(coords, resourceVariableValueSource.getVariable().getValueType() == PointType.get());
       summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NOT_NULL_NAME, notNullCount, notNullCount * 1F / freqSum, false));
       summary.setN(n);
 
