@@ -26,12 +26,16 @@ import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.service.storage.DiskLevel;
 import org.obiba.opal.core.service.storage.DiskSpaceService;
 import org.obiba.opal.shell.CommandJob;
+import org.obiba.opal.shell.domain.TaskState;
+import org.obiba.opal.shell.repository.TaskStateRepository;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,11 +58,23 @@ public class DefaultCommandJobService implements CommandJobService {
   @Autowired(required = false)
   private DiskSpaceService diskSpaceService;
 
+  /**
+   * Where the history is kept across restarts. Left null by the callers that build the service by hand, which then
+   * keeps it in memory only.
+   */
+  @Autowired(required = false)
+  private TaskStateRepository taskStateRepository;
+
+  @Value("${tasks.retention.days:30}")
+  private int retentionDays = 30;
+
   private final Map<String, Executor> projectExecutors;
 
   private final Map<String, Executor> rClusterExecutors;
 
   private boolean isRunning;
+
+  private boolean historyRestored;
 
   private final AtomicInteger lastJobId;
 
@@ -113,6 +129,10 @@ public class DefaultCommandJobService implements CommandJobService {
 
   @Override
   public void start() {
+    if(!historyRestored) {
+      historyRestored = true;
+      restoreHistory();
+    }
     isRunning = true;
   }
 
@@ -161,6 +181,8 @@ public class DefaultCommandJobService implements CommandJobService {
     commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
     commandJob.setDiskSpaceService(diskSpaceService);
+    // Before it is queued, so that this write cannot land after the one made when it finishes.
+    persist(commandJob, true);
 
     if (commandJob.hasProject()) {
       return launchProjectCommand(commandJob, owner);
@@ -227,6 +249,7 @@ public class DefaultCommandJobService implements CommandJobService {
           throw new IllegalStateException("commandJob not cancellable");
         }
         job.setStatus(Status.CANCEL_PENDING);
+        persist(job);
         futureCommandJob.cancel(true);
         return;
       }
@@ -239,11 +262,10 @@ public class DefaultCommandJobService implements CommandJobService {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
-        if(!isDeletable(job)) {
+        if(!isDeletable(job) || !removeTerminated(futureCommandJob)) {
           log.info("CommandJob {} is not deletable (current status: {})", id, job.getStatus());
           throw new IllegalStateException("commandJob not deletable");
         }
-        getTerminatedJobs().remove(futureCommandJob);
         cleanupResult(job);
         return;
       }
@@ -255,11 +277,48 @@ public class DefaultCommandJobService implements CommandJobService {
   public void deleteCompletedCommands() {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
-      if(isDeletable(job)) {
-        getTerminatedJobs().remove(futureCommandJob);
+      if(isDeletable(job) && removeTerminated(futureCommandJob)) {
         cleanupResult(job);
       }
     }
+  }
+
+  /**
+   * A job's status reads as finished before it leaves the started list, so it is deleted only from the terminated one,
+   * and under the lock {@code afterExecute} holds while adding it there and saving it: a delete in between would
+   * otherwise be undone by that save.
+   */
+  private boolean removeTerminated(FutureCommandJob futureCommandJob) {
+    synchronized(getTerminatedJobs()) {
+      if(!getTerminatedJobs().remove(futureCommandJob)) return false;
+      unpersist(futureCommandJob.getCommandJob());
+      return true;
+    }
+  }
+
+  /**
+   * Retention is applied at startup and then daily, so that a server that is seldom restarted keeps a bounded history.
+   */
+  @Scheduled(cron = "0 30 1 * * *")
+  public void deleteExpiredCommands() {
+    Date expiry = getExpiry();
+    if(expiry == null) return;
+    List<FutureCommandJob> expired;
+    synchronized(getTerminatedJobs()) {
+      expired = getTerminatedJobs().stream()
+          .filter(f -> f.getCommandJob().getSubmitTime().before(expiry))
+          .collect(Collectors.toList());
+      getTerminatedJobs().removeAll(expired);
+    }
+    for(FutureCommandJob futureCommandJob : expired) {
+      cleanupResult(futureCommandJob.getCommandJob());
+      unpersist(futureCommandJob.getCommandJob());
+    }
+    if(!expired.isEmpty()) log.info("Task history: {} expired tasks deleted", expired.size());
+  }
+
+  private Date getExpiry() {
+    return retentionDays > 0 ? new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(retentionDays)) : null;
   }
 
   /**
@@ -277,6 +336,7 @@ public class DefaultCommandJobService implements CommandJobService {
       if(job.getStatus() != Status.IN_PROGRESS) continue;
       log.warn("Cancelling task {}, there is not enough free disk space: {}", job.getId(), event.getDetail());
       job.setStatus(Status.CANCEL_PENDING);
+      persist(job);
       futureCommandJob.cancel(true);
     }
   }
@@ -287,6 +347,10 @@ public class DefaultCommandJobService implements CommandJobService {
 
   public void setExecutor(Executor executor) {
     this.executor = executor;
+  }
+
+  void setTaskStateRepository(TaskStateRepository taskStateRepository) {
+    this.taskStateRepository = taskStateRepository;
   }
 
   protected Executor createExecutor(BlockingQueue<Runnable> queue) {
@@ -300,12 +364,17 @@ public class DefaultCommandJobService implements CommandJobService {
 
       @Override
       protected void afterExecute(Runnable r, Throwable t) {
-        log.info("CommandJob {} finished executing", ((FutureCommandJob) r).commandJob.getId());
+        CommandJob job = ((FutureCommandJob) r).commandJob;
+        log.info("CommandJob {} finished executing", job.getId());
         if(t != null) {
-          log.warn("CommandJob {} threw an exception: {}", t.getMessage());
+          log.warn("CommandJob {} threw an exception: {}", job.getId(), t.getMessage());
         }
+        job.cancelIfPending();
         getStartedJobs().remove(r);
-        getTerminatedJobs().add((FutureCommandJob) r);
+        synchronized(getTerminatedJobs()) {
+          getTerminatedJobs().add((FutureCommandJob) r);
+          persist(job);
+        }
       }
     };
   }
@@ -386,6 +455,91 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   /**
+   * Reads back the history of the previous run. A task that had not finished when the server stopped never will: it is
+   * recorded as failed, or as canceled if a cancel was pending, and is not run again. Tasks submitted more than
+   * {@code tasks.retention.days} ago are deleted instead.
+   */
+  private void restoreHistory() {
+    if(taskStateRepository == null) return;
+    List<TaskState> states;
+    try {
+      states = taskStateRepository.findAll();
+    } catch(Exception e) {
+      log.error("Task history could not be restored", e);
+      return;
+    }
+    // Ids carry on after the largest one stored, whatever happens to the rows below: a reused id would overwrite one.
+    states.forEach(state -> lastJobId.accumulateAndGet(state.getId(), Math::max));
+    Date expiry = getExpiry();
+    List<TaskState> expired = new ArrayList<>();
+    for(TaskState state : states) {
+      if(expiry != null && (state.getSubmitTime() == null || state.getSubmitTime().before(expiry))) {
+        expired.add(state);
+        continue;
+      }
+      try {
+        if(!isTerminated(state.getStatus())) {
+          interrupt(state);
+          taskStateRepository.save(state);
+        }
+        getTerminatedJobs().add(new FutureCommandJob(CommandJob.restore(state)));
+      } catch(Exception e) {
+        log.warn("Task {} could not be restored: {}", state.getId(), e.getMessage());
+      }
+    }
+    try {
+      taskStateRepository.deleteAll(expired);
+    } catch(Exception e) {
+      log.warn("Expired tasks could not be deleted: {}", e.getMessage());
+    }
+    log.info("Task history restored: {} tasks, {} expired ones deleted", getTerminatedJobs().size(), expired.size());
+  }
+
+  private void interrupt(TaskState state) {
+    state.setStatus(state.getStatus() == Status.CANCEL_PENDING ? Status.CANCELED : Status.FAILED);
+    List<TaskState.TaskMessage> messages = new ArrayList<>();
+    if(state.getMessages() != null) messages.addAll(state.getMessages());
+    messages.add(new TaskState.TaskMessage("Interrupted by server restart.", System.currentTimeMillis()));
+    state.setMessages(messages);
+  }
+
+  /**
+   * A failed write loses that task's history across a restart, not the task, so it is logged and not thrown: this runs
+   * on the executor threads, where an exception would end the worker.
+   */
+  private void persist(CommandJob job) {
+    persist(job, false);
+  }
+
+  /**
+   * Synchronized on the job so that writes land in the order their states were read: a cancel saved as the job
+   * finishes cannot overwrite the final state.
+   *
+   * @param isNew true for the first save, which is then an insert rather than a merge
+   */
+  private void persist(CommandJob job, boolean isNew) {
+    if(taskStateRepository == null) return;
+    try {
+      synchronized(job) {
+        TaskState state = job.asState();
+        state.setNew(isNew);
+        taskStateRepository.save(state);
+      }
+    } catch(Exception e) {
+      log.warn("Task {} could not be saved: {}", job.getId(), e.getMessage());
+    }
+  }
+
+  private void unpersist(CommandJob job) {
+    if(taskStateRepository == null) return;
+    try {
+      taskStateRepository.deleteById(job.getId());
+    } catch(Exception e) {
+      log.warn("Task {} could not be deleted: {}", job.getId(), e.getMessage());
+    }
+  }
+
+  /**
    * Cleans up any result resources (e.g. temp files) held by the given job.
    * Called whenever a job is removed from the history or the service stops.
    */
@@ -400,7 +554,12 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   public boolean isDeletable(CommandJob commandJob) {
-    switch(commandJob.getStatus()) {
+    return isTerminated(commandJob.getStatus());
+  }
+
+  private static boolean isTerminated(Status status) {
+    if(status == null) return false;
+    switch(status) {
       case SUCCEEDED:
       case FAILED:
       case CANCELED:
@@ -424,6 +583,14 @@ public class DefaultCommandJobService implements CommandJobService {
 
     FutureCommandJob(Subject subject, CommandJob commandJob) {
       super(subject.associateWith(commandJob), null);
+      this.commandJob = commandJob;
+    }
+
+    /**
+     * For a job restored from the history, which is never run.
+     */
+    FutureCommandJob(CommandJob commandJob) {
+      super(commandJob, null);
       this.commandJob = commandJob;
     }
 

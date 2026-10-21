@@ -509,4 +509,36 @@
     </createIndex>
   </changeSet>
 
+  <!--
+    Task history (obiba/opal#4225): the state of each task, so that the history survives a restart. The command itself
+    is not stored, only its name and arguments as shown: a task read back is never run again.
+
+    `id` is assigned by the task service, not by the database, because it is the number users already see in the
+    task list and the REST paths.
+  -->
+  <changeSet id="3-tasks" author="opal">
+    <createTable tableName="tasks">
+      <column name="id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="pk_tasks"/>
+      </column>
+      <column name="name" type="VARCHAR(255)"/>
+      <column name="command" type="VARCHAR(255)"/>
+      <column name="command_args" type="CLOB"/>
+      <column name="owner" type="VARCHAR(255)"/>
+      <column name="project" type="VARCHAR(255)"/>
+      <column name="r_cluster" type="VARCHAR(255)"/>
+      <column name="status" type="VARCHAR(255)"/>
+      <column name="submit_time" type="TIMESTAMP"/>
+      <column name="start_time" type="TIMESTAMP"/>
+      <column name="end_time" type="TIMESTAMP"/>
+      <column name="messages" type="CLOB"/>
+    </createTable>
+    <createIndex tableName="tasks" indexName="idx_tasks_owner">
+      <column name="owner"/>
+    </createIndex>
+    <createIndex tableName="tasks" indexName="idx_tasks_project">
+      <column name="project"/>
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

@@ -32,7 +32,8 @@ public class ConfigSchemaTest extends AbstractConfigPersistenceTest {
   private static final Set<String> EXPECTED_ENTITIES = Set.of(
       "App", "AppsConfig", "Database", "DataShieldProfile", "Group", "KeyStoreState", "OpalAnalysis",
       "OpalAnalysisResult", "OpalGeneralConfig", "PodSpec", "Project", "ResourceReference", "RQuota",
-      "RSessionActivity", "SubjectAcl", "SubjectCredentials", "SubjectProfile", "SubjectToken", "VCFSamplesMapping");
+      "RSessionActivity", "SubjectAcl", "SubjectCredentials", "SubjectProfile", "SubjectToken", "TaskState",
+      "VCFSamplesMapping");
 
   @Test
   public void test_the_whole_configuration_model_is_mapped() {

@@ -57,7 +57,8 @@ public abstract class AbstractConfigPersistenceTest {
       "org.obiba.opal.core.domain",
       "org.obiba.opal.core.runtime",
       "org.obiba.opal.datashield.cfg",
-      "org.obiba.opal.r.service"
+      "org.obiba.opal.r.service",
+      "org.obiba.opal.shell.domain"
   };
 
   private LocalContainerEntityManagerFactoryBean factoryBean;

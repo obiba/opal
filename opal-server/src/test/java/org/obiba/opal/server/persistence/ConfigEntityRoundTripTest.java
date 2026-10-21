@@ -28,6 +28,8 @@ import org.obiba.opal.core.runtime.App;
 import org.obiba.opal.datashield.cfg.DataShieldProfile;
 import org.obiba.opal.r.service.RQuota;
 import org.obiba.opal.r.service.RSessionActivity;
+import org.obiba.opal.shell.domain.TaskState;
+import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 
 import java.util.Date;
 import java.util.List;
@@ -368,6 +370,43 @@ public class ConfigEntityRoundTripTest extends AbstractConfigPersistenceTest {
     assertThat(reloaded.getSessionTimeMillis()).isEqualTo(56789L);
     assertThat(reloaded.getIdleTimeMillis()).isEqualTo(56789L - 1234L);
     assertThat(reloaded.getCreated()).isNotNull();
+  }
+
+  /**
+   * The messages are a JSON list in a text column, and a long import writes many of them: what comes back has to be the
+   * whole list, in order.
+   */
+  @Test
+  public void test_task_state_keeps_its_status_and_messages() {
+    TaskState state = new TaskState();
+    state.setId(42);
+    state.setName("Import");
+    state.setCommand("import");
+    state.setCommandArgs("--project p1 --tables t1");
+    state.setOwner("alice");
+    state.setProject("p1");
+    state.setStatus(Status.SUCCEEDED);
+    state.setSubmitTime(new Date(1000L));
+    state.setStartTime(new Date(2000L));
+    state.setEndTime(new Date(3000L));
+    state.setMessages(Lists.newArrayList(
+        new TaskState.TaskMessage("Job started.", 2000L),
+        new TaskState.TaskMessage("Job completed successfully.", 3000L)));
+
+    TaskState reloaded = roundTrip(state);
+
+    assertThat(reloaded.getId()).isEqualTo(42);
+    assertThat(reloaded.getCommand()).isEqualTo("import");
+    assertThat(reloaded.getCommandArgs()).isEqualTo("--project p1 --tables t1");
+    assertThat(reloaded.getOwner()).isEqualTo("alice");
+    assertThat(reloaded.getProject()).isEqualTo("p1");
+    assertThat(reloaded.getRCluster()).isNull();
+    assertThat(reloaded.getStatus()).isEqualTo(Status.SUCCEEDED);
+    assertThat(reloaded.getSubmitTime().getTime()).isEqualTo(1000L);
+    assertThat(reloaded.getEndTime().getTime()).isEqualTo(3000L);
+    assertThat(reloaded.getMessages()).hasSize(2);
+    assertThat(reloaded.getMessages().get(1).getMsg()).isEqualTo("Job completed successfully.");
+    assertThat(reloaded.getMessages().get(1).getTimestamp()).isEqualTo(3000L);
   }
 
   /**
