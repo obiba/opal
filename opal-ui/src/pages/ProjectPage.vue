@@ -157,6 +157,7 @@ import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 import { projectStatusColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
 import { formatNumber } from 'src/utils/numbers';
+import { ProjectDatasourceStatusDto } from 'src/models/Projects';
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -172,6 +173,27 @@ const entityTypeCountsSize = computed(() => {
   return projectsStore.summary?.entityTypeCounts ? projectsStore.summary.entityTypeCounts.length : 0;
 });
 
+let summaryTimer: ReturnType<typeof setTimeout> | undefined;
+
+// counts are all zero while the datasource is loading, so ask again until it is done
+function loadSummary() {
+  projectsStore
+    .loadSummary()
+    .then(() => {
+      if (projectsStore.summary.datasourceStatus === ProjectDatasourceStatusDto.LOADING) {
+        summaryTimer = setTimeout(loadSummary, 3000);
+      } else {
+        loadingSummary.value = false;
+      }
+    })
+    .catch((error) => {
+      loadingSummary.value = false;
+      notifyError(error);
+    });
+}
+
+onUnmounted(() => clearTimeout(summaryTimer));
+
 onMounted(() => {
   projectsStore
     .initProject(name.value)
@@ -179,11 +201,7 @@ onMounted(() => {
       canViewSummary.value = projectsStore.perms.summary ? projectsStore.perms.summary.canRead() : false;
       if (canViewSummary.value) {
         loadingSummary.value = true;
-        projectsStore
-          .loadSummary()
-          .finally(() => {
-            loadingSummary.value = false;
-          });
+        loadSummary();
       }
     })
     .catch((error) => {

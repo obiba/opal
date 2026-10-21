@@ -68,7 +68,13 @@ export const useProjectsStore = defineStore('projects', () => {
     return loadProjects();
   }
 
+  // in-flight project load, so that concurrent callers wait for the permissions too
+  let pendingLoad: { name: string; promise: Promise<unknown> } | undefined;
+
   async function initProject(name: string) {
+    if (pendingLoad?.name === name) {
+      return pendingLoad.promise;
+    }
     if (project.value.name !== name) {
       return loadProject(name);
     }
@@ -93,6 +99,14 @@ export const useProjectsStore = defineStore('projects', () => {
   async function loadProject(name: string) {
     project.value = {} as ProjectDto;
     perms.value = {} as ProjectPerms;
+    const promise = doLoadProject(name).finally(() => {
+      if (pendingLoad?.promise === promise) pendingLoad = undefined;
+    });
+    pendingLoad = { name, promise };
+    return promise;
+  }
+
+  async function doLoadProject(name: string) {
     return api.get(`/project/${name}`).then((response) => {
       project.value = response.data;
       return Promise.all([
