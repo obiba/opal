@@ -108,11 +108,14 @@ const essentialLinks: EssentialLinkProps[] = [
   },
 ];
 
-onMounted(() => {
-  if (authStore.isAuthenticated) {
-    commandsStore.init();
-  }
-});
+// After a page refresh the profile is still loading when the drawer mounts.
+watch(
+  () => authStore.isAuthenticated,
+  (authenticated) => {
+    if (authenticated) commandsStore.init();
+  },
+  { immediate: true },
+);
 
 function onSignout() {
   const logoutURL = systemStore.generalConf.logoutURL;
