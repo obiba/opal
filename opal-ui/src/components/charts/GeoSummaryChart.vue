@@ -70,7 +70,7 @@ const mapData = computed(() => {
       geojson: {
         type: 'FeatureCollection',
         features: cells.map((cell) => {
-          const ring = cell.boundary.map((p) => [p.lon, p.lat]);
+          const ring = (cell.boundary ?? []).map((p) => [p.lon, p.lat]);
           return {
             type: 'Feature',
             id: cell.index,
@@ -112,13 +112,15 @@ const mapData = computed(() => {
 const extent = computed(() => {
   const { min, max, cells } = props.data;
   if (min && max) return { min, max };
-  const points = (cells ?? []).flatMap((cell) => cell.boundary);
-  const lats = points.map((p) => p.lat);
-  const lons = points.map((p) => p.lon);
-  return {
-    min: { lat: Math.min(...lats), lon: Math.min(...lons) },
-    max: { lat: Math.max(...lats), lon: Math.max(...lons) },
-  };
+  return (cells ?? [])
+    .flatMap((cell) => cell.boundary ?? [])
+    .reduce(
+      (acc, p) => ({
+        min: { lat: Math.min(acc.min.lat, p.lat), lon: Math.min(acc.min.lon, p.lon) },
+        max: { lat: Math.max(acc.max.lat, p.lat), lon: Math.max(acc.max.lon, p.lon) },
+      }),
+      { min: { lat: 90, lon: 180 }, max: { lat: -90, lon: -180 } },
+    );
 });
 
 const layout = computed(() => {

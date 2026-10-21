@@ -49,7 +49,7 @@ export interface GeoSummaryDto {
   max?: PointDto | undefined;
   centroid?: PointDto | undefined;
   /** points only, counted by H3 cell */
-  cells: H3CellDto[];
+  cells?: H3CellDto[] | undefined;
 }
 
 export interface PointDto {
@@ -60,7 +60,7 @@ export interface PointDto {
 export interface H3CellDto {
   index: string;
   count: number;
-  boundary: PointDto[];
+  boundary?: PointDto[] | undefined;
 }
 
 export interface FrequencyDto {

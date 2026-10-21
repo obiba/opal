@@ -40,6 +40,11 @@ public class GeoSummaryResourceImpl extends AbstractSummaryResource implements G
 
   @Override
   public Response get(Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
+    // comparing the cells of two entity windows would locate the entity that differs
+    if (!viewValuesPermitted) {
+      offset = null;
+      limit = null;
+    }
     GeoVariableSummaryFactory summaryFactory = new GeoVariableSummaryFactory.Builder() //
         .variable(getVariable()) //
         .table(getValueTable()) //
