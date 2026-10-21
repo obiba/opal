@@ -79,8 +79,9 @@ public class TablesIndexerImpl implements IndexSynchronization {
     // the table is up to date only once its documents are committed, as of the start of the indexing
     long start = System.currentTimeMillis();
     index.delete();
-    try (IndexWriter writer = indexManager.newTablesIndexWriter();
-         IndexWriter entitiesWriter = indexManager.newEntitiesIndexWriter()) {
+    try {
+      IndexWriter writer = indexManager.getTablesIndexWriter();
+      IndexWriter entitiesWriter = indexManager.getEntitiesIndexWriter();
       done = 1;
       writer.updateDocument(new Term("table-ref", index.getValueTableReference()), index.asDocument());
       TablesIndexManagerImpl.writeEntities(entitiesWriter, index.getValueTableReference(), table.getVariableEntities());

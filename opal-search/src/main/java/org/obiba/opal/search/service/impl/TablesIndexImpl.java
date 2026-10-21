@@ -47,8 +47,9 @@ public class TablesIndexImpl extends AbstractValueTableIndex {
     File file = getIndexFile();
     if (file.exists()) {
       getIndexFile().delete();
-      try (IndexWriter writer = indexManager.newTablesIndexWriter();
-           IndexWriter entitiesWriter = indexManager.newEntitiesIndexWriter()) {
+      try {
+        IndexWriter writer = indexManager.getTablesIndexWriter();
+        IndexWriter entitiesWriter = indexManager.getEntitiesIndexWriter();
         // Create a query to match the documents to delete
         Query query = new TermQuery(new Term("table-ref", getValueTableReference()));
         // Delete documents that match the query
