@@ -65,7 +65,8 @@ import java.util.Map;
     basePackages = {
         "org.obiba.opal.core.repository",
         "org.obiba.opal.datashield.repository",
-        "org.obiba.opal.r.repository"
+        "org.obiba.opal.r.repository",
+        "org.obiba.opal.shell.repository"
     },
     entityManagerFactoryRef = "configEntityManagerFactory",
     transactionManagerRef = "configTransactionManager")
@@ -74,15 +75,16 @@ public class ConfigDatabaseConfiguration {
   private static final Logger log = LoggerFactory.getLogger(ConfigDatabaseConfiguration.class);
 
   /**
-   * Entity packages, scanned recursively. The configuration model is spread over three modules: most of it is in
-   * opal-core-api, DataShield profiles are in opal-datashield and R session activity is in opal-r. opal-core cannot
-   * name the last two as classes, only as packages.
+   * Entity packages, scanned recursively. The configuration model is spread over four modules: most of it is in
+   * opal-core-api, DataShield profiles are in opal-datashield, R session activity is in opal-r and the task history is
+   * in opal-shell. opal-core cannot name the last three as classes, only as packages.
    */
   private static final String[] ENTITY_PACKAGES = {
       "org.obiba.opal.core.domain",
       "org.obiba.opal.core.runtime",
       "org.obiba.opal.datashield.cfg",
-      "org.obiba.opal.r.service"
+      "org.obiba.opal.r.service",
+      "org.obiba.opal.shell.domain"
   };
 
   private static final String DEFAULT_DRIVER_CLASS = "org.h2.Driver";

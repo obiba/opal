@@ -27,6 +27,8 @@ import org.junit.Test;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.domain.TaskState;
+import org.obiba.opal.shell.repository.TaskStateRepository;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
@@ -146,6 +148,40 @@ public class DefaultCommandJobServiceTest {
 
     // Verify
     assertThat(sut.isRunning()).isFalse();
+  }
+
+  @Test
+  public void testStart_RestoresHistory() {
+    TaskState running = createTaskState(5, Status.IN_PROGRESS, new Date());
+    TaskState cancelPending = createTaskState(6, Status.CANCEL_PENDING, new Date());
+    TaskState succeeded = createTaskState(7, Status.SUCCEEDED, new Date());
+    TaskState expired = createTaskState(9, Status.SUCCEEDED, new Date(0));
+
+    TaskStateRepository repository = createMock(TaskStateRepository.class);
+    expect(repository.findAll()).andReturn(List.of(running, cancelPending, succeeded, expired));
+    expect(repository.save(running)).andReturn(running);
+    expect(repository.save(cancelPending)).andReturn(cancelPending);
+    repository.deleteAll(List.of(expired));
+    expectLastCall().once();
+    replay(repository);
+
+    DefaultCommandJobService service = new DefaultCommandJobService();
+    service.setTaskStateRepository(repository);
+    service.start();
+
+    verify(repository);
+    // Unfinished tasks are never resumed: they are recorded as failed, or as canceled if a cancel was pending.
+    assertThat(running.getStatus()).isEqualTo(Status.FAILED);
+    assertThat(cancelPending.getStatus()).isEqualTo(Status.CANCELED);
+    assertThat(running.getMessages()).hasSize(1);
+    assertThat(running.getMessages().get(0).getMsg()).isEqualTo("Interrupted by server restart.");
+    assertThat(service.getTerminatedJobs()).hasSize(3);
+    CommandJob restored = service.getTerminatedJobs().get(2).getCommandJob();
+    assertThat(restored.getId()).isEqualTo(7);
+    assertThat(restored.getCommand().getName()).isEqualTo("import");
+    assertThat(restored.getCommand().toString()).isEqualTo("--project p1");
+    // Ids carry on after the largest one ever stored, expired ones included.
+    assertThat(service.nextJobId()).isEqualTo(10);
   }
 
   @Test
@@ -453,5 +489,17 @@ public class DefaultCommandJobServiceTest {
   static Runnable eqFutureCommandJob(FutureCommandJob in) {
     EasyMock.reportMatcher(new FutureCommandJobMatcher(in));
     return null;
+  }
+  private TaskState createTaskState(int id, Status status, Date submitTime) {
+    TaskState state = new TaskState();
+    state.setId(id);
+    state.setName("Import");
+    state.setCommand("import");
+    state.setCommandArgs("--project p1");
+    state.setOwner("testUser");
+    state.setProject("p1");
+    state.setStatus(status);
+    state.setSubmitTime(submitTime);
+    return state;
   }
 }

@@ -18,6 +18,7 @@ import org.obiba.opal.core.service.storage.InsufficientStorageException;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandResult;
 import org.obiba.opal.shell.commands.ResultCapable;
+import org.obiba.opal.shell.domain.TaskState;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.Message;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Contains a command and the state of its execution.
@@ -96,6 +98,48 @@ public class CommandJob implements OpalShell, Runnable {
     this.command.setShell(this);
     messages = new ArrayList<>();
     status = Status.NOT_STARTED;
+  }
+
+  /**
+   * Rebuilds a job from its stored state, for the history only: its command cannot be run.
+   */
+  public static CommandJob restore(TaskState state) {
+    CommandJob job = new CommandJob(state.getName(), new RestoredCommand(state.getCommand(), state.getCommandArgs()));
+    job.id = state.getId();
+    job.owner = state.getOwner();
+    job.project = state.getProject();
+    job.rCluster = state.getRCluster();
+    job.status = state.getStatus();
+    job.submitTime = state.getSubmitTime() == null ? 0 : state.getSubmitTime().getTime();
+    job.startTime = state.getStartTime() == null ? null : state.getStartTime().getTime();
+    job.endTime = state.getEndTime() == null ? null : state.getEndTime().getTime();
+    if(state.getMessages() != null) {
+      state.getMessages().forEach(m -> job.messages.add(
+          Message.newBuilder().setMsg(m.getMsg()).setTimestamp(m.getTimestamp()).build()));
+    }
+    return job;
+  }
+
+  /**
+   * The state to store. Progress is left out: it moves too often to be written, and means nothing after a restart.
+   */
+  public TaskState asState() {
+    TaskState state = new TaskState();
+    state.setId(id);
+    state.setName(name);
+    state.setCommand(command.getName());
+    state.setCommandArgs(command.toString());
+    state.setOwner(owner);
+    state.setProject(project);
+    state.setRCluster(rCluster);
+    state.setStatus(status);
+    state.setSubmitTime(getSubmitTime());
+    state.setStartTime(getStartTime());
+    state.setEndTime(getEndTime());
+    state.setMessages(getMessages().stream()
+        .map(m -> new TaskState.TaskMessage(m.getMsg(), m.getTimestamp()))
+        .collect(Collectors.toList()));
+    return state;
   }
 
   //
@@ -373,6 +417,62 @@ public class CommandJob implements OpalShell, Runnable {
       case SUCCEEDED:
         printf("Job completed successfully.");
         break;
+    }
+  }
+
+  /**
+   * Stands in for the command of a restored job: it answers with what was stored, so the history and its permission
+   * checks work as for any other job, and refuses to run.
+   */
+  private static class RestoredCommand implements Command<Void> {
+
+    private final String name;
+
+    private final String args;
+
+    private String owner;
+
+    private RestoredCommand(String name, String args) {
+      this.name = name;
+      this.args = args;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+    @Override
+    public void setShell(OpalShell shell) {
+    }
+
+    @Override
+    public Void getOptions() {
+      return null;
+    }
+
+    @Override
+    public void setOptions(Void options) {
+    }
+
+    @Override
+    public void setOwner(String owner) {
+      this.owner = owner;
+    }
+
+    @Override
+    public String getOwner() {
+      return owner;
+    }
+
+    @Override
+    public int execute() {
+      throw new UnsupportedOperationException("A task restored from the history cannot be run again");
+    }
+
+    @Override
+    public String toString() {
+      return Strings.nullToEmpty(args);
     }
   }
 }
