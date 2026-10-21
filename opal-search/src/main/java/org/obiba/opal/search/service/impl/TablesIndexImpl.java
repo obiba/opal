@@ -47,12 +47,16 @@ public class TablesIndexImpl extends AbstractValueTableIndex {
     File file = getIndexFile();
     if (file.exists()) {
       getIndexFile().delete();
-      try (IndexWriter writer = indexManager.newTablesIndexWriter()) {
+      try {
+        IndexWriter writer = indexManager.getTablesIndexWriter();
+        IndexWriter entitiesWriter = indexManager.getEntitiesIndexWriter();
         // Create a query to match the documents to delete
         Query query = new TermQuery(new Term("table-ref", getValueTableReference()));
         // Delete documents that match the query
         writer.deleteDocuments(query);
         writer.commit();
+        entitiesWriter.deleteDocuments(query);
+        entitiesWriter.commit();
       } catch (Exception e) {
         log.error("Tables index delete failed", e);
       }
@@ -73,11 +77,14 @@ public class TablesIndexImpl extends AbstractValueTableIndex {
     return new File(TablesIndexManagerImpl.TABLES_INDEX_DIR, getValueTableReference() + ".idx");
   }
 
-  public void create() {
+  /**
+   * Mark the table as indexed at the given time, i.e. when the indexing started.
+   */
+  public void markIndexed(long time) {
     try {
-      delete();
       getIndexFile().getParentFile().mkdirs();
       getIndexFile().createNewFile();
+      getIndexFile().setLastModified(time);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

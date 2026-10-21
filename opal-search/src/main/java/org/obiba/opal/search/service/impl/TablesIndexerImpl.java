@@ -11,6 +11,7 @@
 package org.obiba.opal.search.service.impl;
 
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.service.IndexManager;
 import org.obiba.opal.search.service.IndexSynchronization;
@@ -75,12 +76,19 @@ public class TablesIndexerImpl implements IndexSynchronization {
 
   @Override
   public void run() {
-    index.create();
-    try (IndexWriter writer = indexManager.newTablesIndexWriter()) {
+    // the table is up to date only once its documents are committed, as of the start of the indexing
+    long start = System.currentTimeMillis();
+    index.delete();
+    try {
+      IndexWriter writer = indexManager.getTablesIndexWriter();
+      IndexWriter entitiesWriter = indexManager.getEntitiesIndexWriter();
       done = 1;
-      writer.addDocument(index.asDocument());
-      done = 2;
+      writer.updateDocument(new Term("table-ref", index.getValueTableReference()), index.asDocument());
+      TablesIndexManagerImpl.writeEntities(entitiesWriter, index.getValueTableReference(), table.getVariableEntities());
       writer.commit();
+      entitiesWriter.commit();
+      done = 2;
+      index.markIndexed(start);
     } catch (Exception e) {
       log.error("Tables index writing failed", e);
     }

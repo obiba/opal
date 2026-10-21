@@ -11,7 +11,7 @@
 package org.obiba.opal.search.service.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
 public class AnalyzerFactory {
 
@@ -24,6 +24,6 @@ public class AnalyzerFactory {
   }
 
   public static Analyzer newEntitiesAnalyzer() {
-    return new StandardAnalyzer();
+    return new KeywordAnalyzer();
   }
 }

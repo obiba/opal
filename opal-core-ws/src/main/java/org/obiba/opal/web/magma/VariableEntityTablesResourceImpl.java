@@ -14,10 +14,13 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.finder.*;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.search.service.TablesIndexManager;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -35,6 +39,9 @@ import java.util.List;
 public class VariableEntityTablesResourceImpl implements AbstractTablesResource, VariableEntityTablesResource {
 
   private static final Logger log = LoggerFactory.getLogger(VariableEntityTablesResourceImpl.class);
+
+  @Autowired
+  private OpalSearchService opalSearchService;
 
   private VariableEntityBean variableEntity;
 
@@ -94,15 +101,23 @@ public class VariableEntityTablesResourceImpl implements AbstractTablesResource,
     }
   }
 
-  private static class EntityTablesMagmaFinder
+  private class EntityTablesMagmaFinder
       extends AbstractMagmaFinder<VariableEntityTablesQuery, FinderResult<List<Magma.TableDto>>> {
 
     @Override
     public void executeQuery(VariableEntityTablesQuery query, FinderResult<List<Magma.TableDto>> result) {
+      TablesIndexManager indexManager = opalSearchService.isRunning() && opalSearchService.getTablesIndexManager().isReady()
+          ? opalSearchService.getTablesIndexManager() : null;
+      Set<String> indexed = indexManager == null ? Set.of() : indexManager.findTableReferences(query.getEntity());
 
       for(ValueTable valueTable : query.getTableFilter()) {
 
-        if(valueTable.hasValueSet(query.getEntity())) {
+        // tables not indexed yet, or modified since, are looked up directly
+        boolean hasEntity = indexManager != null && indexManager.isIndexUpToDate(valueTable)
+            ? indexed.contains(valueTable.getTableReference())
+            : valueTable.hasValueSet(query.getEntity());
+
+        if(hasEntity) {
           Magma.TableDto tableDto = Dtos.asDto(valueTable, false).build();
           result.getValue().add(tableDto);
 
