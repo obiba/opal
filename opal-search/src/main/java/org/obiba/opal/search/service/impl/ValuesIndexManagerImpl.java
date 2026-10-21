@@ -10,11 +10,6 @@
 
 package org.obiba.opal.search.service.impl;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.SystemService;
@@ -40,8 +35,6 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager, SystemService
   private final VariableSummaryHandler variableSummaryHandler;
 
   private final ThreadFactory threadFactory;
-
-  private Directory entitiesDirectory;
 
   @Autowired
   public ValuesIndexManagerImpl(VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory) {
@@ -106,16 +99,6 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager, SystemService
     return getIndex(valueTable).exists();
   }
 
-  IndexWriter newIndexWriter() {
-    try {
-      Analyzer analyzer = AnalyzerFactory.newEntitiesAnalyzer();
-      IndexWriterConfig config = new IndexWriterConfig(analyzer);
-      return new IndexWriter(entitiesDirectory, config);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   ThreadFactory getThreadFactory() {
     return threadFactory;
   }
@@ -127,21 +110,16 @@ public class ValuesIndexManagerImpl implements ValuesIndexManager, SystemService
 
   @Override
   public void start() {
+    // entities are indexed by the tables index
     try {
-      this.entitiesDirectory = FSDirectory.open(new File(VALUES_INDEX_DIR, "lucene-entities").toPath());
+      FileUtil.delete(new File(VALUES_INDEX_DIR, "lucene-entities"));
     } catch (IOException e) {
-      log.error("Failed at opening lucene entities index", e);
+      log.warn("Cannot delete obsolete index folder: {}", VALUES_INDEX_DIR, e);
     }
   }
 
   @Override
   public void stop() {
-    if (this.entitiesDirectory == null) return;
-    try {
-      entitiesDirectory.close();
-      entitiesDirectory = null;
-    } catch (IOException e) {
-      log.error("Failed at closing lucene entities index", e);
-    }
+    // nothing to close
   }
 }

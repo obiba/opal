@@ -10,6 +10,9 @@
 package org.obiba.opal.search.service;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.VariableEntity;
+
+import java.util.Set;
 
 /**
  * Manager of {@code ValueTable} variables indices.
@@ -24,5 +27,14 @@ public interface TablesIndexManager extends IndexManager {
    */
   @Override
   ValueTableIndex getIndex(ValueTable valueTable);
+
+  /**
+   * Get the references of the indexed tables having the entity, exact match on identifier and type.
+   * Only the tables which index is up to date are relevant.
+   *
+   * @param entity
+   * @return
+   */
+  Set<String> findTableReferences(VariableEntity entity);
 
 }

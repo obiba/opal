@@ -11,12 +11,20 @@
 package org.obiba.opal.search.service.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.search.service.IndexSynchronization;
 import org.obiba.opal.search.service.SearchQueryExecutor;
@@ -28,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -39,6 +48,8 @@ public class TablesIndexManagerImpl implements TablesIndexManager, SystemService
   public static final String TABLES_INDEX_DIR = INDEX_DIR + File.separatorChar + "opal-tables";
 
   private Directory tablesDirectory;
+
+  private Directory entitiesDirectory;
 
   @Override
   public String getName() {
@@ -107,9 +118,63 @@ public class TablesIndexManagerImpl implements TablesIndexManager, SystemService
   }
 
   @Override
+  public Set<String> findTableReferences(VariableEntity entity) {
+    return entitiesDirectory == null ? Set.of() : findTableReferences(entitiesDirectory, entity);
+  }
+
+  IndexWriter newEntitiesIndexWriter() {
+    return newEntitiesIndexWriter(entitiesDirectory);
+  }
+
+  static IndexWriter newEntitiesIndexWriter(Directory directory) {
+    try {
+      return new IndexWriter(directory, new IndexWriterConfig(AnalyzerFactory.newEntitiesAnalyzer()));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Replace the entity documents of a table, to be committed by the caller.
+   */
+  static void writeEntities(IndexWriter writer, String tableReference, Iterable<VariableEntity> entities) throws IOException {
+    writer.deleteDocuments(new Term("table-ref", tableReference));
+    for (VariableEntity entity : entities) {
+      Document doc = new Document();
+      doc.add(new StringField("table-ref", tableReference, Field.Store.YES));
+      doc.add(new StringField("id", entity.getIdentifier(), Field.Store.NO));
+      doc.add(new StringField("type", entity.getType(), Field.Store.NO));
+      writer.addDocument(doc);
+    }
+  }
+
+  static Set<String> findTableReferences(Directory directory, VariableEntity entity) {
+    Set<String> references = new HashSet<>();
+    try (IndexReader reader = DirectoryReader.open(directory)) {
+      BooleanQuery query = new BooleanQuery.Builder()
+          .add(new TermQuery(new Term("id", entity.getIdentifier())), BooleanClause.Occur.FILTER)
+          .add(new TermQuery(new Term("type", entity.getType())), BooleanClause.Occur.FILTER)
+          .build();
+      IndexSearcher searcher = new IndexSearcher(reader);
+      StoredFields storedFields = reader.storedFields();
+      for (ScoreDoc hit : searcher.search(query, Math.max(1, reader.maxDoc())).scoreDocs) {
+        references.add(storedFields.document(hit.doc).get("table-ref"));
+      }
+    } catch (IndexNotFoundException e) {
+      // nothing indexed yet
+    } catch (IOException e) {
+      log.error("Failed at searching lucene entities index", e);
+    }
+    return references;
+  }
+
+  @Override
   public void start() {
     try {
+      // tables indexed before entities were: reindex them all
+      if (!new File(TABLES_INDEX_DIR, "lucene-entities").exists()) FileUtil.delete(new File(TABLES_INDEX_DIR));
       this.tablesDirectory = FSDirectory.open(new File(TABLES_INDEX_DIR, "lucene").toPath());
+      this.entitiesDirectory = FSDirectory.open(new File(TABLES_INDEX_DIR, "lucene-entities").toPath());
     } catch (IOException e) {
       log.error("Failed at opening lucene tables/variables index", e);
     }
@@ -118,7 +183,9 @@ public class TablesIndexManagerImpl implements TablesIndexManager, SystemService
   @Override
   public void stop() {
     close(tablesDirectory);
+    close(entitiesDirectory);
     this.tablesDirectory = null;
+    this.entitiesDirectory = null;
   }
 
   private void close(Directory directory) {
