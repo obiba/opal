@@ -279,6 +279,7 @@ export default {
     },
     server: {
       opal: 'This format imports variable dictionaries and data from a remote Opal.',
+      amber: 'This format imports the case reports or the interviews collected by Amber, with their data dictionary and their files, using an Amber API key.',
     },
     id_mappings: {
       hint: 'When a mapping of identifiers is selected, each identifier in the imported data will be mapped to a system identifier. Otherwise the imported identifier will be added to the system identifiers.',
@@ -439,6 +440,27 @@ export default {
     ERROR: 'Error',
     IGNORED: 'Ignored',
     UNRECOGNIZED: 'Unrecognized',
+  },
+  amber: {
+    url: 'Amber URL',
+    url_hint: 'The Amber API URL, e.g. https://amber.example.org/api',
+    api_key: 'API key',
+    api_key_hint: 'An Amber API key giving access to the study, created by an Amber administrator',
+    case_reports: 'Case reports',
+    interviews: 'Interviews',
+    study: 'Study',
+    campaign: 'Campaign',
+    campaign_hint: 'Optional, the name of the campaign of the interviews',
+    case_report_form: 'Case report form',
+    interview_design: 'Interview design',
+    state: 'State',
+    states: {
+      initiated: 'Initiated',
+      in_progress: 'In progress',
+      completed: 'Completed',
+    },
+    updated_hint: 'Records updated in this period',
+    entity_type_hint: 'Optional, the entity type of the tables is defined by Amber',
   },
   analyse_validate: {
     info: 'Analyses can improve data quality by detecting inconsistencies through validation rules and custom reports.',

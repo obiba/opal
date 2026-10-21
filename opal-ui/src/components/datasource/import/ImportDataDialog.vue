@@ -79,6 +79,9 @@
               <div v-if="serverImporter.value === 'opal'">
                 <import-opal-form v-model="factory" />
               </div>
+              <div v-else-if="serverImporter.value === 'amber'">
+                <import-amber-form v-model="factory" />
+              </div>
               <div v-else>
                 <import-plugin-form v-model="factory" :type="serverImporter.value" />
               </div>
@@ -179,6 +182,7 @@ import ImportCsvForm from 'src/components/datasource/import/ImportCsvForm.vue';
 import ImportFsForm from 'src/components/datasource/import/ImportFsForm.vue';
 import ImportHavenForm from 'src/components/datasource/import/ImportHavenForm.vue';
 import ImportOpalForm from 'src/components/datasource/import/ImportOpalForm.vue';
+import ImportAmberForm from 'src/components/datasource/import/ImportAmberForm.vue';
 import ImportPluginForm from 'src/components/datasource/import/ImportPluginForm.vue';
 import ImportDatabaseForm from 'src/components/datasource/import/ImportDatabaseForm.vue';
 import TablePreview from 'src/components/datasource/preview/TablePreview.vue';
@@ -229,7 +233,10 @@ const builtinFileImporters: ImporterOption[] = [
 const fileImporters = ref([...builtinFileImporters]);
 const fileImporter = ref();
 
-const builtinServerImporters: ImporterOption[] = [{ label: 'Opal', value: 'opal' }];
+const builtinServerImporters: ImporterOption[] = [
+  { label: 'Opal', value: 'opal' },
+  { label: 'Amber', value: 'amber' },
+];
 const serverImporters = ref([...builtinServerImporters]);
 const serverImporter = ref();
 const databaseImporter = ref();

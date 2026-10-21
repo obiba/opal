@@ -206,6 +206,22 @@ message PluginDatasourceFactoryDto {
   }
 }
 
+message AmberDatasourceFactoryDto {
+  required string url = 1;           // Amber API url
+  required string token = 2;         // Amber API key, sent as x-api-key
+  required string source = 3;        // "case_report" | "interview"
+  required string study = 4;         // study name
+  required string form = 5;          // case report form name | interview design name
+  optional string state = 6;         // records state, e.g. "completed"
+  optional string from = 7;          // records updated from (ISO date)
+  optional string to = 8;            // records updated until (ISO date)
+  optional string entityType = 9;    // overrides the entity type of the tables
+  optional string campaign = 10;     // campaign name, interviews only
+  extend DatasourceFactoryDto {
+    optional AmberDatasourceFactoryDto params = 1016;
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;
