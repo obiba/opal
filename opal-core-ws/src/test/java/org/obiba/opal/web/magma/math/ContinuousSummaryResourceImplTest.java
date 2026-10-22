@@ -17,8 +17,8 @@ public class ContinuousSummaryResourceImplTest {
     assertFalse(dto.getSummary().hasMax());
     assertEquals(0, dto.getIntervalFrequencyCount());
     assertEquals(0, dto.getDistributionPercentilesCount());
+    assertEquals(0, dto.getSummary().getPercentilesCount());
     assertEquals(2.5, dto.getSummary().getMean(), 0);
-    assertEquals(1, dto.getSummary().getPercentilesCount());
 
     resource.setViewValuesPermitted(true);
     dto = resource.withoutIndividualValues(summary()).build();

@@ -64,13 +64,14 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
   }
 
   /**
-   * Users who cannot see the values do not get the min and the max, which are individual values, nor the histogram,
-   * whose outer bounds are the min and the max and whose bins can single out individuals, nor the distribution
-   * percentiles of the normal plot. The mean, the median, the standard deviation and the percentiles remain.
+   * Users who cannot see the values do not get the min and the max, which are individual values, nor the percentiles,
+   * the extreme ones being the min and the max, and dense ones the sorted values, nor the histogram, whose outer bounds
+   * are the min and the max and whose bins can single out individuals, nor the distribution percentiles of the normal
+   * plot. The mean, the median, the standard deviation and the other moments remain.
    */
   ContinuousSummaryDto.Builder withoutIndividualValues(ContinuousSummaryDto.Builder builder) {
     if (isViewValuesPermitted()) return builder;
-    builder.getSummaryBuilder().clearMin().clearMax().clearValues();
+    builder.getSummaryBuilder().clearMin().clearMax().clearValues().clearPercentiles();
     return builder.clearIntervalFrequency().clearDistributionPercentiles();
   }
 

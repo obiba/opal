@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.ws.rs.core.*;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component("variableResource")
@@ -99,9 +100,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
     Variable variable = variableValueSource.getVariable();
 
     // OPAL-2979 if user does not have access to individual values, summary should not provide details about top value frequencies
-    String path = uriInfo.getPath();
-    path = path.replaceAll("\\/variable\\/" + Pattern.quote(variable.getName()) + "\\/summary$", "/valueSets");
-    boolean viewValuesPermitted = SecurityUtils.getSubject().isPermitted("rest:" + path + ":GET");
+    boolean viewValuesPermitted = isViewValuesPermitted(uriInfo.getPath());
 
     VariableNature nature = natureStr == null
         ? VariableNature.getNature(variable)
@@ -131,6 +130,18 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
   //
   // Private methods
   //
+
+  private static final Pattern SUMMARY_PATH = Pattern.compile("/variable/[^/]+/summary/?$");
+
+  /**
+   * Whether the user can see the values of the table of the variable summary at this path. Any other path is denied,
+   * as the summary privacy rules depend on it.
+   */
+  static boolean isViewValuesPermitted(String summaryPath) {
+    Matcher matcher = SUMMARY_PATH.matcher(summaryPath);
+    if (!matcher.find()) return false;
+    return SecurityUtils.getSubject().isPermitted("rest:" + matcher.replaceFirst("/valueSets") + ":GET");
+  }
 
   protected Variable updateVariableAttribute(Variable originalVariable, String name, String namespace, String locale, String value) {
     VariableBean.Builder builder = VariableBean.Builder.sameAs(originalVariable);
