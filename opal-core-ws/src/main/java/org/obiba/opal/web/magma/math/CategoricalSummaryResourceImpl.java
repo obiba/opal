@@ -37,16 +37,17 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
         .variable(getVariable()) //
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
-        .distinct(distinct) //
-        .offset(offset).build();
+        .distinct(distinct && isViewValuesPermitted()) // raw values that are not categories
+        .offset(windowIfPermitted(offset)).build();
 
     CategoricalVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getFrequencies()) || isDisclosive(summary.getOtherFrequency())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build());

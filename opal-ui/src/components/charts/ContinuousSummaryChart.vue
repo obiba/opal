@@ -2,6 +2,7 @@
   <div>
     <div>
       <q-btn-toggle
+        v-if="hasIntervalFrequencies"
         v-model="valueType"
         size="sm"
         toggle-color="secondary"

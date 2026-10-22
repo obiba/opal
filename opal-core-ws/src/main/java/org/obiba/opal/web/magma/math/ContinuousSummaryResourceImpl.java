@@ -41,25 +41,38 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
         .distribution(distribution) //
         .percentiles(percentiles) //
         .intervals(intervals) //
-        .offset(offset).build();
+        .offset(windowIfPermitted(offset)).build();
 
     ContinuousVariableSummary summary;
     if (fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getN())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
 
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(ContinuousSummaryDto.continuous, Dtos.asDto(summary).build());
+        .setExtension(ContinuousSummaryDto.continuous, withoutIndividualValues(Dtos.asDto(summary)).build());
     if (summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //
         ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
 
+  }
+
+  /**
+   * Users who cannot see the values do not get the min and the max, which are individual values, nor the percentiles,
+   * the extreme ones being the min and the max, and dense ones the sorted values, nor the histogram, whose outer bounds
+   * are the min and the max and whose bins can single out individuals, nor the distribution percentiles of the normal
+   * plot. The mean, the median, the standard deviation and the other moments remain.
+   */
+  ContinuousSummaryDto.Builder withoutIndividualValues(ContinuousSummaryDto.Builder builder) {
+    if (isViewValuesPermitted()) return builder;
+    builder.getSummaryBuilder().clearMin().clearMax().clearValues().clearPercentiles();
+    return builder.clearIntervalFrequency().clearDistributionPercentiles();
   }
 
 }

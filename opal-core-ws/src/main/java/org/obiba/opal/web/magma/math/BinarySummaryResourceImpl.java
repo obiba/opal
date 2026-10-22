@@ -34,15 +34,16 @@ public class BinarySummaryResourceImpl extends AbstractSummaryResource implement
         .variable(getVariable()) //
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
-        .offset(offset).build();
+        .offset(windowIfPermitted(offset)).build();
 
     BinaryVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getFrequencies())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build());

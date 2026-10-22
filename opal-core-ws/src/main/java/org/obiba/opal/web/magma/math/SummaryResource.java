@@ -23,6 +23,8 @@ public interface SummaryResource {
 
   void setVariableValueSource(@NotNull ValueSource variableValueSource);
 
+  void setViewValuesPermitted(boolean viewValuesPermitted);
+
   @NotNull
   ValueTable getValueTable();
 
