@@ -422,18 +422,37 @@ public final class Dtos {
     return dtoBuilder;
   }
 
-  public static Math.GeoSummaryDto.Builder asDto(GeoSummary summary) {
+  /**
+   * @param minCellCount H3 cells that count fewer points are left out
+   * @param withExtent include the bounding box and the centroid, which can be exact individual coordinates
+   */
+  public static Math.GeoSummaryDto.Builder asDto(GeoSummary summary, int minCellCount, boolean withExtent) {
     Math.GeoSummaryDto.Builder dtoBuilder = Math.GeoSummaryDto.newBuilder() //
         .setN(summary.getN());
     for (Frequency frequency : summary.getFrequencies()) {
       dtoBuilder.addFrequencies(asDto(frequency));
     }
 
-    for (Coordinate coord : summary.getCoordinates()) {
-      dtoBuilder.addPoints(Math.PointDto.newBuilder().setLon(coord.getLongitude()).setLat(coord.getLatitude()).build());
+    if (withExtent && summary.getCentroid() != null) {
+      dtoBuilder.setMin(asPointDto(summary.getMin())) //
+          .setMax(asPointDto(summary.getMax())) //
+          .setCentroid(asPointDto(summary.getCentroid()));
+    }
+
+    for (H3Cell cell : summary.getCells()) {
+      if (cell.count() < minCellCount) continue;
+      Math.H3CellDto.Builder cellBuilder = Math.H3CellDto.newBuilder() //
+          .setIndex(cell.index()) //
+          .setCount(cell.count());
+      cell.boundary().forEach(vertex -> cellBuilder.addBoundary(asPointDto(vertex)));
+      dtoBuilder.addCells(cellBuilder);
     }
 
     return dtoBuilder;
+  }
+
+  private static Math.PointDto asPointDto(Coordinate coord) {
+    return Math.PointDto.newBuilder().setLat(coord.getLatitude()).setLon(coord.getLongitude()).build();
   }
 
   private static void addTimestamps(DatasourceDto.Builder builder, Timestamped datasource) {

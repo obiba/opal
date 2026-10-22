@@ -28,8 +28,23 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Transactional
 public class GeoSummaryResourceImpl extends AbstractSummaryResource implements GeoSummaryResource {
 
+  // H3 cells counting fewer points, and the bounding box and centroid, are hidden from users who cannot see the values
+  private static final int MIN_CELL_COUNT = 5;
+
+  private boolean viewValuesPermitted;
+
+  @Override
+  public void setViewValuesPermitted(boolean viewValuesPermitted) {
+    this.viewValuesPermitted = viewValuesPermitted;
+  }
+
   @Override
   public Response get(Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
+    // comparing the cells of two entity windows would locate the entity that differs
+    if (!viewValuesPermitted) {
+      offset = null;
+      limit = null;
+    }
     GeoVariableSummaryFactory summaryFactory = new GeoVariableSummaryFactory.Builder() //
         .variable(getVariable()) //
         .table(getValueTable()) //
@@ -45,7 +60,7 @@ public class GeoSummaryResourceImpl extends AbstractSummaryResource implements G
     }
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(Math.GeoSummaryDto.geoSummary, Dtos.asDto(summary).build());
+        .setExtension(Math.GeoSummaryDto.geoSummary, Dtos.asDto(summary, viewValuesPermitted ? 1 : MIN_CELL_COUNT, viewValuesPermitted).build());
     if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //

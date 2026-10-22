@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.ws.rs.core.*;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component("variableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -99,7 +100,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
     // OPAL-2979 if user does not have access to individual values, summary should not provide details about top value frequencies
     String path = uriInfo.getPath();
-    path = path.replaceAll("\\/variable\\/" + variable.getName() + "\\/summary$", "/valueSets");
+    path = path.replaceAll("\\/variable\\/" + Pattern.quote(variable.getName()) + "\\/summary$", "/valueSets");
     boolean viewValuesPermitted = SecurityUtils.getSubject().isPermitted("rest:" + path + ":GET");
 
     VariableNature nature = natureStr == null
@@ -120,6 +121,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
     else {
       resource = getSummaryResourceClass(nature);
     }
+    if (resource instanceof GeoSummaryResource geoResource) geoResource.setViewValuesPermitted(viewValuesPermitted);
     resource.setValueTable(getValueTable());
     resource.setVariable(variable);
     resource.setVariableValueSource(variableValueSource);
