@@ -44,11 +44,11 @@ export interface TextSummaryDto {
 export interface GeoSummaryDto {
   n: number;
   frequencies: FrequencyDto[];
-  /** bounding box and centroid of all the coordinates */
+  /** bounding box of all the coordinates, mean of the feature centroids */
   min?: PointDto | undefined;
   max?: PointDto | undefined;
   centroid?: PointDto | undefined;
-  /** points only, counted by H3 cell */
+  /** feature centroids, counted by H3 cell */
   cells?: H3CellDto[] | undefined;
 }
 

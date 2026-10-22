@@ -1173,7 +1173,7 @@ export default {
     bounding_box: 'Boîte englobante',
     centroid: 'Centroïde',
     h3_cells: 'Hexagones (H3, résolution 7)',
-    h3_cells_hint: "Nombre de points dans chaque hexagone. Les hexagones contenant peu de points peuvent être masqués si vous n'avez pas accès aux valeurs individuelles.",
+    h3_cells_hint: "Nombre d'entités dans chaque hexagone, une ligne ou un polygone étant situé par son centroïde. Les hexagones contenant peu d'entités peuvent être masqués si vous n'avez pas accès aux valeurs individuelles.",
     latitude: 'Latitude',
     longitude: 'Longitude',
   },

@@ -70,11 +70,11 @@ message GeoSummaryDto {
   repeated FrequencyDto frequencies = 3;
   // was the raw coordinates, replaced by the H3 cells
   reserved 4;
-  // bounding box and centroid of all the coordinates
+  // bounding box of all the coordinates, mean of the feature centroids
   optional PointDto min = 5;
   optional PointDto max = 6;
   optional PointDto centroid = 7;
-  // points only, counted by H3 cell
+  // feature centroids, counted by H3 cell
   repeated H3CellDto cells = 8;
 
   extend SummaryStatisticsDto {

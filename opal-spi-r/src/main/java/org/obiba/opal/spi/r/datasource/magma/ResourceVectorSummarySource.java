@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -264,7 +265,8 @@ class ResourceVectorSummarySource implements VectorSummarySource {
       // observations
       int n = 0;
       int notNullCount = 0;
-      List<Coordinate> coords = Lists.newArrayList();
+      List<Coordinate> vertices = Lists.newArrayList();
+      List<Coordinate> centroids = Lists.newArrayList();
       for (RNamedList<RServerResult> freqMap : freqResults.stream()
           .filter(RServerResult::isNamedList)
           .map(RServerResult::asNamedList)
@@ -278,15 +280,16 @@ class ResourceVectorSummarySource implements VectorSummarySource {
           if (missings.contains(value))
             summary.addFrequency(new DefaultFrequency(value, count, count * 1F / freqSum, missings.contains(value)));
           else {
+            Value geoValue = resourceVariableValueSource.getVariable().getValueType().valueOf(value);
+            vertices.addAll(DefaultGeoSummary.getVertices(geoValue));
             // each distinct value is counted as many times as it is observed
-            List<Coordinate> valueCoords = Lists.newArrayList();
-            addCoordinates(valueCoords, resourceVariableValueSource.getVariable().getValueType().valueOf(value));
-            for (int i = 0; i < count; i++) coords.addAll(valueCoords);
+            Coordinate centroid = DefaultGeoSummary.getCentroid(geoValue);
+            if (centroid != null) centroids.addAll(Collections.nCopies(count, centroid));
             notNullCount += count;
           }
         }
       }
-      summary.addExtentAndCells(coords, resourceVariableValueSource.getVariable().getValueType() == PointType.get());
+      summary.addExtentAndCells(vertices, centroids);
       summary.addFrequency(new DefaultFrequency(FrequenciesSummary.NOT_NULL_NAME, notNullCount, notNullCount * 1F / freqSum, false));
       summary.setN(n);
 
@@ -303,19 +306,6 @@ class ResourceVectorSummarySource implements VectorSummarySource {
   //
   // Private methods
   //
-
-  private void addCoordinates(List<Coordinate> coords, Value value) {
-    if (value.getValueType() == PointType.get()) {
-      coords.add((Coordinate) value.getValue());
-    } else if (value.getValueType() == LineStringType.get()) {
-      coords.addAll((Collection<Coordinate>) value.getValue());
-    } else if (value.getValueType() == PolygonType.get()) {
-      Collection<List<Coordinate>> coordinateList = (Collection<List<Coordinate>>) value.getValue();
-      for (List<Coordinate> coordinate : coordinateList) {
-        coords.addAll(coordinate);
-      }
-    }
-  }
 
   private RNamedList<RServerResult> queryHistogram(String columnName, int intervals, Set<Category> categories) {
     String histStatement = String.format("hist(%s %s %%>%% select(`%s`) %%>%% pull(), breaks = %s, plot = FALSE)",

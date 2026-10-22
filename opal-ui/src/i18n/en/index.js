@@ -1173,7 +1173,7 @@ export default {
     bounding_box: 'Bounding box',
     centroid: 'Centroid',
     h3_cells: 'Hexagons (H3, resolution 7)',
-    h3_cells_hint: 'Number of points in each hexagon. Hexagons with few points may be hidden if you cannot see individual values.',
+    h3_cells_hint: 'Number of features in each hexagon, a line or a polygon being located by its centroid. Hexagons with few features may be hidden if you cannot see individual values.',
     latitude: 'Latitude',
     longitude: 'Longitude',
   },
