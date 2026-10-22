@@ -54,13 +54,24 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
 
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(ContinuousSummaryDto.continuous, Dtos.asDto(summary).build());
+        .setExtension(ContinuousSummaryDto.continuous, withoutIndividualValues(Dtos.asDto(summary)).build());
     if (summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
     SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //
         ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
 
+  }
+
+  /**
+   * Users who cannot see the values do not get the min and the max, which are individual values, nor the histogram,
+   * whose outer bounds are the min and the max and whose bins can single out individuals, nor the distribution
+   * percentiles of the normal plot. The mean, the median, the standard deviation and the percentiles remain.
+   */
+  ContinuousSummaryDto.Builder withoutIndividualValues(ContinuousSummaryDto.Builder builder) {
+    if (isViewValuesPermitted()) return builder;
+    builder.getSummaryBuilder().clearMin().clearMax().clearValues();
+    return builder.clearIntervalFrequency().clearDistributionPercentiles();
   }
 
 }
