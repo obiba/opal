@@ -28,6 +28,8 @@ public abstract class AbstractSummaryResource implements SummaryResource {
   @NotNull
   private ValueSource variableValueSource;
 
+  private boolean viewValuesPermitted;
+
   @Autowired
   protected VariableSummaryService variableSummaryService;
 
@@ -44,6 +46,23 @@ public abstract class AbstractSummaryResource implements SummaryResource {
   @Override
   public void setVariableValueSource(@NotNull ValueSource variableValueSource) {
     this.variableValueSource = variableValueSource;
+  }
+
+  @Override
+  public void setViewValuesPermitted(boolean viewValuesPermitted) {
+    this.viewValuesPermitted = viewValuesPermitted;
+  }
+
+  protected boolean isViewValuesPermitted() {
+    return viewValuesPermitted;
+  }
+
+  /**
+   * The entity window (offset or limit) is ignored for users who cannot see the values: a summary of a single entity,
+   * or the difference between two windows, would give away individual values.
+   */
+  protected Integer windowIfPermitted(Integer window) {
+    return viewValuesPermitted ? window : null;
   }
 
   @Override

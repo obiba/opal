@@ -38,13 +38,13 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
         .distinct(distinct) //
-        .offset(offset).build();
+        .offset(windowIfPermitted(offset)).build();
 
     CategoricalVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //

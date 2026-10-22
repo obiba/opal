@@ -34,13 +34,13 @@ public class DefaultSummaryResourceImpl extends AbstractSummaryResource implemen
         .variable(getVariable()) //
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
-        .offset(offset).build();
+        .offset(windowIfPermitted(offset)).build();
 
     DefaultVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //

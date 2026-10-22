@@ -121,10 +121,10 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
     else {
       resource = getSummaryResourceClass(nature);
     }
-    if (resource instanceof GeoSummaryResource geoResource) geoResource.setViewValuesPermitted(viewValuesPermitted);
     resource.setValueTable(getValueTable());
     resource.setVariable(variable);
     resource.setVariableValueSource(variableValueSource);
+    resource.setViewValuesPermitted(viewValuesPermitted);
     return resource;
   }
 

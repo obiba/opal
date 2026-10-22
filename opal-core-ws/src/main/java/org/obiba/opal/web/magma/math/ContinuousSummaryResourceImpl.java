@@ -41,13 +41,13 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
         .distribution(distribution) //
         .percentiles(percentiles) //
         .intervals(intervals) //
-        .offset(offset).build();
+        .offset(windowIfPermitted(offset)).build();
 
     ContinuousVariableSummary summary;
     if (fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
-      summaryFactory.setLimit(limit);
+      summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
 
