@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
-    "@intlify/unplugin-vue-i18n": "^11.2.5",
+    "@intlify/unplugin-vue-i18n": "^11.2.7",
     "@quasar/app-vite": "^3.8.1",
     "@quasar/quasar-app-extension-qmarkdown": "^4.2.1",
     "@types/markdown-it": "^14.1.2",
@@ -53,11 +53,17 @@
     "typescript": "^5.9.3",
     "unplugin-auto-import": "^21.1.0",
     "vite-plugin-checker": "^0.14.5",
-    "vitest": "^4.1.0",
+    "vitest": "^4.1.12",
     "vue-tsc": "^3.3.11"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "@intlify/vue-i18n-extensions": "^9.0.0",
+    "front-matter": {
+      "js-yaml": {
+        "argparse": "^2.0.1"
+      }
+    }
   },
   "engines": {
     "node": "^24 || ^22.22.0",
