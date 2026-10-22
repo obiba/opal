@@ -50,6 +50,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
       summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getN())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
 
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //

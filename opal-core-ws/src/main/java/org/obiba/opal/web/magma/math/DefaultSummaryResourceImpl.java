@@ -11,12 +11,6 @@ package org.obiba.opal.web.magma.math;
 
 import jakarta.ws.rs.core.Response;
 
-import org.obiba.magma.math.summary.DefaultVariableSummary;
-import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
-import org.obiba.opal.web.TimestampedResponses;
-import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Math;
-import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,27 +24,7 @@ public class DefaultSummaryResourceImpl extends AbstractSummaryResource implemen
 
   @Override
   public Response get(Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
-    DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder() //
-        .variable(getVariable()) //
-        .table(getValueTable()) //
-        .valueSource(getVariableValueSource()) //
-        .offset(windowIfPermitted(offset)).build();
-
-    DefaultVariableSummary summary;
-    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
-      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
-    } else {
-      summaryFactory.setLimit(windowIfPermitted(limit));
-      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
-    }
-    SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
-        .setResource(getVariable().getName()) //
-        .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build());
-    if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
-    SummaryStatisticsDto dto = dtoBuilder.build();
-    return summary.getOffset() == null && summary.getLimit() == null //
-        ? TimestampedResponses.ok(getValueTable(), dto).build() //
-        : Response.ok(dto).build();
+    return getDefaultSummary(offset, limit, fullIfCached, resetCache);
   }
 
 }

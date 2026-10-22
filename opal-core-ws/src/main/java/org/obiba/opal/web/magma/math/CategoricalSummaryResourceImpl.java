@@ -47,6 +47,7 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
       summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getFrequencies())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build());

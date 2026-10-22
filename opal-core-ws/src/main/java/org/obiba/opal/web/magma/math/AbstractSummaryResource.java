@@ -10,12 +10,21 @@
 package org.obiba.opal.web.magma.math;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.Response;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.Frequency;
+import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 import org.obiba.opal.core.service.VariableSummaryService;
+import org.obiba.opal.web.TimestampedResponses;
+import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Math;
+import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 public abstract class AbstractSummaryResource implements SummaryResource {
 
@@ -29,6 +38,9 @@ public abstract class AbstractSummaryResource implements SummaryResource {
   private ValueSource variableValueSource;
 
   private boolean viewValuesPermitted;
+
+  @Value("${summary.minN:5}")
+  protected int minN;
 
   @Autowired
   protected VariableSummaryService variableSummaryService;
@@ -63,6 +75,52 @@ public abstract class AbstractSummaryResource implements SummaryResource {
    */
   protected Integer windowIfPermitted(Integer window) {
     return viewValuesPermitted ? window : null;
+  }
+
+  /**
+   * Whether a count, between 1 and {@code summary.minN} - 1, would single out individuals to a user who cannot see the
+   * values.
+   */
+  protected boolean isDisclosive(long count) {
+    return !viewValuesPermitted && count > 0 && count < minN;
+  }
+
+  /**
+   * Whether a non-missing frequency is disclosive, the missing ones being part of the default summary anyway.
+   */
+  protected boolean isDisclosive(Iterable<Frequency> frequencies) {
+    for (Frequency frequency : frequencies) {
+      if (!frequency.isMissing() && isDisclosive(frequency.getFreq())) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Counts of the non-missing values and of the missing ones only, which is what users who cannot see the values get
+   * when a summary would disclose fewer than {@code summary.minN} individuals.
+   */
+  protected Response getDefaultSummary(Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
+    DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder() //
+        .variable(getVariable()) //
+        .table(getValueTable()) //
+        .valueSource(getVariableValueSource()) //
+        .offset(windowIfPermitted(offset)).build();
+
+    DefaultVariableSummary summary;
+    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
+    } else {
+      summaryFactory.setLimit(windowIfPermitted(limit));
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
+    }
+    SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
+        .setResource(getVariable().getName()) //
+        .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build());
+    if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
+    SummaryStatisticsDto dto = dtoBuilder.build();
+    return summary.getOffset() == null && summary.getLimit() == null //
+        ? TimestampedResponses.ok(getValueTable(), dto).build() //
+        : Response.ok(dto).build();
   }
 
   @Override

@@ -43,6 +43,7 @@ public class BinarySummaryResourceImpl extends AbstractSummaryResource implement
       summaryFactory.setLimit(windowIfPermitted(limit));
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
+    if (isDisclosive(summary.getFrequencies())) return getDefaultSummary(offset, limit, fullIfCached, resetCache);
     SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build());
