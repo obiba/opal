@@ -136,13 +136,13 @@
 
   <appender name="otel" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
     <captureExperimentalAttributes>false</captureExperimentalAttributes>
-    <captureMdcAttributes>ip,username</captureMdcAttributes>
+    <mdcAttributesIncluded>ip,username</mdcAttributesIncluded>
     <numLogsCapturedBeforeOtelInstall>2000</numLogsCapturedBeforeOtelInstall>
   </appender>
 
   <appender name="otelrest" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
     <captureExperimentalAttributes>false</captureExperimentalAttributes>
-    <captureMdcAttributes>ip,username,status,method</captureMdcAttributes>
+    <mdcAttributesIncluded>ip,username,status,method</mdcAttributesIncluded>
     <numLogsCapturedBeforeOtelInstall>2000</numLogsCapturedBeforeOtelInstall>
   </appender>
 
@@ -151,7 +151,7 @@
        on its way to otelraw only, so the file appender above is unaffected. -->
   <appender name="otelraw" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
     <captureExperimentalAttributes>false</captureExperimentalAttributes>
-    <captureMdcAttributes>*</captureMdcAttributes>
+    <mdcAttributesIncluded>*</mdcAttributesIncluded>
     <numLogsCapturedBeforeOtelInstall>2000</numLogsCapturedBeforeOtelInstall>
   </appender>
 
