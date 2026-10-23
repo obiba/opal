@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.slf4j.Logger;
@@ -71,6 +72,9 @@ public class CSRFInterceptor extends AbstractSecurityComponent implements Reques
     if (!productionMode || csrfAllowed.contains("*")) return;
     // session by header (see OpalSessionHeaderFilter): cookies were dropped, so no ambient credentials
     if (httpServletRequest.getAttribute(OpalAuth.SESSION_HEADER_ATTRIBUTE) != null) return;
+    // explicit credentials in a header: a browser cannot attach them cross-site, so no ambient credentials either
+    if (requestContext.getHeaderString(OpalAuth.CREDENTIALS_HEADER) != null
+        || requestContext.getHeaderString(HttpHeaders.AUTHORIZATION) != null) return;
 
     String method = requestContext.getMethod();
     if (!SAFE_METHODS.contains(method)) {
