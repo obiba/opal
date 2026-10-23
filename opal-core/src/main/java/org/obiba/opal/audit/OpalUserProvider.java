@@ -9,8 +9,7 @@
  */
 package org.obiba.opal.audit;
 
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
+import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.audit.UserProvider;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +21,8 @@ public class OpalUserProvider implements UserProvider {
   @Override
   public String getUsername() {
     // TODO: Defaulting to "Unknown" as a temporary patch.
-    Subject subject = ThreadContext.getSubject();
-    return subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : UNKNOWN_USERNAME;
+    Object principal = SecurityUtils.getSubject().getPrincipal();
+    return principal != null ? principal.toString() : UNKNOWN_USERNAME;
   }
 
 }

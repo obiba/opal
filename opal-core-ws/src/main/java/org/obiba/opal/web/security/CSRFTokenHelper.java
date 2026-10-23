@@ -2,9 +2,8 @@ package org.obiba.opal.web.security;
 
 import com.google.common.base.Strings;
 import jakarta.ws.rs.core.NewCookie;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -65,12 +64,8 @@ public class CSRFTokenHelper {
    * @return true if the token is valid or no subject is associated with the request, false otherwise
    */
   public boolean validateXsrfToken(String headerToken) {
-    Subject subject = ThreadContext.getSubject();
-    if (subject == null) {
-      // do not validate if no subject is associated with the request
-      return true;
-    }
-    Session session = subject.getSession(false);
+    // an anonymous subject has no session: validation is skipped
+    Session session = SecurityUtils.getSubject().getSession(false);
     if (session != null) {
       String sessionToken = (String) session.getAttribute(CSRF_TOKEN_COOKIE_NAME);
       if (Strings.isNullOrEmpty(sessionToken)) {
@@ -86,12 +81,11 @@ public class CSRFTokenHelper {
   //
 
   private String getOrGenerateCsrfToken() {
-    Subject subject = ThreadContext.getSubject();
-    if (subject == null) {
-      // return a default token if no subject is associated with the request
+    // an anonymous subject has no session: no token
+    Session session = SecurityUtils.getSubject().getSession(false);
+    if (session == null) {
       return null;
     }
-    Session session = subject.getSession();
     String csrfToken = (String) session.getAttribute(CSRF_TOKEN_COOKIE_NAME);
     if (csrfToken == null) {
       csrfToken = UUID.randomUUID().toString();

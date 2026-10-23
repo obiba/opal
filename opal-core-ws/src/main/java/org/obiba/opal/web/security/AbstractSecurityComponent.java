@@ -23,7 +23,6 @@ import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -66,8 +65,7 @@ abstract class AbstractSecurityComponent {
   }
 
   static boolean isUserAuthenticated() {
-    Subject subject = ThreadContext.getSubject();
-    return subject != null && subject.isAuthenticated();
+    return getSubject().isAuthenticated();
   }
 
   /**

@@ -23,10 +23,8 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -107,9 +105,9 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       addPermissions(responseContext);
     }
 
-    Subject subject = ThreadContext.getSubject();
-    if (subject != null && subject.isAuthenticated() && !subject.getPrincipals().getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) {
-      Session session = SecurityUtils.getSubject().getSession(false);
+    Subject subject = getSubject();
+    if (subject.isAuthenticated() && !subject.getPrincipals().getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) {
+      Session session = subject.getSession(false);
       if (session != null && session.getAttribute("ensuredProfileGroups") == null) {
         Set<String> roles = (Set<String>) session.getAttribute("roles");
         if (roles != null && !roles.isEmpty()) {

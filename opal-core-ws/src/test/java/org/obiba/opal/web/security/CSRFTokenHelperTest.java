@@ -1,6 +1,8 @@
 package org.obiba.opal.web.security;
 
 import jakarta.ws.rs.core.NewCookie;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -15,6 +17,7 @@ public class CSRFTokenHelperTest {
   @Test
   public void createCsrfTokenCookieReturnsNullWhenNoSubject() {
     ThreadContext.unbindSubject();
+    SecurityUtils.setSecurityManager(new DefaultSecurityManager());
     NewCookie cookie = new CSRFTokenHelper().createCsrfTokenCookie();
     assertThat(cookie).isNull();
   }
@@ -27,7 +30,7 @@ public class CSRFTokenHelperTest {
     replay(mockSession);
 
     Subject mockSubject = createMock(Subject.class);
-    expect(mockSubject.getSession()).andReturn(mockSession);
+    expect(mockSubject.getSession(false)).andReturn(mockSession);
     ThreadContext.bind(mockSubject);
     replay(mockSubject);
 
@@ -57,6 +60,7 @@ public class CSRFTokenHelperTest {
   @Test
   public void validateXsrfTokenReturnsTrueWhenNoSubject() {
     ThreadContext.unbindSubject();
+    SecurityUtils.setSecurityManager(new DefaultSecurityManager());
     boolean isValid = new CSRFTokenHelper().validateXsrfToken("any-token");
     assertThat(isValid).isTrue();
   }
