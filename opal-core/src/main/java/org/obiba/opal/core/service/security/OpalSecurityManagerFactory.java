@@ -30,7 +30,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.OIDCConfigurationProvider;
-import org.obiba.oidc.shiro.realm.OIDCRealm;
+import org.obiba.opal.core.service.security.realm.OpalOIDCRealm;
 import org.obiba.opal.core.service.SubjectTokenService;
 import org.obiba.opal.core.service.security.realm.OpalModularRealmAuthorizer;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
@@ -151,7 +151,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SessionsSecurityM
         }
       }
       if (enabled) {
-        OIDCRealm realm = new OIDCRealm(configuration);
+        OpalOIDCRealm realm = new OpalOIDCRealm(configuration);
         shiroRealms.add(realm);
       }
     }
