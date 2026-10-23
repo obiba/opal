@@ -102,7 +102,7 @@
     <mysql-connector-j.version>9.7.0</mysql-connector-j.version>
     <nimbus-jose-jwt.version>10.10</nimbus-jose-jwt.version>
     <oauth-oidc-sdk.version>11.38.2</oauth-oidc-sdk.version>
-    <obiba-commons.version>5.2.3</obiba-commons.version>
+    <obiba-commons.version>5.3.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>3.2.57</orientdb.version>
@@ -114,7 +114,7 @@
     <resteasy.version>6.2.14.Final</resteasy.version>
     <resteasy-spring.version>3.1.2.Final</resteasy-spring.version>
     <rhino-js.version>1.7.14.1</rhino-js.version>
-    <shiro.version>2.2.1</shiro.version>
+    <shiro.version>3.0.1</shiro.version>
     <shiro-extras.version>2.0.0</shiro-extras.version>
     <slf4j.version>2.0.17</slf4j.version>
     <snakeyaml.version>2.7</snakeyaml.version>
@@ -904,19 +904,16 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-core</artifactId>
         <version>${shiro.version}</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-web</artifactId>
         <version>${shiro.version}</version>
-        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-spring</artifactId>
         <version>${shiro.version}</version>
-        <classifier>jakarta</classifier>
         <exclusions>
           <exclusion>
             <groupId>org.apache.shiro</groupId>
