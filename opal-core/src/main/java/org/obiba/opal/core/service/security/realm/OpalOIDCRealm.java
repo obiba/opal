@@ -18,6 +18,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.OIDCCredentials;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.util.Collection;
 
 /**
  * OIDC realm that also accepts, on the REST API, a JWT issued by its ID provider and presented as
@@ -70,6 +72,13 @@ public class OpalOIDCRealm extends OIDCRealm {
       log.warn("Bearer token rejected by OIDC realm {}: {}", getName(), e.getMessage());
       throw new AuthenticationException("Bearer token rejected by " + getName(), e);
     }
+  }
+
+  /**
+   * The groups this realm grants to these principals, from the UserInfo they carry.
+   */
+  public Collection<String> getGroups(PrincipalCollection principals) {
+    return doGetAuthorizationInfo(principals).getRoles();
   }
 
   /**

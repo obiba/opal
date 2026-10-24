@@ -17,12 +17,16 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.cache.jcache.JCacheManager;
 import org.obiba.oidc.OIDCConfiguration;
+import org.obiba.oidc.OIDCCredentials;
+import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.shiro.authc.TicketAuthenticationToken;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,9 +35,11 @@ import org.junit.Test;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import javax.cache.Caching;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -83,6 +89,32 @@ public class OpalOIDCRealmTest {
     assertThat(realm.hasRole(info.getPrincipals(), "keycloak")).isTrue();
   }
 
+  /**
+   * #4235: with Opal's Shiro cache in place, the groups of a second login must be the ones of its own UserInfo.
+   */
+  @Test
+  public void groupsFollowTheLatestLoginDespiteTheAuthorizationCache() throws Exception {
+    System.setProperty("OPAL_HOME", Files.createTempDirectory("opal-oidc-test").toString());
+    JCacheManager cacheManager = new JCacheManager();
+    cacheManager.setCacheManager(Caching.getCachingProvider()
+        .getCacheManager(getClass().getResource("/ehcache-shiro.xml").toURI(), getClass().getClassLoader()));
+    OpalOIDCRealm realm = realm();
+    realm.setCacheManager(cacheManager);
+
+    AuthenticationInfo first = realm.getAuthenticationInfo(browser("analysts"));
+    assertThat(realm.hasRole(first.getPrincipals(), "analysts")).isTrue();
+    AuthenticationInfo second = realm.getAuthenticationInfo(browser("reviewers"));
+    assertThat(realm.hasRole(second.getPrincipals(), "reviewers")).isTrue();
+    assertThat(realm.hasRole(second.getPrincipals(), "analysts")).isFalse();
+  }
+
+  private OIDCAuthenticationToken browser(String role) throws Exception {
+    OIDCCredentials credentials = new OIDCCredentials();
+    credentials.setIdToken(JWTParser.parse(jwt(issuer, "opal", 60, role)));
+    credentials.setUserInfo(Map.of("sub", "1234", "preferred_username", "alice", "roles", List.of(role)));
+    return new OIDCAuthenticationToken(credentials);
+  }
+
   @Test(expected = AuthenticationException.class)
   public void tokenForAnotherAudienceIsRejected() throws Exception {
     realm().getAuthenticationInfo(bearer(jwt(issuer, "other-client", 60)));
@@ -119,11 +151,15 @@ public class OpalOIDCRealmTest {
   }
 
   private static String jwt(String iss, String aud, int secondsToLive) throws Exception {
+    return jwt(iss, aud, secondsToLive, "analysts");
+  }
+
+  private static String jwt(String iss, String aud, int secondsToLive, String role) throws Exception {
     long now = System.currentTimeMillis();
     JWTClaimsSet claims = new JWTClaimsSet.Builder()
         .issuer(iss).subject("1234").audience(aud)
         .issueTime(new Date(now - 1000)).expirationTime(new Date(now + secondsToLive * 1000L))
-        .claim("preferred_username", "alice").claim("roles", List.of("analysts"))
+        .claim("preferred_username", "alice").claim("roles", List.of(role))
         .build();
     SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(key.getKeyID()).build(), claims);
     jwt.sign(new RSASSASigner(key));
