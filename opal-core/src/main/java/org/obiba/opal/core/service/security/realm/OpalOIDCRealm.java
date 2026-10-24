@@ -22,6 +22,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.OIDCCredentials;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
+import org.obiba.oidc.shiro.realm.DefaultOIDCGroupsExtractor;
+import org.obiba.oidc.shiro.realm.OIDCGroupsExtractor;
 import org.obiba.oidc.shiro.realm.OIDCRealm;
 import org.obiba.oidc.utils.OIDCTokenValidator;
 import org.obiba.shiro.authc.TicketAuthenticationToken;
@@ -43,6 +45,12 @@ public class OpalOIDCRealm extends OIDCRealm {
   private static final Logger log = LoggerFactory.getLogger(OpalOIDCRealm.class);
 
   private final OIDCConfiguration configuration;
+
+  /**
+   * obiba-oidc 5.3.1 no longer caches authorization info, so the groups are extracted on every permission check:
+   * the extractor (and the {@code ScriptEngineManager} SPI scan its constructor runs) is built once per realm.
+   */
+  private final OIDCGroupsExtractor groupsExtractor = new DefaultOIDCGroupsExtractor();
 
   public OpalOIDCRealm(OIDCConfiguration configuration) {
     super(configuration);
@@ -73,6 +81,11 @@ public class OpalOIDCRealm extends OIDCRealm {
       log.warn("Bearer token rejected by OIDC realm {}: {}", getName(), e.getMessage());
       throw new AuthenticationException("Bearer token rejected by " + getName(), e);
     }
+  }
+
+  @Override
+  protected OIDCGroupsExtractor newOIDCGroupsExtractor() {
+    return groupsExtractor;
   }
 
   /**
