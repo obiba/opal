@@ -17,12 +17,16 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.oidc.OIDCConfiguration;
+import org.obiba.oidc.OIDCCredentials;
+import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
 import org.obiba.shiro.authc.TicketAuthenticationToken;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -83,6 +87,30 @@ public class OpalOIDCRealmTest {
     assertThat(realm.hasRole(info.getPrincipals(), "keycloak")).isTrue();
   }
 
+  /**
+   * #4235: the groups of a login are the ones of its own UserInfo, whatever a previous login of the same user carried.
+   */
+  @Test
+  public void groupsFollowTheLatestLogin() throws Exception {
+    OpalOIDCRealm realm = realm();
+    AuthenticationInfo first = realm.getAuthenticationInfo(browser("analysts"));
+    assertThat(realm.getGroups(first.getPrincipals())).containsOnly("analysts", "keycloak");
+    AuthenticationInfo second = realm.getAuthenticationInfo(browser("reviewers"));
+    assertThat(realm.getGroups(second.getPrincipals())).containsOnly("reviewers", "keycloak");
+  }
+
+  @Test
+  public void principalsOfAnotherRealmHaveNoGroups() {
+    assertThat(realm().getGroups(new SimplePrincipalCollection("bob", "opal-user-realm"))).isEmpty();
+  }
+
+  private OIDCAuthenticationToken browser(String role) throws Exception {
+    OIDCCredentials credentials = new OIDCCredentials();
+    credentials.setIdToken(JWTParser.parse(jwt(issuer, "opal", 60, role)));
+    credentials.setUserInfo(Map.of("sub", "1234", "preferred_username", "alice", "roles", List.of(role)));
+    return new OIDCAuthenticationToken(credentials);
+  }
+
   @Test(expected = AuthenticationException.class)
   public void tokenForAnotherAudienceIsRejected() throws Exception {
     realm().getAuthenticationInfo(bearer(jwt(issuer, "other-client", 60)));
@@ -119,11 +147,15 @@ public class OpalOIDCRealmTest {
   }
 
   private static String jwt(String iss, String aud, int secondsToLive) throws Exception {
+    return jwt(iss, aud, secondsToLive, "analysts");
+  }
+
+  private static String jwt(String iss, String aud, int secondsToLive, String role) throws Exception {
     long now = System.currentTimeMillis();
     JWTClaimsSet claims = new JWTClaimsSet.Builder()
         .issuer(iss).subject("1234").audience(aud)
         .issueTime(new Date(now - 1000)).expirationTime(new Date(now + secondsToLive * 1000L))
-        .claim("preferred_username", "alice").claim("roles", List.of("analysts"))
+        .claim("preferred_username", "alice").claim("roles", List.of(role))
         .build();
     SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(key.getKeyID()).build(), claims);
     jwt.sign(new RSASSASigner(key));

@@ -10,9 +10,13 @@
 
 package org.obiba.opal.web.security;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.realm.OpalOIDCRealm;
 import org.obiba.shiro.web.filter.AbstractAuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Perform the authentication, either by username-password token or by obiba ticket token.
@@ -75,9 +81,26 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
       String username = principal.toString();
       log.debug("Ensure HOME folder for {}", username);
       subjectProfileService.ensureProfile(subject.getPrincipals());
+      oidcGroups(subject.getPrincipals()).ifPresent(groups -> {
+        subjectProfileService.applyProfileGroups(username, groups);
+        // the ID provider is authoritative: do not let the roles seen by permission resolution overwrite these
+        if (subjectSession != null) subjectSession.setAttribute(AuthorizationInterceptor.ENSURED_PROFILE_GROUPS, true);
+      });
       if (subjectSession != null) {
         subjectSession.setAttribute(ENSURED_PROFILE, true);
       }
     }
+  }
+
+  /**
+   * The groups of an OIDC login are known from its UserInfo: store them now, so that the profile does not wait for the
+   * first authorized request of the session to catch up with the ID provider (obiba/opal#4235).
+   */
+  private Optional<Set<String>> oidcGroups(PrincipalCollection principals) {
+    if (!(SecurityUtils.getSecurityManager() instanceof RealmSecurityManager manager)) return Optional.empty();
+    return manager.getRealms().stream()
+        .filter(realm -> realm instanceof OpalOIDCRealm && principals.getRealmNames().contains(realm.getName()))
+        .findFirst()
+        .map(realm -> ((OpalOIDCRealm) realm).getGroups(principals));
   }
 }

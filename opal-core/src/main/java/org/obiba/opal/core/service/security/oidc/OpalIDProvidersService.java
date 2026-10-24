@@ -17,7 +17,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.obiba.oidc.OIDCConfiguration;
-import org.obiba.oidc.shiro.realm.OIDCRealm;
+import org.obiba.opal.core.service.security.realm.OpalOIDCRealm;
 import org.obiba.opal.core.service.security.DuplicateIDProviderException;
 import org.obiba.opal.core.service.security.IDProvidersService;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class OpalIDProvidersService implements IDProvidersService, InitializingB
     if ("true".equals(configuration.getCustomParam("enabled"))) {
       RealmSecurityManager securityManager = ((RealmSecurityManager) SecurityUtils.getSecurityManager());
       Collection<Realm> realms = securityManager.getRealms();
-      realms.add(new OIDCRealm(configuration));
+      realms.add(new OpalOIDCRealm(configuration));
       securityManager.setRealms(realms);
     }
   }
