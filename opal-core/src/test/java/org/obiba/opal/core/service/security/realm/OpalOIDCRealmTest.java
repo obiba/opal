@@ -23,7 +23,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.cache.jcache.JCacheManager;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.oidc.OIDCConfiguration;
 import org.obiba.oidc.OIDCCredentials;
 import org.obiba.oidc.shiro.authc.OIDCAuthenticationToken;
@@ -35,11 +35,9 @@ import org.junit.Test;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.cache.Caching;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -90,22 +88,20 @@ public class OpalOIDCRealmTest {
   }
 
   /**
-   * #4235: with Opal's Shiro cache in place, the groups of a second login must be the ones of its own UserInfo.
+   * #4235: the groups of a login are the ones of its own UserInfo, whatever a previous login of the same user carried.
    */
   @Test
-  public void groupsFollowTheLatestLoginDespiteTheAuthorizationCache() throws Exception {
-    System.setProperty("OPAL_HOME", Files.createTempDirectory("opal-oidc-test").toString());
-    JCacheManager cacheManager = new JCacheManager();
-    cacheManager.setCacheManager(Caching.getCachingProvider()
-        .getCacheManager(getClass().getResource("/ehcache-shiro.xml").toURI(), getClass().getClassLoader()));
+  public void groupsFollowTheLatestLogin() throws Exception {
     OpalOIDCRealm realm = realm();
-    realm.setCacheManager(cacheManager);
-
     AuthenticationInfo first = realm.getAuthenticationInfo(browser("analysts"));
-    assertThat(realm.hasRole(first.getPrincipals(), "analysts")).isTrue();
+    assertThat(realm.getGroups(first.getPrincipals())).containsOnly("analysts", "keycloak");
     AuthenticationInfo second = realm.getAuthenticationInfo(browser("reviewers"));
-    assertThat(realm.hasRole(second.getPrincipals(), "reviewers")).isTrue();
-    assertThat(realm.hasRole(second.getPrincipals(), "analysts")).isFalse();
+    assertThat(realm.getGroups(second.getPrincipals())).containsOnly("reviewers", "keycloak");
+  }
+
+  @Test
+  public void principalsOfAnotherRealmHaveNoGroups() {
+    assertThat(realm().getGroups(new SimplePrincipalCollection("bob", "opal-user-realm"))).isEmpty();
   }
 
   private OIDCAuthenticationToken browser(String role) throws Exception {

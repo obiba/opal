@@ -104,6 +104,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   public synchronized void applyProfileGroups(@NotNull String principal, Set<String> groups) {
     try {
       SubjectProfile profile = getProfile(principal);
+      if (profile.getGroups().equals(groups)) return;
       profile.setGroups(groups);
       profile.setUpdated(new Date());
       subjectProfileRepository.upsert(profile);
