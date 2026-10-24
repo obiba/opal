@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * OIDC realm that also accepts, on the REST API, a JWT issued by its ID provider and presented as
@@ -77,8 +78,9 @@ public class OpalOIDCRealm extends OIDCRealm {
   /**
    * The groups this realm grants to these principals, from the UserInfo they carry.
    */
-  public Collection<String> getGroups(PrincipalCollection principals) {
-    return doGetAuthorizationInfo(principals).getRoles();
+  public Set<String> getGroups(PrincipalCollection principals) {
+    Collection<String> roles = doGetAuthorizationInfo(principals).getRoles();
+    return roles == null ? Set.of() : Set.copyOf(roles);
   }
 
   /**

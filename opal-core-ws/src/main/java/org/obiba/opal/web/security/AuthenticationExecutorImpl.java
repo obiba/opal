@@ -81,7 +81,11 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
       String username = principal.toString();
       log.debug("Ensure HOME folder for {}", username);
       subjectProfileService.ensureProfile(subject.getPrincipals());
-      oidcGroups(subject.getPrincipals()).ifPresent(groups -> subjectProfileService.applyProfileGroups(username, groups));
+      oidcGroups(subject.getPrincipals()).ifPresent(groups -> {
+        subjectProfileService.applyProfileGroups(username, groups);
+        // the ID provider is authoritative: do not let the roles seen by permission resolution overwrite these
+        if (subjectSession != null) subjectSession.setAttribute(AuthorizationInterceptor.ENSURED_PROFILE_GROUPS, true);
+      });
       if (subjectSession != null) {
         subjectSession.setAttribute(ENSURED_PROFILE, true);
       }
@@ -97,6 +101,6 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor i
     return manager.getRealms().stream()
         .filter(realm -> realm instanceof OpalOIDCRealm && principals.getRealmNames().contains(realm.getName()))
         .findFirst()
-        .map(realm -> Set.copyOf(((OpalOIDCRealm) realm).getGroups(principals)));
+        .map(realm -> ((OpalOIDCRealm) realm).getGroups(principals));
   }
 }

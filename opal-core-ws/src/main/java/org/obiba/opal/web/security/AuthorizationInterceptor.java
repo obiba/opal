@@ -61,6 +61,11 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   public static final String ALT_PERMISSIONS = "X-Alt-Permissions";
 
+  /**
+   * Session flag: the profile groups were already written for this session, by the login (OIDC) or by this interceptor.
+   */
+  public static final String ENSURED_PROFILE_GROUPS = "ensuredProfileGroups";
+
   @Autowired
   private SubjectAclService subjectAclService;
 
@@ -108,12 +113,12 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     Subject subject = getSubject();
     if (subject.isAuthenticated() && !subject.getPrincipals().getRealmNames().contains(OpalTokenRealm.TOKEN_REALM)) {
       Session session = subject.getSession(false);
-      if (session != null && session.getAttribute("ensuredProfileGroups") == null) {
+      if (session != null && session.getAttribute(ENSURED_PROFILE_GROUPS) == null) {
         Set<String> roles = (Set<String>) session.getAttribute("roles");
         if (roles != null && !roles.isEmpty()) {
           log.debug("{} has roles {}", subject.getPrincipal(), Joiner.on(",").join(roles));
           subjectProfileService.applyProfileGroups(subject.getPrincipal().toString(), roles);
-          session.setAttribute("ensuredProfileGroups", true);
+          session.setAttribute(ENSURED_PROFILE_GROUPS, true);
         }
       }
     }
