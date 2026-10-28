@@ -41,10 +41,6 @@ public class ValueTableIndexManager {
     return datasource + "." + table;
   }
 
-  public String getQuery() {
-    return "reference:(" + getReference().replaceAll(" ", "+") + ")";
-  }
-
   public VariableNature getVariableNature(String variableName) {
     Variable var = getValueTable().getVariable(variableName);
 

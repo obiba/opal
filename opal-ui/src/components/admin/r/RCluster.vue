@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { baseUrl } from 'src/boot/api';
+import { baseUrl, u } from 'src/boot/api';
 import type { RServerClusterDto, RServerDto } from 'src/models/OpalR';
 import { getSizeLabel } from 'src/utils/files';
 import RPackages from 'src/components/admin/r/RPackages.vue';
@@ -159,11 +159,11 @@ const columns = computed(() => [
 ]);
 
 function onClusterLogsDownload() {
-  window.open(`${baseUrl}/service/r/cluster/${props.cluster.name}/_log`);
+  window.open(baseUrl + u`/service/r/cluster/${props.cluster.name}/_log`);
 }
 
 function onRServerLogsDownload(server: RServerDto) {
-  window.open(`${baseUrl}/service/r/cluster/${props.cluster.name}/server/${server.name}/_log`);
+  window.open(baseUrl + u`/service/r/cluster/${props.cluster.name}/server/${server.name}/_log`);
 }
 
 function onRServerStart(server: RServerDto) {

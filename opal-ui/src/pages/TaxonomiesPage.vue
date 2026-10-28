@@ -17,7 +17,7 @@
         <template v-for="summary in summaries" :key="summary.name">
           <q-card flat bordered class="on-left q-mb-md o-card-sm bg-grey-1">
             <q-card-section class="q-pa-sm text-h6 text-center bg-grey-4">
-              <router-link :to="`/taxonomy/${summary.name}`">{{ summary.name }}</router-link>
+              <router-link :to="u`/taxonomy/${summary.name}`">{{ summary.name }}</router-link>
             </q-card-section>
             <q-separator />
             <q-card-section class="text-hint">
@@ -29,7 +29,7 @@
                 icon="arrow_forward"
                 size="xs"
                 color="primary"
-                :to="`/taxonomy/${summary.name}`"
+                :to="u`/taxonomy/${summary.name}`"
               />
             </q-card-section>
           </q-card>
@@ -44,6 +44,7 @@
 
 <script setup lang="ts">
 import type { TaxonomiesDto_TaxonomySummaryDto } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
 const { t, locale } = useI18n();

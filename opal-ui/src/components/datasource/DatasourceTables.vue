@@ -178,6 +178,7 @@
 
 <script setup lang="ts">
 import type { TableDto } from 'src/models/Magma';
+import { u } from 'src/boot/api';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
 import AddViewDialog from 'src/components/datasource/AddViewDialog.vue';
 import AddTablesDialog from 'src/components/datasource/AddTablesDialog.vue';
@@ -293,7 +294,7 @@ function init() {
 }
 
 function onRowClick(evt: unknown, row: { name: string }) {
-  router.push(`/project/${dsName.value}/table/${row.name}`);
+  router.push(u`/project/${dsName.value}/table/${row.name}`);
 }
 
 function onShowAddTable() {

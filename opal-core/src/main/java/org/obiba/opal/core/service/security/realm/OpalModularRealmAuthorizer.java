@@ -48,7 +48,7 @@ public class OpalModularRealmAuthorizer extends ModularRealmAuthorizer {
 
   private final SubjectTokenService subjectTokenService;
 
-  private final Pattern projectCmdPattern = Pattern.compile("^/project/\\w+/commands/_\\w+$");
+  private final Pattern projectCmdPattern = Pattern.compile("^/project/[^/]+/commands/_\\w+$");
 
   private final com.google.common.cache.Cache<String, SubjectToken> tokenCache = CacheBuilder.newBuilder()
       .expireAfterAccess(10, TimeUnit.SECONDS)

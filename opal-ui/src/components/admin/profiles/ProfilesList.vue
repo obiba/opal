@@ -33,13 +33,22 @@
             :disable="selectedProfiles.length === 0"
             @click="onDeleteProfiles"
           ></q-btn>
-          <span class="text-caption" :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{ t('delete_profiles_selected') }}</span>
+          <span class="text-caption" :class="{ 'text-secondary': selectedProfiles.length === 0 }">{{
+            t('delete_profiles_selected')
+          }}</span>
         </div>
       </template>
       <template v-slot:body-cell-principal="props">
         <q-td :props="props">
-          <router-link :to="`/admin/profile/${props.value}`" class="text-primary">{{ props.value }}</router-link>
-          <q-icon name="info" color="secondary" size="xs" v-if="props.row.userInfo" :title="t('user_profile.user_info')" class="q-ml-sm" />
+          <router-link :to="u`/admin/profile/${props.value}`" class="text-primary">{{ props.value }}</router-link>
+          <q-icon
+            name="info"
+            color="secondary"
+            size="xs"
+            v-if="props.row.userInfo"
+            :title="t('user_profile.user_info')"
+            class="q-ml-sm"
+          />
         </q-td>
       </template>
       <template v-slot:body-cell-realm="props">
@@ -58,9 +67,7 @@
         <q-td :props="props">
           <div v-if="props.value">
             <q-checkbox v-model="props.row.otpEnabled" @click="disableOtp(props.row)" />
-            <q-tooltip>{{
-              t('profile_otp_disable', { user: props.row.principal })
-            }}</q-tooltip>
+            <q-tooltip>{{ t('profile_otp_disable', { user: props.row.principal }) }}</q-tooltip>
           </div>
         </q-td>
       </template>
@@ -77,6 +84,7 @@
 
 <script setup lang="ts">
 import type { SubjectProfileDto } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.analysis;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -291,7 +292,7 @@ public class TableAnalysisResource {
     String fileName = String.format("%s-%s-analysis.zip", datasourceName, tableName);
     String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
     return Response.ok(outputStream, mimeType)
-        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(fileName)).build();
   }
 
   private OpalAnalysis getAnalysis(String analysisName) throws NoSuchAnalysisException {

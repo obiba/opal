@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 import type { AttributeDto, TableDto, VariableDto } from 'src/models/Magma';
+import { decodePath, u } from 'src/boot/api';
 import { ValueTypes } from 'src/utils/magma';
 import { DefaultAlignment } from 'src/components/models';
 import { notifyError } from 'src/utils/notify';
@@ -145,7 +146,7 @@ function onSaveView() {
   }
 
   const from = getFromTables();
-  const newViewPage = `/project/${projectDestination.value}/table/${newTableName.value}`;
+  const newViewPage = u`/project/${projectDestination.value}/table/${newTableName.value}`;
 
   datasourceStore
     .getView(projectDestination.value, newTableName.value)
@@ -170,8 +171,8 @@ function onSaveView() {
 }
 
 function getFromTables() {
-  const tables = props.variables.map((v) =>
-    v.parentLink?.link.split('/').map(decodeURIComponent).join('/').replace('/datasource/', '').replace('/table/', '.'),
+  const tables = props.variables.map(
+    (v) => v.parentLink?.link && decodePath(v.parentLink.link).replace('/datasource/', '').replace('/table/', '.'),
   );
   return tables.filter((table, idx) => table && tables.indexOf(table) === idx).filter((table) => table !== undefined);
 }

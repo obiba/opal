@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
+        <q-breadcrumbs-el :label="name" :to="u`/project/${name}`" />
         <q-breadcrumbs-el :label="t('files')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 import FileView from 'src/components/files/FileView.vue';
+import { u } from 'src/boot/api';
 
 const { t } = useI18n();
 const route = useRoute();

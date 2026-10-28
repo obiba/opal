@@ -80,7 +80,7 @@
       </template>
       <template v-slot:body-cell-name="props">
         <q-td :props="props" class="items-start" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <router-link :to="`/taxonomy/${taxonomy.name}/vocabulary/${props.value}`">
+          <router-link :to="u`/taxonomy/${taxonomy.name}/vocabulary/${props.value}`">
             {{ props.value }}
           </router-link>
           <div class="float-right" v-if="taxonomiesStore.canEdit && !hasFilter">
@@ -171,6 +171,7 @@
 
 <script setup lang="ts">
 import type { TaxonomyDto, VocabularyDto } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';

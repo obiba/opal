@@ -10,29 +10,46 @@
 package org.obiba.opal.core.security;
 
 import java.net.URI;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal.AclAction;
-import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.UriInfo;
+
 public class OpalPermissions implements SubjectAclService.Permissions {
 
   private final URI uri;
 
+  @Nullable
+  private final String basePath;
+
   private final Iterable<String> perms;
 
+  /**
+   * Permissions on a resource URI that is relative to the web services root.
+   */
   public OpalPermissions(URI uri, AclAction action) {
-    this(uri, Lists.newArrayList(action));
+    this(null, uri, Lists.newArrayList(action));
   }
 
-  public OpalPermissions(URI uri, Iterable<AclAction> actions) {
+  /**
+   * Permissions on a resource URI built from the base URI of the request, context path and /ws root included.
+   */
+  public OpalPermissions(UriInfo uriInfo, URI uri, AclAction action) {
+    this(uriInfo.getBaseUri().getPath(), uri, Lists.newArrayList(action));
+  }
+
+  private OpalPermissions(@Nullable String basePath, URI uri, Iterable<AclAction> actions) {
+    this.basePath = basePath;
     this.uri = uri;
     perms = StreamSupport.stream(actions.spliterator(), false)
         .map(Enum::name).collect(Collectors.toList());
@@ -45,7 +62,9 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   @Override
   public String getNode() {
-    return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
+    String path = uri.getPath();
+    if (basePath == null) return path;
+    return path.replaceFirst("^" + Pattern.quote(basePath.replaceAll("/+$", "")) + "(?=/|$)", "");
   }
 
   @Override

@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { encodePath } from 'src/boot/api';
 import { type BookmarkDto, BookmarkDto_ResourceType } from 'src/models/Opal';
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
 
@@ -52,7 +53,7 @@ function getTitle(bookmark: BookmarkDto) {
 }
 
 function getLink(bookmark: BookmarkDto) {
-  const link = bookmark.resource;
+  const link = encodePath(bookmark.resource);
   if (bookmark.type === BookmarkDto_ResourceType.TABLE) return link.replace(/\/datasource\//g, '/project/');
   return link;
 }

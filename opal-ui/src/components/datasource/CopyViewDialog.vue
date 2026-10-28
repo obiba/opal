@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import type { TableDto, ViewDto } from 'src/models/Magma';
+import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
 interface DialogProps {
@@ -94,7 +95,7 @@ function onCopyView() {
   newView.name = newTableName.value;
   datasourceStore
     .createView(projectDestination.value, newView)
-    .then(() => router.push(`/project/${projectDestination.value}/table/${newTableName.value}`))
+    .then(() => router.push(u`/project/${projectDestination.value}/table/${newTableName.value}`))
     .catch((err) => {
       notifyError(err);
     });

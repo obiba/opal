@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('taxonomies')" to="/taxonomies" />
-        <q-breadcrumbs-el :label="taxonomyName" :to="`/taxonomy/${taxonomyName}`" />
+        <q-breadcrumbs-el :label="taxonomyName" :to="u`/taxonomy/${taxonomyName}`" />
         <q-breadcrumbs-el :label="vocabularyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import VocabularyContent from 'src/components/taxonomies/VocabularyContent.vue';
+import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 import type { VocabularyDto } from 'src/models/Opal';
 
@@ -52,7 +53,7 @@ async function onRefresh(newName?: string) {
   try {
     if (newName !== undefined) {
       await taxonomiesStore.getVocabulary(taxonomyName.value, newName);
-      router.replace(`/taxonomy/${taxonomyName.value}/vocabulary/${newName}`);
+      router.replace(u`/taxonomy/${taxonomyName.value}/vocabulary/${newName}`);
     } else {
       await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
     }
@@ -66,7 +67,7 @@ onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
     notifyError(error);
-    router.replace(`/taxonomy/${taxonomyName}`);
+    router.replace(u`/taxonomy/${taxonomyName}`);
   });
 });
 </script>

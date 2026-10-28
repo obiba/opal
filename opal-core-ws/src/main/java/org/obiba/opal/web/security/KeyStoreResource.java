@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.security;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -200,7 +201,7 @@ public class KeyStoreResource implements BaseResource {
   })
   public Response getCertificate(@PathParam("alias") String alias) throws IOException, KeyStoreException {
     return Response.ok(getPEMCertificate(keyStore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition",
-        "attachment; filename=\"" + keyStore.getName() + "-" + alias + "-certificate.pem\"").build();
+        ContentDisposition.attachment(keyStore.getName() + "-" + alias + "-certificate.pem")).build();
   }
 
   @Nullable

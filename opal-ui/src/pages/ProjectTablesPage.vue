@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
+        <q-breadcrumbs-el :label="name" :to="u`/project/${name}`" />
         <q-breadcrumbs-el :label="t('tables')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import DatasourceTables from 'src/components/datasource/DatasourceTables.vue';
+import { u } from 'src/boot/api';
 import SqlPanel from 'src/components/datasource/SqlPanel.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import { notifyError } from 'src/utils/notify';
@@ -69,8 +70,9 @@ const tab = ref('dictionary');
 const name = computed(() => route.params.id as string);
 
 onMounted(() => {
-  projectsStore.initProject(name.value)
-  .then(() => {
+  projectsStore
+    .initProject(name.value)
+    .then(() => {
       const canViewSummary = projectsStore.perms.summary ? projectsStore.perms.summary.canRead() : false;
       if (canViewSummary) projectsStore.loadSummary();
     })

@@ -4,8 +4,8 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="pName" :to="`/project/${pName}`" />
-        <q-breadcrumbs-el :label="t('resources')" :to="`/project/${pName}/resources`" />
+        <q-breadcrumbs-el :label="pName" :to="u`/project/${pName}`" />
+        <q-breadcrumbs-el :label="t('resources')" :to="u`/project/${pName}/resources`" />
         <q-breadcrumbs-el :label="rName" />
       </q-breadcrumbs>
       <q-space />
@@ -15,7 +15,7 @@
         icon="navigate_before"
         size="sm"
         :label="previousReference?.name"
-        :to="`/project/${pName}/resource/${previousReference?.name}`"
+        :to="u`/project/${pName}/resource/${previousReference?.name}`"
         v-if="previousReference"
         class="on-right"
       />
@@ -25,7 +25,7 @@
         icon-right="navigate_next"
         size="sm"
         :label="nextReference?.name"
-        :to="`/project/${pName}/resource/${nextReference?.name}`"
+        :to="u`/project/${pName}/resource/${nextReference?.name}`"
         v-if="nextReference"
         class="on-right"
       />
@@ -124,6 +124,7 @@
 
 <script setup lang="ts">
 import type { ResourceReferenceDto } from 'src/models/Projects';
+import { u } from 'src/boot/api';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ResourceReference from 'src/components/resources/ResourceReference.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
@@ -193,7 +194,7 @@ function onDeleteResource() {
       return resourcesStore.loadResourceReferences(pName.value);
     })
     .then(() => {
-      router.push(`/project/${pName.value}/resources`);
+      router.push(u`/project/${pName.value}/resources`);
     });
 }
 
@@ -211,7 +212,7 @@ function onShowDuplicate() {
 function onSaved(resource: ResourceReferenceDto) {
   resourcesStore
     .loadResourceReferences(pName.value)
-    .then(() => router.push(`/project/${pName.value}/resource/${resource.name}`));
+    .then(() => router.push(u`/project/${pName.value}/resource/${resource.name}`));
 }
 
 function onAddView() {

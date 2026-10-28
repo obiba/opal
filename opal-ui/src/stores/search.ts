@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { ItemFieldsDto, ItemResultDto } from 'src/models/Search';
 
 export interface ItemFieldsResultDto extends ItemResultDto {
@@ -85,7 +85,7 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   async function getEntityTables(type: string, entity: string) {
-    return api.get(`/entity/${entity}/type/${type}/tables`).then((response) => response.data);
+    return api.get(u`/entity/${entity}/type/${type}/tables`).then((response) => response.data);
   }
 
   async function getTables() {

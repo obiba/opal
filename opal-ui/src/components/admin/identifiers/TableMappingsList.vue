@@ -10,7 +10,15 @@
   >
     <template v-slot:top-left>
       <div class="q-gutter-sm">
-        <q-btn v-if="authStore.isAdministrator" no-caps color="primary" icon="add" size="sm" :label="t('add')" @click="onAddMapping" />
+        <q-btn
+          v-if="authStore.isAdministrator"
+          no-caps
+          color="primary"
+          icon="add"
+          size="sm"
+          :label="t('add')"
+          @click="onAddMapping"
+        />
       </div>
     </template>
     <template v-slot:body-cell-name="props">
@@ -96,7 +104,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddMappingDialog from 'src/components/admin/identifiers/AddMappingDialog.vue';
 import GenerateMappingIdentifiersDialog from 'src/components/admin/identifiers/GenerateMappingIdentifiersDialog.vue';
 import { notifyError } from 'src/utils/notify';
-import { baseUrl } from 'src/boot/api';
+import { baseUrl, u } from 'src/boot/api';
 import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
@@ -189,7 +197,11 @@ async function onMappingAdded() {
 }
 
 function onExportMappingIdentifiers(mappingName: string) {
-  window.open(`${baseUrl}/identifiers/mapping/${mappingName}/_export?type=${props.identifierTable.entityType}`);
+  window.open(
+    baseUrl +
+      u`/identifiers/mapping/${mappingName}/_export?` +
+      new URLSearchParams({ type: props.identifierTable.entityType }),
+  );
 }
 
 function onOverRow(row: VariableDto) {

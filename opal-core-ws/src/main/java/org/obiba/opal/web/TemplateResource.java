@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -54,6 +55,6 @@ public class TemplateResource {
   }
 
   private String getContentDispositionOfAttachment(String fileName) {
-    return "attachment; filename=\"" + fileName + "\"";
+    return ContentDisposition.attachment(fileName);
   }
 }

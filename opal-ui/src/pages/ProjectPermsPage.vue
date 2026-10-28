@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
+        <q-breadcrumbs-el :label="name" :to="u`/project/${name}`" />
         <q-breadcrumbs-el :label="t('permissions')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -62,6 +62,7 @@
 
 <script setup lang="ts">
 import { type Subject, type Acl, Subject_SubjectType } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 import AccessControlTable from 'src/components/permissions/AccessControlTable.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';

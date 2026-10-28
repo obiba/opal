@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import { Perms } from 'src/utils/authz';
 import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 
@@ -41,12 +41,12 @@ export const useCommandsStore = defineStore('commands', () => {
         return response;
       });
     } else {
-      return Promise.all(commands.map((cmd) => api.delete(`/shell/command/${cmd.id}`)));
+      return Promise.all(commands.map((cmd) => api.delete(u`/shell/command/${cmd.id}`)));
     }
   }
 
   function cancel(command: CommandStateDto) {
-    return api.put(`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
+    return api.put(u`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
       headers: { 'Content-Type': 'text/plain' },
     });
   }

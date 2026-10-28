@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, encodePath } from 'src/boot/api';
 import type { Acl, SuggestionsDto } from 'src/models/Opal';
 
 export const useAuthzStore = defineStore('authz', () => {
@@ -11,7 +11,7 @@ export const useAuthzStore = defineStore('authz', () => {
 
   async function initAcls(path: string) {
     acls.value[path] = [];
-    return api.get(path).then((response) => {
+    return api.get(encodePath(path)).then((response) => {
       if (response.status === 200) {
         acls.value[path] = response.data;
       }
@@ -26,7 +26,7 @@ export const useAuthzStore = defineStore('authz', () => {
   async function setAcl(path: string, acl: Acl) {
     return api
       .post(
-        path,
+        encodePath(path),
         {},
         {
           params: {
@@ -43,7 +43,7 @@ export const useAuthzStore = defineStore('authz', () => {
 
   async function deleteAcl(path: string, acl: Acl) {
     return api
-      .delete(path, {
+      .delete(encodePath(path), {
         params: {
           type: acl.subject?.type,
           principal: acl.subject?.principal,

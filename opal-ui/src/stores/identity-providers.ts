@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { IDProviderDto } from 'src/models/Opal';
 
 export const useIdentityProvidersStore = defineStore('identityProviders', () => {
@@ -25,21 +25,21 @@ export const useIdentityProvidersStore = defineStore('identityProviders', () => 
   }
 
   async function updateProvider(provider: IDProviderDto) {
-    return api.put(`/system/idprovider/${provider.name}`, provider);
+    return api.put(u`/system/idprovider/${provider.name}`, provider);
   }
 
   async function getProvider(provider: IDProviderDto) {
-    return api.delete(`/system/idprovider/${provider.name}`);
+    return api.delete(u`/system/idprovider/${provider.name}`);
   }
 
   async function toggleEnableProvider(provider: IDProviderDto) {
     return provider.enabled
-      ? api.delete(`/system/idprovider/${provider.name}/_enable`)
-      : api.put(`/system/idprovider/${provider.name}/_enable`);
+      ? api.delete(u`/system/idprovider/${provider.name}/_enable`)
+      : api.put(u`/system/idprovider/${provider.name}/_enable`);
   }
 
   async function deleteProvider(provider: IDProviderDto) {
-    return api.delete(`/system/idprovider/${provider.name}`);
+    return api.delete(u`/system/idprovider/${provider.name}`);
   }
 
   return {

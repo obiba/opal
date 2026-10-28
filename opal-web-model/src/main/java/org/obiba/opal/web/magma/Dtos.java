@@ -25,6 +25,8 @@ import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 
 import jakarta.annotation.Nullable;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,14 @@ public final class Dtos {
       = from -> asDto(from).build();
 
   private Dtos() {
+  }
+
+  /**
+   * Percent-encode one path segment of a link. Every link the server hands out goes through here, so that the same
+   * table has the same link whichever endpoint produced it, and a client can decode them all the same way.
+   */
+  public static String encodeSegment(String segment) {
+    return URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20");
   }
 
   public static Function<Variable, VariableDto.Builder> asDtoFunc(final LinkDto tableLink) {
@@ -190,7 +200,7 @@ public final class Dtos {
     }
 
     builder.setDatasourceName(valueTable.getDatasource().getName());
-    String link = "/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName();
+    String link = "/datasource/" + encodeSegment(valueTable.getDatasource().getName()) + "/table/" + encodeSegment(valueTable.getName());
     builder.setLink(link);
     if (valueTable.isView()) {
       builder.setViewLink(link.replaceFirst("/table/", "/view/"));

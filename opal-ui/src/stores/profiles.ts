@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { SubjectProfileDto } from 'src/models/Opal';
 
 export const useProfilesStore = defineStore('profiles', () => {
@@ -28,13 +28,13 @@ export const useProfilesStore = defineStore('profiles', () => {
   }
 
   async function loadProfile(principal: string) {
-    return api.get(`/system/subject-profile/${principal}`).then((response) => {
+    return api.get(u`/system/subject-profile/${principal}`).then((response) => {
       profile.value = response.data;
     });
   }
 
   async function deleteProfile(profile: SubjectProfileDto) {
-    return api.delete(`/system/subject-profile/${profile.principal}`);
+    return api.delete(u`/system/subject-profile/${profile.principal}`);
   }
 
   async function deleteProfiles(profiles: SubjectProfileDto[]) {
@@ -50,7 +50,7 @@ export const useProfilesStore = defineStore('profiles', () => {
   }
 
   async function disableOtp(profile: SubjectProfileDto) {
-    return api.delete(`/system/subject-profile/${profile.principal}/otp`);
+    return api.delete(u`/system/subject-profile/${profile.principal}/otp`);
   }
 
   async function enableCurrentOtp(): Promise<string> {
@@ -62,7 +62,7 @@ export const useProfilesStore = defineStore('profiles', () => {
   }
 
   async function getProfile(principal: string): Promise<SubjectProfileDto> {
-    return api.get(`/system/subject-profile/${principal}`).then((response) => {
+    return api.get(u`/system/subject-profile/${principal}`).then((response) => {
       return response.data;
     });
   }

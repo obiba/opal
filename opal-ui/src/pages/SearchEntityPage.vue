@@ -65,7 +65,7 @@
           <template v-slot:body-cell-variable="props">
             <q-td :props="props">
               <router-link
-                :to="`/project/${table?.datasourceName}/table/${table?.name}/variable/${props.value}`"
+                :to="u`/project/${table?.datasourceName}/table/${table?.name}/variable/${props.value}`"
                 class="text-primary"
                 >{{ props.value }}</router-link
               >
@@ -87,6 +87,7 @@
 
 <script setup lang="ts">
 import ValueCell from 'src/components/datasource/ValueCell.vue';
+import { u } from 'src/boot/api';
 import type { TableDto, ValueSetsDto, ValueSetsDto_ValueDto, VariableDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
@@ -169,7 +170,9 @@ function onSubmit() {
       if (response.length > 0) {
         // if there is a table in the app context state, select it
         if (datasourceStore.table) {
-          const tbl = tables.value?.find((t) => t.link === datasourceStore.table.link);
+          const tbl = tables.value?.find(
+            (t) => t.datasourceName === datasourceStore.table.datasourceName && t.name === datasourceStore.table.name,
+          );
           // check if the table is in the list
           if (tbl) {
             tableId.value = asTableId(tbl);

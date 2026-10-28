@@ -1,16 +1,31 @@
 <template>
   <q-card class="bg-white text-dark">
     <q-card-section class="q-pb-none">
-      <div class="text-help text-center q-pt-xs q-pb-xs">{{ t(authStore.isAuthenticated ? 'auth.confirm_title' : 'auth.title') }}</div>
+      <div class="text-help text-center q-pt-xs q-pb-xs">
+        {{ t(authStore.isAuthenticated ? 'auth.confirm_title' : 'auth.title') }}
+      </div>
       <q-card-section v-show="!withToken">
         <q-form @submit="onSubmit">
           <div v-if="!authStore.isAuthenticated || isCredentialsRealm" class="q-gutter-md q-mb-md">
-            <q-input autofocus color="grey-10" v-model="username" :disable="authStore.isAuthenticated" :label="t('auth.username')" autocomplete="nope">
+            <q-input
+              autofocus
+              color="grey-10"
+              v-model="username"
+              :disable="authStore.isAuthenticated"
+              :label="t('auth.username')"
+              autocomplete="nope"
+            >
               <template v-slot:prepend>
                 <q-icon name="fas fa-user" size="xs" />
               </template>
             </q-input>
-            <q-input type="password" color="grey-10" v-model="password" :label="t('auth.password')" autocomplete="new-password">
+            <q-input
+              type="password"
+              color="grey-10"
+              v-model="password"
+              :label="t('auth.password')"
+              autocomplete="new-password"
+            >
               <template v-slot:prepend>
                 <q-icon name="fas fa-lock" size="xs" />
               </template>
@@ -96,7 +111,7 @@ import type { AxiosError } from 'axios';
 import { Cookies } from 'quasar';
 import { locales } from 'src/boot/i18n';
 import type { AuthProviderDto } from 'src/models/Opal';
-import { baseUrl } from 'src/boot/api';
+import { baseUrl, u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 
 interface AuthResponse {
@@ -129,7 +144,8 @@ const withToken = ref(false);
 const authProviders = ref<AuthProviderDto[]>([]);
 
 const isCredentialsRealm = computed(
-  () => authStore.profile && ['opal-user-realm', 'opal-ini-realm', 'obiba-realm'].includes(authStore.profile.realm || ''),
+  () =>
+    authStore.profile && ['opal-user-realm', 'opal-ini-realm', 'obiba-realm'].includes(authStore.profile.realm || ''),
 );
 
 const disableSubmit = computed(() => {
@@ -183,7 +199,7 @@ async function onSubmit() {
 }
 
 function onSigninProvider(provider: AuthProviderDto) {
-  window.open(`${baseUrl}/../auth/login/${provider.name}`, '_self');
+  window.open(baseUrl + u`/../auth/login/${provider.name}`, '_self');
 }
 
 function onCancelToken() {

@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { isReAuthError } from 'src/utils/notify';
 import { useAuthStore } from 'src/stores/auth';
+import { u, encodePath, decodePath } from 'src/utils/url';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -57,18 +58,19 @@ api.interceptors.response.use(
     ) {
       // verify that user is still logged in
       console.debug('error', error);
-      api.get(PROFILE_PATH)
-      .then(() => {
-        // user is still logged in
-        if (isReAuthError(error)) {
-          const authStore = useAuthStore();
-          authStore.reAuthRequired = true;
-        }
-      })
-      .catch(() => {
-        // reload to redirect to sign in page (and reset app state)
-        window.location.replace(contextPath);
-      });
+      api
+        .get(PROFILE_PATH)
+        .then(() => {
+          // user is still logged in
+          if (isReAuthError(error)) {
+            const authStore = useAuthStore();
+            authStore.reAuthRequired = true;
+          }
+        })
+        .catch(() => {
+          // reload to redirect to sign in page (and reset app state)
+          window.location.replace(contextPath);
+        });
     }
     return Promise.reject(error);
   },
@@ -86,4 +88,4 @@ export default defineBoot(({ app }) => {
   //       so you can easily perform requests against your app's API
 });
 
-export { api, baseUrl, contextPath };
+export { api, baseUrl, contextPath, u, encodePath, decodePath };

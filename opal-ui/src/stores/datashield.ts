@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { RPackageDto } from 'src/models/OpalR';
 import type { DataShieldProfileDto, DataShieldMethodDto, DataShieldROptionDto } from 'src/models/DataShield';
 
@@ -37,7 +37,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
   }
 
   async function deleteProfile(name: string) {
-    return api.delete(`/datashield/profile/${name}?force=true`).then(() => initProfiles());
+    return api.delete(u`/datashield/profile/${name}?force=true`).then(() => initProfiles());
   }
 
   async function getPackages(cluster: string | undefined = undefined): Promise<RPackageDto[]> {
@@ -48,7 +48,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function loadMethods(env: string): Promise<DataShieldMethodDto[]> {
     return api
-      .get(`/datashield/env/${env}/methods`, { params: { profile: profile.value.name } })
+      .get(u`/datashield/env/${env}/methods`, { params: { profile: profile.value.name } })
       .then((response) => response.data);
   }
 
@@ -60,7 +60,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function deleteMethods(env: string, methodNames: string[]) {
     return api
-      .delete(`/datashield/env/${env}/methods`, {
+      .delete(u`/datashield/env/${env}/methods`, {
         params: { profile: profile.value.name, name: methodNames },
         paramsSerializer: {
           indexes: null, // no brackets at all
@@ -71,13 +71,13 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function addMethod(env: string, method: DataShieldMethodDto) {
     return api
-      .post(`/datashield/env/${env}/methods`, method, { params: { profile: profile.value.name } })
+      .post(u`/datashield/env/${env}/methods`, method, { params: { profile: profile.value.name } })
       .then(() => loadProfileSettings());
   }
 
   async function updateMethod(env: string, method: DataShieldMethodDto) {
     return api
-      .put(`/datashield/env/${env}/method/${method.name}`, method, { params: { profile: profile.value.name } })
+      .put(u`/datashield/env/${env}/method/${method.name}`, method, { params: { profile: profile.value.name } })
       .then(() => loadProfileSettings());
   }
 
@@ -105,8 +105,8 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function updateProfileStatus(status: boolean) {
     return status
-      ? api.put(`/datashield/profile/${profile.value.name}/_enable`).then(() => (profile.value.enabled = true))
-      : api.delete(`/datashield/profile/${profile.value.name}/_enable`).then(() => (profile.value.enabled = false));
+      ? api.put(u`/datashield/profile/${profile.value.name}/_enable`).then(() => (profile.value.enabled = true))
+      : api.delete(u`/datashield/profile/${profile.value.name}/_enable`).then(() => (profile.value.enabled = false));
   }
 
   async function loadProfileSettings() {
@@ -133,9 +133,11 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function applyProfileAccess(access: boolean) {
     return access
-      ? api.put(`/datashield/profile/${profile.value.name}/_access`).then(() => (profile.value.restrictedAccess = true))
+      ? api
+          .put(u`/datashield/profile/${profile.value.name}/_access`)
+          .then(() => (profile.value.restrictedAccess = true))
       : api
-          .delete(`/datashield/profile/${profile.value.name}/_access`)
+          .delete(u`/datashield/profile/${profile.value.name}/_access`)
           .then(() => (profile.value.restrictedAccess = false));
   }
 

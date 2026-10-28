@@ -89,6 +89,7 @@
 
 <script setup lang="ts">
 import type { ResourceReferenceDto } from 'src/models/Projects';
+import { u } from 'src/boot/api';
 import type { ResourceProviderDto } from 'src/models/Resources';
 import ResourceReferenceDialog from 'src/components/resources/ResourceReferenceDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
@@ -142,7 +143,7 @@ function getResourceFactory(reference: ResourceReferenceDto) {
 }
 
 function onRowClick(evt: unknown, row: ResourceReferenceDto) {
-  router.push(`/project/${resourcesStore.project}/resource/${row.name}`);
+  router.push(u`/project/${resourcesStore.project}/resource/${row.name}`);
 }
 
 function onShowAdd(provider: ResourceProviderDto) {
