@@ -80,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import { u } from 'src/boot/api';
 import type { ResourceReferenceDto } from 'src/models/Projects';
 import type { ViewDto, ResourceViewDto } from 'src/models/Magma';
 import { notifyError } from 'src/utils/notify';
@@ -160,7 +161,7 @@ function onSaveView() {
     allColumns: allColumns.value,
   } as ResourceViewDto;
 
-  const newViewPage = `/project/${projectDestination.value}/table/${name.value}`;
+  const newViewPage = u`/project/${projectDestination.value}/table/${name.value}`;
 
   processing.value = true;
 

@@ -53,7 +53,7 @@ async function onRefresh(newName?: string) {
   try {
     if (newName !== undefined) {
       await taxonomiesStore.getVocabulary(taxonomyName.value, newName);
-      router.replace(`/taxonomy/${taxonomyName.value}/vocabulary/${newName}`);
+      router.replace(u`/taxonomy/${taxonomyName.value}/vocabulary/${newName}`);
     } else {
       await taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value);
     }
@@ -67,7 +67,7 @@ onMounted(() => {
   taxonomiesStore.initSummaries().catch(notifyError);
   taxonomiesStore.getVocabulary(taxonomyName.value, vocabularyName.value).catch((error) => {
     notifyError(error);
-    router.replace(`/taxonomy/${taxonomyName}`);
+    router.replace(u`/taxonomy/${taxonomyName}`);
   });
 });
 </script>

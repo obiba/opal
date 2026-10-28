@@ -142,7 +142,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   async function updateTerm(taxonomyName: string, vocabularyName: string, term: TermDto, oldName?: string) {
     return api
       .put(
-        `/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
+        u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
         term,
       )
       .then((response) => response.data);

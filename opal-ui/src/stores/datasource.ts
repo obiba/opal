@@ -322,8 +322,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
   function loadVariableSummary(localVar: VariableDto | undefined, fullIfCached: boolean, limit: number | undefined) {
     if (!localVar?.parentLink) return Promise.reject('No variable');
     const link = localVar
-      ? `${localVar.parentLink?.link}/variable/${localVar.name}`
-      : `/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
+      ? `${localVar.parentLink?.link}/variable/${encodeURIComponent(localVar.name)}`
+      : u`/datasource/${datasource.value.name}/table/${table.value.name}/variable`;
     const params: { fullIfCached: boolean; limit: number | undefined; resetCache: boolean | undefined } = {
       fullIfCached,
       limit,
@@ -344,13 +344,13 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function addOrUpdateVariables(tName: string, localVars: VariableDto[]) {
-    const link = `/datasource/${datasource.value.name}/table/${tName}`;
+    const link = u`/datasource/${datasource.value.name}/table/${tName}`;
     return api.post(`${link}/variables`, localVars);
   }
 
   function addVariable(localVar: VariableDto) {
     const tableType = table.value.viewType ? 'view' : 'table';
-    const link = `/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
+    const link = u`/datasource/${datasource.value.name}/${tableType}/${table.value.name}`;
     const isNew = variables.value === undefined || variables.value.find((v) => v.name === localVar.name) === undefined;
     localVar.entityType = table.value.entityType;
     if (isNew) {
@@ -368,7 +368,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     localVar.entityType = table.value.entityType;
     return api
       .put(
-        `/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`,
+        u`/datasource/${datasource.value.name}/${tableType}/${table.value.name}/variable/${variable.value.name}`,
         localVar,
       )
       .then(() => {
@@ -377,7 +377,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   function saveDerivedVariable(localVar: VariableDto, comment: string | undefined) {
-    const link = `/datasource/${datasource.value.name}/view/${table.value.name}`;
+    const link = u`/datasource/${datasource.value.name}/view/${table.value.name}`;
     return api.put(link + u`/variable/${variable.value.name}`, localVar, { params: { comment } }).then(() => {
       return Promise.all([loadTableVariable(localVar.name), loadTableVariables()]);
     });

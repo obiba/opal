@@ -95,7 +95,7 @@ export const useRStore = defineStore('r', () => {
       throw new Error(`Invalid package manager: ${manager}`);
     }
     return api.post(
-      `/service/r/cluster/${clusterId}/commands/_install`,
+      u`/service/r/cluster/${clusterId}/commands/_install`,
       {
         cluster: clusterId,
         manager: manager,

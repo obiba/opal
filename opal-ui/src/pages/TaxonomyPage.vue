@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { u } from 'src/boot/api';
 import TaxonomyContent from 'src/components/taxonomies/TaxonomyContent.vue';
 import { notifyError } from 'src/utils/notify';
 import type { TaxonomyDto } from 'src/models/Opal';
@@ -46,7 +47,7 @@ async function onRefresh(newName?: string) {
   try {
     if (newName) {
       await taxonomiesStore.refreshSummaries();
-      router.replace(`/taxonomy/${newName}`);
+      router.replace(u`/taxonomy/${newName}`);
     } else {
       await taxonomiesStore.getTaxonomy(taxonomyName.value);
     }

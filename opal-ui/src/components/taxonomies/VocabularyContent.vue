@@ -341,7 +341,7 @@ async function doDelete() {
   showDelete.value = false;
   try {
     await taxonomiesStore.deleteVocabulary(props.taxonomy, props.vocabulary);
-    router.replace(`/taxonomy/${props.taxonomy}`);
+    router.replace(u`/taxonomy/${props.taxonomy}`);
   } catch (error) {
     notifyError(error);
   }
