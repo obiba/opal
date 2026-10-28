@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -87,7 +88,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     }
 
     return Response.ok().entity(excelOutput.toByteArray()).type("application/vnd.ms-excel")
-        .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(destinationName + ".xlsx")).build();
   }
 
   @Override

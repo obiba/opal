@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -436,7 +437,7 @@ public class FilesResource {
       log.info("The following file was uploaded to Opal file system : {}", file.getURL());
 
       if (!overwrite) {
-        URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
+        URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path("{name}").build(fileName);
         OpalPermissions perms = new OpalPermissions(fileUri, AclAction.FILES_ALL);
         subjectAclService.addSubjectPermission(perms.getDomain(), perms.getNode(),
             SubjectAcl.SubjectType.USER.subjectFor(SecurityUtils.getSubject().getPrincipal().toString()),
@@ -489,7 +490,7 @@ public class FilesResource {
     try {
       file.createFolder();
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
-      URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(folderName).build();
+      URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path("{name}").build(folderName);
       return Response.created(folderUri)//
           .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
           .entity(dto).build();
@@ -893,7 +894,7 @@ public class FilesResource {
   }
 
   private String getContentDispositionOfAttachment(String fileName) {
-    return "attachment; filename=\"" + fileName + "\"";
+    return ContentDisposition.attachment(fileName);
   }
 
 }

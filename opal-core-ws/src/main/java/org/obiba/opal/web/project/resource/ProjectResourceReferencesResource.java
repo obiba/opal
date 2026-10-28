@@ -95,7 +95,7 @@ public class ProjectResourceReferencesResource implements BaseResource {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ReservedResourceName").build()).build();
     resourceReferenceService.save(reference);
-    URI uri = uriInfo.getBaseUriBuilder().path("project").path(name).path("resource").path(reference.getName()).build();
+    URI uri = uriInfo.getBaseUriBuilder().path("project/{project}/resource/{resource}").build(name, reference.getName());
     return Response.created(uri).build();
   }
 

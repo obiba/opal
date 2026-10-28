@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -87,7 +88,7 @@ public Response download() {
     if(taxonomy == null) throw new NoSuchTaxonomyException(name);
     TaxonomyYaml yaml = new TaxonomyYaml();
     return Response.ok(yaml.dump(taxonomy), "text/plain")
-        .header("Content-Disposition", "attachment; filename=\"" + taxonomy.getName() + ".yml\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(taxonomy.getName() + ".yml")).build();
   }
 
 @PUT

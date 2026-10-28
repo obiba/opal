@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
@@ -152,7 +153,7 @@ public class DatasourcesResource {
     };
 
     return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE)
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   @POST
@@ -176,7 +177,7 @@ public class DatasourcesResource {
     };
 
     return Response.ok(stream, "text/csv")
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   @POST
@@ -200,7 +201,7 @@ public class DatasourcesResource {
     };
 
     return Response.ok(stream, "application/x-rdata")
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   private DatasourceTablesResource getDatasourceTablesResource(Datasource datasource) {

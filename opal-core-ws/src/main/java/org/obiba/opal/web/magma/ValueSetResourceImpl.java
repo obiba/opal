@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.MediaType;
@@ -194,7 +195,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
     // download as a file
     ResponseBuilder builder = TimestampedResponses.ok(getValueTable(), value.isNull() ? null : value.getValue())
         .type(getVariableMimeType(variable));
-    builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier, pos) + "\"");
+    builder.header("Content-Disposition", ContentDisposition.attachment(getFileName(variable, identifier, pos)));
     return builder;
   }
 

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import org.apache.shiro.SecurityUtils;
@@ -143,7 +144,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
       Disposables.silentlyDispose(destinationDatasource);
     }
     return Response.ok(excelOutput.toByteArray(), "application/vnd.ms-excel")
-        .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(destinationName + ".xlsx")).build();
   }
 
   @Override

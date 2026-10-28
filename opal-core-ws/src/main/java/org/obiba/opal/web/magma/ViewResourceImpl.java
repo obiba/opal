@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import org.obiba.magma.*;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
@@ -122,7 +123,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Override
   public Response downloadViewDefinition() {
     return Response.ok(asValueView(), "application/xml")
-        .header("Content-Disposition", "attachment; filename=\"" + getValueTable().getName() + ".xml\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(getValueTable().getName() + ".xml")).build();
   }
 
   @Override

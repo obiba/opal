@@ -11,6 +11,7 @@
 package org.obiba.opal.web.vcf;
 
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -224,7 +225,7 @@ public class ProjectVCFStoreResource implements BaseResource {
     initVCFStoreResource(name);
     StreamingOutput stream = os -> store.readVCFStatistics(vcfName, os);
     return Response.ok(stream)
-      .header("Content-Disposition", "attachment; filename=\"" +  store.getName() + "-" + vcfName + "-statistics.txt\"").build();
+      .header("Content-Disposition", ContentDisposition.attachment(store.getName() + "-" + vcfName + "-statistics.txt")).build();
   }
 
   /**
