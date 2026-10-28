@@ -136,7 +136,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
           @Override
           public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
+            String link = uriInfo.getPath(false) + "/variable/" + Dtos.encodeSegment(fromVariable.getName()) + "/value";
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return Dtos.asDto(link, value, filterBinary).build();
           }
@@ -162,7 +162,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
   private ValueSetsDto.ValueDto getValueDto(UriInfo uriInfo, boolean filterBinary) {
     Value value = extractValue(entity.getIdentifier());
-    return Dtos.asDto(uriInfo.getPath() + "/value", value, filterBinary).build();
+    return Dtos.asDto(uriInfo.getPath(false) + "/value", value, filterBinary).build();
   }
 
   @Nullable

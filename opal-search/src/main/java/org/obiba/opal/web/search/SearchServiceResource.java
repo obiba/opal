@@ -155,7 +155,7 @@ public class SearchServiceResource extends IndexResource {
         .setSchedule(getScheduleDto(datasource.getName(), valueTable.getName())) //
         .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())) //
         .setProgress(progress) //
-        .setLink(link.getPath()).build();
+        .setLink(link.toString()).build();
 
     if(!timestamps.getLastUpdate().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(timestamps.getLastUpdate().toString()).build();

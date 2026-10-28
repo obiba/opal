@@ -45,17 +45,28 @@ public class UriBuilder {
     return this;
   }
 
+  /**
+   * Adds the segments of a link as served by Opal. Links are percent-encoded, and build() encodes the segments again, so
+   * they are decoded first; a link an older server left raw is taken as is.
+   */
   public UriBuilder link(String link) {
     int idx = link.indexOf('?');
+    String path = idx > 0 ? link.substring(0, idx) : link;
+    segment(decodePath(path).substring(1).split("/"));
     if(idx > 0) {
-      segment(link.substring(1, idx).split("/"));
       for(String q : link.substring(idx + 1).split("&")) {
         query(q.split("="));
       }
-    } else {
-      segment(link.substring(1).split("/"));
     }
     return this;
+  }
+
+  private static String decodePath(String path) {
+    try {
+      return new URI(path).getPath();
+    } catch(URISyntaxException e) {
+      return path;
+    }
   }
 
   public UriBuilder query(String parameter, String value) {
