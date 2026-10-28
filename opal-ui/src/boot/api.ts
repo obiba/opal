@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { isReAuthError } from 'src/utils/notify';
 import { useAuthStore } from 'src/stores/auth';
+import { u, encodePath, decodePath } from 'src/utils/url';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -86,32 +87,5 @@ export default defineBoot(({ app }) => {
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
 });
-
-/** Tagged template for request paths: every interpolated value is percent-encoded as one path segment. */
-function u(strings: TemplateStringsArray, ...values: unknown[]): string {
-  return strings.reduce(
-    (out, str, i) => out + str + (i < values.length ? encodeURIComponent(String(values[i])) : ''),
-    '',
-  );
-}
-
-/** Percent-encodes each segment of a path that already holds slashes, such as a file path or a permission resource. */
-function encodePath(path: string): string {
-  return path.split('/').map(encodeURIComponent).join('/');
-}
-
-/** Decodes a link as served by Opal; a segment that is not valid percent-encoding is kept as is. */
-function decodePath(path: string): string {
-  return path
-    .split('/')
-    .map((s) => {
-      try {
-        return decodeURIComponent(s);
-      } catch {
-        return s;
-      }
-    })
-    .join('/');
-}
 
 export { api, baseUrl, contextPath, u, encodePath, decodePath };
