@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
+        <q-breadcrumbs-el :label="name" :to="u`/project/${name}`" />
         <q-breadcrumbs-el :label="t('administration')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -191,6 +191,7 @@
 
 <script setup lang="ts">
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import { u } from 'src/boot/api';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { AclAction } from 'src/models/Opal';
@@ -220,9 +221,7 @@ const state = ref(ProjectDatasourceStatusDto.NONE);
 const project = computed(() => projectsStore.project);
 const name = computed(() => route.params.id as string);
 const hasAdminPermission = computed(
-  () =>
-    projectsStore.perms.project?.canUpdate() ||
-    projectsStore.perms.project?.canDelete(),
+  () => projectsStore.perms.project?.canUpdate() || projectsStore.perms.project?.canDelete(),
 );
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);

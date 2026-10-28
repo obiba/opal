@@ -76,7 +76,7 @@
           </q-td>
 
           <q-td key="context" :props="props">
-            <router-link v-if="props.row.project" :to="`/project/${props.row.project}`"
+            <router-link v-if="props.row.project" :to="u`/project/${props.row.project}`"
               >{{ props.row.project }}
             </router-link>
             <q-badge v-if="props.row.rCluster">R: {{ props.row.rCluster }}</q-badge>
@@ -153,6 +153,7 @@
 
 <script setup lang="ts">
 import type { QTableColumn } from 'quasar';
+import { u } from 'src/boot/api';
 import { type CommandStateDto, CommandStateDto_Status } from 'src/models/Commands';
 import { commandStatusColor } from 'src/utils/colors';
 import { getDateLabel, getDatesDistanceLabel } from 'src/utils/dates';

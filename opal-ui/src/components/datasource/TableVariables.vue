@@ -147,6 +147,7 @@
 
 <script setup lang="ts">
 import type { CategoryDto, VariableDto } from 'src/models/Magma';
+import { u } from 'src/boot/api';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
@@ -245,7 +246,7 @@ function init() {
     .initDatasourceTableVariables(dsName.value, tName.value)
     .catch((err) => {
       notifyError(err);
-      if (err.response?.status === 404) router.push(`/project/${dsName.value}/tables`);
+      if (err.response?.status === 404) router.push(u`/project/${dsName.value}/tables`);
     })
     .finally(() => {
       loading.value = false;
@@ -265,7 +266,7 @@ function getCategoryNames(categories: CategoryDto[]) {
 }
 
 function onRowClick(evt: unknown, row: { name: string }) {
-  router.push(`/project/${dsName.value}/table/${tName.value}/variable/${row.name}`);
+  router.push(u`/project/${dsName.value}/table/${tName.value}/variable/${row.name}`);
 }
 
 function onShowDeleteVariables() {

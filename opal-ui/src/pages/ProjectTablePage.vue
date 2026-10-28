@@ -4,8 +4,8 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="dsName" :to="`/project/${dsName}`" />
-        <q-breadcrumbs-el :label="t('tables')" :to="`/project/${dsName}/tables`" />
+        <q-breadcrumbs-el :label="dsName" :to="u`/project/${dsName}`" />
+        <q-breadcrumbs-el :label="t('tables')" :to="u`/project/${dsName}/tables`" />
         <q-breadcrumbs-el :label="tName" />
       </q-breadcrumbs>
       <q-icon name="circle" :color="tableStatusColor(datasourceStore.table.status)" size="sm" class="on-right" />
@@ -17,7 +17,7 @@
         icon="navigate_before"
         size="sm"
         :label="previousTable?.name"
-        :to="`/project/${dsName}/table/${previousTable?.name}`"
+        :to="u`/project/${dsName}/table/${previousTable?.name}`"
         v-if="previousTable"
         class="on-right"
       />
@@ -27,7 +27,7 @@
         icon-right="navigate_next"
         size="sm"
         :label="nextTable?.name"
-        :to="`/project/${dsName}/table/${nextTable?.name}`"
+        :to="u`/project/${dsName}/table/${nextTable?.name}`"
         v-if="nextTable"
         class="on-right"
       />
@@ -148,18 +148,10 @@
         <q-tabs v-model="tab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
           <q-tab name="dictionary" :label="t('dictionary')" />
           <q-tab name="summary" :label="t('summary')" />
-          <q-tab
-            name="entity_filter"
-            :label="t('entity_filter')"
-            v-if="isTablesView && canReadValues"
-          />
+          <q-tab name="entity_filter" :label="t('entity_filter')" v-if="isTablesView && canReadValues" />
           <q-tab name="values" :label="t('values')" v-if="canReadValues" />
           <q-tab name="analyses" :label="t('analyses')" v-if="canAnalyseValidate" />
-          <q-tab
-            name="permissions"
-            :label="t('permissions')"
-            v-if="canReadPermissions"
-          />
+          <q-tab name="permissions" :label="t('permissions')" v-if="canReadPermissions" />
         </q-tabs>
 
         <q-separator />
@@ -272,6 +264,7 @@
 
 <script setup lang="ts">
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
+import { u } from 'src/boot/api';
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
@@ -353,7 +346,7 @@ const items1 = computed(() => {
           ? datasourceStore.view.from?.map((f) => {
               return {
                 label: f,
-                to: `/project/${f.split('.')[0]}/${isTablesView.value ? 'table' : 'resource'}/${f.split('.')[1]}`,
+                to: u`/project/${f.slice(0, f.indexOf('.'))}/${isTablesView.value ? 'table' : 'resource'}/${f.slice(f.indexOf('.') + 1)}`,
                 icon: datasourceStore.view.innerFrom?.includes(f) ? 'panorama_fish_eye' : 'circle',
               };
             })
@@ -408,7 +401,7 @@ function init() {
     })
     .catch((err) => {
       notifyError(err);
-      if (err.response?.status === 404) router.push(`/project/${dsName.value}/tables`);
+      if (err.response?.status === 404) router.push(u`/project/${dsName.value}/tables`);
     });
 }
 
@@ -441,11 +434,11 @@ function onShowDelete() {
 }
 
 function onDeleteTable() {
-  datasourceStore.deleteTable(tName.value).then(() => router.push(`/project/${dsName.value}/tables`));
+  datasourceStore.deleteTable(tName.value).then(() => router.push(u`/project/${dsName.value}/tables`));
 }
 
 function onTableUpdate(updated: TableDto) {
-  router.push(`/project/${dsName.value}/table/${updated.name}`);
+  router.push(u`/project/${dsName.value}/table/${updated.name}`);
 }
 
 function onViewUpdate(updated: ViewDto) {
@@ -453,7 +446,7 @@ function onViewUpdate(updated: ViewDto) {
     datasourceStore.view = updated;
     datasourceStore.loadTable(tName.value);
   } else {
-    router.push(`/project/${dsName.value}/table/${updated.name}`);
+    router.push(u`/project/${dsName.value}/table/${updated.name}`);
   }
 }
 

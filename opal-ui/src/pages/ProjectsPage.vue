@@ -51,7 +51,7 @@
         </template>
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
-            <router-link :to="`/project/${props.value}`" class="text-primary">{{ props.value }}</router-link>
+            <router-link :to="u`/project/${props.value}`" class="text-primary">{{ props.value }}</router-link>
           </q-td>
         </template>
         <template v-slot:body-cell-tags="props">
@@ -73,6 +73,7 @@
 
 <script setup lang="ts">
 import type { ProjectDto } from 'src/models/Projects';
+import { u } from 'src/boot/api';
 import { getDateLabel } from 'src/utils/dates';
 import { projectStatusColor } from 'src/utils/colors';
 import AddProjectDialog from 'src/components/project/AddProjectDialog.vue';
@@ -189,7 +190,7 @@ function init() {
 
 function onRowClick(evt: unknown, row: { name: string }) {
   projectsStore.initProject(row.name).then(() => {
-    router.push(`/project/${row.name}`);
+    router.push(u`/project/${row.name}`);
   });
 }
 
@@ -217,6 +218,6 @@ function onAddProject() {
 }
 
 async function onProjectAdded(newProject: ProjectDto) {
-  projectsStore.refreshProject(newProject.name).then(() => router.push(`/project/${projectsStore.project.name}`));
+  projectsStore.refreshProject(newProject.name).then(() => router.push(u`/project/${projectsStore.project.name}`));
 }
 </script>

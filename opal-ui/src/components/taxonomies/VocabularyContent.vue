@@ -1,6 +1,6 @@
 <template>
   <div class="text-h5">
-    <router-link :to="`/taxonomy/${taxonomyName}`" :title="taxonomyName" class="q-mr-xs">
+    <router-link :to="u`/taxonomy/${taxonomyName}`" :title="taxonomyName" class="q-mr-xs">
       <q-icon name="arrow_back_ios_new" />
     </router-link>
     <span>{{ vocabulary.name }}</span>
@@ -221,6 +221,7 @@
 
 <script setup lang="ts">
 import type { VocabularyDto, TermDto } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';

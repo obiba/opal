@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="name" :to="`/project/${name}`" />
+        <q-breadcrumbs-el :label="name" :to="u`/project/${name}`" />
         <q-breadcrumbs-el :label="t('genotypes')" />
       </q-breadcrumbs>
     </q-toolbar>

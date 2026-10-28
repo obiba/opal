@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="projectsStore.project?.name" :to="`/project/${projectsStore.project.name}`" />
+        <q-breadcrumbs-el :label="projectsStore.project?.name" :to="u`/project/${projectsStore.project.name}`" />
         <q-breadcrumbs-el :label="t('tasks')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import CommandStates from 'src/components/CommandStates.vue';
+import { u } from 'src/boot/api';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import type { CommandStateDto } from 'src/models/Commands';
 

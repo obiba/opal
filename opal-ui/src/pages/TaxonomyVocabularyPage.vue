@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('taxonomies')" to="/taxonomies" />
-        <q-breadcrumbs-el :label="taxonomyName" :to="`/taxonomy/${taxonomyName}`" />
+        <q-breadcrumbs-el :label="taxonomyName" :to="u`/taxonomy/${taxonomyName}`" />
         <q-breadcrumbs-el :label="vocabularyName" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import VocabularyContent from 'src/components/taxonomies/VocabularyContent.vue';
+import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
 import type { VocabularyDto } from 'src/models/Opal';
 

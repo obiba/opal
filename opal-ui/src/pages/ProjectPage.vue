@@ -22,7 +22,7 @@
       </div>
       <div v-if="canViewSummary" class="row q-gutter-lg">
         <q-card flat bordered class="q-mb-md card bg-blue-12">
-          <q-card-section @click="router.push(`/project/${name}/tables`)">
+          <q-card-section @click="router.push(u`/project/${name}/tables`)">
             <q-item class="q-pb-none">
               <q-item-section>
                 <q-item-label>
@@ -33,16 +33,15 @@
                     <q-spinner-dots v-if="loadingSummary" size="36px" color="white" />
                     <div v-else>
                       <span class="text-h3">{{ formatNumber(projectsStore.summary.tableCount, locale) }}</span>
-                      <span class="text-h5 q-ml-sm" v-if="projectsStore.summary.viewCount">({{ formatNumber(projectsStore.summary.viewCount, locale) }})</span>
+                      <span class="text-h5 q-ml-sm" v-if="projectsStore.summary.viewCount"
+                        >({{ formatNumber(projectsStore.summary.viewCount, locale) }})</span
+                      >
                     </div>
                   </div>
                 </q-item-label>
               </q-item-section>
               <q-item-section avatar>
-                <q-icon
-                  name="table_chart"
-                  size="64px"
-                  color="blue-3" />
+                <q-icon name="table_chart" size="64px" color="blue-3" />
               </q-item-section>
             </q-item>
           </q-card-section>
@@ -54,7 +53,8 @@
                 </div>
                 <div class="text-caption text-white">
                   <span v-for="(entityCount, index) in projectsStore.summary.entityTypeCounts" :key="entityCount.type">
-                    {{ entityCount.type }} <b>{{ formatNumber(entityCount.count, locale) }}</b> <span v-if="index < entityTypeCountsSize - 1"> / </span>
+                    {{ entityCount.type }} <b>{{ formatNumber(entityCount.count, locale) }}</b>
+                    <span v-if="index < entityTypeCountsSize - 1"> / </span>
                   </span>
                 </div>
               </q-item-label>
@@ -69,12 +69,12 @@
               size="sm"
               color="white"
               class="q-pa-sm q-ml-md"
-              :to="`/project/${name}/tables`"
+              :to="u`/project/${name}/tables`"
             ></q-btn>
           </q-card-actions>
         </q-card>
         <q-card flat bordered class="q-mb-md card bg-green-6">
-          <q-card-section @click="router.push(`/project/${name}/resources`)">
+          <q-card-section @click="router.push(u`/project/${name}/resources`)">
             <q-item class="q-pb-none">
               <q-item-section>
                 <q-item-label>
@@ -90,10 +90,7 @@
                 </q-item-label>
               </q-item-section>
               <q-item-section avatar>
-                <q-icon
-                  name="link"
-                  size="64px"
-                  color="green-3" />
+                <q-icon name="link" size="64px" color="green-3" />
               </q-item-section>
             </q-item>
           </q-card-section>
@@ -106,12 +103,12 @@
               size="sm"
               color="white"
               class="q-pa-sm q-ml-md"
-              :to="`/project/${name}/resources`"
+              :to="u`/project/${name}/resources`"
             ></q-btn>
           </q-card-actions>
         </q-card>
         <q-card v-if="projectsStore.perms.files?.canRead()" flat bordered class="q-mb-md card bg-amber-9">
-          <q-card-section @click="router.push(`/project/${name}/files`)">
+          <q-card-section @click="router.push(u`/project/${name}/files`)">
             <q-item class="q-pb-none">
               <q-item-section>
                 <q-item-label>
@@ -127,10 +124,7 @@
                 </q-item-label>
               </q-item-section>
               <q-item-section avatar>
-                <q-icon
-                  name="folder"
-                  size="64px"
-                  color="amber-2" />
+                <q-icon name="folder" size="64px" color="amber-2" />
               </q-item-section>
             </q-item>
           </q-card-section>
@@ -143,7 +137,7 @@
               size="sm"
               color="white"
               class="q-pa-sm q-ml-md"
-              :to="`/project/${name}/files`"
+              :to="u`/project/${name}/files`"
             ></q-btn>
           </q-card-actions>
         </q-card>
@@ -154,6 +148,7 @@
 
 <script setup lang="ts">
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
+import { u } from 'src/boot/api';
 import { projectStatusColor } from 'src/utils/colors';
 import { notifyError } from 'src/utils/notify';
 import { formatNumber } from 'src/utils/numbers';
@@ -212,16 +207,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-  .card {
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-  }
+.card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
 
-  .footer {
-    background-color: rgba(30, 58, 138, 0.2);
-    margin-top: auto;
-  }
+.footer {
+  background-color: rgba(30, 58, 138, 0.2);
+  margin-top: auto;
+}
 </style>
-
