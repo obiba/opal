@@ -170,7 +170,9 @@ function onSaveView() {
 }
 
 function getFromTables() {
-  const tables = props.variables.map((v) => v.parentLink?.link.replace('/datasource/', '').replace('/table/', '.'));
+  const tables = props.variables.map((v) =>
+    v.parentLink?.link.split('/').map(decodeURIComponent).join('/').replace('/datasource/', '').replace('/table/', '.'),
+  );
   return tables.filter((table, idx) => table && tables.indexOf(table) === idx).filter((table) => table !== undefined);
 }
 
