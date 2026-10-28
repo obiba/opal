@@ -17,6 +17,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.search.service.QuerySettings;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.service.VariablesIndexManager;
 import org.obiba.opal.search.service.support.ItemResultDtoStrategy;
@@ -62,8 +63,10 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
       if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if (!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable()))
         return Response.status(Response.Status.NOT_FOUND).build();
-      String esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + query;
-      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(esQuery, lastDoc, limit, fields, facets, sortField, sortDir),
+      // the table is an exact term filter, so its reference needs no query escaping
+      QuerySettings settings = buildQuerySearch(query, lastDoc, limit, fields, facets, sortField, sortDir)
+          .filterReferences(List.of(getValueTable().getTableReference()));
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(settings,
         getSearchPath(),
         addVariableDto ? new ItemResultDtoStrategy(getValueTable()) : null);
       return Response.ok().entity(dtoResponse).build();
