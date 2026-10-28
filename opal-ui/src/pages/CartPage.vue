@@ -199,7 +199,7 @@ function getTableRoute(link: string) {
 }
 
 function getTableName(link: string) {
-  return link.replace('/datasource/', '').replace('/table/', '.');
+  return link.split('/').map(decodeURIComponent).join('/').replace('/datasource/', '').replace('/table/', '.');
 }
 
 function onRemoveFromCart() {
