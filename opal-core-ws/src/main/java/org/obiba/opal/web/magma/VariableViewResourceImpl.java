@@ -26,9 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
-import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 
@@ -42,12 +40,7 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
   @Override
   public VariableDto get(UriInfo uriInfo) {
-    UriBuilder uriBuilder = UriBuilder.fromPath("/");
-    List<PathSegment> pathSegments = uriInfo.getPathSegments();
-    for (int i = 0; i < 4; i++) {
-      uriBuilder.segment(pathSegments.get(i).getPath());
-    }
-    String tableUri = uriBuilder.build().toString();
+    String tableUri = VariablesResourceImpl.linkOf(uriInfo.getPathSegments().subList(0, 4));
     Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName()).build();
 
     return Dtos.asDto(linkDto, getValueTable().getVariable(getName())).build();

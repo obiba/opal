@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.analysis;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -110,7 +111,7 @@ public class ProjectAnalysisResource {
     String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
 
     return Response.ok(outputStream, mimeType)
-      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+      .header("Content-Disposition", ContentDisposition.attachment(fileName)).build();
   }
 
   @Path("/table/{table}")

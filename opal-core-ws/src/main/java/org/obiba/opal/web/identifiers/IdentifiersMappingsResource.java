@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.identifiers;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -318,7 +319,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
       values.flush();
 
       return Response.ok(values.toByteArray(), "text/csv")
-          .header("Content-Disposition", "attachment; filename=\"" + filename + "\"").build();
+          .header("Content-Disposition", ContentDisposition.attachment(filename)).build();
     }
   }
   //

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { SqlCommand, SqlResults } from 'src/components/models';
 
 const datasourceStore = useDatasourceStore();
@@ -16,7 +16,7 @@ export const useSqlStore = defineStore('sql', () => {
       delay: 0,
     } as SqlCommand;
     return api
-      .post(`/datasource/${command.datasource}/_sql`, command.query, {
+      .post(u`/datasource/${command.datasource}/_sql`, command.query, {
         headers: {
           'Content-Type': 'text/plain',
         },

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.log;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -89,7 +90,7 @@ public class SystemLogResource {
   private Response getLog(File file) {
     StreamingOutput stream = os -> Files.copy(file.toPath(), os);
     return Response.ok(stream, "text/plain")
-        .header("Content-Disposition", "attachment; filename=" + file.getName()).build();
+        .header("Content-Disposition", ContentDisposition.attachment(file.getName())).build();
   }
 
   private Response getLogs(String filename, List<File> files) {
@@ -102,6 +103,6 @@ public class SystemLogResource {
           }
         });
     return Response.ok(stream, "text/plain")
-        .header("Content-Disposition", "attachment; filename=" + filename).build();
+        .header("Content-Disposition", ContentDisposition.attachment(filename)).build();
   }
 }

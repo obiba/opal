@@ -27,9 +27,9 @@ public class ItemResultDtoStrategy {
     String variableName = MagmaEngineVariableResolver.valueOf(dtoItemResultBuilder.getIdentifier()).getVariableName();
     Search.VariableItemDto.Builder dtoVariableItemBuilder = Search.VariableItemDto.newBuilder();
     Magma.LinkDto parentLink = Magma.LinkDto.newBuilder().setRel(valueTable.getName())
-        .setLink("/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName()).build();
+        .setLink("/datasource/" + Dtos.encodeSegment(valueTable.getDatasource().getName()) + "/table/" + Dtos.encodeSegment(valueTable.getName())).build();
     dtoVariableItemBuilder.setVariable(Dtos.asDto(parentLink, valueTable.getVariable(variableName))
-        .setLink(parentLink.getLink() + "/variable/" + variableName));
+        .setLink(parentLink.getLink() + "/variable/" + Dtos.encodeSegment(variableName)));
     dtoItemResultBuilder.setExtension(Search.VariableItemDto.item, dtoVariableItemBuilder.build());
   }
 

@@ -86,7 +86,7 @@ public class DataShieldProfilesResource {
 
     datashieldProfileService.saveProfile(profile);
 
-    URI profileUri = UriBuilder.fromPath("/datashield/profile/" + profileDto.getName()).build();
+    URI profileUri = UriBuilder.fromPath("/datashield/profile/{name}").build(profileDto.getName());
     return Response.created(profileUri).build();
   }
 

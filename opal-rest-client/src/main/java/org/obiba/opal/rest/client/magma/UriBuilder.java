@@ -12,6 +12,9 @@ package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class UriBuilder {
@@ -45,17 +48,33 @@ public class UriBuilder {
     return this;
   }
 
+  /**
+   * Adds the segments and query of a link as served by Opal. Links are percent-encoded, and build() encodes again, so
+   * they are decoded first, segment by segment so that an encoded slash stays in its name; a segment an older server
+   * left raw is taken as is.
+   */
   public UriBuilder link(String link) {
     int idx = link.indexOf('?');
+    String path = idx > 0 ? link.substring(0, idx) : link;
+    for(String segment : path.substring(1).split("/")) {
+      segment(decodeSegment(segment));
+    }
     if(idx > 0) {
-      segment(link.substring(1, idx).split("/"));
       for(String q : link.substring(idx + 1).split("&")) {
-        query(q.split("="));
+        int eq = q.indexOf('=');
+        query(URLDecoder.decode(eq < 0 ? q : q.substring(0, eq), StandardCharsets.UTF_8),
+            eq < 0 ? "" : URLDecoder.decode(q.substring(eq + 1), StandardCharsets.UTF_8));
       }
-    } else {
-      segment(link.substring(1).split("/"));
     }
     return this;
+  }
+
+  private static String decodeSegment(String segment) {
+    try {
+      return new URI(segment).getPath();
+    } catch(URISyntaxException e) {
+      return segment;
+    }
   }
 
   public UriBuilder query(String parameter, String value) {
@@ -69,7 +88,9 @@ public class UriBuilder {
 
   public URI build() {
     try {
-      return root.resolve(new URI(null, null, path(), hasQuery() ? query() : null, null));
+      // the query is encoded here, the multi-argument URI constructor would quote its percent signs again
+      URI uri = root.resolve(new URI(null, null, path(), null, null));
+      return hasQuery() ? URI.create(uri + "?" + query()) : uri;
     } catch(URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -82,7 +103,8 @@ public class UriBuilder {
   private String query() {
     StringBuilder sb = new StringBuilder();
     for(Map.Entry<String, String> e : query.entrySet()) {
-      sb.append(e.getKey()).append('=').append(e.getValue() != null ? e.getValue() : "").append('&');
+      sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)).append('=')
+          .append(e.getValue() != null ? URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8) : "").append('&');
     }
     if(sb.length() > 0) {
       sb.setLength(sb.length() - 1);

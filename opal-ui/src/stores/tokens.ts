@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { SubjectTokenDto } from 'src/models/Opal';
 
 export enum TOKEN_TYPES {
@@ -32,11 +32,11 @@ export const useTokensStore = defineStore('tokens', () => {
   }
 
   async function deleteToken(name: string): Promise<void> {
-    return api.delete(`/system/subject-token/_current/token/${name}`);
+    return api.delete(u`/system/subject-token/_current/token/${name}`);
   }
 
   async function renewToken(name: string): Promise<void> {
-    return api.put(`/system/subject-token/_current/token/${name}/_renew`);
+    return api.put(u`/system/subject-token/_current/token/${name}/_renew`);
   }
 
   return {

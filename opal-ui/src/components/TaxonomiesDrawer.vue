@@ -11,7 +11,7 @@
         v-for="summary in summaries"
         :active="taxonomyName === summary.name"
         :key="summary.name"
-        :to="`/taxonomy/${summary.name}`"
+        :to="u`/taxonomy/${summary.name}`"
       >
         <q-item-section avatar>
           <q-icon name="sell" />
@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import type { TaxonomiesDto_TaxonomySummaryDto as TaxonomySummariesDto, TaxonomyDto } from 'src/models/Opal';
+import { u } from 'src/boot/api';
 import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
 import ImportMlstrTaxonomiesDialog from 'src/components/taxonomies/ImportMlstrTaxonomiesDialog.vue';
 import ImportGithubTaxonomiesDialog from 'src/components/taxonomies/ImportGithubTaxonomiesDialog.vue';
@@ -132,7 +133,7 @@ async function onAdded(updated: TaxonomyDto) {
   if (updated) {
     taxonomiesStore
       .refreshSummaries()
-      .then(() => router.push(`/taxonomy/${updated.name}`))
+      .then(() => router.push(u`/taxonomy/${updated.name}`))
       .catch(notifyError);
   }
 }

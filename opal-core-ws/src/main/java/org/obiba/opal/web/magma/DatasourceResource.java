@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.protobuf.format.JsonFormat;
@@ -209,7 +210,7 @@ public class DatasourceResource {
       return Response.status(BAD_REQUEST).build();
     }
 
-    if ("*".equals(viewDto.getName())) {
+    if (ReservedNames.isReserved(viewDto.getName())) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ReservedTableName").build()).build();
     }
@@ -230,7 +231,7 @@ public class DatasourceResource {
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
     return Response.created(viewUri)
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, action)).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(uriInfo, viewUri, action)).build();
   }
 
   @GET
@@ -265,7 +266,7 @@ public class DatasourceResource {
 
     return Response
         .ok(outputStream, MediaType.APPLICATION_OCTET_STREAM)
-        .header("Content-Disposition", "inline; filename=\"backup-" + name + "-" + new Date().getTime() + ".zip\"")
+        .header("Content-Disposition", ContentDisposition.inline("backup-" + name + "-" + new Date().getTime() + ".zip"))
         .build();
   }
 
@@ -316,7 +317,7 @@ public class DatasourceResource {
     };
 
     return Response.ok(stream, MediaType.APPLICATION_JSON_TYPE)
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   @POST
@@ -341,7 +342,7 @@ public class DatasourceResource {
     };
 
     return Response.ok(stream, "text/csv")
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   @POST
@@ -366,7 +367,7 @@ public class DatasourceResource {
     };
 
     return Response.ok(stream, "application/x-rdata")
-        .header("Content-Disposition", "attachment; filename=\"" + output.getName() + "\"").build();
+        .header("Content-Disposition", ContentDisposition.attachment(output.getName())).build();
   }
 
   Datasource getDatasource() {

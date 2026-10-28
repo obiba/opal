@@ -7,7 +7,7 @@
       </span>
     </h6>
     <q-list>
-      <q-item :to="`/files/home/${username}`">
+      <q-item :to="u`/files/home/${username}`">
         <q-item-section avatar>
           <q-icon name="person" />
         </q-item-section>
@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { u } from 'src/boot/api';
 const { t } = useI18n();
 const route = useRoute();
 const filesStore = useFilesStore();

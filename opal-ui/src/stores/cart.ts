@@ -7,6 +7,9 @@ export const useCartStore = defineStore(
   () => {
     const variables = ref([] as VariableDto[]);
 
+    // the single-variable endpoint sets parentLink but no link, so identity is parent table + name
+    const key = (v: VariableDto) => `${v.parentLink?.link}/variable/${encodeURIComponent(v.name)}`;
+
     function reset() {
       variables.value = [];
     }
@@ -17,7 +20,7 @@ export const useCartStore = defineStore(
       await Promise.all(
         variables.value.map((v, i) =>
           api
-            .get(`${v.parentLink?.link}/variable/${v.name}`)
+            .get(`${v.parentLink?.link}/variable/${encodeURIComponent(v.name)}`)
             .then((response) => {
               // replace the variable in the cart with the updated version
               variables.value[i] = response.data;
@@ -33,16 +36,16 @@ export const useCartStore = defineStore(
 
     function addVariables(vars: VariableDto[]) {
       const merged = [...variables.value, ...vars];
-      const unique = merged.filter((v, i, a) => a.findIndex((t) => t.link === v.link) === i);
+      const unique = merged.filter((v, i, a) => a.findIndex((t) => key(t) === key(v)) === i);
       variables.value = unique;
     }
 
     function removeVariables(vars: VariableDto[]) {
-      variables.value = variables.value.filter((v) => vars.findIndex((t) => t.link === v.link) === -1);
+      variables.value = variables.value.filter((v) => vars.findIndex((t) => key(t) === key(v)) === -1);
     }
 
     function isInCart(variable: VariableDto) {
-      return variables.value.findIndex((v) => v.link === variable.link) !== -1;
+      return variables.value.findIndex((v) => key(v) === key(variable)) !== -1;
     }
 
     return {

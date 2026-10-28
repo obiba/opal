@@ -145,6 +145,7 @@
 
 <script setup lang="ts">
 import type { TableDto } from 'src/models/Magma';
+import { u } from 'src/boot/api';
 import type { QueryResultDto } from 'src/models/Search';
 import type { ItemFieldsResultDto } from 'src/stores/search';
 import { VariableNatures, ValueTypes } from 'src/utils/magma';
@@ -284,7 +285,7 @@ function goToVariable(item: ItemFieldsResultDto) {
     }
   }
   if (project || table || variable) {
-    router.push(`/project/${project}/table/${table}/variable/${variable}`);
+    router.push(u`/project/${project}/table/${table}/variable/${variable}`);
   }
 }
 

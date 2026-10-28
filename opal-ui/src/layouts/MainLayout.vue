@@ -48,7 +48,7 @@
                 </q-item>
                 <q-item v-if="itemResults.length > 0" clickable class="bg-grey-2">
                   <q-item-section>
-                    <router-link :to="`/search/variables?q=${query}`" class="text-primary">
+                    <router-link :to="{ path: '/search/variables', query: { q: query } }" class="text-primary">
                       <q-icon name="arrow_circle_right" size="sm" class="on-left" />{{ t('advanced_search') }}
                     </router-link>
                   </q-item-section>
@@ -117,6 +117,7 @@
 
 <script setup lang="ts">
 import { Cookies } from 'quasar';
+import { u } from 'src/boot/api';
 import { locales } from 'boot/i18n';
 
 import MainDrawer from 'src/components/MainDrawer.vue';
@@ -245,7 +246,7 @@ function goToVariable(item: ItemFieldsResultDto) {
     }
   }
   if (project || table || variable) {
-    router.push(`/project/${project}/table/${table}/variable/${variable}`);
+    router.push(u`/project/${project}/table/${table}/variable/${variable}`);
   }
 }
 </script>

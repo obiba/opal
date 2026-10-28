@@ -22,7 +22,12 @@
       </template>
       <template v-slot:body-cell-subject="props">
         <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
-          <router-link v-if="props.row.subjectType === 'USER'" :to="`/admin/profile/${props.row.principal}`" class="text-primary">{{ getSubjectLabel(props.row) }}</router-link>
+          <router-link
+            v-if="props.row.subjectType === 'USER'"
+            :to="u`/admin/profile/${props.row.principal}`"
+            class="text-primary"
+            >{{ getSubjectLabel(props.row) }}</router-link
+          >
           <span v-else>{{ getSubjectLabel(props.row) }}</span>
           <q-badge v-if="props.row.subjectType === 'GROUP'" color="primary" class="q-ml-sm">
             {{ t('r_quota.group') }}
@@ -86,6 +91,7 @@
 
 <script setup lang="ts">
 import type { RQuotaDto, RQuotaUsageDto } from 'src/models/OpalR';
+import { u } from 'src/boot/api';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import AddRQuotaDialog from 'src/components/admin/r/AddRQuotaDialog.vue';
 import { getMillisLabel } from 'src/utils/dates';

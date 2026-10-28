@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.shell;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -244,7 +245,7 @@ public class WebShellResource extends AbstractCommandsResource {
       };
       return Response.ok(stream, fileResult.getMimeType())
           .header("Content-Disposition",
-              "attachment; filename=\"" + fileResult.getLabel() + "\"")
+              ContentDisposition.attachment(fileResult.getLabel()))
           .build();
     }
 

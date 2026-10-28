@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
@@ -273,6 +274,7 @@ public class FilesResourceTest {
     expect(fileItemMock.getBody(InputStream.class, null)).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
         .once();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
+    expect(uriInfoMock.getBaseUri()).andReturn(URI.create("/"));
 
     FilesResource fileResource = new FilesResource() {
       @Override
@@ -502,6 +504,7 @@ public class FilesResourceTest {
     expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.resolveFile("folder")).andReturn(childFolderMock).atLeastOnce();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
+    expect(uriInfoMock.getBaseUri()).andReturn(URI.create("/"));
 
     replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
 

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, encodePath } from 'src/boot/api';
 import type { BookmarkDto, SubjectProfileDto, AuthProviderDto } from 'src/models/Opal';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function toggleBookmark(resource: string) {
     if (isBookmarked(resource)) {
-      return api.delete(`/system/subject-profile/_current/bookmark${resource}`).then(() => {
+      return api.delete('/system/subject-profile/_current/bookmark' + encodePath(resource)).then(() => {
         return loadBookmarks();
       });
     } else {

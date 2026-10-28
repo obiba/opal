@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api, baseUrl } from 'src/boot/api';
+import { api, baseUrl, u } from 'src/boot/api';
 import type {
   TaxonomyDto,
   TaxonomiesDto_TaxonomySummaryDto,
@@ -84,7 +84,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
     taxonomy.value = {} as TaxonomyDto;
     vocabulary.value = {} as VocabularyDto;
     canEdit.value = false;
-    return api.get(`/system/conf/taxonomy/${name}`).then((response) => {
+    return api.get(u`/system/conf/taxonomy/${name}`).then((response) => {
       canEdit.value = response.headers['allow']
         .split(',')
         .map((m: string) => m.trim())
@@ -100,32 +100,34 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function updateTaxonomy(taxonomy: TaxonomyDto, oldName?: string) {
     return api
-      .put(`/system/conf/taxonomy/${oldName ? oldName : taxonomy.name}`, taxonomy)
+      .put(u`/system/conf/taxonomy/${oldName ? oldName : taxonomy.name}`, taxonomy)
       .then((response) => response.data);
   }
 
   async function deleteTaxonomy(toDelete: TaxonomyDto) {
     taxonomy.value = {} as TaxonomyDto;
-    return api.delete(`/system/conf/taxonomy/${toDelete.name}`);
+    return api.delete(u`/system/conf/taxonomy/${toDelete.name}`);
   }
 
   async function addVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
-    return api.post(`/system/conf/taxonomy/${taxonomyName}/vocabularies`, vocabulary).then((response) => response.data);
+    return api
+      .post(u`/system/conf/taxonomy/${taxonomyName}/vocabularies`, vocabulary)
+      .then((response) => response.data);
   }
 
   async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto, oldName?: string) {
     return api
-      .put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${oldName ? oldName : vocabulary.name}`, vocabulary)
+      .put(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${oldName ? oldName : vocabulary.name}`, vocabulary)
       .then((response) => response.data);
   }
 
   async function deleteVocabulary(taxonomyName: string, vocabulary: VocabularyDto) {
-    return api.delete(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`);
+    return api.delete(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabulary.name}`);
   }
 
   async function getVocabulary(taxonomyName: string, vocabularyName: string) {
     vocabulary.value = {} as VocabularyDto;
-    return api.get(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}`).then((response) => {
+    return api.get(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}`).then((response) => {
       vocabulary.value = response.data;
       return response;
     });
@@ -133,37 +135,37 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function addTerm(taxonomyName: string, vocabularyName: string, term: TermDto) {
     return api
-      .post(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/terms`, term)
+      .post(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/terms`, term)
       .then((response) => response.data);
   }
 
   async function updateTerm(taxonomyName: string, vocabularyName: string, term: TermDto, oldName?: string) {
     return api
       .put(
-        `/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
+        u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${oldName ? oldName : term.name}`,
         term,
       )
       .then((response) => response.data);
   }
 
   async function deleteTerm(taxonomyName: string, vocabularyName: string, term: TermDto) {
-    return api.delete(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${term.name}`);
+    return api.delete(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/term/${term.name}`);
   }
 
   async function gitCommits(name: string) {
-    return api.get(`/system/conf/taxonomy/${name}/commits`).then((response) => response.data);
+    return api.get(u`/system/conf/taxonomy/${name}/commits`).then((response) => response.data);
   }
 
   async function gitCompare(name: string, id: string) {
-    return api.get(`/system/conf/taxonomy/${name}/commit/${id}`).then((response) => response.data);
+    return api.get(u`/system/conf/taxonomy/${name}/commit/${id}`).then((response) => response.data);
   }
 
   async function gitCompareWith(name: string, id: string, withId = 'head') {
-    return api.get(`/system/conf/taxonomy/${name}/commit/${withId}/${id}`).then((response) => response.data);
+    return api.get(u`/system/conf/taxonomy/${name}/commit/${withId}/${id}`).then((response) => response.data);
   }
 
   async function gitRestore(name: string, id: string) {
-    return api.put(`/system/conf/taxonomy/${name}/restore/${id}`).then((response) => response.data);
+    return api.put(u`/system/conf/taxonomy/${name}/restore/${id}`).then((response) => response.data);
   }
 
   async function getMlstrTaxonomies() {
@@ -258,7 +260,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
   }
 
   function downloadTaxonomy(taxonomy: TaxonomyDto) {
-    window.open(`${baseUrl}/system/conf/taxonomy/${taxonomy.name}/_download`, '_self');
+    window.open(baseUrl + u`/system/conf/taxonomy/${taxonomy.name}/_download`, '_self');
   }
 
   return {

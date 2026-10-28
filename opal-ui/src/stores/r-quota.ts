@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { RQuotaDto, RQuotaUsageDto } from 'src/models/OpalR';
 
 export const useRQuotaStore = defineStore('rQuota', () => {
@@ -25,11 +25,11 @@ export const useRQuotaStore = defineStore('rQuota', () => {
   }
 
   async function updateQuota(quota: RQuotaDto) {
-    return api.put(`/service/r/quota/${quota.id}`, quota);
+    return api.put(u`/service/r/quota/${quota.id}`, quota);
   }
 
   async function deleteQuota(quota: RQuotaDto) {
-    return api.delete(`/service/r/quota/${quota.id}`);
+    return api.delete(u`/service/r/quota/${quota.id}`);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { ResourceProvidersDto } from 'src/models/Resources';
 import type { ResourceReferenceDto } from 'src/models/Projects';
 import { Perms } from 'src/utils/authz';
@@ -43,12 +43,12 @@ export const useResourcesStore = defineStore('resources', () => {
     perms.value.resources = undefined;
     perms.value.resourcesPermissions = undefined;
     return Promise.all([
-      api.get(`/project/${project.value}/resources`).then((response) => {
+      api.get(u`/project/${project.value}/resources`).then((response) => {
         perms.value.resources = new Perms(response);
         resourceReferences.value = response.data;
         return response;
       }),
-      api.options(`/project/${pName}/permissions/resources`).then((response) => {
+      api.options(u`/project/${pName}/permissions/resources`).then((response) => {
         perms.value.resourcesPermissions = new Perms(response);
         return response;
       }),
@@ -60,15 +60,15 @@ export const useResourcesStore = defineStore('resources', () => {
   }
 
   async function testResource(pName: string, name: string) {
-    return api.put(`/project/${pName}/resource/${name}/_test`);
+    return api.put(u`/project/${pName}/resource/${name}/_test`);
   }
 
   async function deleteResource(pName: string, name: string) {
-    return api.delete(`/project/${pName}/resource/${name}`);
+    return api.delete(u`/project/${pName}/resource/${name}`);
   }
 
   async function deleteResources(pName: string, names: string[]) {
-    return api.delete(`/project/${pName}/resources`, {
+    return api.delete(u`/project/${pName}/resources`, {
       params: { names },
       paramsSerializer: {
         indexes: null,
@@ -87,22 +87,22 @@ export const useResourcesStore = defineStore('resources', () => {
   }
 
   async function addResource(resourceRef: ResourceReferenceDto) {
-    return api.post(`/project/${resourceRef.project}/resources`, resourceRef);
+    return api.post(u`/project/${resourceRef.project}/resources`, resourceRef);
   }
 
   async function saveResource(resourceRef: ResourceReferenceDto) {
-    return api.put(`/project/${resourceRef.project}/resource/${resourceRef.name}`, resourceRef);
+    return api.put(u`/project/${resourceRef.project}/resource/${resourceRef.name}`, resourceRef);
   }
 
   async function loadResourcePerms(pName: string, name: string) {
     perms.value.resource = undefined;
     perms.value.resourcePermissions = undefined;
     return Promise.all([
-      api.options(`/project/${pName}/resource/${name}`).then((response) => {
+      api.options(u`/project/${pName}/resource/${name}`).then((response) => {
         perms.value.resource = new Perms(response);
         return response;
       }),
-      api.options(`/project/${pName}/permissions/resource/${name}`).then((response) => {
+      api.options(u`/project/${pName}/permissions/resource/${name}`).then((response) => {
         perms.value.resourcePermissions = new Perms(response);
         return response;
       }),

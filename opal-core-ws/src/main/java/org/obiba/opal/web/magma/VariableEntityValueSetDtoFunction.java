@@ -41,15 +41,22 @@ public class VariableEntityValueSetDtoFunction implements Function<ValueSet, Mag
     this.filterBinary = filterBinary;
   }
 
+  /**
+   * Link of one value, from the encoded path of the {@code .../valueSets} or {@code .../valueSets/variable/x} request:
+   * the trailing segments are replaced, so a table whose name contains "valueSets" is left alone.
+   */
+  static String valueLink(String valueSetsPath, String entityIdentifier, String variableName) {
+    return valueSetsPath.replaceFirst("/valueSets(/variable/[^/]+)?/?$", "/valueSet/entity/" + Dtos.encodeSegment(entityIdentifier) +
+        "/variable/" + Dtos.encodeSegment(variableName) + "/value");
+  }
+
   @Override
   public Magma.ValueSetsDto.ValueSetDto apply(final ValueSet valueSet) {
     ImmutableList.Builder<Magma.ValueSetsDto.ValueDto> valueDtos = ImmutableList.builder();
     Function<Variable, Magma.ValueSetsDto.ValueDto> variableToValueDto = new Function<Variable, Magma.ValueSetsDto.ValueDto>() {
       @Override
       public Magma.ValueSetsDto.ValueDto apply(Variable fromVariable) {
-        String link = uriInfoPath.replace("valueSets",
-            "valueSet/entity/" + valueSet.getVariableEntity().getIdentifier() + "/variable/" + fromVariable.getName() +
-                "/value");
+        String link = valueLink(uriInfoPath, valueSet.getVariableEntity().getIdentifier(), fromVariable.getName());
         Value value = valueTable.getVariableValueSource(fromVariable.getName()).getValue(valueSet);
         return asDto(link, value, filterBinary).build();
       }

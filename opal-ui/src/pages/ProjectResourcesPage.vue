@@ -4,7 +4,7 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="pName" :to="`/project/${pName}`" />
+        <q-breadcrumbs-el :label="pName" :to="u`/project/${pName}`" />
         <q-breadcrumbs-el :label="t('resources')" />
       </q-breadcrumbs>
     </q-toolbar>
@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import ResourceReferences from 'src/components/resources/ResourceReferences.vue';
+import { u } from 'src/boot/api';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 
 const { t } = useI18n();

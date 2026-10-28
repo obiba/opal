@@ -49,7 +49,7 @@ const props = defineProps<ValueCellProps>();
 
 function onDownload() {
   if (props.value?.link) {
-    window.open(`${baseUrl}${props.value.link.replace('/entity/', '/')}`, '_blank');
+    window.open(baseUrl + props.value.link.replace('/valueSet/entity/', '/valueSet/'), '_blank');
   }
 }
 </script>

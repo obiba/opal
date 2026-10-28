@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.URI;
+import java.util.regex.Pattern;
 
 @Component
 public class SpringRequestAttributesProvider implements RequestAttributesProvider {
@@ -39,7 +40,8 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
 
   @Override
   public String getResourcePath(URI uri) {
-    return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
+    String wsPath = currentRequestAttributes().getRequest().getContextPath() + OpalWsConfig.WS_ROOT;
+    return uri.getPath().replaceFirst("^" + Pattern.quote(wsPath) + "(?=/|$)", "");
   }
 
 

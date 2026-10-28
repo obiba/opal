@@ -92,7 +92,7 @@ public class ProjectsResource implements BaseResource {
     projectService.save(project, storageOf(projectFactoryDto));
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
     return Response.created(projectUri)
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL))
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(uriInfo, projectUri, Opal.AclAction.PROJECT_ALL))
         .build();
   }
 

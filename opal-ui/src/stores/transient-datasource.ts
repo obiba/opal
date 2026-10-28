@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
 import type { DatasourceFactory } from 'src/components/models';
 import type { FileDto } from 'src/models/Opal';
@@ -52,7 +52,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   async function createDatasource(factory: DatasourceFactory, merge: boolean) {
     project.value = projectsStore.project.name;
     return api
-      .post<DatasourceDto>(`/project/${project.value}/transient-datasources`, factory, { params: { merge } })
+      .post<DatasourceDto>(u`/project/${project.value}/transient-datasources`, factory, { params: { merge } })
       .then((response) => {
         datasource.value = response.data;
       });
@@ -60,14 +60,14 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
 
   async function deleteDatasource() {
     if (!datasource.value.name) return Promise.resolve();
-    return api.delete(`/datasource/${datasource.value.name}`).then(() => {
+    return api.delete(u`/datasource/${datasource.value.name}`).then(() => {
       reset();
     });
   }
 
   async function loadTable(tableName: string) {
     return api
-      .get<TableDto>(`/datasource/${datasource.value.name}/table/${tableName}`, { params: { counts: true } })
+      .get<TableDto>(u`/datasource/${datasource.value.name}/table/${tableName}`, { params: { counts: true } })
       .then((response) => {
         table.value = response.data;
       });
@@ -75,7 +75,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
 
   async function loadVariables() {
     return api
-      .get<VariableDto[]>(`/datasource/${datasource.value.name}/table/${table.value.name}/variables`)
+      .get<VariableDto[]>(u`/datasource/${datasource.value.name}/table/${table.value.name}/variables`)
       .then((response) => {
         variables.value = response.data;
       });
@@ -84,10 +84,11 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
   function loadValueSets(offset: number, limit: number, select: string[] | undefined) {
     const params: { offset: number; limit: number; select: string | undefined } = { offset, limit, select: undefined };
     if (select && select.length > 0) {
-      params.select = `name().matches(/^${select.join('$|^')}$/)`;
+      const names = select.map((name) => name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&'));
+      params.select = `name().matches(/^${names.join('$|^')}$/)`;
     }
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
       .then((response) => {
         return response.data;
       });

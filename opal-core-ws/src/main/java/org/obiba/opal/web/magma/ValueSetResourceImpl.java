@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.MediaType;
@@ -136,7 +137,8 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
           @Override
           public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfo.getPath() + "/variable/" + fromVariable.getName() + "/value";
+            // the request may be variable-scoped already (.../valueSet/id/variable/x)
+            String link = uriInfo.getPath(false).replaceFirst("/variable/[^/]+$", "") + "/variable/" + Dtos.encodeSegment(fromVariable.getName()) + "/value";
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return Dtos.asDto(link, value, filterBinary).build();
           }
@@ -162,7 +164,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
   private ValueSetsDto.ValueDto getValueDto(UriInfo uriInfo, boolean filterBinary) {
     Value value = extractValue(entity.getIdentifier());
-    return Dtos.asDto(uriInfo.getPath() + "/value", value, filterBinary).build();
+    return Dtos.asDto(uriInfo.getPath(false) + "/value", value, filterBinary).build();
   }
 
   @Nullable
@@ -193,7 +195,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
     // download as a file
     ResponseBuilder builder = TimestampedResponses.ok(getValueTable(), value.isNull() ? null : value.getValue())
         .type(getVariableMimeType(variable));
-    builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier, pos) + "\"");
+    builder.header("Content-Disposition", ContentDisposition.attachment(getFileName(variable, identifier, pos)));
     return builder;
   }
 

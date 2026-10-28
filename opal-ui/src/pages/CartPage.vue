@@ -69,7 +69,7 @@
         <template v-slot:body-cell-name="props">
           <q-td :props="props">
             <router-link
-              :to="`${getTableRoute(props.row.parentLink.link)}/variable/${props.value}`"
+              :to="getTableRoute(props.row.parentLink.link) + u`/variable/${props.value}`"
               class="text-primary"
               >{{ props.value }}</router-link
             >
@@ -119,6 +119,7 @@
 
 <script setup lang="ts">
 import type { VariableDto } from 'src/models/Magma';
+import { decodePath, u } from 'src/boot/api';
 import { getLabels } from 'src/utils/attributes';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';
 import AnnotateDialog from 'src/components/datasource/AnnotateDialog.vue';
@@ -199,7 +200,7 @@ function getTableRoute(link: string) {
 }
 
 function getTableName(link: string) {
-  return link.split('/').map(decodeURIComponent).join('/').replace('/datasource/', '').replace('/table/', '.');
+  return decodePath(link).replace('/datasource/', '').replace('/table/', '.');
 }
 
 function onRemoveFromCart() {

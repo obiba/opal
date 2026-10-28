@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { PluginPackage } from 'src/components/models';
 import type { PluginPackagesDto } from 'src/models/Plugins';
 import { mergeAnalysesTranslations } from 'src/utils/plugins';
@@ -29,7 +29,7 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function getDatasourcePluginForm(pluginId: string, usage: 'import' | 'export') {
-    return api.get(`datasource-plugin/${pluginId}/form`, { params: { usage } }).then((response) => response.data);
+    return api.get(u`datasource-plugin/${pluginId}/form`, { params: { usage } }).then((response) => response.data);
   }
 
   async function loadDatasourcePlugins(usage: 'import' | 'export') {
@@ -84,16 +84,16 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function getPlugin(name: string) {
-    return api.get(`plugin/${name}`).then((response) => response.data);
+    return api.get(u`plugin/${name}`).then((response) => response.data);
   }
 
   async function configurePlugin(name: string, config: string | undefined) {
     if (!config) return Promise.resolve();
-    return api.put(`plugin/${name}/cfg`, config, { headers: { 'Content-Type': 'text/plain' } });
+    return api.put(u`plugin/${name}/cfg`, config, { headers: { 'Content-Type': 'text/plain' } });
   }
 
   async function restartPlugin(name: string) {
-    return api.delete(`plugin/${name}/service`).then(() => api.put(`plugin/${name}/service`));
+    return api.delete(u`plugin/${name}/service`).then(() => api.put(u`plugin/${name}/service`));
   }
 
   async function installPlugin(name: string, version: string) {
@@ -105,11 +105,11 @@ export const usePluginsStore = defineStore('plugins', () => {
   }
 
   async function uninstallPlugin(name: string) {
-    return api.delete(`plugin/${name}`).then(() => loadPlugins());
+    return api.delete(u`plugin/${name}`).then(() => loadPlugins());
   }
 
   async function cancelUninstallPlugin(name: string) {
-    return api.put(`plugin/${name}`).then(() => loadPlugins());
+    return api.put(u`plugin/${name}`).then(() => loadPlugins());
   }
 
   async function getPluginsUpdates() {

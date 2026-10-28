@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { DatabaseDto, DatabasesStatusDto } from 'src/models/Database';
 import type { GeneralConf, OpalStatus } from 'src/models/Opal';
 
@@ -45,16 +45,16 @@ export const useSystemStore = defineStore('system', () => {
   }
 
   async function testDatabase(name: string) {
-    return api.post(`/system/database/${name}/connections`);
+    return api.post(u`/system/database/${name}/connections`);
   }
 
   async function deleteDatabase(name: string, deleteFiles = false) {
-    return api.delete(`/system/database/${name}`, { params: deleteFiles ? { deleteFiles: true } : {} });
+    return api.delete(u`/system/database/${name}`, { params: deleteFiles ? { deleteFiles: true } : {} });
   }
 
   async function saveDatabase(database: DatabaseDto, update: boolean) {
     if (update) {
-      return api.put(`/system/database/${database.name}`, database);
+      return api.put(u`/system/database/${database.name}`, database);
     } else {
       return api.post('/system/databases', database);
     }

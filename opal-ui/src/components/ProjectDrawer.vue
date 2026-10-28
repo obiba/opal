@@ -7,7 +7,7 @@
       </span>
     </h6>
     <q-list>
-      <q-item :to="`/project/${projectsStore.project.name}`">
+      <q-item :to="u`/project/${projectsStore.project.name}`">
         <q-item-section avatar>
           <q-icon name="dashboard" />
         </q-item-section>
@@ -18,7 +18,7 @@
 
       <q-item-label header class="text-weight-bolder">{{ t('content') }}</q-item-label>
 
-      <q-item v-if="projectsStore.perms.summary?.canRead()" :to="`/project/${projectsStore.project.name}/tables`">
+      <q-item v-if="projectsStore.perms.summary?.canRead()" :to="u`/project/${projectsStore.project.name}/tables`">
         <q-item-section avatar>
           <q-icon name="table_chart" />
         </q-item-section>
@@ -27,7 +27,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="`/project/${projectsStore.project.name}/resources`">
+      <q-item :to="u`/project/${projectsStore.project.name}/resources`">
         <q-item-section avatar>
           <q-icon name="link" />
         </q-item-section>
@@ -36,7 +36,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item v-show="hasVcfPlugins && hasVcfStorePermission" :to="`/project/${projectsStore.project.name}/genotypes`">
+      <q-item v-show="hasVcfPlugins && hasVcfStorePermission" :to="u`/project/${projectsStore.project.name}/genotypes`">
         <q-item-section avatar>
           <q-icon name="science" />
         </q-item-section>
@@ -45,7 +45,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="`/project/${projectsStore.project.name}/files`">
+      <q-item :to="u`/project/${projectsStore.project.name}/files`">
         <q-item-section avatar>
           <q-icon name="folder" />
         </q-item-section>
@@ -56,7 +56,7 @@
 
       <q-item-label header class="text-weight-bolder">{{ t('administration') }}</q-item-label>
 
-      <q-item v-show="hasTasksPermission" :to="`/project/${projectsStore.project.name}/tasks`">
+      <q-item v-show="hasTasksPermission" :to="u`/project/${projectsStore.project.name}/tasks`">
         <q-item-section avatar>
           <q-icon name="splitscreen" />
         </q-item-section>
@@ -65,7 +65,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="`/project/${projectsStore.project.name}/perms`">
+      <q-item :to="u`/project/${projectsStore.project.name}/perms`">
         <q-item-section avatar>
           <q-icon name="lock" />
         </q-item-section>
@@ -74,7 +74,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item v-show="hasAdminPermission" :to="`/project/${projectsStore.project.name}/admin`">
+      <q-item v-show="hasAdminPermission" :to="u`/project/${projectsStore.project.name}/admin`">
         <q-item-section avatar>
           <q-icon name="admin_panel_settings" />
         </q-item-section>
@@ -87,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+import { u } from 'src/boot/api';
 const { t } = useI18n();
 const authStore = useAuthStore();
 const projectsStore = useProjectsStore();
@@ -108,8 +109,7 @@ watchEffect(() => {
   hasVcfStorePermission.value =
     projectsStore.perms.vcfstore?.canRead() && projectsStore.project.vcfStoreService ? true : false;
 
-  hasTasksPermission.value =
-    projectsStore.perms.commands?.canRead() || false;
+  hasTasksPermission.value = projectsStore.perms.commands?.canRead() || false;
 });
 
 onMounted(() => {

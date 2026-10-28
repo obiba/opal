@@ -4,9 +4,9 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
         <q-breadcrumbs-el :label="t('projects')" to="/projects" />
-        <q-breadcrumbs-el :label="dsName" :to="`/project/${dsName}`" />
-        <q-breadcrumbs-el :label="t('tables')" :to="`/project/${dsName}/tables`" />
-        <q-breadcrumbs-el :label="tName" :to="`/project/${dsName}/table/${tName}`" />
+        <q-breadcrumbs-el :label="dsName" :to="u`/project/${dsName}`" />
+        <q-breadcrumbs-el :label="t('tables')" :to="u`/project/${dsName}/tables`" />
+        <q-breadcrumbs-el :label="tName" :to="u`/project/${dsName}/table/${tName}`" />
         <q-breadcrumbs-el :label="vName" />
       </q-breadcrumbs>
       <q-space />
@@ -16,7 +16,7 @@
         icon="navigate_before"
         size="sm"
         :label="previousVariable?.name"
-        :to="`/project/${dsName}/table/${tName}/variable/${previousVariable?.name}`"
+        :to="u`/project/${dsName}/table/${tName}/variable/${previousVariable?.name}`"
         v-if="previousVariable"
         class="on-right"
       />
@@ -26,7 +26,7 @@
         icon-right="navigate_next"
         size="sm"
         :label="nextVariable?.name"
-        :to="`/project/${dsName}/table/${tName}/variable/${nextVariable?.name}`"
+        :to="u`/project/${dsName}/table/${tName}/variable/${nextVariable?.name}`"
         v-if="nextVariable"
         class="on-right"
       />
@@ -169,6 +169,7 @@
 
 <script setup lang="ts">
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
+import { u } from 'src/boot/api';
 import VariableCategories from 'src/components/datasource/VariableCategories.vue';
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
@@ -219,7 +220,8 @@ const items1: FieldItem[] = [
   {
     field: 'name',
     label: 'full_name',
-    html: (val) => (val ? `<code>${escapeHtml(dsName.value)}.${escapeHtml(tName.value)}:${escapeHtml(val.name)}</code>` : ''),
+    html: (val) =>
+      val ? `<code>${escapeHtml(dsName.value)}.${escapeHtml(tName.value)}:${escapeHtml(val.name)}</code>` : '',
   },
   {
     field: 'entityType',
@@ -274,7 +276,7 @@ function init() {
     .initDatasourceTableVariable(dsName.value, tName.value, vName.value)
     .catch((err) => {
       notifyError(err);
-      if (err.response?.status === 404) router.push(`/project/${dsName.value}/table/${tName.value}`);
+      if (err.response?.status === 404) router.push(u`/project/${dsName.value}/table/${tName.value}`);
     })
     .finally(() => {
       loading.value = false;
@@ -305,12 +307,12 @@ function onRemoveFromCart() {
 function onDeleteVariable() {
   datasourceStore
     .deleteVariables([vName.value])
-    .then(() => router.push(`/project/${dsName.value}/table/${tName.value}`));
+    .then(() => router.push(u`/project/${dsName.value}/table/${tName.value}`));
 }
 
 function onSaved(variable: VariableDto) {
   if (variable.name !== vName.value) {
-    router.push(`/project/${dsName.value}/table/${tName.value}/variable/${variable.name}`);
+    router.push(u`/project/${dsName.value}/table/${tName.value}/variable/${variable.name}`);
   } else {
     datasourceStore.loadTableVariable(variable.name);
   }

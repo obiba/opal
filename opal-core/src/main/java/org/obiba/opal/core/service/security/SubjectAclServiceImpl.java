@@ -100,7 +100,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
 
   @Override
   public void deleteNodePermissions(String node) {
-    Iterable<SubjectAcl> subjectAcls = subjectAclRepository.findByNodeOrNodeLike(node, node + "/%");
+    Iterable<SubjectAcl> subjectAcls = subjectAclRepository.findByNodeOrNodeStartingWith(node, node + "/");
     Set<Subject> subjects = Sets.newTreeSet();
     for (SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
@@ -252,7 +252,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   }
 
   private Iterable<SubjectAcl> findLike(String domain, String node, SubjectType type) {
-    return subjectAclRepository.findByDomainAndNodeLikeAndType(domain, node + "%", type);
+    return subjectAclRepository.findByDomainAndNodeStartingWithAndType(domain, node, type);
   }
 
   private Iterable<SubjectAcl> find(String domain, SubjectType type) {
@@ -265,7 +265,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   }
 
   private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
-    return subjectAclRepository.findByDomainAndNodeLikeAndPrincipalAndType(domain, node + "%",
+    return subjectAclRepository.findByDomainAndNodeStartingWithAndPrincipalAndType(domain, node,
         subject.getPrincipal(), subject.getType());
   }
 
@@ -274,7 +274,7 @@ public class SubjectAclServiceImpl implements SubjectAclService {
   }
 
   private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node) {
-    return subjectAclRepository.findByDomainAndNodeLike(domain, node + "%");
+    return subjectAclRepository.findByDomainAndNodeStartingWith(domain, node);
   }
 
   private SubjectAcl find(String domain, String node, Subject subject, String permission) {

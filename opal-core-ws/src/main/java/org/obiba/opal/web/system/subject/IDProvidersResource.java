@@ -66,7 +66,7 @@ public class IDProvidersResource {
     try {
       idProvidersService.ensureUniqueConfiguration(dto.getName());
       idProvidersService.saveConfiguration(Dtos.fromDto(dto));
-      return Response.created(uriInfo.getBaseUriBuilder().path("/system/idprovider/" + dto.getName()).build()).build();
+      return Response.created(uriInfo.getBaseUriBuilder().path("/system/idprovider/{name}").build(dto.getName())).build();
     } catch (IOException e) {
       log.error("Save OIDC configuration failed", e);
       return Response.serverError().build();
