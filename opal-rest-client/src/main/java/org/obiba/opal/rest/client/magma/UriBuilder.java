@@ -50,12 +50,15 @@ public class UriBuilder {
 
   /**
    * Adds the segments and query of a link as served by Opal. Links are percent-encoded, and build() encodes again, so
-   * they are decoded first; a path an older server left raw is taken as is.
+   * they are decoded first, segment by segment so that an encoded slash stays in its name; a segment an older server
+   * left raw is taken as is.
    */
   public UriBuilder link(String link) {
     int idx = link.indexOf('?');
     String path = idx > 0 ? link.substring(0, idx) : link;
-    segment(decodePath(path).substring(1).split("/"));
+    for(String segment : path.substring(1).split("/")) {
+      segment(decodeSegment(segment));
+    }
     if(idx > 0) {
       for(String q : link.substring(idx + 1).split("&")) {
         int eq = q.indexOf('=');
@@ -66,11 +69,11 @@ public class UriBuilder {
     return this;
   }
 
-  private static String decodePath(String path) {
+  private static String decodeSegment(String segment) {
     try {
-      return new URI(path).getPath();
+      return new URI(segment).getPath();
     } catch(URISyntaxException e) {
-      return path;
+      return segment;
     }
   }
 
