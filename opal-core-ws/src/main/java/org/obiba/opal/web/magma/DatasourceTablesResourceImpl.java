@@ -159,7 +159,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   private Response createTableInternal(TableDto table) {
-    if("*".equals(table.getName())) {
+    if (ReservedNames.isReserved(table.getName())) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "ReservedTableName").build()).build();
     }

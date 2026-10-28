@@ -209,7 +209,7 @@ public class DatasourceResource {
       return Response.status(BAD_REQUEST).build();
     }
 
-    if ("*".equals(viewDto.getName())) {
+    if (ReservedNames.isReserved(viewDto.getName())) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ReservedTableName").build()).build();
     }

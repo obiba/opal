@@ -75,7 +75,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
     if (isResourceView() && !viewDto.hasExtension(Magma.ResourceViewDto.view))
       return Response.status(Status.BAD_REQUEST).build();
 
-    if ("*".equals(viewDto.getName()))
+    if (ReservedNames.isReserved(viewDto.getName()))
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "ReservedTableName").build()).build();
 
