@@ -46,7 +46,6 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
-import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
@@ -54,7 +53,6 @@ import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.runtime.OpalFileSystemService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
-import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -81,8 +79,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -133,9 +129,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private EventBus eventBus;
-
-  @Autowired
-  private OpalGeneralConfigService opalGeneralConfigService;
 
   private Map<String, String> entityIdMap;
 
@@ -538,19 +531,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   /**
-   * Returns the decoded local file
-   * NOTE: newer VFS versions encode the file path, decode path to remove escape characters.
-   * @param path
-   * @return new File instance
-   * @throws UnsupportedEncodingException
-   */
-  private File getDecodedFile(String path) throws UnsupportedEncodingException {
-    // Remove the possible escape characters that will cause errors when creating folders
-    OpalGeneralConfig config = opalGeneralConfigService.getConfig();
-    return new File(URLDecoder.decode(path, config.getDefaultCharacterSet()));
-  }
-
-  /**
    * Get the output file to which the metadata will be exported to.
    *
    * @return The output file.
@@ -679,7 +659,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
       if (outputFile.getType() == FileType.FOLDER) {
-        return getMultipleFileCsvDatasource(getDecodedFile(getLocalFile(outputFile).getPath()));
+        return getMultipleFileCsvDatasource(getLocalFile(outputFile));
       }
       return null;
     }
@@ -798,7 +778,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           }
         };
         List<File> outFiles = Lists.newArrayList();
-        File outFile = getDecodedFile(getLocalFile(outputFile).getPath());
+        File outFile = getLocalFile(outputFile);
         FileUtil.delete(outFile);
         if (getValueTables().size() == 1) {
           outFiles.add(outFile);

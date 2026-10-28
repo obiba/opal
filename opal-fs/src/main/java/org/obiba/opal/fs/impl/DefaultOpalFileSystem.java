@@ -128,7 +128,8 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
         String virtualFileURL = virtualFile.getURL().toString();
         String nativeFileURL = virtualFileURL.replace(root.getURL().toString(), nativeRootURL);
         String encodedPath = nativeFileURL.replaceFirst("[a-zA-Z]*[0-9]?://", "");
-        String decodedPath = URLDecoder.decode(encodedPath, "UTF-8");
+        // VFS percent-encodes the URL but leaves + literal; URLDecoder alone would turn it into a space
+        String decodedPath = URLDecoder.decode(encodedPath.replace("+", "%2B"), "UTF-8");
         return new File(decodedPath);
       }
       return convertVirtualFileToLocal(virtualFile);
