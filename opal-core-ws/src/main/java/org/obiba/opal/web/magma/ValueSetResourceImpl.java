@@ -136,7 +136,8 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
           @Override
           public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfo.getPath(false) + "/variable/" + Dtos.encodeSegment(fromVariable.getName()) + "/value";
+            // the request may be variable-scoped already (.../valueSet/id/variable/x)
+            String link = uriInfo.getPath(false).replaceFirst("/variable/[^/]+$", "") + "/variable/" + Dtos.encodeSegment(fromVariable.getName()) + "/value";
             Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return Dtos.asDto(link, value, filterBinary).build();
           }

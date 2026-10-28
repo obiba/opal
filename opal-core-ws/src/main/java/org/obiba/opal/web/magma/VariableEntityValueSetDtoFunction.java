@@ -42,11 +42,11 @@ public class VariableEntityValueSetDtoFunction implements Function<ValueSet, Mag
   }
 
   /**
-   * Link of one value, from the encoded path of the {@code .../valueSets} request: the last segment is replaced, so a
-   * table whose name contains "valueSets" is left alone.
+   * Link of one value, from the encoded path of the {@code .../valueSets} or {@code .../valueSets/variable/x} request:
+   * the trailing segments are replaced, so a table whose name contains "valueSets" is left alone.
    */
   static String valueLink(String valueSetsPath, String entityIdentifier, String variableName) {
-    return valueSetsPath.replaceFirst("/valueSets$", "/valueSet/entity/" + Dtos.encodeSegment(entityIdentifier) +
+    return valueSetsPath.replaceFirst("/valueSets(/.*)?$", "/valueSet/entity/" + Dtos.encodeSegment(entityIdentifier) +
         "/variable/" + Dtos.encodeSegment(variableName) + "/value");
   }
 
