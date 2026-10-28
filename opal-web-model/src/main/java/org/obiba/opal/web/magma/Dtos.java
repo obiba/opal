@@ -46,8 +46,8 @@ public final class Dtos {
   }
 
   /**
-   * Percent-encode one path segment of a link, the way {@code UriBuilder} does for the links of variables and projects,
-   * so that a client can decode every link the same way whatever the name holds.
+   * Percent-encode one path segment of a link. Every link the server hands out goes through here, so that the same
+   * table has the same link whichever endpoint produced it, and a client can decode them all the same way.
    */
   public static String encodeSegment(String segment) {
     return URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20");

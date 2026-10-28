@@ -59,15 +59,14 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
-    final UriBuilder uriBuilder = tableUriBuilder(uriInfo);
-    String tableUri = uriBuilder.build().toString();
-    uriBuilder.path(TableResource.class, "getVariable");
+    List<PathSegment> segments = uriInfo.getPathSegments();
+    String tableUri = linkOf(segments.subList(0, segments.size() - 1));
 
     LinkDto.Builder tableLinkBuilder = LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName());
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
     Iterable<VariableDto> entity = Iterables
-        .transform(variables, Functions.compose(input -> input.setLink(uriBuilder.build(input.getName()).toString()).build(),
+        .transform(variables, Functions.compose(input -> input.setLink(tableUri + "/variable/" + Dtos.encodeSegment(input.getName())).build(),
             Dtos.asDtoFunc(tableLinkBuilder.build())));
 
     return entity;
@@ -346,14 +345,15 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
 
-  private static UriBuilder tableUriBuilder(UriInfo uriInfo) {
-    List<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
-    segments.remove(segments.size() - 1);
-    UriBuilder ub = UriBuilder.fromPath("/");
+  /**
+   * Link of the resource at these (decoded) request path segments, encoded like every other link.
+   */
+  static String linkOf(List<PathSegment> segments) {
+    StringBuilder link = new StringBuilder();
     for (PathSegment segment : segments) {
-      ub.segment(segment.getPath());
+      link.append('/').append(Dtos.encodeSegment(segment.getPath()));
     }
-    return ub;
+    return link.toString();
   }
 
 }

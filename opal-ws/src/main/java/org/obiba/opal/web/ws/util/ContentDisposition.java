@@ -31,7 +31,7 @@ public final class ContentDisposition {
   private static String of(String disposition, String fileName) {
     String name = fileName.replaceAll("[\\r\\n]", "");
     String ascii = name.replaceAll("[\"\\\\]", "").replaceAll("[^\\x20-\\x7E]", "_");
-    String encoded = URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
+    String encoded = URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20").replace("*", "%2A");
     return disposition + "; filename=\"" + ascii + "\"; filename*=UTF-8''" + encoded;
   }
 }

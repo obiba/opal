@@ -45,7 +45,9 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   @Override
   public String getNode() {
-    return uri.getPath().replaceFirst("^" + OpalWsConfig.WS_ROOT + "(?=/|$)", "");
+    // an absolute URI was built from the base URI: drop the servlet context path along with the /ws root
+    String path = uri.getPath();
+    return uri.isAbsolute() ? path.replaceFirst("^.*?" + OpalWsConfig.WS_ROOT + "(?=/|$)", "") : path;
   }
 
   @Override
