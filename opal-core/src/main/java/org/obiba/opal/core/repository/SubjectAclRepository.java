@@ -28,21 +28,21 @@ public interface SubjectAclRepository extends JpaRepository<SubjectAcl, Long> {
 
   List<SubjectAcl> findByDomainAndNodeAndType(String domain, String node, SubjectType type);
 
-  List<SubjectAcl> findByDomainAndNodeLikeAndType(String domain, String node, SubjectType type);
+  List<SubjectAcl> findByDomainAndNodeStartingWithAndType(String domain, String node, SubjectType type);
 
   List<SubjectAcl> findByDomainAndType(String domain, SubjectType type);
 
   List<SubjectAcl> findByDomainAndNodeAndPrincipalAndType(String domain, String node, String principal,
                                                           SubjectType type);
 
-  List<SubjectAcl> findByDomainAndNodeLikeAndPrincipalAndType(String domain, String node, String principal,
+  List<SubjectAcl> findByDomainAndNodeStartingWithAndPrincipalAndType(String domain, String node, String principal,
                                                               SubjectType type);
 
   List<SubjectAcl> findByDomainAndNode(String domain, String node);
 
-  List<SubjectAcl> findByDomainAndNodeLike(String domain, String node);
+  List<SubjectAcl> findByDomainAndNodeStartingWith(String domain, String node);
 
-  List<SubjectAcl> findByNodeOrNodeLike(String node, String nodePattern);
+  List<SubjectAcl> findByNodeOrNodeStartingWith(String node, String prefix);
 
   List<SubjectAcl> findByPermission(String permission);
 
