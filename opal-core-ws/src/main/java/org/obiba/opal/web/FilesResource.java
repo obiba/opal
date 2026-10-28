@@ -438,7 +438,7 @@ public class FilesResource {
 
       if (!overwrite) {
         URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path("{name}").build(fileName);
-        OpalPermissions perms = new OpalPermissions(fileUri, AclAction.FILES_ALL);
+        OpalPermissions perms = new OpalPermissions(uriInfo, fileUri, AclAction.FILES_ALL);
         subjectAclService.addSubjectPermission(perms.getDomain(), perms.getNode(),
             SubjectAcl.SubjectType.USER.subjectFor(SecurityUtils.getSubject().getPrincipal().toString()),
             AclAction.FILES_ALL.name());
@@ -492,7 +492,7 @@ public class FilesResource {
       Opal.FileDto dto = getBaseFolderBuilder(file).build();
       URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path("{name}").build(folderName);
       return Response.created(folderUri)//
-          .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
+          .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(uriInfo, folderUri, AclAction.FILES_ALL))//
           .entity(dto).build();
     } catch (FileSystemException couldNotCreateTheFolder) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
@@ -671,9 +671,9 @@ public class FilesResource {
       throw new BadRequestException("Archive file extraction failed.");
 
     Opal.FileDto dto = getBaseFolderBuilder(unzippedFileObj).build();
-    URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(destinationPath).path(destinationFolder.getName()).build();
+    URI folderUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(destinationPath).path("{name}").build(destinationFolder.getName());
     return Response.created(folderUri)//
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(uriInfo, folderUri, AclAction.FILES_ALL))//
         .entity(dto).build();
   }
 

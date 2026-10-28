@@ -231,7 +231,7 @@ public class DatasourceResource {
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
     return Response.created(viewUri)
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, action)).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(uriInfo, viewUri, action)).build();
   }
 
   @GET

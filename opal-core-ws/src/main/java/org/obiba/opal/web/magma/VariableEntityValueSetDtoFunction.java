@@ -46,7 +46,7 @@ public class VariableEntityValueSetDtoFunction implements Function<ValueSet, Mag
    * the trailing segments are replaced, so a table whose name contains "valueSets" is left alone.
    */
   static String valueLink(String valueSetsPath, String entityIdentifier, String variableName) {
-    return valueSetsPath.replaceFirst("/valueSets(/variable/[^/]+)?$", "/valueSet/entity/" + Dtos.encodeSegment(entityIdentifier) +
+    return valueSetsPath.replaceFirst("/valueSets(/variable/[^/]+)?/?$", "/valueSet/entity/" + Dtos.encodeSegment(entityIdentifier) +
         "/variable/" + Dtos.encodeSegment(variableName) + "/value");
   }
 

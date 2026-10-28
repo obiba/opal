@@ -22,6 +22,8 @@ public class VariableEntityValueSetDtoFunctionTest {
         .isEqualTo("/datasource/p/table/t/valueSet/entity/1/variable/v/value");
     assertThat(valueLink("/datasource/p/table/t/valueSets/variable/a%20b", "1", "a b"))
         .isEqualTo("/datasource/p/table/t/valueSet/entity/1/variable/a%20b/value");
+    assertThat(valueLink("/datasource/p/table/t/valueSets/", "1", "v"))
+        .isEqualTo("/datasource/p/table/t/valueSet/entity/1/variable/v/value");
     assertThat(valueLink("/datasource/p/table/valueSets/valueSets", "1", "v"))
         .isEqualTo("/datasource/p/table/valueSets/valueSet/entity/1/variable/v/value");
   }
