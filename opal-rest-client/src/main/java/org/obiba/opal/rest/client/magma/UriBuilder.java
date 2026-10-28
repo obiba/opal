@@ -12,6 +12,7 @@ package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -48,8 +49,8 @@ public class UriBuilder {
   }
 
   /**
-   * Adds the segments of a link as served by Opal. Links are percent-encoded, and build() encodes the segments again, so
-   * they are decoded first; a link an older server left raw is taken as is.
+   * Adds the segments and query of a link as served by Opal. Links are percent-encoded, and build() encodes again, so
+   * they are decoded first; a path an older server left raw is taken as is.
    */
   public UriBuilder link(String link) {
     int idx = link.indexOf('?');
@@ -57,7 +58,9 @@ public class UriBuilder {
     segment(decodePath(path).substring(1).split("/"));
     if(idx > 0) {
       for(String q : link.substring(idx + 1).split("&")) {
-        query(q.split("="));
+        int eq = q.indexOf('=');
+        query(URLDecoder.decode(eq < 0 ? q : q.substring(0, eq), StandardCharsets.UTF_8),
+            eq < 0 ? "" : URLDecoder.decode(q.substring(eq + 1), StandardCharsets.UTF_8));
       }
     }
     return this;
