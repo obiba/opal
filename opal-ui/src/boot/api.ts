@@ -57,18 +57,19 @@ api.interceptors.response.use(
     ) {
       // verify that user is still logged in
       console.debug('error', error);
-      api.get(PROFILE_PATH)
-      .then(() => {
-        // user is still logged in
-        if (isReAuthError(error)) {
-          const authStore = useAuthStore();
-          authStore.reAuthRequired = true;
-        }
-      })
-      .catch(() => {
-        // reload to redirect to sign in page (and reset app state)
-        window.location.replace(contextPath);
-      });
+      api
+        .get(PROFILE_PATH)
+        .then(() => {
+          // user is still logged in
+          if (isReAuthError(error)) {
+            const authStore = useAuthStore();
+            authStore.reAuthRequired = true;
+          }
+        })
+        .catch(() => {
+          // reload to redirect to sign in page (and reset app state)
+          window.location.replace(contextPath);
+        });
     }
     return Promise.reject(error);
   },
@@ -86,4 +87,31 @@ export default defineBoot(({ app }) => {
   //       so you can easily perform requests against your app's API
 });
 
-export { api, baseUrl, contextPath };
+/** Tagged template for request paths: every interpolated value is percent-encoded as one path segment. */
+function u(strings: TemplateStringsArray, ...values: unknown[]): string {
+  return strings.reduce(
+    (out, str, i) => out + str + (i < values.length ? encodeURIComponent(String(values[i])) : ''),
+    '',
+  );
+}
+
+/** Percent-encodes each segment of a path that already holds slashes, such as a file path or a permission resource. */
+function encodePath(path: string): string {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
+/** Decodes a link as served by Opal; a segment that is not valid percent-encoding is kept as is. */
+function decodePath(path: string): string {
+  return path
+    .split('/')
+    .map((s) => {
+      try {
+        return decodeURIComponent(s);
+      } catch {
+        return s;
+      }
+    })
+    .join('/');
+}
+
+export { api, baseUrl, contextPath, u, encodePath, decodePath };

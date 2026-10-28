@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api, baseUrl } from 'src/boot/api';
+import { api, baseUrl, u, encodePath } from 'src/boot/api';
 import type { ProjectDto, ProjectSummaryDto, ProjectDto_IdentifiersMappingDto } from 'src/models/Projects';
 import { ProjectDatasourceStatusDto } from 'src/models/Projects';
 import type { Acl } from 'src/models/Opal';
@@ -30,7 +30,7 @@ interface ProjectPerms {
   project: Perms | undefined;
   keystore: Perms | undefined;
   reload: Perms | undefined;
-  
+
   vcfstore: Perms | undefined;
   samples: Perms | undefined;
   vcfs: Perms | undefined;
@@ -107,7 +107,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function doLoadProject(name: string) {
-    return api.get(`/project/${name}`).then((response) => {
+    return api.get(u`/project/${name}`).then((response) => {
       project.value = response.data;
       return Promise.all([
         api.options(`/project/${project.value.name}`).then((response) => {
@@ -189,14 +189,14 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function updateProject(toUpdate: ProjectDto) {
-    return api.put(`/project/${toUpdate.name}`, toUpdate).then((response) => {
+    return api.put(u`/project/${toUpdate.name}`, toUpdate).then((response) => {
       if (toUpdate.name === project.value.name) project.value = toUpdate;
       return response;
     });
   }
 
   async function deleteProject(toDelete: ProjectDto) {
-    return api.delete(`/project/${toDelete.name}`).then((response) => {
+    return api.delete(u`/project/${toDelete.name}`).then((response) => {
       if (toDelete.name === project.value.name) project.value = {} as ProjectDto;
       return response;
     });
@@ -209,27 +209,27 @@ export const useProjectsStore = defineStore('projects', () => {
    */
   async function loadSummary() {
     summary.value = {} as ProjectSummaryDto;
-    return api.get(`/project/${project.value.name}/summary`).then((response) => {
+    return api.get(u`/project/${project.value.name}/summary`).then((response) => {
       summary.value = response.data;
       return response;
     });
   }
 
   async function copyCommand(name: string, options: CopyCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_copy`, options);
+    return api.post(u`/project/${name}/commands/_copy`, options);
   }
 
   async function exportCommand(name: string, options: ExportCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_export`, options);
+    return api.post(u`/project/${name}/commands/_export`, options);
   }
 
   async function importCommand(name: string, options: ImportCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_import`, options);
+    return api.post(u`/project/${name}/commands/_import`, options);
   }
 
   async function loadCommandStates() {
     commandStates.value = [];
-    return api.get(`/project/${project.value.name}/commands`).then((response) => {
+    return api.get(u`/project/${project.value.name}/commands`).then((response) => {
       commandStates.value = response.data;
       return response;
     });
@@ -237,32 +237,32 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function clearCommandStates(commands: CommandStateDto[]) {
     if (commands.length === 0) {
-      return api.delete(`/project/${project.value.name}/commands/completed`).then((response) => {
+      return api.delete(u`/project/${project.value.name}/commands/completed`).then((response) => {
         commandStates.value = [];
         return response;
       });
     } else {
-      return Promise.all(commands.map((cmd) => api.delete(`/project/${project.value.name}/command/${cmd.id}`)));
+      return Promise.all(commands.map((cmd) => api.delete(u`/project/${project.value.name}/command/${cmd.id}`)));
     }
   }
 
   function cancelCommandState(command: CommandStateDto) {
-    return api.put(`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
+    return api.put(u`/shell/command/${command.id}/status`, CommandStateDto_Status.CANCELED, {
       headers: { 'Content-Type': 'text/plain' },
     });
   }
 
   async function reloadDbCommand(name: string) {
-    return api.post(`/project/${name}/commands/_reload`);
+    return api.post(u`/project/${name}/commands/_reload`);
   }
 
   async function getState(name: string): Promise<ProjectDatasourceStatusDto> {
-    return api.get(`/project/${name}/state`).then((response) => response.data);
+    return api.get(u`/project/${name}/state`).then((response) => response.data);
   }
 
   async function loadAcls(project: ProjectDto) {
     acls.value = [];
-    return api.get(`/project/${project.name}/permissions/project`).then((response) => {
+    return api.get(u`/project/${project.name}/permissions/project`).then((response) => {
       acls.value = response.data;
       return response;
     });
@@ -270,14 +270,14 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function loadSubjects() {
     subjects.value = [] as Subject[];
-    return api.get(`/project/${project.value.name}/permissions/subjects`).then((response) => {
+    return api.get(u`/project/${project.value.name}/permissions/subjects`).then((response) => {
       subjects.value = response.data;
       return response;
     });
   }
 
   async function deleteSubject(subject: Subject) {
-    return api.delete(`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
+    return api.delete(u`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
       params: { type: subject.type },
     });
   }
@@ -297,48 +297,48 @@ export const useProjectsStore = defineStore('projects', () => {
       .replace(/^\//, '')
       .replace(/^project.*/, 'project')
       .replace(/^datasource\/[^/]+$/, 'datasource')
-      .replace(/.*(table|view)/, 'table');
+      .replace(/^datasource\/[^/]+\/(table|view)\//, 'table/');
 
     const params = { principal: subject.principal, type: subject.type };
-    return api.delete(`/project/${project.value.name}/permissions/${resource}`, {
+    return api.delete(u`/project/${project.value.name}/permissions/` + encodePath(resource), {
       params,
     });
   }
 
   async function backup(project: ProjectDto, options: BackupCommandOptionsDto) {
-    return api.post(`/project/${project.name}/commands/_backup`, options);
+    return api.post(u`/project/${project.name}/commands/_backup`, options);
   }
 
   async function restore(project: ProjectDto, options: RestoreCommandOptionsDto) {
-    return api.post(`/project/${project.name}/commands/_restore`, options);
+    return api.post(u`/project/${project.name}/commands/_restore`, options);
   }
 
   async function archive(project: ProjectDto) {
-    return api.delete(`/project/${project.name}`, { params: { archive: true } });
+    return api.delete(u`/project/${project.name}`, { params: { archive: true } });
   }
 
   async function getIdMappings(name: string) {
-    return api.get(`/project/${name}/identifiers-mappings`).then((response) => response.data);
+    return api.get(u`/project/${name}/identifiers-mappings`).then((response) => response.data);
   }
 
   async function getVcfStore(name: string) {
-    return api.get(`/project/${name}/vcf-store`).then((response) => response.data);
+    return api.get(u`/project/${name}/vcf-store`).then((response) => response.data);
   }
 
   async function getVcfSamplesMapping(name: string) {
-    return api.get(`/project/${name}/vcf-store/samples`).then((response) => response.data);
+    return api.get(u`/project/${name}/vcf-store/samples`).then((response) => response.data);
   }
 
   async function addVcfSamplesMapping(name: string, mapping: VCFSamplesMappingDto) {
-    return api.put(`/project/${name}/vcf-store/samples`, mapping);
+    return api.put(u`/project/${name}/vcf-store/samples`, mapping);
   }
 
   async function deleteVcfSamplesMapping(name: string) {
-    return api.delete(`/project/${name}/vcf-store/samples`);
+    return api.delete(u`/project/${name}/vcf-store/samples`);
   }
 
   async function getVcfs(name: string) {
-    return api.get(`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
+    return api.get(u`/project/${name}/vcf-store/vcfs`).then((response) => response.data);
   }
 
   async function deleteVcf(name: string, files: string[]) {
@@ -353,11 +353,11 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function importVcfFiles(name: string, importOptions: ImportVCFCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_import_vcf`, importOptions).then((response) => response.data.id);
+    return api.post(u`/project/${name}/commands/_import_vcf`, importOptions).then((response) => response.data.id);
   }
 
   async function exportVcfFiles(name: string, exportOptions: ExportVCFCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_export_vcf`, exportOptions).then((response) => response.data.id);
+    return api.post(u`/project/${name}/commands/_export_vcf`, exportOptions).then((response) => response.data.id);
   }
 
   async function addIdMappings(project: ProjectDto, mapping: ProjectDto_IdentifiersMappingDto) {
@@ -383,39 +383,39 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function getKeyPairs(name: string) {
-    return api.get(`/project/${name}/keystore`).then((response) => response.data);
+    return api.get(u`/project/${name}/keystore`).then((response) => response.data);
   }
 
   async function addKeyPair(name: string, keyPair: KeyForm) {
-    return api.post(`/project/${name}/keystore`, keyPair);
+    return api.post(u`/project/${name}/keystore`, keyPair);
   }
 
   async function deleteKeyPair(name: string, alias: string) {
-    return api.delete(`/project/${name}/keystore/${alias}`);
+    return api.delete(u`/project/${name}/keystore/${alias}`);
   }
 
   async function getAnalysis(name: string, table: string, analysisName: string) {
-    return api.get(`/project/${name}/table/${name}/analysis/${analysisName}`).then((response) => response.data);
+    return api.get(u`/project/${name}/table/${table}/analysis/${analysisName}`).then((response) => response.data);
   }
 
   async function getAnalyses(name: string, table: string) {
-    return api.get(`/project/${name}/table/${table}/analyses`).then((response) => response.data);
+    return api.get(u`/project/${name}/table/${table}/analyses`).then((response) => response.data);
   }
 
   async function runAnalysis(name: string, analysis: AnalyseCommandOptionsDto) {
-    return api.post(`/project/${name}/commands/_analyse`, analysis).then((response) => response.data.id);
+    return api.post(u`/project/${name}/commands/_analyse`, analysis).then((response) => response.data.id);
   }
 
   async function removeAnalysis(name: string, table: string, analysisName: string) {
-    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}`);
+    return api.delete(u`/project/${name}/table/${table}/analysis/${analysisName}`);
   }
 
   function getAnalysisReportUrl(name: string, table: string, analysisName: string, resultId: string) {
-    return `${baseUrl}/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}/_report`;
+    return baseUrl + u`/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}/_report`;
   }
 
   async function removeAnalysisResult(name: string, table: string, analysisName: string, resultId: string) {
-    return api.delete(`/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}`);
+    return api.delete(u`/project/${name}/table/${table}/analysis/${analysisName}/result/${resultId}`);
   }
 
   return {

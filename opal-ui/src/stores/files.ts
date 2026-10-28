@@ -1,16 +1,17 @@
 import { defineStore } from 'pinia';
-import { api, baseUrl } from 'src/boot/api';
+import { api, baseUrl, u, encodePath } from 'src/boot/api';
 import { type FileDto, FileDto_FileType } from 'src/models/Opal';
 import type { FileObject } from 'src/components/models';
 import { type CommandStateDto, CommandStateDto_Status, type FileBundleCommandOptionsDto } from 'src/models/Commands';
 import { useAuthStore } from 'src/stores/auth';
 
-export const useFilesStore = defineStore('files',
+export const useFilesStore = defineStore(
+  'files',
   () => {
     const current = ref({} as FileDto);
     const copySelection = ref<FileDto[]>([]);
     const cutSelection = ref<FileDto[]>([]);
-    const managedCommands = ref<number[]>([])
+    const managedCommands = ref<number[]>([]);
 
     function reset() {
       current.value = {} as FileDto;
@@ -19,7 +20,7 @@ export const useFilesStore = defineStore('files',
     }
 
     async function getFile(path: string) {
-      return api.get(`/files/_meta${path}`).then((response) => {
+      return api.get('/files/_meta' + encodePath(path)).then((response) => {
         return response.data;
       });
     }
@@ -35,14 +36,14 @@ export const useFilesStore = defineStore('files',
     }
 
     async function loadFiles(path: string) {
-      return api.get(`/files/_meta${path}`).then((response) => {
+      return api.get('/files/_meta' + encodePath(path)).then((response) => {
         current.value = response.data;
         return response;
       });
     }
 
     async function getFileContent(path: string): Promise<Blob> {
-      return api.get(`/files${path}`, { responseType: 'blob' }).then((response) => response.data as Blob);
+      return api.get('/files' + encodePath(path), { responseType: 'blob' }).then((response) => response.data as Blob);
     }
 
     function downloadFile(path: string) {
@@ -52,7 +53,7 @@ export const useFilesStore = defineStore('files',
     function downloadFiles(path: string, files: FileDto[], password: string | undefined) {
       if (password) {
         return api
-          .get(`/files${path}`, {
+          .get('/files' + encodePath(path), {
             params: {
               file: files.map((f) => f.name),
             },
@@ -77,13 +78,14 @@ export const useFilesStore = defineStore('files',
             return response;
           });
       } else {
-        let uri = `${baseUrl}/files${path}`;
+        let uri = baseUrl + '/files' + encodePath(path);
         if (files && files.length > 0) {
           if (files.length > 1) {
-            uri += '?';
-            files.forEach((f) => (uri += `&file=${f.name}`));
+            const params = new URLSearchParams();
+            files.forEach((f) => params.append('file', f.name));
+            uri += '?' + params;
           } else if (files[0]) {
-            uri += `/${files[0].name}`;
+            uri += u`/${files[0].name}`;
           }
         }
         window.open(uri, '_self');
@@ -93,20 +95,19 @@ export const useFilesStore = defineStore('files',
     async function createFileBundle(paths: string[], password: string | undefined): Promise<CommandStateDto> {
       const payload: FileBundleCommandOptionsDto = { paths };
       if (password) payload['password'] = password;
-      return api.post('/shell/commands/_file-bundle', payload)
-        .then((r) => {
-          const command = r.data as CommandStateDto;
-          managedCommands.value.push(command.id);
-          return command;
-        });
+      return api.post('/shell/commands/_file-bundle', payload).then((r) => {
+        const command = r.data as CommandStateDto;
+        managedCommands.value.push(command.id);
+        return command;
+      });
     }
 
     async function getCommand(id: number): Promise<CommandStateDto> {
-      return api.get(`/shell/command/${id}`).then((r) => r.data as CommandStateDto);
+      return api.get(u`/shell/command/${id}`).then((r) => r.data as CommandStateDto);
     }
 
     async function downloadCommandResult(id: number): Promise<void> {
-      return api.get(`/shell/command/${id}/_result`, { responseType: 'blob' }).then((response) => {
+      return api.get(u`/shell/command/${id}/_result`, { responseType: 'blob' }).then((response) => {
         const disposition: string = response.headers['content-disposition'] ?? '';
         const match = disposition.match(/filename="?([^"]+)"?/);
         const fileName = match ? match[1] || 'download.zip' : 'download.zip';
@@ -127,7 +128,7 @@ export const useFilesStore = defineStore('files',
 
     function deleteCommand(id: number): Promise<void> {
       managedCommands.value = managedCommands.value.filter((cmdId) => cmdId !== id);
-      return api.delete(`/shell/command/${id}`).then(() => undefined);
+      return api.delete(u`/shell/command/${id}`).then(() => undefined);
     }
 
     async function getPendingFileDownloadCommands(): Promise<CommandStateDto[]> {
@@ -146,7 +147,9 @@ export const useFilesStore = defineStore('files',
           return (
             isCommandManaged(cmd.id) &&
             cmd.command?.includes('file-bundle') &&
-            (cmd.status === CommandStateDto_Status.NOT_STARTED || cmd.status === CommandStateDto_Status.IN_PROGRESS || cmd.status === CommandStateDto_Status.SUCCEEDED) &&
+            (cmd.status === CommandStateDto_Status.NOT_STARTED ||
+              cmd.status === CommandStateDto_Status.IN_PROGRESS ||
+              cmd.status === CommandStateDto_Status.SUCCEEDED) &&
             cmd.owner === currentUser
           );
         });
@@ -160,7 +163,7 @@ export const useFilesStore = defineStore('files',
     }
 
     function addFolder(path: string, folderName: string) {
-      return api.post(`/files${path}`, folderName, {
+      return api.post('/files' + encodePath(path), folderName, {
         headers: {
           'Content-Type': 'text/plain',
         },
@@ -172,7 +175,7 @@ export const useFilesStore = defineStore('files',
       files.forEach((f) => {
         formData.append('attachment', f);
       });
-      return api.post(`/files${path}`, formData, {
+      return api.post('/files' + encodePath(path), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -187,17 +190,17 @@ export const useFilesStore = defineStore('files',
         key,
       };
 
-      return api.post(`/files${path}`, {}, { params });
+      return api.post('/files' + encodePath(path), {}, { params });
     }
 
     function deleteFile(path: string) {
-      return api.delete(`/files${path}`);
+      return api.delete('/files' + encodePath(path));
     }
 
     function deleteFiles(files: FileDto[]) {
       return Promise.all(
         files.map((f) => {
-          return api.delete(`/files${f.path}`);
+          return api.delete('/files' + encodePath(f.path));
         }),
       );
     }
@@ -217,11 +220,13 @@ export const useFilesStore = defineStore('files',
       const params = {
         action: copySelection.value.length > 0 ? 'copy' : 'move',
         file:
-          copySelection.value.length > 0 ? copySelection.value.map((f) => f.path) : cutSelection.value.map((f) => f.path),
+          copySelection.value.length > 0
+            ? copySelection.value.map((f) => f.path)
+            : cutSelection.value.map((f) => f.path),
       };
       return api
         .put(
-          `/files${path}`,
+          '/files' + encodePath(path),
           {},
           {
             params,
@@ -256,7 +261,7 @@ export const useFilesStore = defineStore('files',
       parts.push(newName);
       const newPath = `/${parts.join('/')}`;
       // check if file exists
-      return api.head(`/files${newPath}`).then(
+      return api.head('/files' + encodePath(newPath)).then(
         () => {
           return Promise.reject('file_already_exists');
         },
@@ -265,7 +270,7 @@ export const useFilesStore = defineStore('files',
             action: 'move',
             file: path,
           };
-          return api.put(`/files${newPath}`, {}, { params });
+          return api.put('/files' + encodePath(newPath), {}, { params });
         },
       );
     }
@@ -314,7 +319,7 @@ export const useFilesStore = defineStore('files',
   },
   {
     persist: {
-      pick: ['managedCommands']
-    }
+      pick: ['managedCommands'],
+    },
   },
 );

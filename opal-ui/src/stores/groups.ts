@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { GroupDto } from 'src/models/Opal';
 
 export const useGroupsStore = defineStore('groups', () => {
@@ -21,7 +21,7 @@ export const useGroupsStore = defineStore('groups', () => {
   }
 
   async function deleteGroup(group: GroupDto) {
-    return api.delete(`/system/group/${group.name}`).then(() => loadGroups());
+    return api.delete(u`/system/group/${group.name}`).then(() => loadGroups());
   }
 
   return {

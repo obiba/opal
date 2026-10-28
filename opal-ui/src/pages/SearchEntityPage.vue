@@ -169,7 +169,9 @@ function onSubmit() {
       if (response.length > 0) {
         // if there is a table in the app context state, select it
         if (datasourceStore.table) {
-          const tbl = tables.value?.find((t) => t.link === datasourceStore.table.link);
+          const tbl = tables.value?.find(
+            (t) => t.datasourceName === datasourceStore.table.datasourceName && t.name === datasourceStore.table.name,
+          );
           // check if the table is in the list
           if (tbl) {
             tableId.value = asTableId(tbl);

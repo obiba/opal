@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { TableDto, VariableDto } from 'src/models/Magma';
 import type { IdentifiersMappingDto } from 'src/models/Identifiers';
 
@@ -36,7 +36,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function deleteIdentifierTable(identifier: TableDto) {
-    return api.delete(`/identifiers/table/${identifier.name}`);
+    return api.delete(u`/identifiers/table/${identifier.name}`);
   }
 
   async function initMappings(idTableName: string) {
@@ -45,7 +45,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function loadMappings(idTableName: string) {
-    return api.get(`/identifiers/table/${idTableName}/variables`).then((response) => {
+    return api.get(u`/identifiers/table/${idTableName}/variables`).then((response) => {
       mappings.value = response.data;
       return response;
     });
@@ -58,7 +58,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function addMappings(idTableName: string, mappings: VariableDto[]) {
-    return api.post(`/identifiers/table/${idTableName}/variables`, mappings);
+    return api.post(u`/identifiers/table/${idTableName}/variables`, mappings);
   }
 
   async function addMapping(idTableName: string, mappings: VariableDto) {
@@ -66,11 +66,11 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function updateMapping(idTableName: string, mapping: VariableDto) {
-    return api.put(`/identifiers/table/${idTableName}/variable/${mapping.name}`, mapping);
+    return api.put(u`/identifiers/table/${idTableName}/variable/${mapping.name}`, mapping);
   }
 
   async function deleteMapping(idTableName: string, mappingName: string) {
-    return api.delete(`/identifiers/table/${idTableName}/variable/${mappingName}`);
+    return api.delete(u`/identifiers/table/${idTableName}/variable/${mappingName}`);
   }
 
   async function getMappingIdentifiersCount(entityType: string, mappingName: string) {
@@ -80,7 +80,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
   }
 
   async function generateMapping(entityType: string, mappingName: string, options: GenerateIdentifiersOptions) {
-    return api.post(`/identifiers/mapping/${mappingName}/_generate`, null, {
+    return api.post(u`/identifiers/mapping/${mappingName}/_generate`, null, {
       params: { type: entityType, ...options },
     });
   }
@@ -102,7 +102,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
     content: string,
     separator?: string,
   ) {
-    return api.post(`/identifiers/mapping/${mappingName}/_import`, content, {
+    return api.post(u`/identifiers/mapping/${mappingName}/_import`, content, {
       params: separator ? { type: entityType, separator } : { type: entityType },
       headers: { 'Content-Type': 'text/plain' },
     });

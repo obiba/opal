@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u, encodePath } from 'src/boot/api';
 import { type Acl, Subject_SubjectType, type SubjectProfileDto } from 'src/models/Opal';
 
 export const useProfileAclsStore = defineStore('profileAcls', () => {
@@ -24,7 +24,7 @@ export const useProfileAclsStore = defineStore('profileAcls', () => {
   }
 
   async function loadAcls(principal: string, type: Subject_SubjectType) {
-    return api.get(`/authz-subject/${principal}`, { params: { type } }).then((response) => {
+    return api.get(u`/authz-subject/${principal}`, { params: { type } }).then((response) => {
       if (type === Subject_SubjectType.USER) {
         acls.value = response.data;
       } else {
@@ -35,7 +35,7 @@ export const useProfileAclsStore = defineStore('profileAcls', () => {
 
   async function deleteAcls(acls: Acl[]) {
     const requests = acls.map((acl) =>
-      api.delete(`/authz/${acl.resource.replace(/^\//, '')}`, {
+      api.delete('/authz/' + encodePath(acl.resource.replace(/^\//, '')), {
         params: { subject: acl.subject?.principal, perm: acl.actions.pop() || '', type: acl.subject?.type },
       }),
     );

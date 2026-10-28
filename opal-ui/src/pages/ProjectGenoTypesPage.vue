@@ -23,7 +23,11 @@
         align="justify"
       >
         <q-tab name="vcf" :label="t('vcf')" />
-        <q-tab name="permissions" :label="t('permissions')" v-if="projectsStore.perms.permissions_vcfstore?.canRead()" />
+        <q-tab
+          name="permissions"
+          :label="t('permissions')"
+          v-if="projectsStore.perms.permissions_vcfstore?.canRead()"
+        />
       </q-tabs>
 
       <q-separator />
@@ -197,7 +201,7 @@ import AddVcfMappingTableDialog from 'src/components/project/AddVcfMappingTableD
 import ImportVcfFileDialog from 'src/components/project/ImportVcfFileDialog.vue';
 import ExportVcfFileDialog from 'src/components/project/ExportVcfFileDialog.vue';
 import { getSizeLabel } from 'src/utils/files';
-import { baseUrl } from 'src/boot/api';
+import { baseUrl, u } from 'src/boot/api';
 import { DefaultAlignment } from 'src/components/models';
 
 const { t } = useI18n();
@@ -483,7 +487,7 @@ function onExportedVcfs() {
 }
 
 async function onGetStats() {
-  window.open(`${baseUrl}/project/${projectsStore.project.name}/vcf-store/vcf/plate/_statistics`);
+  window.open(baseUrl + u`/project/${projectsStore.project.name}/vcf-store/vcf/plate/_statistics`);
 }
 
 onMounted(() => {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { AppDto, AppsConfigDto } from 'src/models/Apps';
 
 export const useAppsStore = defineStore('apps', () => {
@@ -24,7 +24,7 @@ export const useAppsStore = defineStore('apps', () => {
   }
 
   async function unregisterApp(id: string) {
-    return api.delete(`/app/${id}`);
+    return api.delete(u`/app/${id}`);
   }
 
   async function initConfig() {

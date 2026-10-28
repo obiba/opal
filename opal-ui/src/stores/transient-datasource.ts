@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { DatasourceDto, TableDto, ViewDto, VariableDto } from 'src/models/Magma';
 import type { DatasourceFactory } from 'src/components/models';
 import type { FileDto } from 'src/models/Opal';
@@ -60,7 +60,7 @@ export const useTransientDatasourceStore = defineStore('transientDatasource', ()
 
   async function deleteDatasource() {
     if (!datasource.value.name) return Promise.resolve();
-    return api.delete(`/datasource/${datasource.value.name}`).then(() => {
+    return api.delete(u`/datasource/${datasource.value.name}`).then(() => {
       reset();
     });
   }

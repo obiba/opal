@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
 import type { RServerClusterDto, RSessionDto, RWorkspaceDto, RPackageDto } from 'src/models/OpalR';
 
 export const useRStore = defineStore('r', () => {
@@ -49,23 +49,23 @@ export const useRStore = defineStore('r', () => {
   }
 
   async function getRPackages(clusterId: string): Promise<RPackageDto[]> {
-    return api.get(`/service/r/cluster/${clusterId}/packages`).then((response) => response.data);
+    return api.get(u`/service/r/cluster/${clusterId}/packages`).then((response) => response.data);
   }
 
   async function startRServer(clusterId: string, serverId: string) {
-    return api.put(`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
+    return api.put(u`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
       initClusters();
     });
   }
 
   async function stopRServer(clusterId: string, serverId: string) {
-    return api.delete(`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
+    return api.delete(u`/service/r/cluster/${clusterId}/server/${serverId}`).then(() => {
       Promise.all([initClusters(), initSessions()]);
     });
   }
 
   async function terminateSession(session: RSessionDto) {
-    return api.delete(`/service/r/session/${session.id}`);
+    return api.delete(u`/service/r/session/${session.id}`);
   }
 
   async function terminateSessions(sessions: RSessionDto[]) {
@@ -107,11 +107,11 @@ export const useRStore = defineStore('r', () => {
   }
 
   async function updateRPackages(clusterId: string) {
-    return api.post(`/service/r/cluster/${clusterId}/commands/_update`);
+    return api.post(u`/service/r/cluster/${clusterId}/commands/_update`);
   }
 
   async function deleteRPackage(clusterId: string, packageName: string) {
-    return api.delete(`/service/r/cluster/${clusterId}/package/${packageName}`);
+    return api.delete(u`/service/r/cluster/${clusterId}/package/${packageName}`);
   }
 
   return {
