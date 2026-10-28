@@ -39,7 +39,7 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
 
   @Override
   public String getResourcePath(URI uri) {
-    return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
+    return uri.getPath().replaceFirst("^" + OpalWsConfig.WS_ROOT + "(?=/|$)", "");
   }
 
 

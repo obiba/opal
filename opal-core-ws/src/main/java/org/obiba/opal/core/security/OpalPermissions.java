@@ -45,7 +45,7 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   @Override
   public String getNode() {
-    return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
+    return uri.getPath().replaceFirst("^" + OpalWsConfig.WS_ROOT + "(?=/|$)", "");
   }
 
   @Override
