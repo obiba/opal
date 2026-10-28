@@ -12,6 +12,8 @@ package org.obiba.opal.rest.client.magma;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class UriBuilder {
@@ -80,7 +82,9 @@ public class UriBuilder {
 
   public URI build() {
     try {
-      return root.resolve(new URI(null, null, path(), hasQuery() ? query() : null, null));
+      // the query is encoded here, the multi-argument URI constructor would quote its percent signs again
+      URI uri = root.resolve(new URI(null, null, path(), null, null));
+      return hasQuery() ? URI.create(uri + "?" + query()) : uri;
     } catch(URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -93,7 +97,8 @@ public class UriBuilder {
   private String query() {
     StringBuilder sb = new StringBuilder();
     for(Map.Entry<String, String> e : query.entrySet()) {
-      sb.append(e.getKey()).append('=').append(e.getValue() != null ? e.getValue() : "").append('&');
+      sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)).append('=')
+          .append(e.getValue() != null ? URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8) : "").append('&');
     }
     if(sb.length() > 0) {
       sb.setLength(sb.length() - 1);
