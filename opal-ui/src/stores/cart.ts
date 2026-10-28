@@ -8,7 +8,7 @@ export const useCartStore = defineStore(
     const variables = ref([] as VariableDto[]);
 
     // the single-variable endpoint sets parentLink but no link, so identity is parent table + name
-    const key = (v: VariableDto) => `${v.parentLink?.link}/variable/${v.name}`;
+    const key = (v: VariableDto) => `${v.parentLink?.link}/variable/${encodeURIComponent(v.name)}`;
 
     function reset() {
       variables.value = [];
@@ -20,7 +20,7 @@ export const useCartStore = defineStore(
       await Promise.all(
         variables.value.map((v, i) =>
           api
-            .get(`${v.parentLink?.link}/variable/${v.name}`)
+            .get(`${v.parentLink?.link}/variable/${encodeURIComponent(v.name)}`)
             .then((response) => {
               // replace the variable in the cart with the updated version
               variables.value[i] = response.data;

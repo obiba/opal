@@ -100,7 +100,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function updateTaxonomy(taxonomy: TaxonomyDto, oldName?: string) {
     return api
-      .put(`/system/conf/taxonomy/${oldName ? oldName : taxonomy.name}`, taxonomy)
+      .put(u`/system/conf/taxonomy/${oldName ? oldName : taxonomy.name}`, taxonomy)
       .then((response) => response.data);
   }
 
@@ -117,7 +117,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function updateVocabulary(taxonomyName: string, vocabulary: VocabularyDto, oldName?: string) {
     return api
-      .put(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${oldName ? oldName : vocabulary.name}`, vocabulary)
+      .put(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${oldName ? oldName : vocabulary.name}`, vocabulary)
       .then((response) => response.data);
   }
 
@@ -135,7 +135,7 @@ export const useTaxonomiesStore = defineStore('taxonomies', () => {
 
   async function addTerm(taxonomyName: string, vocabularyName: string, term: TermDto) {
     return api
-      .post(`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/terms`, term)
+      .post(u`/system/conf/taxonomy/${taxonomyName}/vocabulary/${vocabularyName}/terms`, term)
       .then((response) => response.data);
   }
 

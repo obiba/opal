@@ -48,7 +48,7 @@ export const useResourcesStore = defineStore('resources', () => {
         resourceReferences.value = response.data;
         return response;
       }),
-      api.options(`/project/${pName}/permissions/resources`).then((response) => {
+      api.options(u`/project/${pName}/permissions/resources`).then((response) => {
         perms.value.resourcesPermissions = new Perms(response);
         return response;
       }),
@@ -98,11 +98,11 @@ export const useResourcesStore = defineStore('resources', () => {
     perms.value.resource = undefined;
     perms.value.resourcePermissions = undefined;
     return Promise.all([
-      api.options(`/project/${pName}/resource/${name}`).then((response) => {
+      api.options(u`/project/${pName}/resource/${name}`).then((response) => {
         perms.value.resource = new Perms(response);
         return response;
       }),
-      api.options(`/project/${pName}/permissions/resource/${name}`).then((response) => {
+      api.options(u`/project/${pName}/permissions/resource/${name}`).then((response) => {
         perms.value.resourcePermissions = new Perms(response);
         return response;
       }),

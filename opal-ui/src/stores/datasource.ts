@@ -118,9 +118,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadDatasourcePermissions(name: string) {
     return Promise.all([
-      api.options(`/project/${name}/permissions/datasource`),
+      api.options(u`/project/${name}/permissions/datasource`),
       // FIXME: OPTIONS not working for datasource SQL endpoint
-      api.options(`/datasource/${name}/_sql`),
+      api.options(u`/datasource/${name}/_sql`),
     ]).then(([datasourcePermissions, datasourceSql]) => {
       perms.value.datasourcePermissions = new Perms(datasourcePermissions);
       perms.value.datasourceSql = new Perms(datasourceSql);
@@ -147,18 +147,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
     variables.value = [];
     perms.value.variables = undefined;
     return api
-      .get(`/datasource/${datasource.value.name}/table/${name}`, { params: { counts: true } })
+      .get(u`/datasource/${datasource.value.name}/table/${name}`, { params: { counts: true } })
       .then((response) => {
         perms.value.table = new Perms(response);
         table.value = response.data;
         return Promise.all([
           table.value.viewType !== undefined ? loadView(name) : Promise.resolve(),
           loadTableVariables(),
-          api.options(`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
+          api.options(u`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
             perms.value.tableValueSets = new Perms(response);
             return response;
           }),
-          api.options(`/project/${datasource.value.name}/permissions/table/${name}`).then((response) => {
+          api.options(u`/project/${datasource.value.name}/permissions/table/${name}`).then((response) => {
             perms.value.tablePermissions = new Perms(response);
             return response;
           }),
@@ -194,20 +194,20 @@ export const useDatasourceStore = defineStore('datasource', () => {
     variable.value = {} as VariableDto;
     perms.value.variable = undefined;
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`)
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}`)
       .then((response) => {
         perms.value.variable = new Perms(response);
         variable.value = response.data;
         return Promise.all([
           api
-            .options(`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`)
+            .options(u`/project/${datasource.value.name}/permissions/table/${table.value.name}/variable/${name}`)
             .then((response) => {
               perms.value.variablePermissions = new Perms(response);
               return response;
             }),
           // FIXME: OPTIONS not working for variable summary endpoint
           api
-            .options(`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
+            .options(u`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
             .then((response) => {
               perms.value.variableSummary = new Perms(response);
               return response;
@@ -267,7 +267,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function deleteVariables(variables: string[] | undefined) {
     const type = table.value.viewType ? 'view' : 'table';
     return api
-      .delete(`/datasource/${datasource.value.name}/${type}/${table.value.name}/variables`, {
+      .delete(u`/datasource/${datasource.value.name}/${type}/${table.value.name}/variables`, {
         params: { variable: variables },
         paramsSerializer: {
           indexes: null, // no brackets at all
@@ -313,7 +313,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       params.select = `name().matches(/^${names.join('$|^')}$/)`;
     }
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/valueSets`, { params })
       .then((response) => {
         return response.data;
       });
@@ -490,7 +490,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function getContingencyTable(var0: string, var1: string): Promise<QueryResultDto> {
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/_contingency`, {
         params: {
           v0: var0,
           v1: var1,
@@ -501,7 +501,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTableIndex() {
     return api
-      .get(`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
       .then((response) => (tableIndex.value = response.data));
   }
 
@@ -515,7 +515,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function scheduleTableIndex(schedule: ScheduleDto) {
     return api
-      .put(`/datasource/${datasource.value.name}/table/${table.value.name}/index/schedule`, schedule)
+      .put(u`/datasource/${datasource.value.name}/table/${table.value.name}/index/schedule`, schedule)
       .finally(loadTableIndex);
   }
 

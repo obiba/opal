@@ -48,7 +48,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function loadMethods(env: string): Promise<DataShieldMethodDto[]> {
     return api
-      .get(`/datashield/env/${env}/methods`, { params: { profile: profile.value.name } })
+      .get(u`/datashield/env/${env}/methods`, { params: { profile: profile.value.name } })
       .then((response) => response.data);
   }
 
@@ -60,7 +60,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function deleteMethods(env: string, methodNames: string[]) {
     return api
-      .delete(`/datashield/env/${env}/methods`, {
+      .delete(u`/datashield/env/${env}/methods`, {
         params: { profile: profile.value.name, name: methodNames },
         paramsSerializer: {
           indexes: null, // no brackets at all
@@ -71,13 +71,13 @@ export const useDatashieldStore = defineStore('datashield', () => {
 
   async function addMethod(env: string, method: DataShieldMethodDto) {
     return api
-      .post(`/datashield/env/${env}/methods`, method, { params: { profile: profile.value.name } })
+      .post(u`/datashield/env/${env}/methods`, method, { params: { profile: profile.value.name } })
       .then(() => loadProfileSettings());
   }
 
   async function updateMethod(env: string, method: DataShieldMethodDto) {
     return api
-      .put(`/datashield/env/${env}/method/${method.name}`, method, { params: { profile: profile.value.name } })
+      .put(u`/datashield/env/${env}/method/${method.name}`, method, { params: { profile: profile.value.name } })
       .then(() => loadProfileSettings());
   }
 
@@ -137,7 +137,7 @@ export const useDatashieldStore = defineStore('datashield', () => {
           .put(u`/datashield/profile/${profile.value.name}/_access`)
           .then(() => (profile.value.restrictedAccess = true))
       : api
-          .delete(`/datashield/profile/${profile.value.name}/_access`)
+          .delete(u`/datashield/profile/${profile.value.name}/_access`)
           .then(() => (profile.value.restrictedAccess = false));
   }
 

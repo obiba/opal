@@ -75,7 +75,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
 
   async function getMappingIdentifiersCount(entityType: string, mappingName: string) {
     return api
-      .get(`/identifiers/mapping/${mappingName}/_count`, { params: { type: entityType } })
+      .get(u`/identifiers/mapping/${mappingName}/_count`, { params: { type: entityType } })
       .then((response) => response.data);
   }
 
@@ -114,7 +114,7 @@ export const useIdentifiersStore = defineStore('identifiers', () => {
 
   async function loadIdentifiers(idTableName: string, offset = 0, limit = 20) {
     return api
-      .get(`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
+      .get(u`/identifiers/table/${idTableName}/valueSets`, { params: { select: true, offset, limit } })
       .then((response) => response.data);
   }
 

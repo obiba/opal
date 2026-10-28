@@ -110,47 +110,47 @@ export const useProjectsStore = defineStore('projects', () => {
     return api.get(u`/project/${name}`).then((response) => {
       project.value = response.data;
       return Promise.all([
-        api.options(`/project/${project.value.name}`).then((response) => {
+        api.options(u`/project/${project.value.name}`).then((response) => {
           perms.value.project = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/summary`).then((response) => {
+        api.options(u`/project/${project.value.name}/summary`).then((response) => {
           perms.value.summary = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/files`).then((response) => {
+        api.options(u`/project/${project.value.name}/files`).then((response) => {
           perms.value.files = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands`).then((response) => {
           perms.value.commands = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands/_export`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands/_export`).then((response) => {
           perms.value.export = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands/_import`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands/_import`).then((response) => {
           perms.value.import = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands/_copy`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands/_copy`).then((response) => {
           perms.value.copy = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands/_reload`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands/_reload`).then((response) => {
           perms.value.reload = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/commands/_analyse`).then((response) => {
+        api.options(u`/project/${project.value.name}/commands/_analyse`).then((response) => {
           perms.value.analyse = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/keystore`).then((response) => {
+        api.options(u`/project/${project.value.name}/keystore`).then((response) => {
           perms.value.keystore = new Perms(response);
           return response;
         }),
-        api.options(`/project/${project.value.name}/vcf-store`).then((response) => {
+        api.options(u`/project/${project.value.name}/vcf-store`).then((response) => {
           perms.value.vcfstore = new Perms(response);
           return response;
         }),
@@ -160,8 +160,8 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function loadAnalysesPermissions(name: string, tableName: string) {
     return Promise.all([
-      api.options(`/project/${name}/table/${tableName}/analyses`),
-      api.options(`/project/${name}/table/${tableName}/analyses_export`),
+      api.options(u`/project/${name}/table/${tableName}/analyses`),
+      api.options(u`/project/${name}/table/${tableName}/analyses_export`),
     ]).then(([analyses, analyses_export]) => {
       perms.value.analyses = new Perms(analyses);
       perms.value.vcfs = new Perms(analyses_export);
@@ -170,11 +170,11 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function loadVcfPermissions(name: string) {
     return Promise.all([
-      api.options(`/project/${name}/vcf-store/samples`),
-      api.options(`/project/${name}/vcf-store/vcfs`),
-      api.options(`/project/${name}/permissions/vcf-store`),
-      api.options(`/project/${name}/commands/_import_vcf`),
-      api.options(`/project/${name}/commands/_export_vcf`),
+      api.options(u`/project/${name}/vcf-store/samples`),
+      api.options(u`/project/${name}/vcf-store/vcfs`),
+      api.options(u`/project/${name}/permissions/vcf-store`),
+      api.options(u`/project/${name}/commands/_import_vcf`),
+      api.options(u`/project/${name}/commands/_export_vcf`),
     ]).then(([samples, vcfs, permissions_vcfstore, import_vcf, export_vcf]) => {
       perms.value.samples = new Perms(samples);
       perms.value.vcfs = new Perms(vcfs);
@@ -284,7 +284,7 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function getSubjectPermissions(subject: Subject) {
     return api
-      .get(`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
+      .get(u`/project/${project.value.name}/permissions/subject/${subject.principal}`, {
         params: { type: subject.type },
       })
       .then((response) => {
@@ -343,7 +343,7 @@ export const useProjectsStore = defineStore('projects', () => {
 
   async function deleteVcf(name: string, files: string[]) {
     return api
-      .delete(`/project/${name}/vcf-store/vcfs`, {
+      .delete(u`/project/${name}/vcf-store/vcfs`, {
         params: { file: files },
         paramsSerializer: {
           indexes: null,
