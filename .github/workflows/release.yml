@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      # Deploy Release creates the GitHub release and uploads its assets
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm devscripts fakeroot debhelper build-essential
+
+      - name: Cache Maven and general cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2
+            ~/.cache
+          key: ${{ runner.os }}-maven-jdk21-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-jdk21-
+            ${{ runner.os }}-maven-
+
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .settings.xml ~/.m2/settings.xml
+
+      - name: Deploy Release
+        run: mvn -Prelease deploy
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
+
+      - name: Upload RPM and DEB packages to Artifactory
+        run: |
+          version=${GITHUB_REF_NAME}
+          curl -fsS -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PWD}" -XPUT https://obiba.jfrog.io/artifactory/rpm-local/ \
+            -T opal-server/target/rpm/opal-server/RPMS/noarch/opal-server-${version}-1.noarch.rpm
+          curl -fsS -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PWD}" -XPUT \
+            "https://obiba.jfrog.io/artifactory/debian-local/pool/opal_${version}_all.deb;deb.distribution=all;deb.component=main;deb.architecture=all" \
+            -T opal-server/target/opal_${version}_all.deb
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PWD }}
