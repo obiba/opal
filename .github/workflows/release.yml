@@ -5,9 +5,15 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      # Deploy Release creates the GitHub release and uploads its assets
+      contents: write
 
     steps:
       - name: Checkout repository
