@@ -24,13 +24,30 @@
       {{ t('no_entity_filter') }}
     </div>
     <script-dialog v-model="showEdit" :script="view.where" @save="onSave" />
+    <template v-if="datasourceStore.perms.table?.canUpdate()">
+      <div class="text-h6 q-mt-lg">{{ t('history') }}</div>
+      <!-- the where script is versioned like a variable script, as <view>/__where.js -->
+      <git-history
+        :key="view.where || ''"
+        :name="WHERE"
+        :load-commits="() => datasourceStore.getVariableCommits(WHERE)"
+        :diff="(id: string) => datasourceStore.getVariableCommit(WHERE, id)"
+        :diff-with-head="(id: string) => datasourceStore.getVariableCommitFromHead(WHERE, id)"
+        :restore="onRestore"
+      />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor';
 import ScriptDialog from 'src/components/datasource/ScriptDialog.vue';
+import GitHistory from 'src/components/git/GitHistory.vue';
 import type { ViewDto } from 'src/models/Magma';
+import type { VcsCommitInfoDto } from 'src/models/Opal';
+
+// name of the where script file in the view git folder, without the .js extension
+const WHERE = '__where';
 
 interface VariableScriptProps {
   view: ViewDto;
@@ -65,6 +82,11 @@ async function onSave(script: string, comment: string) {
   const updateComment = comment || 'Update view where script';
   await datasourceStore.updateView(datasourceStore.datasource.name, newView.name, newView, updateComment);
   await datasourceStore.loadTable(newView.name);
+}
+
+async function onRestore(commit: VcsCommitInfoDto) {
+  const { blob } = await datasourceStore.getVariableBlob(WHERE, commit.commitId);
+  return onSave(blob || '', `Restore view where script from commit ${commit.commitId.slice(0, 7)}`);
 }
 
 async function onDelete() {
