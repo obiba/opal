@@ -510,6 +510,9 @@ export default {
     no_database_warning: "Aucune base de données d'identifiants n'est configurée.",
   },
   git: {
+    compare_current: 'Comparer avec le courant',
+    restore_confirm: "Êtes-vous sûr de vouloir restaurer la version à partir du '{date}' ? Cela remplacera les informations actuelles.",
+    restore_script_confirm: "Êtes-vous sûr de vouloir restaurer le script du '{date}' ? Seul le script est restauré : le type de valeur, les catégories et les attributs ne sont pas modifiés.",
     diff_viewer: {
       title: 'Détails de la validation',
     },
@@ -818,8 +821,6 @@ export default {
     import_github: 'Dépôt GitHub',
     import_file: 'Fichier YAML',
     change_history: 'Historique des modifications',
-    compare_current: 'Comparer avec le courant',
-    restore_confirm: "Êtes-vous sûr de vouloir restaurer la version à partir du '{date}' ? Cela remplacera les informations actuelles.",
     filter_vocabulary: 'Filtrer les vocabulaires...',
     vocabulary: {
       title: 'Vocabulaire',
