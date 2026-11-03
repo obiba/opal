@@ -152,7 +152,8 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     for (File f : viewRepo.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.getName().endsWith(OpalGitUtils.VARIABLE_FILE_EXTENSION);
+        return pathname.getName().endsWith(OpalGitUtils.VARIABLE_FILE_EXTENSION)
+            && !pathname.getName().equals(OpalGitUtils.VIEW_WHERE_FILE_NAME);
       }
     })) {
       String varName = f.getName().substring(0, f.getName().length() - 3);
