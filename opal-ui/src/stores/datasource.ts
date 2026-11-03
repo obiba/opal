@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl, u } from 'src/boot/api';
 import type { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
+import { notifyError } from 'src/utils/notify';
 import type { AttributesBundle } from 'src/components/models';
 import type { QueryResultDto } from 'src/models/Search';
 import type { ScheduleDto, TableIndexStatusDto, VcsCommitInfoDto, VcsCommitInfosDto } from 'src/models/Opal';
@@ -25,6 +26,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
   const tables = ref([] as TableDto[]); // current datasource tables
   const table = ref({} as TableDto); // current table
   const view = ref({} as ViewDto); // current view
+  const tableCountsLoading = ref(false); // current table counts are being computed
+  const tablesCountsLoading = ref(false); // current datasource tables counts are being computed
   const tableIndex = ref({} as TableIndexStatusDto); // current table index
   const variables = ref([] as VariableDto[]); // current table variables
   const variable = ref({} as VariableDto); // current variable
@@ -131,38 +134,94 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadTables() {
     tables.value = [];
     perms.value.tables = undefined;
-    return api.get(u`/datasource/${datasource.value.name}/tables`, { params: { counts: true } }).then((response) => {
+    // no counts: they can be slow (the entity filter of a view is evaluated), see loadTablesCounts
+    return api.get(u`/datasource/${datasource.value.name}/tables`).then((response) => {
       perms.value.tables = new Perms(response);
       tables.value = response.data;
       return response;
     });
   }
 
+  let tablesCountsRequest = 0;
+
+  // ponytail: one request for all the tables, so the slowest view delays all the counts; per table requests if it matters
+  async function loadTablesCounts() {
+    const request = ++tablesCountsRequest;
+    const dsName = datasource.value.name;
+    tablesCountsLoading.value = true;
+    return api
+      .get(u`/datasource/${dsName}/tables`, { params: { counts: true } })
+      .then((response) => {
+        // ignore the counts of a datasource that is not the current one anymore
+        if (request !== tablesCountsRequest || datasource.value.name !== dsName) return;
+        const counts = new Map<string, TableDto>(response.data.map((t: TableDto) => [t.name, t]));
+        // update in place: the tables array is not replaced, so watchers of a tables reload do not fire again
+        tables.value.forEach((t) => {
+          t.variableCount = counts.get(t.name)?.variableCount;
+          t.valueSetCount = counts.get(t.name)?.valueSetCount;
+        });
+      })
+      .catch((err) => {
+        if (request === tablesCountsRequest) notifyError(err);
+      })
+      .finally(() => {
+        if (request === tablesCountsRequest) tablesCountsLoading.value = false;
+      });
+  }
+
   async function loadTable(name: string) {
-    table.value = {} as TableDto;
-    view.value = {} as ViewDto;
-    tableIndex.value = {} as TableIndexStatusDto;
-    perms.value.table = undefined;
-    perms.value.tableValueSets = undefined;
-    variables.value = [];
-    perms.value.variables = undefined;
+    // on a reload of the same table, keep the current state so that the page stays rendered
+    if (table.value.name !== name || table.value.datasourceName !== datasource.value.name) {
+      table.value = {} as TableDto;
+      view.value = {} as ViewDto;
+      tableIndex.value = {} as TableIndexStatusDto;
+      perms.value.table = undefined;
+      perms.value.tableValueSets = undefined;
+      variables.value = [];
+      perms.value.variables = undefined;
+    }
+    // the counts can be slow (the entity filter of a view is evaluated), so they are loaded afterwards
+    return api.get(u`/datasource/${datasource.value.name}/table/${name}`).then((response) => {
+      perms.value.table = new Perms(response);
+      table.value = response.data;
+      void loadTableCounts(name);
+      return Promise.all([
+        table.value.viewType !== undefined ? loadView(name) : Promise.resolve(),
+        loadTableVariables(),
+        api.options(u`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
+          perms.value.tableValueSets = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${datasource.value.name}/permissions/table/${name}`).then((response) => {
+          perms.value.tablePermissions = new Perms(response);
+          return response;
+        }),
+      ]);
+    });
+  }
+
+  let countsRequest = 0;
+
+  async function loadTableCounts(name: string) {
+    const request = ++countsRequest;
+    tableCountsLoading.value = true;
     return api
       .get(u`/datasource/${datasource.value.name}/table/${name}`, { params: { counts: true } })
       .then((response) => {
-        perms.value.table = new Perms(response);
-        table.value = response.data;
-        return Promise.all([
-          table.value.viewType !== undefined ? loadView(name) : Promise.resolve(),
-          loadTableVariables(),
-          api.options(u`/datasource/${datasource.value.name}/table/${name}/valueSets`).then((response) => {
-            perms.value.tableValueSets = new Perms(response);
-            return response;
-          }),
-          api.options(u`/project/${datasource.value.name}/permissions/table/${name}`).then((response) => {
-            perms.value.tablePermissions = new Perms(response);
-            return response;
-          }),
-        ]);
+        // ignore the counts of a table that is not the current one anymore
+        if (request === countsRequest && table.value.name === name) {
+          table.value = {
+            ...table.value,
+            variableCount: response.data.variableCount,
+            valueSetCount: response.data.valueSetCount,
+          };
+        }
+      })
+      .catch((err) => {
+        if (request === countsRequest) notifyError(err);
+      })
+      .finally(() => {
+        if (request === countsRequest) tableCountsLoading.value = false;
       });
   }
 
@@ -551,6 +610,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     datasource,
     tables,
     table,
+    tableCountsLoading,
+    tablesCountsLoading,
     view,
     tableIndex,
     variables,
@@ -558,6 +619,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     variableAttributesBundles,
     perms,
     initDatasourceTables,
+    loadTablesCounts,
     initDatasourceTable,
     initDatasourceTableVariables,
     initDatasourceTableVariable,

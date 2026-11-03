@@ -139,7 +139,15 @@
           </q-tab-panel>
 
           <q-tab-panel name="summary">
-            <variable-summary :variable="datasourceStore.variable" :total="datasourceStore.table.valueSetCount || 0" />
+            <!-- the summary limit depends on the entity count -->
+            <div v-if="datasourceStore.tableCountsLoading" class="text-center q-pa-md">
+              <q-spinner-dots size="lg" color="primary" />
+            </div>
+            <variable-summary
+              v-else
+              :variable="datasourceStore.variable"
+              :total="datasourceStore.table.valueSetCount || 0"
+            />
           </q-tab-panel>
 
           <q-tab-panel name="values" v-if="datasourceStore.perms.tableValueSets?.canRead()">

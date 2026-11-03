@@ -177,7 +177,8 @@
                 <q-separator />
                 <q-card-section>
                   <div class="text-h6 text-center">
-                    {{ datasourceStore.table.variableCount }}
+                    <q-spinner-dots v-if="datasourceStore.tableCountsLoading" color="primary" />
+                    <span v-else>{{ datasourceStore.table.variableCount }}</span>
                   </div>
                 </q-card-section>
               </q-card>
@@ -188,12 +189,13 @@
                 <q-separator />
                 <q-card-section>
                   <div class="text-h6 text-center">
-                    {{ datasourceStore.table.valueSetCount }}
+                    <q-spinner-dots v-if="datasourceStore.tableCountsLoading" color="primary" />
+                    <span v-else>{{ datasourceStore.table.valueSetCount }}</span>
                   </div>
                 </q-card-section>
               </q-card>
             </div>
-            <div v-if="canReadValues">
+            <div v-if="canReadValues && !datasourceStore.tableCountsLoading">
               <div v-if="datasourceStore.table.valueSetCount === 0">
                 <div class="q-mb-md box-info">
                   <q-icon name="error" size="1.2rem" />
@@ -209,7 +211,11 @@
           </q-tab-panel>
 
           <q-tab-panel name="values" v-if="canReadValues">
-            <div v-if="datasourceStore.table.valueSetCount === 0">
+            <!-- the values table paginates on the entity count -->
+            <div v-if="datasourceStore.tableCountsLoading" class="text-center q-pa-md">
+              <q-spinner-dots size="lg" color="primary" />
+            </div>
+            <div v-else-if="datasourceStore.table.valueSetCount === 0">
               <div class="q-mb-md box-info">
                 <q-icon name="error" size="1.2rem" />
                 <span class="on-right">
