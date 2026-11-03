@@ -24,18 +24,19 @@
       {{ t('no_entity_filter') }}
     </div>
     <script-dialog v-model="showEdit" :script="view.where" @save="onSave" />
-    <template v-if="datasourceStore.perms.table?.canUpdate()">
+    <!-- v-show, not v-if: the history must stay mounted to load the commits -->
+    <div v-if="datasourceStore.perms.table?.canUpdate()" v-show="hasHistory">
       <div class="text-h6 q-mt-lg">{{ t('history') }}</div>
       <!-- the where script is versioned like a variable script, as <view>/__where.js -->
       <git-history
         :key="view.where || ''"
         :name="WHERE"
-        :load-commits="() => datasourceStore.getVariableCommits(WHERE)"
+        :load-commits="loadCommits"
         :diff="(id: string) => datasourceStore.getVariableCommit(WHERE, id)"
         :diff-with-head="(id: string) => datasourceStore.getVariableCommitFromHead(WHERE, id)"
         :restore="onRestore"
       />
-    </template>
+    </div>
   </div>
 </template>
 
@@ -82,6 +83,15 @@ async function onSave(script: string, comment: string) {
   const updateComment = comment || 'Update view where script';
   await datasourceStore.updateView(datasourceStore.datasource.name, newView.name, newView, updateComment);
   await datasourceStore.loadTable(newView.name);
+}
+
+// a view that never had a where script has no history: hide it
+const hasHistory = ref(false);
+
+async function loadCommits() {
+  const commits = await datasourceStore.getVariableCommits(WHERE);
+  hasHistory.value = (commits.commitInfos?.length ?? 0) > 0;
+  return commits;
 }
 
 async function onRestore(commit: VcsCommitInfoDto) {
