@@ -132,8 +132,10 @@
 
           <q-tab-panel name="script" v-if="withScript">
             <variable-script :variable="datasourceStore.variable" />
-            <div class="text-h6 q-mt-lg">{{ t('history') }}</div>
-            <variable-history :variable="datasourceStore.variable" />
+            <template v-if="datasourceStore.perms.table?.canUpdate()">
+              <div class="text-h6 q-mt-lg">{{ t('history') }}</div>
+              <variable-history :variable="datasourceStore.variable" />
+            </template>
           </q-tab-panel>
 
           <q-tab-panel name="summary">
