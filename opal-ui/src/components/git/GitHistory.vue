@@ -3,7 +3,7 @@
     flat
     :rows="commits"
     :columns="columns"
-    row-key="id"
+    row-key="commitId"
     :pagination="initialPagination"
     :hide-pagination="commits.length <= initialPagination.rowsPerPage"
   >
@@ -32,13 +32,13 @@
             flat
             size="sm"
             color="secondary"
-            :title="t('taxonomy.compare_current')"
+            :title="t('git.compare_current')"
             :icon="toolsVisible[props.row.commitId] ? 'keyboard_tab' : 'none'"
             class="q-ml-xs"
             @click="onCompareWith(props.row)"
           />
           <q-btn
-            v-if="props.rowIndex > 0"
+            v-if="canRestore && props.rowIndex > 0"
             rounded
             dense
             flat
@@ -62,6 +62,11 @@
         {{ props.value }}
       </q-td>
     </template>
+    <template v-slot:body-cell-comment="props">
+      <q-td :props="props" @mouseover="onOverRow(props.row)" @mouseleave="onLeaveRow(props.row)">
+        {{ props.value }}
+      </q-td>
+    </template>
   </q-table>
 
   <!-- Dialogs -->
@@ -69,7 +74,7 @@
   <confirm-dialog
     v-model="showRestore"
     :title="t('restore')"
-    :text="t('taxonomy.restore_confirm', { date: getDateLabel(commitInfo.date) })"
+    :text="t(restoreConfirmKey, { date: getDateLabel(commitInfo.date) })"
     @confirm="doRestore"
   />
 
@@ -80,17 +85,26 @@
 import GitDiffViewerDialog from 'src/components/git/GitDiffViewerDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
-import type { VcsCommitInfoDto } from 'src/models/Opal';
+import type { VcsCommitInfoDto, VcsCommitInfosDto } from 'src/models/Opal';
 import { notifyError } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';
 
 interface Props {
-  taxonomyName: string;
+  // changes whenever the history must be reloaded (e.g. the versioned item name)
+  name: string;
+  loadCommits: () => Promise<VcsCommitInfosDto>;
+  diff: (commitId: string) => Promise<VcsCommitInfoDto>;
+  diffWithHead: (commitId: string) => Promise<VcsCommitInfoDto>;
+  restore: (commit: VcsCommitInfoDto) => Promise<unknown>;
+  canRestore?: boolean;
+  restoreConfirmKey?: string;
 }
 const emit = defineEmits(['restore']);
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  canRestore: true,
+  restoreConfirmKey: 'git.restore_confirm',
+});
 const { t } = useI18n({ useScope: 'global' });
-const taxonomiesStore = useTaxonomiesStore();
 const showDiff = ref(false);
 const showRestore = ref(false);
 const commits = ref<VcsCommitInfoDto[]>([]);
@@ -126,6 +140,12 @@ const columns = computed(() => [
     align: DefaultAlignment,
     field: 'author',
   },
+  {
+    name: 'comment',
+    label: t('comment'),
+    align: DefaultAlignment,
+    field: 'comment',
+  },
 ]);
 
 // Handlers
@@ -140,7 +160,7 @@ function onLeaveRow(row: VcsCommitInfoDto) {
 
 async function onCompare(row: VcsCommitInfoDto) {
   try {
-    commitInfo.value = await taxonomiesStore.gitCompare(props.taxonomyName, row.commitId);
+    commitInfo.value = await props.diff(row.commitId);
     showDiff.value = true;
   } catch (error) {
     notifyError(error);
@@ -149,7 +169,7 @@ async function onCompare(row: VcsCommitInfoDto) {
 
 async function onCompareWith(row: VcsCommitInfoDto) {
   try {
-    commitInfo.value = await taxonomiesStore.gitCompareWith(props.taxonomyName, row.commitId, 'head');
+    commitInfo.value = await props.diffWithHead(row.commitId);
     showDiff.value = true;
   } catch (error) {
     notifyError(error);
@@ -167,8 +187,9 @@ async function doRestore() {
   commitInfo.value = {} as VcsCommitInfoDto;
 
   try {
-    await taxonomiesStore.gitRestore(props.taxonomyName, toRestore.commitId);
+    await props.restore(toRestore);
     emit('restore');
+    getCommits();
   } catch (error) {
     notifyError(error);
   }
@@ -179,9 +200,9 @@ function onCloseDiffViewer() {
   showDiff.value = false;
 }
 
-async function getCommits() {
-  taxonomiesStore
-    .gitCommits(props.taxonomyName)
+function getCommits() {
+  props
+    .loadCommits()
     .then((response) => {
       commits.value = response.commitInfos;
     })
@@ -189,8 +210,8 @@ async function getCommits() {
 }
 
 watch(
-  () => props.taxonomyName,
-  async (newValue) => {
+  () => props.name,
+  (newValue) => {
     if (newValue) {
       getCommits();
     }
@@ -198,7 +219,7 @@ watch(
 );
 
 onMounted(() => {
-  if (props.taxonomyName) {
+  if (props.name) {
     getCommits();
   }
 });

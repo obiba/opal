@@ -132,6 +132,10 @@
 
           <q-tab-panel name="script" v-if="withScript">
             <variable-script :variable="datasourceStore.variable" />
+            <template v-if="datasourceStore.perms.table?.canUpdate()">
+              <div class="text-h6 q-mt-lg">{{ t('history') }}</div>
+              <variable-history :variable="datasourceStore.variable" />
+            </template>
           </q-tab-panel>
 
           <q-tab-panel name="summary">
@@ -174,6 +178,7 @@ import VariableCategories from 'src/components/datasource/VariableCategories.vue
 import VariableAttribues from 'src/components/datasource/VariableAttributes.vue';
 import VariableSummary from 'src/components/datasource/VariableSummary.vue';
 import VariableScript from 'src/components/datasource/VariableScript.vue';
+import VariableHistory from 'src/components/datasource/VariableHistory.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
 import EditVariableDialog from 'src/components/datasource/EditVariableDialog.vue';
 import AddToViewDialog from 'src/components/datasource/AddToViewDialog.vue';

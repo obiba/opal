@@ -4,7 +4,7 @@ import type { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, Resou
 import { Perms } from 'src/utils/authz';
 import type { AttributesBundle } from 'src/components/models';
 import type { QueryResultDto } from 'src/models/Search';
-import type { ScheduleDto, TableIndexStatusDto } from 'src/models/Opal';
+import type { ScheduleDto, TableIndexStatusDto, VcsCommitInfoDto, VcsCommitInfosDto } from 'src/models/Opal';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -383,6 +383,26 @@ export const useDatasourceStore = defineStore('datasource', () => {
     });
   }
 
+  function variableVcsUrl(name: string) {
+    return u`/datasource/${datasource.value.name}/view/${table.value.name}/vcs/variable/${name}`;
+  }
+
+  async function getVariableCommits(name: string): Promise<VcsCommitInfosDto> {
+    return api.get(`${variableVcsUrl(name)}/commits`).then((response) => response.data);
+  }
+
+  async function getVariableCommit(name: string, commitId: string): Promise<VcsCommitInfoDto> {
+    return api.get(variableVcsUrl(name) + u`/commit/${commitId}`).then((response) => response.data);
+  }
+
+  async function getVariableCommitFromHead(name: string, commitId: string): Promise<VcsCommitInfoDto> {
+    return api.get(variableVcsUrl(name) + u`/commit/head/${commitId}`).then((response) => response.data);
+  }
+
+  async function getVariableBlob(name: string, commitId: string): Promise<VcsCommitInfoDto> {
+    return api.get(variableVcsUrl(name) + u`/blob/${commitId}`).then((response) => response.data);
+  }
+
   async function createView(destination: string, view: ViewDto) {
     delete view.datasourceName;
     delete view.status;
@@ -568,6 +588,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     addVariable,
     updateVariable,
     saveDerivedVariable,
+    getVariableCommits,
+    getVariableCommit,
+    getVariableCommitFromHead,
+    getVariableBlob,
     getAllTables,
     createView,
     getView,

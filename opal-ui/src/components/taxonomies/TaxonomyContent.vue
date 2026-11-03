@@ -143,7 +143,15 @@
     </q-table>
 
     <div v-if="taxonomiesStore.canEdit" class="text-h6 q-mb-none q-mt-lg">{{ t('taxonomy.change_history') }}</div>
-    <taxonomy-git-history v-if="taxonomiesStore.canEdit" :taxonomy-name="taxonomyName" @restore="onGitRestored" />
+    <git-history
+      v-if="taxonomiesStore.canEdit"
+      :name="taxonomyName"
+      :load-commits="() => taxonomiesStore.gitCommits(taxonomyName)"
+      :diff="(id: string) => taxonomiesStore.gitCompare(taxonomyName, id)"
+      :diff-with-head="(id: string) => taxonomiesStore.gitCompareWith(taxonomyName, id, 'head')"
+      :restore="(commit: VcsCommitInfoDto) => taxonomiesStore.gitRestore(taxonomyName, commit.commitId)"
+      @restore="onGitRestored"
+    />
 
     <!-- Dialogs -->
     <confirm-dialog
@@ -177,7 +185,8 @@ import AddTaxonomyDialog from 'src/components/taxonomies/AddTaxonomyDialog.vue';
 import AddVocabularyDialog from 'src/components/taxonomies/AddVocabularyDialog.vue';
 import FieldsList, { type FieldItem } from 'src/components/FieldsList.vue';
 import useTaxonomyEntityContent from 'src/components/taxonomies/TaxonomyEntityContent';
-import TaxonomyGitHistory from 'src/components/taxonomies/TaxonomyGitHistory.vue';
+import GitHistory from 'src/components/git/GitHistory.vue';
+import type { VcsCommitInfoDto } from 'src/models/Opal';
 import { getCreativeCommonsLicenseAnchor } from 'src/utils/taxonomies';
 import { notifyError } from 'src/utils/notify';
 import { DefaultAlignment } from 'src/components/models';

@@ -510,6 +510,9 @@ export default {
     no_database_warning: 'There are no identifiers database configured.',
   },
   git: {
+    compare_current: 'Compare with current',
+    restore_confirm: "Are you sure you want to restore the version from '{date}'? This will replace the current information.",
+    restore_script_confirm: "Are you sure you want to restore the script from '{date}'? Only the script is restored: the value type, categories and attributes are not changed.",
     diff_viewer: {
       title: 'Commit Details',
     },
@@ -818,8 +821,6 @@ export default {
     import_github: 'GitHub Repository',
     import_file: 'YAML File',
     change_history: 'History of Changes',
-    compare_current: 'Compare with current',
-    restore_confirm: "Are you sure you want to restore the version from '{date}'? This will replace the current information.",
     filter_vocabulary: 'Filter vocabularies...',
     vocabulary: {
       title: 'Vocabulary',
