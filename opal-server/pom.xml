@@ -227,6 +227,9 @@
                   <prefix>/usr/share</prefix>
                   <changelogFile>/usr/share/changelog</changelogFile>
                   <targetOS>Linux</targetOS>
+                  <defineStatements>
+                    <defineStatement>_use_weak_usergroup_deps 1</defineStatement>
+                  </defineStatements>
                   <requires>
                     <require>unzip</require>
                   </requires>
