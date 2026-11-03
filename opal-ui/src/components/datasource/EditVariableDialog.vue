@@ -121,7 +121,10 @@ function onHide() {
 
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const hasValues = computed(
-  () => datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0,
+  // while the counts are loading, assume values exist so that the value type stays locked
+  () =>
+    datasourceStore.tableCountsLoading ||
+    (datasourceStore.table.valueSetCount !== undefined && datasourceStore.table.valueSetCount > 0),
 );
 const canEditTypeFields = computed(() => isView.value || !editMode.value || !hasValues.value);
 const isValid = computed(

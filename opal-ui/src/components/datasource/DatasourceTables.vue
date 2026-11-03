@@ -146,6 +146,18 @@
           <q-icon v-if="props.row.viewType" name="visibility" size="xs" color="primary" class="on-right" />
         </q-td>
       </template>
+      <template v-slot:body-cell-variableCount="props">
+        <q-td :props="props">
+          <q-spinner-dots v-if="datasourceStore.tablesCountsLoading" color="primary" />
+          <span v-else>{{ props.value }}</span>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-valueSetCount="props">
+        <q-td :props="props">
+          <q-spinner-dots v-if="datasourceStore.tablesCountsLoading" color="primary" />
+          <span v-else>{{ props.value }}</span>
+        </q-td>
+      </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
           <q-icon name="circle" size="sm" :color="tableStatusColor(props.value)" />
@@ -285,6 +297,14 @@ const rows = computed(() => {
 const dsName = computed(() => route.params.id as string);
 const removableTables = computed(() => (selected.value.length === 0 ? datasourceStore.tables : selected.value));
 const readableTables = computed(() => (selected.value.length === 0 ? datasourceStore.tables : selected.value));
+
+// the tables are loaded without counts: compute them in the background on each reload of the tables
+watch(
+  () => datasourceStore.tables,
+  (tables) => {
+    if (tables.length > 0) void datasourceStore.loadTablesCounts();
+  },
+);
 
 function init() {
   loading.value = true;
