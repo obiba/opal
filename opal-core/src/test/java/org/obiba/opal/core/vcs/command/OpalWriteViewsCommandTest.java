@@ -20,6 +20,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,19 +41,24 @@ public class OpalWriteViewsCommandTest {
 
   private File root;
 
+  private boolean opalHomeSet;
+
   @Before
   public void setUp() throws Exception {
     root = Files.createTempDirectory("opal-git-views").toFile();
-    if (System.getProperty("OPAL_HOME") == null) System.setProperty("OPAL_HOME", root.getAbsolutePath());
+    opalHomeSet = System.getProperty("OPAL_HOME") == null;
+    if (opalHomeSet) System.setProperty("OPAL_HOME", root.getAbsolutePath());
     new MagmaEngine().extend(new MagmaXStreamExtension());
     // the commit author is read from the shiro subject, anonymous here
     SecurityUtils.setSecurityManager(new DefaultSecurityManager());
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
     SecurityUtils.setSecurityManager(null);
     MagmaEngine.get().shutdown();
+    if (opalHomeSet) System.clearProperty("OPAL_HOME");
+    FileUtils.delete(root, FileUtils.RECURSIVE | FileUtils.SKIP_MISSING);
   }
 
   @Test

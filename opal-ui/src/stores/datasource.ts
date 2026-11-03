@@ -161,7 +161,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
           t.valueSetCount = counts.get(t.name)?.valueSetCount;
         });
       })
-      .catch(notifyError)
+      .catch((err) => {
+        if (request === tablesCountsRequest) notifyError(err);
+      })
       .finally(() => {
         if (request === tablesCountsRequest) tablesCountsLoading.value = false;
       });
@@ -169,7 +171,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadTable(name: string) {
     // on a reload of the same table, keep the current state so that the page stays rendered
-    if (table.value.name !== name) {
+    if (table.value.name !== name || table.value.datasourceName !== datasource.value.name) {
       table.value = {} as TableDto;
       view.value = {} as ViewDto;
       tableIndex.value = {} as TableIndexStatusDto;
@@ -215,7 +217,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
           };
         }
       })
-      .catch(notifyError)
+      .catch((err) => {
+        if (request === countsRequest) notifyError(err);
+      })
       .finally(() => {
         if (request === countsRequest) tableCountsLoading.value = false;
       });
