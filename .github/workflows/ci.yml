@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       # a JDK 25 failure must not cancel the JDK 21 leg, which is the one that deploys
