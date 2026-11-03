@@ -10,10 +10,16 @@
 
 package org.obiba.opal.core.vcs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.git.CommitInfo;
+import org.obiba.git.TagInfo;
+import org.obiba.git.command.TagCommand;
+import org.obiba.git.command.TagListCommand;
 import org.obiba.git.command.CommitLogCommand;
 import org.obiba.git.command.DiffAsStringCommand;
 import org.obiba.git.command.FetchBlobCommand;
@@ -29,10 +35,32 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
   private GitCommandHandler gitCommandHandler;
 
   @Override
-  public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
+  public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String view, @NotNull String path) {
     return gitCommandHandler.execute(new LogsCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
-            OpalGitUtils.getGitViewsWorkFolder()).path(path).excludeDeletedCommits(true).build()
+            OpalGitUtils.getGitViewsWorkFolder()).path(path).excludeDeletedCommits(true)
+        .tagsPrefix(OpalGitUtils.getViewTagsPrefix(view)).build()
     );
+  }
+
+  @Override
+  public void createTag(@NotNull String datasource, @NotNull String view, @NotNull String name,
+      @Nullable String message) {
+    gitCommandHandler.execute(new TagCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
+        OpalGitUtils.getGitViewsWorkFolder(), message, OpalGitUtils.getViewTagsPrefix(view) + name).path(view)
+        .build());
+  }
+
+  @Override
+  public Iterable<TagInfo> getTags(@NotNull String datasource, @NotNull String view) {
+    String prefix = OpalGitUtils.getViewTagsPrefix(view);
+    List<TagInfo> tags = new ArrayList<>();
+    for(TagInfo tag : gitCommandHandler.execute(new TagListCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
+        OpalGitUtils.getGitViewsWorkFolder()).prefix(prefix).build())) {
+      tags.add(new TagInfo.Builder().name(tag.getName().substring(prefix.length())).ref(tag.getRef())
+          .commitId(tag.getCommitId()).message(tag.getMessage()).taggerName(tag.getTaggerName())
+          .taggerEmail(tag.getTaggerEmail()).date(tag.getDate()).build());
+    }
+    return tags;
   }
 
   @Override

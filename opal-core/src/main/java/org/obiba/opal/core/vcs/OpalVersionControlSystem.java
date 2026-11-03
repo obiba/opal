@@ -14,10 +14,14 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import org.obiba.git.CommitInfo;
+import org.obiba.git.TagInfo;
 
 public interface OpalVersionControlSystem {
 
-  Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path);
+  /**
+   * Commits of a path of the view, with the tags of the view.
+   */
+  Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String view, @NotNull String path);
 
   CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId);
 
@@ -25,4 +29,14 @@ public interface OpalVersionControlSystem {
 
   Iterable<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId, @Nullable String prevCommitId,
       @Nullable String path);
+
+  /**
+   * Tag the latest commit of the view folder.
+   */
+  void createTag(@NotNull String datasource, @NotNull String view, @NotNull String name, @Nullable String message);
+
+  /**
+   * Tags of the view, with their name without the view prefix.
+   */
+  Iterable<TagInfo> getTags(@NotNull String datasource, @NotNull String view);
 }

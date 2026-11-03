@@ -11,7 +11,25 @@
 package org.obiba.opal.core.cfg;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.obiba.core.util.FileUtil;
+import org.obiba.git.command.GitCommandHandler;
+import org.obiba.magma.Variable;
+import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.js.views.JavascriptClause;
+import org.obiba.magma.js.views.VariablesClause;
+import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
+import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.vcs.OpalGitUtils;
+import org.obiba.opal.core.vcs.OpalGitVersionControlSystem;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -125,6 +143,62 @@ public class OpalViewPersistenceStrategyTest {
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("single-views", views, null, null);
+  }
+
+  @Test
+  public void testReadViewAtCommit() throws Exception {
+    // the commit and tag author is read from the shiro subject, anonymous here
+    SecurityUtils.setSecurityManager(new DefaultSecurityManager());
+    MagmaEngine.get().extend(new MagmaJsExtension());
+    // unique datasource name, because the git folders are shared within the JVM
+    String datasource = "read-view-" + System.nanoTime();
+    GitCommandHandler handler = new GitCommandHandler();
+    OpalViewPersistenceStrategy strategy = new OpalViewPersistenceStrategy();
+    strategy.setGitCommandHandler(handler);
+    OpalGitVersionControlSystem vcs = new OpalGitVersionControlSystem();
+    ReflectionTestUtils.setField(vcs, "gitCommandHandler", handler);
+    try {
+      StaticValueTable table = new StaticValueTable(new StaticDatasource("ds"), "T", ImmutableSet.of("1"));
+      table.addVariables(TextType.get(), "A");
+
+      strategy.writeView(datasource, newView(table, "$('A').eq('a')", "X", "Y"), "first", null);
+      vcs.createTag(datasource, "v", "t1", null);
+      String commitId = vcs.getTags(datasource, "v").iterator().next().getCommitId();
+      strategy.writeView(datasource, newView(table, "$('A').eq('b')", "X"), "second", null);
+
+      View restored = (View) strategy.readView(datasource, "v", commitId);
+      assertThat(((JavascriptClause) restored.getWhereClause()).getScript()).isEqualTo("$('A').eq('a')");
+      assertThat(variableNames(restored)).containsOnly("X", "Y");
+      View latest = (View) strategy.readView(datasource, "v", OpalGitUtils.HEAD_COMMIT_ID);
+      assertThat(variableNames(latest)).containsOnly("X");
+    } finally {
+      SecurityUtils.setSecurityManager(null);
+      FileUtil.delete(OpalGitUtils.getGitViewsRepoFolder(datasource));
+      FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasource));
+    }
+  }
+
+  private View newView(ValueTable table, String where, String... variables) {
+    View view = new View("v", table);
+    view.setWhereClause(new JavascriptClause(where));
+    VariablesClause clause = new VariablesClause();
+    List<Variable> vars = new ArrayList<>();
+    for (String name : variables) {
+      vars.add(Variable.Builder.newVariable(name, TextType.get(), "Participant").addAttribute("script", "'" + name + "'").build());
+    }
+    clause.setVariables(vars);
+    view.setListClause(clause);
+    Initialisables.initialise(view);
+    return view;
+  }
+
+  private List<String> variableNames(View view) {
+    VariablesClause clause = (VariablesClause) view.getListClause();
+    clause.setValueTable(view);
+    clause.initialise();
+    List<String> names = new ArrayList<>();
+    clause.getVariableValueSources().forEach(source -> names.add(source.getVariable().getName()));
+    return names;
   }
 
   private String getTestFilesRoot() {

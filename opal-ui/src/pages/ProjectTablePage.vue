@@ -152,6 +152,7 @@
           <q-tab name="values" :label="t('values')" v-if="canReadValues" />
           <q-tab name="analyses" :label="t('analyses')" v-if="canAnalyseValidate" />
           <q-tab name="permissions" :label="t('permissions')" v-if="canReadPermissions" />
+          <q-tab name="history" :label="t('history')" v-if="isView && canUpdate" />
         </q-tabs>
 
         <q-separator />
@@ -239,6 +240,10 @@
               :read-only="readOnlyPermissions"
             />
           </q-tab-panel>
+
+          <q-tab-panel name="history" v-if="isView && canUpdate">
+            <view-history :key="tName" />
+          </q-tab-panel>
         </q-tab-panels>
       </div>
 
@@ -284,6 +289,7 @@ import ResourceViewDialog from 'src/components/resources/ResourceViewDialog.vue'
 import TableIndexer from 'src/components/datasource/TableIndexer.vue';
 import ContingencyTable from 'src/components/datasource/ContingencyTable.vue';
 import ViewWhereScript from 'src/components/datasource/ViewWhereScript.vue';
+import ViewHistory from 'src/components/datasource/ViewHistory.vue';
 import ProjectAnaylseValidate from 'src/components/project/ProjectAnaylseValidate.vue';
 import type { TableDto, ViewDto } from 'src/models/Magma';
 import { tableStatusColor } from 'src/utils/colors';
@@ -402,6 +408,9 @@ function init() {
         tab.value = 'dictionary';
       }
       if (!isTablesView.value && tab.value === 'entity_filter') {
+        tab.value = 'dictionary';
+      }
+      if ((!isView.value || !canUpdate.value) && tab.value === 'history') {
         tab.value = 'dictionary';
       }
     })

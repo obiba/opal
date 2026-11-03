@@ -13,6 +13,9 @@
         <template v-if="props.rowIndex === 0"
           ><q-badge color="grey-6 q-ml-xs">{{ t('current') }}</q-badge></template
         >
+        <q-badge v-for="tag in props.row.tags" :key="tag" color="primary" class="q-ml-xs">
+          <q-icon name="sell" size="xs" class="q-mr-xs" />{{ tag }}
+        </q-badge>
         <div class="float-right">
           <q-btn
             rounded

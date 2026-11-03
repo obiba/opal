@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.XStream;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.git.command.DeleteFilesCommand;
+import org.obiba.git.command.FetchBlobCommand;
 import org.obiba.git.command.GitCommandHandler;
 import org.obiba.git.command.ReadFilesCommand;
 import org.obiba.magma.MagmaEngine;
@@ -104,16 +105,30 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     List<String> viewNames = Lists.newArrayList();
     if (datasourceRepo.exists()) {
       for (ValueView view : readGitViews(datasourceRepo)) {
-        if (view instanceof ResourceView) {
-          ResourceView resView = (ResourceView) view;
-          resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource(), resView.getProfile()));
-        }
+        setConnector(view);
         builder.add(view);
         viewNames.add(view.getName());
       }
     }
     readLegacyViews(datasourceName, builder, viewNames);
     return builder.build();
+  }
+
+  /**
+   * Read the view from its View.xml file at the commit. The view is not initialised.
+   */
+  public ValueView readView(@NotNull String datasourceName, @NotNull String viewName, @NotNull String commitId) {
+    String xml = gitCommandHandler.execute(new FetchBlobCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+        OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewFilePath(viewName)).commitId(commitId).build());
+    ValueView view = (ValueView) getXStream().fromXML(xml);
+    setConnector(view);
+    return view;
+  }
+
+  private void setConnector(ValueView view) {
+    if (view instanceof ResourceView resView) {
+      resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource(), resView.getProfile()));
+    }
   }
 
   private void readLegacyViews(String datasourceName, ImmutableSet.Builder<ValueView> builder, List<String> viewNames) {

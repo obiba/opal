@@ -5,7 +5,13 @@ import { Perms } from 'src/utils/authz';
 import { notifyError } from 'src/utils/notify';
 import type { AttributesBundle } from 'src/components/models';
 import type { QueryResultDto } from 'src/models/Search';
-import type { ScheduleDto, TableIndexStatusDto, VcsCommitInfoDto, VcsCommitInfosDto } from 'src/models/Opal';
+import type {
+  ScheduleDto,
+  TableIndexStatusDto,
+  VcsCommitInfoDto,
+  VcsCommitInfosDto,
+  VcsTagInfosDto,
+} from 'src/models/Opal';
 
 interface DatasourcePerms {
   datasource: Perms | undefined;
@@ -462,6 +468,34 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.get(variableVcsUrl(name) + u`/blob/${commitId}`).then((response) => response.data);
   }
 
+  function viewVcsUrl() {
+    return u`/datasource/${datasource.value.name}/view/${table.value.name}/vcs`;
+  }
+
+  async function getViewCommits(): Promise<VcsCommitInfosDto> {
+    return api.get(`${viewVcsUrl()}/commits`).then((response) => response.data);
+  }
+
+  async function getViewCommit(commitId: string): Promise<VcsCommitInfoDto> {
+    return api.get(viewVcsUrl() + u`/commit/${commitId}`).then((response) => response.data);
+  }
+
+  async function getViewCommitFromHead(commitId: string): Promise<VcsCommitInfoDto> {
+    return api.get(viewVcsUrl() + u`/commit/head/${commitId}`).then((response) => response.data);
+  }
+
+  async function getViewTags(): Promise<VcsTagInfosDto> {
+    return api.get(`${viewVcsUrl()}/tags`).then((response) => response.data);
+  }
+
+  async function createViewTag(name: string, message: string | undefined) {
+    return api.post(`${viewVcsUrl()}/tags`, null, { params: { name, message } });
+  }
+
+  async function restoreViewCommit(commitId: string) {
+    return api.post(viewVcsUrl() + u`/commit/${commitId}/_restore`);
+  }
+
   async function createView(destination: string, view: ViewDto) {
     delete view.datasourceName;
     delete view.status;
@@ -654,6 +688,12 @@ export const useDatasourceStore = defineStore('datasource', () => {
     getVariableCommit,
     getVariableCommitFromHead,
     getVariableBlob,
+    getViewCommits,
+    getViewCommit,
+    getViewCommitFromHead,
+    getViewTags,
+    createViewTag,
+    restoreViewCommit,
     getAllTables,
     createView,
     getView,

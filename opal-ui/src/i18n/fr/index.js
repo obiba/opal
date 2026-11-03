@@ -143,6 +143,9 @@ export default {
     critical: "Espace disque critique : les tâches en cours sont annulées afin d'éviter une défaillance des bases de données. Libérez de l'espace immédiatement.",
   },
   error: {
+    VcsOperationFailed: "L'opération de gestion des versions a échoué",
+    TagNameRequired: "Le nom de l'étiquette est requis",
+    ViewRestoreFailed: 'La version de la vue ne peut pas être restaurée',
     Forbidden: "L'operation est interdite",
     NoSuchValueTableInDatasource: "La table n'existe pas ou vous n'y avez pas accès",
     PasswordTooWeak: 'Mot de passe trop faible',
@@ -510,6 +513,10 @@ export default {
     no_database_warning: "Aucune base de données d'identifiants n'est configurée.",
   },
   git: {
+    add_tag: 'Ajouter une étiquette',
+    tag_name_hint: 'Sans espaces',
+    tag_name_invalid: "Le nom de l'étiquette est requis et ne doit pas contenir d'espaces ni aucun de ces caractères : ~ ^ : ? * [ \\",
+    restore_view_confirm: "Êtes-vous sûr de vouloir restaurer la vue à partir de l'étiquette '{tag}' ? Le dictionnaire, les scripts des variables et le filtre d'entités de la vue sont remplacés par la version étiquetée. La version actuelle reste dans l'historique.",
     compare_current: 'Comparer avec le courant',
     restore_confirm: "Êtes-vous sûr de vouloir restaurer la version à partir du '{date}' ? Cela remplacera les informations actuelles.",
     restore_script_confirm: "Êtes-vous sûr de vouloir restaurer le script du '{date}' ? Seul le script est restauré : le type de valeur, les catégories et les attributs ne sont pas modifiés.",

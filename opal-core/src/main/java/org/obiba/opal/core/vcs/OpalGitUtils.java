@@ -11,6 +11,8 @@
 package org.obiba.opal.core.vcs;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.annotation.Nonnull;
 
@@ -67,6 +69,18 @@ public final class OpalGitUtils {
 
   public static String getVariableFilePath(String view, String variable) {
     return view + File.separatorChar + variable + VARIABLE_FILE_EXTENSION;
+  }
+
+  public static String getViewFilePath(String view) {
+    return view + File.separatorChar + VIEW_FILE_NAME;
+  }
+
+  /**
+   * All the views of a datasource share one repository: the tags of a view are under the view name. The view name is
+   * URL-encoded, because git does not allow spaces (and other characters) in tag names.
+   */
+  public static String getViewTagsPrefix(String view) {
+    return URLEncoder.encode(view, StandardCharsets.UTF_8) + "/";
   }
 
   //

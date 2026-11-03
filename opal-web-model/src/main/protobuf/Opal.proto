@@ -444,6 +444,19 @@ message VcsCommitInfoDto {
   optional string blob = 6;
   optional bool isHead = 7 [default = false]; // head of the commit tree
   optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
+  repeated string tags = 9;
+}
+
+message VcsTagInfoDto {
+  required string name = 1;
+  required string commitId = 2;
+  optional string message = 3;
+  optional string author = 4;
+  optional string date = 5;
+}
+
+message VcsTagInfosDto {
+  repeated VcsTagInfoDto tagInfos = 1;
 }
 
 message IDProviderDto {

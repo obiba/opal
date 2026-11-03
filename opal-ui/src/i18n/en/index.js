@@ -143,6 +143,9 @@ export default {
     critical: 'Critically low disk space: running tasks are being cancelled to keep the databases from failing. Free some space now.',
   },
   error: {
+    VcsOperationFailed: 'Version control operation failed',
+    TagNameRequired: 'The tag name is required',
+    ViewRestoreFailed: 'The view version cannot be restored',
     Forbidden: 'This operation is forbidden',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
     PasswordTooWeak: 'Password is too weak',
@@ -510,6 +513,10 @@ export default {
     no_database_warning: 'There are no identifiers database configured.',
   },
   git: {
+    add_tag: 'Add tag',
+    tag_name_hint: 'No spaces',
+    tag_name_invalid: 'The tag name is required and must not contain spaces or any of these characters: ~ ^ : ? * [ \\',
+    restore_view_confirm: "Are you sure you want to restore the view from the tag '{tag}'? The dictionary, the variable scripts and the entity filter of the view are replaced by the tagged version. The current version stays in the history.",
     compare_current: 'Compare with current',
     restore_confirm: "Are you sure you want to restore the version from '{date}'? This will replace the current information.",
     restore_script_confirm: "Are you sure you want to restore the script from '{date}'? Only the script is restored: the value type, categories and attributes are not changed.",
