@@ -62,7 +62,7 @@
         </q-card-section>
         <q-separator />
         <q-card-section>
-          <q-form ref="formRef">
+          <q-form ref="formRef" @submit="onAddTag">
             <q-input
               v-model="tagName"
               dense

@@ -410,7 +410,7 @@ function init() {
       if (!isTablesView.value && tab.value === 'entity_filter') {
         tab.value = 'dictionary';
       }
-      if ((!isView.value || !canUpdate.value) && tab.value === 'history') {
+      if ((!isView.value || !canUpdate.value) && tab.value === 'versions') {
         tab.value = 'dictionary';
       }
     })
