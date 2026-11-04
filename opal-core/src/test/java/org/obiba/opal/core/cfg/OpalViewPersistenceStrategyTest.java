@@ -12,13 +12,17 @@ package org.obiba.opal.core.cfg;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.obiba.core.util.FileUtil;
+import org.obiba.git.GitException;
+import org.obiba.git.command.DeleteFilesCommand;
 import org.obiba.git.command.GitCommandHandler;
+import org.obiba.git.command.TagDeleteCommand;
 import org.obiba.magma.Variable;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.js.views.JavascriptClause;
@@ -51,6 +55,10 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OpalViewPersistenceStrategyTest {
 
@@ -209,6 +217,39 @@ public class OpalViewPersistenceStrategyTest {
       FileUtil.delete(OpalGitUtils.getGitViewsRepoFolder(datasource));
       FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasource));
     }
+  }
+
+  @Test
+  public void testRemoveViewKeepsTagsWhenFilesCannotBeDeleted() {
+    GitCommandHandler handler = mock(GitCommandHandler.class);
+    List<Object> executed = new ArrayList<>();
+    when(handler.execute(any())).thenAnswer(call -> {
+      executed.add(call.getArguments()[0]);
+      if(call.getArguments()[0] instanceof DeleteFilesCommand) throw new GitException("push failed");
+      return null;
+    });
+    OpalViewPersistenceStrategy strategy = new OpalViewPersistenceStrategy();
+    strategy.setGitCommandHandler(handler);
+
+    try {
+      strategy.removeView("ds", "v");
+      fail("expected the failure of the file deletion");
+    } catch(GitException e) {
+      assertThat(executed).hasSize(1);
+    }
+  }
+
+  @Test
+  public void testRemoveViewIgnoresTagDeletionFailure() {
+    GitCommandHandler handler = mock(GitCommandHandler.class);
+    when(handler.execute(any())).thenAnswer(call -> {
+      if(call.getArguments()[0] instanceof TagDeleteCommand) throw new GitException("push failed");
+      return null;
+    });
+    OpalViewPersistenceStrategy strategy = new OpalViewPersistenceStrategy();
+    strategy.setGitCommandHandler(handler);
+
+    strategy.removeView("ds", "v");
   }
 
   private View newView(ValueTable table, String where, String... variables) {

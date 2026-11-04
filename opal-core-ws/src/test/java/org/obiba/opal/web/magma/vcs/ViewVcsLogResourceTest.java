@@ -13,6 +13,7 @@ package org.obiba.opal.web.magma.vcs;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import com.thoughtworks.xstream.converters.ConversionException;
 import jakarta.ws.rs.core.Response;
 
 import org.apache.shiro.subject.Subject;
@@ -118,6 +119,15 @@ public class ViewVcsLogResourceTest {
     Mockito.doThrow(new IllegalStateException("no source table")).when((Initialisable) restored).initialise();
 
     assertRejected(resource.restore(COMMIT_ID), 400);
+  }
+
+  @Test
+  public void test_restore_rejects_unreadable_definition() {
+    when(strategy.readView("ds", "v", COMMIT_ID)).thenThrow(new ConversionException("no such class"));
+
+    assertThat(resource.restore(COMMIT_ID).getStatus()).isEqualTo(400);
+    verify(viewManager, never()).addView(anyString(), any(ValueView.class), anyString(),
+        any(VariableOperationContext.class));
   }
 
   @Test

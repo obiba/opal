@@ -82,11 +82,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
-    // the commits of the tags are not reachable by the name of a renamed view, and a new view can reuse this name
-    gitCommandHandler.execute(new TagDeleteCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
-        OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewTagsPrefix(viewName)).build());
+    // first the files: if this fails the view is rolled back and must keep its tags
     gitCommandHandler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
         OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
+    // the commits of the tags are not reachable by the name of a renamed view, and a new view can reuse this name
+    try {
+      gitCommandHandler.execute(new TagDeleteCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+          OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewTagsPrefix(viewName)).build());
+    } catch (RuntimeException e) {
+      // the view is gone from git: failing here would roll it back in memory only
+      log.warn("Failed deleting the tags of the removed view {} in datasource {}", viewName, datasourceName, e);
+    }
   }
 
   @Override

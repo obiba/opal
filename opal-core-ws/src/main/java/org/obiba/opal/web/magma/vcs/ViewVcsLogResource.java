@@ -14,6 +14,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 
+import com.thoughtworks.xstream.XStreamException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
@@ -108,7 +109,14 @@ public class ViewVcsLogResource {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", view).build())
           .build();
-    ValueView restored = viewPersistenceStrategy.readView(datasource, view, commitId);
+    ValueView restored;
+    try {
+      restored = viewPersistenceStrategy.readView(datasource, view, commitId);
+    } catch(XStreamException e) {
+      // for instance the definition refers to a class that does not exist anymore
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", e)).build();
+    }
     // the deserialized view has no datasource until it is added, and the view dto needs it
     restored.setDatasource(viewAwareDatasource);
     boolean added = false;
