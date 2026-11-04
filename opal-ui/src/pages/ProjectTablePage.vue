@@ -152,7 +152,7 @@
           <q-tab name="values" :label="t('values')" v-if="canReadValues" />
           <q-tab name="analyses" :label="t('analyses')" v-if="canAnalyseValidate" />
           <q-tab name="permissions" :label="t('permissions')" v-if="canReadPermissions" />
-          <q-tab name="history" :label="t('history')" v-if="isView && canUpdate" />
+          <q-tab name="versions" :label="t('versions')" v-if="isView && canUpdate" />
         </q-tabs>
 
         <q-separator />
@@ -241,7 +241,7 @@
             />
           </q-tab-panel>
 
-          <q-tab-panel name="history" v-if="isView && canUpdate">
+          <q-tab-panel name="versions" v-if="isView && canUpdate">
             <view-history :key="tName" />
           </q-tab-panel>
         </q-tab-panels>

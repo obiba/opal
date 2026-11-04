@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.obiba.git.TagInfo;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.MagmaEngine;
@@ -31,6 +32,7 @@ import org.obiba.magma.views.ViewAwareDatasource;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
+import org.obiba.opal.core.vcs.OpalGitUtils;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.web.magma.view.ValueViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -134,6 +136,25 @@ public class ViewVcsLogResourceTest {
         .setExtension(Magma.ResourceViewDto.view, Magma.ResourceViewDto.getDefaultInstance()).buildPartial());
 
     assertRejected(resource.restore(COMMIT_ID), 403);
+  }
+
+  @Test
+  public void test_download_view_definition_at_tag() {
+    when(vcs.getTags("ds", "v")).thenReturn(List.of(new TagInfo.Builder().name("t1").commitId(COMMIT_ID).build()));
+    when(vcs.getBlob("ds", OpalGitUtils.getViewFilePath("v"), COMMIT_ID)).thenReturn("<view/>");
+
+    Response response = resource.downloadViewDefinition("t1");
+
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(response.getEntity()).isEqualTo("<view/>");
+    assertThat(response.getHeaderString("Content-Disposition")).contains("filename=\"v-t1.xml\"");
+  }
+
+  @Test
+  public void test_download_view_definition_of_unknown_tag_not_found() {
+    when(vcs.getTags("ds", "v")).thenReturn(List.of());
+
+    assertThat(resource.downloadViewDefinition("t1").getStatus()).isEqualTo(404);
   }
 
   @Test

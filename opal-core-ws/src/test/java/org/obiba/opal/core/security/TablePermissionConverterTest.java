@@ -34,6 +34,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
     String view = "/datasource/patate/view/pwel";
     assertThat(isTableEditPermitted(view + "/vcs/commits", "GET")).isTrue();
     assertThat(isTableEditPermitted(view + "/vcs/tags", "GET")).isTrue();
+    assertThat(isTableEditPermitted(view + "/vcs/tag/xml", "GET")).isTrue();
     assertThat(isTableEditPermitted(view + "/vcs/tags", "POST")).isTrue();
     assertThat(isTableEditPermitted(view + "/vcs/commit/abc/_restore", "POST")).isTrue();
     // the view edition must not give the creation of views

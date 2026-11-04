@@ -20,9 +20,11 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 import org.obiba.git.CommitInfo;
+import org.obiba.git.TagInfo;
 import org.obiba.magma.ValueTableStatus;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.support.Disposables;
@@ -35,6 +37,7 @@ import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.ViewResourceImpl;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.ws.util.ContentDisposition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -132,6 +135,21 @@ public class ViewVcsLogResource {
       // for instance a resource view holds an R session
       if(!added) Disposables.silentlyDispose(restored);
     }
+  }
+
+  /**
+   * The view definition at the tag, as stored: same format as the download of the current view.
+   * The tag is a query parameter because its name can hold a slash.
+   */
+  @GET
+  @Path("/tag/xml")
+  public Response downloadViewDefinition(@QueryParam("name") String name) {
+    for(TagInfo tag : vcs.getTags(datasource, view)) {
+      if(tag.getName().equals(name))
+        return Response.ok(vcs.getBlob(datasource, OpalGitUtils.getViewFilePath(view), tag.getCommitId()), "application/xml")
+            .header("Content-Disposition", ContentDisposition.attachment(view + "-" + name + ".xml")).build();
+    }
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
 
   @GET

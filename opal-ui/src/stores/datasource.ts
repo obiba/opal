@@ -498,6 +498,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.post(viewVcsUrl() + u`/commit/${commitId}/_restore`);
   }
 
+  function downloadViewTag(name: string) {
+    window.open(`${baseUrl}${viewVcsUrl()}/tag/xml?${new URLSearchParams({ name })}`, '_self');
+  }
+
   async function createView(destination: string, view: ViewDto) {
     delete view.datasourceName;
     delete view.status;
@@ -696,6 +700,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     getViewTags,
     createViewTag,
     restoreViewCommit,
+    downloadViewTag,
     getAllTables,
     createView,
     getView,

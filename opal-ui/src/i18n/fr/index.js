@@ -1534,6 +1534,7 @@ export default {
   variance: 'Variance',
   vcf: 'VCF',
   version: 'Version',
+  versions: 'Versions',
   view_destination_hint: "La vue de destination sera créée si elle n'existe pas, sinon elle sera mise à jour en fusionnant les variables dérivées.",
   view_name: 'Nom de la vue',
   view: 'Voir',

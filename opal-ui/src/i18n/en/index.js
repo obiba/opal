@@ -1534,6 +1534,7 @@ export default {
   variance: 'Variance',
   vcf: 'VCF',
   version: 'Version',
+  versions: 'Versions',
   view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated by merging derived variables with the existing ones.',
   view_name: 'View name',
   view: 'View',
