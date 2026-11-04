@@ -20,6 +20,7 @@ import org.obiba.git.command.DeleteFilesCommand;
 import org.obiba.git.command.FetchBlobCommand;
 import org.obiba.git.command.GitCommandHandler;
 import org.obiba.git.command.ReadFilesCommand;
+import org.obiba.git.command.TagDeleteCommand;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.views.View;
@@ -81,6 +82,9 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
+    // the commits of the tags are not reachable by the name of a renamed view, and a new view can reuse this name
+    gitCommandHandler.execute(new TagDeleteCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+        OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewTagsPrefix(viewName)).build());
     gitCommandHandler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
         OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
   }

@@ -178,6 +178,39 @@ public class OpalViewPersistenceStrategyTest {
     }
   }
 
+  @Test
+  public void testRemoveViewRemovesItsTags() throws Exception {
+    SecurityUtils.setSecurityManager(new DefaultSecurityManager());
+    MagmaEngine.get().extend(new MagmaJsExtension());
+    String datasource = "remove-view-" + System.nanoTime();
+    GitCommandHandler handler = new GitCommandHandler();
+    OpalViewPersistenceStrategy strategy = new OpalViewPersistenceStrategy();
+    strategy.setGitCommandHandler(handler);
+    OpalGitVersionControlSystem vcs = new OpalGitVersionControlSystem();
+    ReflectionTestUtils.setField(vcs, "gitCommandHandler", handler);
+    try {
+      StaticValueTable table = new StaticValueTable(new StaticDatasource("ds"), "T", ImmutableSet.of("1"));
+      table.addVariables(TextType.get(), "A");
+      strategy.writeView(datasource, newView(table, "$('A').eq('a')", "X"), "first", null);
+      strategy.writeView(datasource, new View("other", table), "other", null);
+      vcs.createTag(datasource, "v", "t1", null);
+      vcs.createTag(datasource, "other", "t1", null);
+
+      strategy.removeView(datasource, "v");
+      assertThat(vcs.getTags(datasource, "v")).isEmpty();
+      assertThat(vcs.getTags(datasource, "other")).hasSize(1);
+
+      // a new view with the same name can reuse the tag name
+      strategy.writeView(datasource, newView(table, "$('A').eq('b')", "X"), "again", null);
+      vcs.createTag(datasource, "v", "t1", null);
+      assertThat(vcs.getTags(datasource, "v")).hasSize(1);
+    } finally {
+      SecurityUtils.setSecurityManager(null);
+      FileUtil.delete(OpalGitUtils.getGitViewsRepoFolder(datasource));
+      FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasource));
+    }
+  }
+
   private View newView(ValueTable table, String where, String... variables) {
     View view = new View("v", table);
     view.setWhereClause(new JavascriptClause(where));

@@ -489,7 +489,9 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function createViewTag(name: string, message: string | undefined) {
-    return api.post(`${viewVcsUrl()}/tags`, null, { params: { name, message } });
+    const params = new URLSearchParams({ name });
+    if (message) params.append('message', message);
+    return api.post(`${viewVcsUrl()}/tags`, params);
   }
 
   async function restoreViewCommit(commitId: string) {

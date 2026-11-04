@@ -102,6 +102,17 @@ public class OpalGitVersionControlSystemTest {
     assertThat(names(vcs.getTags(datasource, "v 2"))).containsOnly("t");
   }
 
+  @Test
+  public void test_tags_of_views_with_dots_and_stars_in_their_name() {
+    String[] views = { "x.lock", ".hidden", "a..b", "end.", "a*" };
+    writeViews(views);
+
+    for (String view : views) {
+      vcs.createTag(datasource, view, "t", null);
+      assertThat(names(vcs.getTags(datasource, view))).containsOnly("t");
+    }
+  }
+
   @Test(expected = GitException.class)
   public void test_existing_tag_rejected() {
     writeViews("v1");

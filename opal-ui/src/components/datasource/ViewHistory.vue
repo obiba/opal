@@ -1,7 +1,14 @@
 <template>
   <div>
     <div class="text-h6">{{ t('tags') }}</div>
-    <q-table flat :rows="tags" :columns="columns" row-key="name" :hide-pagination="tags.length <= 10">
+    <q-table
+      flat
+      :rows="tags"
+      :columns="columns"
+      row-key="name"
+      :pagination="initialPagination"
+      :hide-pagination="tags.length <= initialPagination.rowsPerPage"
+    >
       <template v-slot:top-left>
         <q-btn color="primary" icon="add" :label="t('git.add_tag')" size="sm" @click="onShowAddTag" />
       </template>
@@ -94,6 +101,12 @@ const tagName = ref('');
 const tagMessage = ref('');
 const showRestore = ref(false);
 const tagToRestore = ref<VcsTagInfoDto>();
+const initialPagination = ref({
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+  minRowsForPagination: 10,
+});
 
 const columns = computed(() => [
   { name: 'name', label: t('name'), align: DefaultAlignment, field: 'name' },

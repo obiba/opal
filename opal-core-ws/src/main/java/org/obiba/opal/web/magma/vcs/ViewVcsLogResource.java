@@ -15,17 +15,18 @@ import java.util.List;
 import jakarta.validation.constraints.NotNull;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 import org.obiba.git.CommitInfo;
-import org.obiba.git.TagInfo;
-import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.ValueTableStatus;
 import org.obiba.magma.ValueView;
+import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.ViewAwareDatasource;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalViewPersistenceStrategy;
@@ -39,7 +40,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
 
 @Component
@@ -108,17 +108,30 @@ public class ViewVcsLogResource {
     ValueView restored = viewPersistenceStrategy.readView(datasource, view, commitId);
     // the deserialized view has no datasource until it is added, and the view dto needs it
     restored.setDatasource(viewAwareDatasource);
+    boolean added = false;
     try {
-      Initialisables.initialise(restored);
-    } catch(RuntimeException e) {
-      // for instance a source table does not exist anymore
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", e)).build();
+      try {
+        Initialisables.initialise(restored);
+      } catch(RuntimeException e) {
+        // for instance a source table does not exist anymore
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", e)).build();
+      }
+      // a resource view does not throw, it only reports the error in its status
+      if(restored.getStatus() == ValueTableStatus.ERROR)
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", view).build())
+            .build();
+      if(!ViewResourceImpl.checkValuesPermissions(current, viewDtos.asDto(restored)))
+        return Response.status(Response.Status.FORBIDDEN).build();
+      viewManager.addView(datasource, restored,
+          "Restore view from " + commitId.substring(0, Math.min(7, commitId.length())), null);
+      added = true;
+      return Response.ok().build();
+    } finally {
+      // for instance a resource view holds an R session
+      if(!added) Disposables.silentlyDispose(restored);
     }
-    if(!ViewResourceImpl.checkValuesPermissions(current, viewDtos.asDto(restored)))
-      return Response.status(Response.Status.FORBIDDEN).build();
-    viewManager.addView(datasource, restored, "Restore view from " + getCommitLabel(commitId), null);
-    return Response.ok().build();
   }
 
   @GET
@@ -133,8 +146,9 @@ public class ViewVcsLogResource {
    */
   @POST
   @Path("/tags")
-  public Response createTag(@QueryParam("name") String name, @QueryParam("message") String message) {
-    if(Strings.isNullOrEmpty(name) || name.isBlank())
+  public Response createTag(@FormParam("name") String name, @FormParam("message") String message) {
+    viewManager.getView(datasource, view); // not found if the view was removed: its last commit is the deletion
+    if(name == null || name.isBlank())
       return Response.status(Response.Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "TagNameRequired").build()).build();
     vcs.createTag(datasource, view, name, message);
@@ -185,12 +199,5 @@ public class ViewVcsLogResource {
       @NotNull String commitId, @Nullable String prevCommitId) {
     Iterable<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
     return CommitInfo.Builder.createFromObject(commitInfo).diffEntries((List<String>) diffEntries).build();
-  }
-
-  private String getCommitLabel(String commitId) {
-    for(TagInfo tag : vcs.getTags(datasource, view)) {
-      if(tag.getCommitId().equals(commitId)) return tag.getName();
-    }
-    return commitId.substring(0, Math.min(7, commitId.length()));
   }
 }

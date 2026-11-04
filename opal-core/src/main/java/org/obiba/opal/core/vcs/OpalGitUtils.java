@@ -77,10 +77,11 @@ public final class OpalGitUtils {
 
   /**
    * All the views of a datasource share one repository: the tags of a view are under the view name. The view name is
-   * URL-encoded, because git does not allow spaces (and other characters) in tag names.
+   * URL-encoded, because git does not allow spaces (and other characters) in tag names. The URL encoder keeps the dots
+   * and the stars, that git does not allow in names such as "x.lock", ".hidden", "a..b" or "a*".
    */
   public static String getViewTagsPrefix(String view) {
-    return URLEncoder.encode(view, StandardCharsets.UTF_8) + "/";
+    return URLEncoder.encode(view, StandardCharsets.UTF_8).replace(".", "%2E").replace("*", "%2A") + "/";
   }
 
   //
