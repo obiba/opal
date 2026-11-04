@@ -17,8 +17,10 @@ import com.thoughtworks.xstream.XStream;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.git.command.DeleteFilesCommand;
+import org.obiba.git.command.FetchBlobCommand;
 import org.obiba.git.command.GitCommandHandler;
 import org.obiba.git.command.ReadFilesCommand;
+import org.obiba.git.command.TagDeleteCommand;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueView;
 import org.obiba.magma.views.View;
@@ -80,8 +82,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
+    // first the files: if this fails the view is rolled back and must keep its tags
     gitCommandHandler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
         OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
+    // the commits of the tags are not reachable by the name of a renamed view, and a new view can reuse this name
+    try {
+      gitCommandHandler.execute(new TagDeleteCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+          OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewTagsPrefix(viewName)).build());
+    } catch (RuntimeException e) {
+      // the view is gone from git: failing here would roll it back in memory only
+      log.warn("Failed deleting the tags of the removed view {} in datasource {}", viewName, datasourceName, e);
+    }
   }
 
   @Override
@@ -104,16 +115,30 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     List<String> viewNames = Lists.newArrayList();
     if (datasourceRepo.exists()) {
       for (ValueView view : readGitViews(datasourceRepo)) {
-        if (view instanceof ResourceView) {
-          ResourceView resView = (ResourceView) view;
-          resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource(), resView.getProfile()));
-        }
+        setConnector(view);
         builder.add(view);
         viewNames.add(view.getName());
       }
     }
     readLegacyViews(datasourceName, builder, viewNames);
     return builder.build();
+  }
+
+  /**
+   * Read the view from its View.xml file at the commit. The view is not initialised.
+   */
+  public ValueView readView(@NotNull String datasourceName, @NotNull String viewName, @NotNull String commitId) {
+    String xml = gitCommandHandler.execute(new FetchBlobCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
+        OpalGitUtils.getGitViewsWorkFolder(), OpalGitUtils.getViewFilePath(viewName)).commitId(commitId).build());
+    ValueView view = (ValueView) getXStream().fromXML(xml);
+    setConnector(view);
+    return view;
+  }
+
+  private void setConnector(ValueView view) {
+    if (view instanceof ResourceView resView) {
+      resView.setConnector(tabularResourceConnectorFactory.newConnector(resView.getProject(), resView.getResource(), resView.getProfile()));
+    }
   }
 
   private void readLegacyViews(String datasourceName, ImmutableSet.Builder<ValueView> builder, List<String> viewNames) {

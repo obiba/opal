@@ -485,6 +485,19 @@ export interface VcsCommitInfoDto {
   isHead?: boolean | undefined;
   /** current (latest) commit for a given path */
   isCurrent?: boolean | undefined;
+  tags: string[];
+}
+
+export interface VcsTagInfoDto {
+  name: string;
+  commitId: string;
+  message?: string | undefined;
+  author?: string | undefined;
+  date?: string | undefined;
+}
+
+export interface VcsTagInfosDto {
+  tagInfos: VcsTagInfoDto[];
 }
 
 export interface IDProviderDto {

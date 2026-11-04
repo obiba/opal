@@ -13,7 +13,6 @@ package org.obiba.opal.core.magma.js;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.EcmaError;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.MagmaContext;
@@ -36,14 +35,19 @@ public class OpalJavascriptSandboxTest {
    */
   private static final String PAYLOAD = "Packages.java.lang.System.getProperty('java.version')";
 
+  private MagmaContextFactory factory;
+
   @Before
   public void setUp() {
     MagmaEngine.get().shutdown();
-    MagmaContextFactory factory = new MagmaContextFactory();
+    factory = new MagmaContextFactory();
     factory.setGlobalMethodProviders(List.of(new OpalGlobalMethodProvider()));
     MagmaJsExtension extension = new MagmaJsExtension();
     extension.setMagmaContextFactory(factory);
     new MagmaEngine().extend(extension);
+    // Rhino's global factory is set once per JVM: a previous test class may have installed one without Opal's methods,
+    // in which case the extension leaves this factory uninitialised. Evaluate through this factory, not the global one.
+    factory.initialise();
   }
 
   @After
@@ -66,6 +70,6 @@ public class OpalJavascriptSandboxTest {
   }
 
   private Object evaluate(String script) {
-    return ContextFactory.getGlobal().call(cx -> cx.evaluateString(MagmaContext.asMagmaContext(cx).newLocalScope(), script, "", 1, null));
+    return factory.call(cx -> cx.evaluateString(MagmaContext.asMagmaContext(cx).newLocalScope(), script, "", 1, null));
   }
 }

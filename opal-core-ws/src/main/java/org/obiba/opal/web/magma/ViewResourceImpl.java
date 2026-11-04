@@ -80,7 +80,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "ReservedTableName").build()).build();
 
-    if (!checkValuesPermissions(viewDto))
+    if (!checkValuesPermissions(getValueTable(), viewDto))
       return Response.status(Status.FORBIDDEN).build();
 
     ValueTable table = getValueTable();
@@ -146,12 +146,14 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
     return resource;
   }
 
-  private boolean checkValuesPermissions(ViewDto viewDto) {
+  /**
+   * A user who can see the values of the view must also be permitted to see the values of the view sources.
+   */
+  public static boolean checkValuesPermissions(ValueTable table, ViewDto viewDto) {
     if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return true;
 
     Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
 
-    ValueTable table = getValueTable();
     if (!authorizer.isPermitted(
         "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET"))
       return true;
@@ -159,7 +161,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
     return viewDto.hasExtension(Magma.ResourceViewDto.view) ? checkResourceValuesPermissions(viewDto) : checkTableValuesPermissions(viewDto);
   }
 
-  private boolean checkTableValuesPermissions(ViewDto viewDto) {
+  private static boolean checkTableValuesPermissions(ViewDto viewDto) {
     Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
     // user can see the values of the view, so make sure user is also permitted to see the referred tables values
     for (String tableName : viewDto.getFromList()) {
@@ -173,7 +175,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
     return true;
   }
 
-  private boolean checkResourceValuesPermissions(ViewDto viewDto) {
+  private static boolean checkResourceValuesPermissions(ViewDto viewDto) {
     // user can see the values of the view, so make sure user is also permitted to edit the resource ref
     for (String tableName : viewDto.getFromList()) {
       // reuse project's table naming for the resource...

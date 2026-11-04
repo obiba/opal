@@ -24,6 +24,10 @@
           :hint="t('resource_ref.view_destination_hint')"
           class="q-mb-md"
         />
+        <div v-if="editMode && name !== view?.name" class="q-mb-md box-warning">
+          <q-icon name="error" size="1.2rem" />
+          <span class="on-right">{{ t('view_rename_warning') }}</span>
+        </div>
         <q-input
           v-show="editMode"
           v-model="resourceFullName"

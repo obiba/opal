@@ -9,7 +9,9 @@
  */
 package org.obiba.opal.core.security;
 
+import org.apache.shiro.authz.Permission;
 import org.junit.Test;
+import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -25,6 +27,28 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
     assertThat(args.length).isEqualTo(2);
     assertThat(args[0]).isEqualTo("patate");
     assertThat(args[1]).isEqualTo("pwel");
+  }
+
+  @Test
+  public void testTableEditOnViewVcs() {
+    String view = "/datasource/patate/view/pwel";
+    assertThat(isTableEditPermitted(view + "/vcs/commits", "GET")).isTrue();
+    assertThat(isTableEditPermitted(view + "/vcs/tags", "GET")).isTrue();
+    assertThat(isTableEditPermitted(view + "/vcs/tag/xml", "GET")).isTrue();
+    assertThat(isTableEditPermitted(view + "/vcs/tags", "POST")).isTrue();
+    assertThat(isTableEditPermitted(view + "/vcs/commit/abc/_restore", "POST")).isTrue();
+    // the view edition must not give the creation of views
+    assertThat(isTableEditPermitted("/datasource/patate/views", "POST")).isFalse();
+  }
+
+  private boolean isTableEditPermitted(String node, String method) {
+    OpalPermissionResolver resolver = new OpalPermissionResolver();
+    Permission requested = resolver.resolvePermission("rest:" + node + ":" + method);
+    for(String granted : newConverter().convert("opal", "/datasource/patate/view/pwel",
+        TablePermissionConverter.Permission.TABLE_EDIT.toString())) {
+      if(resolver.resolvePermission(granted).implies(requested)) return true;
+    }
+    return false;
   }
 
   @Test

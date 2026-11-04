@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.obiba.git.CommitInfo;
+import org.obiba.git.TagInfo;
 import org.obiba.opal.web.model.Opal;
 
 import com.google.common.base.Strings;
@@ -32,6 +33,24 @@ public final class Dtos {
     return tagsDto.build();
   }
 
+  public static Opal.VcsTagInfosDto asTagsDto(Iterable<TagInfo> tagInfos) {
+    Opal.VcsTagInfosDto.Builder builder = Opal.VcsTagInfosDto.newBuilder();
+    for(TagInfo tagInfo : tagInfos) {
+      builder.addTagInfos(asDto(tagInfo));
+    }
+    return builder.build();
+  }
+
+  public static Opal.VcsTagInfoDto asDto(TagInfo tagInfo) {
+    Opal.VcsTagInfoDto.Builder builder = Opal.VcsTagInfoDto.newBuilder() //
+        .setName(tagInfo.getName()) //
+        .setCommitId(tagInfo.getCommitId());
+    if(!Strings.isNullOrEmpty(tagInfo.getMessage())) builder.setMessage(tagInfo.getMessage().trim());
+    if(!Strings.isNullOrEmpty(tagInfo.getTaggerName())) builder.setAuthor(tagInfo.getTaggerName());
+    if(tagInfo.getDate() != null) builder.setDate(tagInfo.getDate().toInstant().toString());
+    return builder.build();
+  }
+
   public static Opal.VcsCommitInfosDto asDto(Iterable<CommitInfo> commitInfos) {
     Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<>();
     for(CommitInfo commitInfo : commitInfos) {
@@ -47,7 +66,8 @@ public final class Dtos {
         .setCommitId(commitInfo.getCommitId()) //
         .setComment(commitInfo.getComment()) //
         .setIsHead(commitInfo.isHead()) //
-        .setIsCurrent(commitInfo.isCurrent());
+        .setIsCurrent(commitInfo.isCurrent()) //
+        .addAllTags(commitInfo.getTags());
 
     List<String> diffEntries = commitInfo.getDiffEntries();
     if(diffEntries != null) {

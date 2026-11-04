@@ -10,6 +10,10 @@
       <q-card-section>
         <q-input v-model="name" dense type="text" :label="t('name')" style="min-width: 300px" class="q-mb-md">
         </q-input>
+        <div v-if="isView && name !== table.name" class="q-mb-md box-warning">
+          <q-icon name="error" size="1.2rem" />
+          <span class="on-right">{{ t('view_rename_warning') }}</span>
+        </div>
         <div v-if="isView">
           <q-select
             v-model="fromSelection"
