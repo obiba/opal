@@ -1537,6 +1537,7 @@ export default {
   versions: 'Versions',
   view_destination_hint: 'The destination view will be created if it does not exist, otherwise it will be updated by merging derived variables with the existing ones.',
   view_name: 'View name',
+  view_rename_warning: 'Renaming this view restarts its history of changes: earlier versions, including the history of its variables, will no longer be listed and all its tags will be deleted.',
   view: 'View',
   vocabularies: 'Vocabularies',
   vocabulary: 'Vocabulary',
