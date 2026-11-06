@@ -121,12 +121,6 @@ public abstract class AbstractVariableSummaryCachedService< //
 
     log.debug("Get {} summary for {}", getSummaryType(summaryFactory), variable.getName());
 
-    // don't cache transient variable summary
-    if(isTransientVariable(variable)) {
-      log.trace("Don't cache transient variable summary for {}", variable.getName());
-      return summaryFactory.getSummary();
-    }
-
     if(refreshCache) {
       log.trace("Force summary cache refresh for {}", variable.getName());
       clearVariableSummaryCache(summaryFactory);
@@ -141,11 +135,6 @@ public abstract class AbstractVariableSummaryCachedService< //
     log.trace("{} summary {} cache {} ({})", StringUtils.capitalize(getSummaryType(summaryFactory)),
         inCache ? "IN" : "NOT IN", summaryFactory.getVariable().getName(), key);
     return inCache;
-  }
-
-  private boolean isTransientVariable(AttributeAware variable) {
-    return variable.hasAttribute("opal", "transient") &&
-        (boolean) variable.getAttribute("opal", "transient").getValue().getValue();
   }
 
   private void clearVariableSummaryCache(@NotNull TVariableSummaryFactory summaryFactory) {

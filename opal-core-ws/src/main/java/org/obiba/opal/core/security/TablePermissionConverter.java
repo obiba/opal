@@ -81,7 +81,6 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),
             toRest("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),
             toRest("/datasource/{0}/table/{1}/facets/_search", "POST:GET", args),
-            toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args),
             toRest("/project/{0}", "GET:GET", args),
             toRest("/project/{0}/resources", "GET:GET", args),
             toRest("/project/{0}/state", "GET:GET", args),
@@ -144,9 +143,6 @@ public class TablePermissionConverter extends OpalPermissionConverter {
               toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),
               toRest("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),
               toRest("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),
-              toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),
-              toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),
-              toRest("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args),
               toRest("/datasource/{0}/view/{1}/vcs", "GET:GET/*", args)));
         }
 
@@ -166,11 +162,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
     TABLE_VALUES_EDIT {
       @Override
       public Iterable<String> convert(String node) {
-        boolean isView = node.contains("/view/");
-        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
-
         List<String> perms = Lists.newArrayList();
-        if(isView) perms.add(toRest("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
         Iterables.addAll(perms, TABLE_VALUES.convert(node));
         Iterables.addAll(perms, TABLE_EDIT.convert(node));
         return perms;

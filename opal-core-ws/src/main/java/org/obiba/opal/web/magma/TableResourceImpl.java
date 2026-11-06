@@ -9,15 +9,10 @@
  */
 package org.obiba.opal.web.magma;
 
-import com.google.common.base.Strings;
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
-import org.obiba.magma.js.JavascriptVariableBuilder;
-import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.magma.views.View;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
@@ -25,24 +20,20 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
-import static org.obiba.magma.Attribute.Builder.newAttribute;
 
 @Component("tableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -175,58 +166,6 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   }
 
   @Override
-  public VariableResource getTransientVariable(String valueTypeName, Boolean repeatable, String scriptQP,
-                                               List<String> categoriesQP, Boolean self, String scriptFP, List<String> categoriesFP, List<String> missingCategories) {
-    return getVariableResource(
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            missingCategories, self), null);
-  }
-
-  @Override
-  public Response compileTransientVariable(String valueTypeName, Boolean repeatable, String scriptQP,
-                                           List<String> categoriesQP, Boolean self, String scriptFP, List<String> categoriesFP) {
-    JavascriptVariableValueSource variableValueSource = getJavascriptVariableValueSource(valueTypeName, repeatable,
-        scriptQP, categoriesQP, scriptFP, categoriesFP, null, self);
-    variableValueSource.validateScript();
-    return Response.ok().build();
-  }
-
-  @Override
-  public ValueSetsResource getTransientVariableValueSets(String valueTypeName, Boolean repeatable, String scriptQP,
-                                                         List<String> categoriesQP, Boolean self, String scriptFP, List<String> categoriesFP) {
-
-    ValueSetsResource resource = applicationContext.getBean(ValueSetsResource.class);
-    resource.setValueTable(getValueTable());
-    resource.setVariableValueSource(
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            null, self));
-    return resource;
-  }
-
-  @Override
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "MethodWithTooManyParameters"})
-  public ValueSetResource getTransientVariableValueSet( //
-                                                        Request request, //
-                                                        String identifier, //
-                                                        Boolean filterBinary, //
-                                                        String valueTypeName, //
-                                                        Boolean repeatable, //
-                                                        String scriptQP, //
-                                                        List<String> categoriesQP, //
-                                                        Boolean self, //
-                                                        String scriptFP, //
-                                                        List<String> categoriesFP) {
-
-    ValueSetResource resource = applicationContext.getBean(ValueSetResource.class);
-    resource.setValueTable(getValueTable());
-    resource.setVariableValueSource(
-        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            null, self));
-    resource.setEntity(new VariableEntityBean(getValueTable().getEntityType(), identifier));
-    return resource;
-  }
-
-  @Override
   public CompareResource getTableCompare() {
     CompareResource resource = applicationContext.getBean(CompareResource.class);
     resource.setComparedTable(getValueTable());
@@ -260,64 +199,12 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     }
   }
 
-  private ValueType resolveValueType(String valueTypeName) {
-    try {
-      return ValueType.Factory.forName(valueTypeName);
-    } catch (IllegalArgumentException ex) {
-      throw new InvalidRequestException("IllegalParameterValue", "valueType", valueTypeName);
-    }
-  }
-
   private VariableResource getVariableResource(VariableValueSource source, String name) {
     VariableResource resource = applicationContext.getBean("variableResource", VariableResource.class);
     resource.setName(name);
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(source);
     return resource;
-  }
-
-  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
-                                                                         String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP,
-                                                                         Collection<String> missingCategories, boolean self) {
-    String script = scriptQP;
-    List<String> categories = categoriesQP;
-    if (Strings.isNullOrEmpty(script)) {
-      script = scriptFP;
-    }
-    if (Strings.isNullOrEmpty(script)) {
-      script = "null";
-    }
-    if (categories == null || categories.isEmpty()) {
-      categories = categoriesFP;
-    }
-    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories,
-        missingCategories);
-    ValueTable transientView = self
-        ? getValueTable()
-        : View.Builder.newView("transient", getValueTable()).build();
-    JavascriptVariableValueSource valueSource = new JavascriptVariableValueSource(transientVariable, transientView);
-    valueSource.initialise();
-    return valueSource;
-  }
-
-  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script,
-                                          @Nullable Iterable<String> categories, @Nullable Collection<String> missingCategories) {
-    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType())
-        .extend(JavascriptVariableBuilder.class).setScript(script);
-    if (repeatable) {
-      builder.repeatable();
-    }
-    if (categories != null) {
-      for (String category : categories) {
-        boolean isMissing = missingCategories != null && missingCategories.contains(category);
-        builder.addCategory(category, "", isMissing);
-      }
-
-    }
-    // use attribute to detect transient variables as we may need to set the name of the variable
-    builder.addAttribute(
-        newAttribute().withNamespace("opal").withName("transient").withValue(BooleanType.get().trueValue()).build());
-    return builder.build();
   }
 
 }
