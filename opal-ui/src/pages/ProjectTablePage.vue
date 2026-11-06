@@ -102,15 +102,17 @@
           </q-list>
         </q-btn-dropdown>
 
-        <q-btn
-          v-if="canUpdate"
-          outline
-          color="secondary"
-          icon="edit"
-          size="sm"
-          @click="onShowEdit"
-          class="on-right"
-        ></q-btn>
+        <span v-if="canUpdate" class="on-right">
+          <q-btn
+            outline
+            color="secondary"
+            icon="edit"
+            size="sm"
+            :disable="!isView && hasDependents"
+            @click="onShowEdit"
+          ></q-btn>
+          <q-tooltip v-if="!isView && hasDependents">{{ t('table_dependents_hint') }}</q-tooltip>
+        </span>
         <span v-if="canDelete" class="on-right">
           <q-btn outline color="red" icon="delete" size="sm" :disable="hasDependents" @click="onShowDelete"></q-btn>
           <q-tooltip v-if="hasDependents">{{ t('table_dependents_hint') }}</q-tooltip>
@@ -312,9 +314,7 @@ const exportType = ref<'file' | 'server' | 'database'>('file');
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
 const isResourceView = computed(() => datasourceStore.table.viewType === 'ResourceView');
-const hasDependents = computed(
-  () => !!datasourceStore.table.dependents?.length || !!datasourceStore.table.hiddenDependents,
-);
+const hasDependents = computed(() => datasourceStore.tableHasDependents);
 const canExport = computed(() => projectsStore.perms.export?.canCreate());
 const canCopy = computed(() => projectsStore.perms.copy?.canCreate());
 const canAnalyseValidate = computed(() => projectsStore.perms.analyses?.canRead());

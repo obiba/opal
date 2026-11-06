@@ -8,7 +8,16 @@
       <q-separator />
 
       <q-card-section>
-        <q-input v-model="name" dense type="text" :label="t('name')" style="min-width: 300px" class="q-mb-md">
+        <q-input
+          v-model="name"
+          dense
+          type="text"
+          :label="t('name')"
+          :disable="datasourceStore.tableHasDependents"
+          :hint="datasourceStore.tableHasDependents ? t('table_dependents_hint') : undefined"
+          style="min-width: 300px"
+          class="q-mb-md"
+        >
         </q-input>
         <div v-if="isView && name !== table.name" class="q-mb-md box-warning">
           <q-icon name="error" size="1.2rem" />

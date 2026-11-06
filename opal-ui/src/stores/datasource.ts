@@ -58,6 +58,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return bundles;
   });
 
+  const tableHasDependents = computed(() => !!table.value.dependents?.length || !!table.value.hiddenDependents);
+
   function reset() {
     datasource.value = {} as DatasourceDto;
     tables.value = [];
@@ -654,6 +656,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tablesCountsLoading,
     view,
     tableIndex,
+    tableHasDependents,
     variables,
     variable,
     variableAttributesBundles,

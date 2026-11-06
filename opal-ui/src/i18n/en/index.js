@@ -1459,7 +1459,7 @@ export default {
   table_name: 'Table name',
   table_dependents: 'Used by views',
   table_dependents_hidden: 'Other views not accessible',
-  table_dependents_hint: 'This table cannot be deleted while views use it',
+  table_dependents_hint: 'This table cannot be deleted or renamed while views use it',
   table_references: 'Table references',
   table: 'Table',
   tables_views: 'Tables (views)',
