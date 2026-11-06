@@ -10,26 +10,25 @@
 package org.obiba.opal.web.magma;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriInfo;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
@@ -41,7 +40,6 @@ import com.google.common.collect.Lists;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -268,48 +266,10 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
-  public void testBuildTransientVariable_BuildsVariableAsSpecified() {
-    // Setup
-    ValueTable valueTable = mock(ValueTable.class);
-    when(valueTable.getEntityType()).thenReturn(PARTICIPANT);
-
-    ApplicationContext applicationContext = mock(ApplicationContext.class);
-    when(applicationContext.getBean("variableResource", VariableResource.class)).thenReturn(new VariableResourceImpl());
-
-    VariableValueSource variableValueSource = mock(VariableValueSource.class);
-    when(variableValueSource.getVariable()).thenReturn(mock(Variable.class));
-    when(valueTable.getVariableValueSource(anyString())).thenReturn(variableValueSource);
-
-    TableResource tableResource = createResource(valueTable, applicationContext);
-    String script = "$('someVar')";
-
-    // Exercise
-    ImmutableList<String> categories = ImmutableList.of("CAT1", "CAT2");
-    VariableResource variableResource = tableResource
-        .getTransientVariable(TextType.get().getName(), false, script, categories, true, script, categories, null);
-
-    // Verify behaviour
-    verify(valueTable).getEntityType();
-    verify(applicationContext).getBean("variableResource", VariableResource.class);
-
-    Variable variable = variableResource.getVariableValueSource().getVariable();
-
-    // Verify state
-    assertThat(variable).isNotNull();
-    assertThat(variable.getEntityType()).isEqualTo(PARTICIPANT);
-    assertThat(TextType.get()).isEqualTo((TextType) variable.getValueType());
-    assertThat(variable.isRepeatable()).isFalse();
-    assertThat(variable.getAttributeStringValue("script")).isEqualTo(script);
-    assertThat(hasCategory(variable, "CAT1")).isTrue();
-    assertThat(hasCategory(variable, "CAT2")).isTrue();
-  }
-
-  private boolean hasCategory(Variable variable, String category) {
-    for(Category c : variable.getCategories()) {
-      if(c.getName().equals(category)) {
-        return true;
-      }
+  public void testNoTransientVariableRoute() {
+    for(Method method : TableResource.class.getMethods()) {
+      Path path = method.getAnnotation(Path.class);
+      if(path != null) assertThat(path.value()).doesNotContain("_transient");
     }
-    return false;
   }
 }

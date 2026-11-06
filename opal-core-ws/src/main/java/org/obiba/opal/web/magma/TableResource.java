@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -150,58 +149,6 @@ public interface TableResource {
    */
   @Path("/variable/{variable}")
   VariableResource getVariable(@Context Request request, @PathParam("variable") String name);
-
-  /**
-   * Get transient derived variable.
-   */
-  @Path("/variable/_transient")
-  VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
-      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self, @FormParam("script") String scriptFP,
-      @FormParam("category") List<String> categoriesFP, @FormParam("missingCategory") List<String> missingCategory);
-
-  /**
-   * Compile a derived variable script.
-   */
-  @GET
-  @POST
-  @Path("/variable/_transient/_compile")
-  @Operation(summary = "Compile transient variable", description = "Compile derived variable script for validation")
-  @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Script compiled successfully", useReturnTypeSchema = true),
-    @ApiResponse(responseCode = "400", description = "Invalid script or parameters"),
-    @ApiResponse(responseCode = "500", description = "Server error during compilation")
-  })
-  Response compileTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
-      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self,
-      @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP);
-
-  /**
-   * Get value sets resource for the transient derived variable.
-   */
-  @Path("/valueSets/variable/_transient")
-  ValueSetsResource getTransientVariableValueSets(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
-      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self, @FormParam("script") String scriptFP,
-      @FormParam("category") List<String> categoriesFP);
-
-  /**
-   * Get value set resource for the transient derived variable and entity.
-   */
-  @Path("/valueSet/{identifier}/variable/_transient")
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "MethodWithTooManyParameters" })
-  ValueSetResource getTransientVariableValueSet( //
-      @Context Request request, //
-      @PathParam("identifier") String identifier, //
-      @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary, //
-      @QueryParam("valueType") @DefaultValue("text") String valueTypeName, //
-      @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, //
-      @QueryParam("script") String scriptQP, //
-      @QueryParam("category") List<String> categoriesQP, //
-      @QueryParam("self") @DefaultValue("true") Boolean self, //
-      @FormParam("script") String scriptFP, //
-      @FormParam("category") List<String> categoriesFP);
 
   @Path("/compare")
   CompareResource getTableCompare();
