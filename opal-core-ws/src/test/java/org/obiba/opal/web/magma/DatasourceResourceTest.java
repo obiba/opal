@@ -29,18 +29,21 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -419,11 +422,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewDto viewDto = ViewDto.newBuilder().setName(viewName).addFrom(fqViewName)
         .setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
-    ViewManager mockViewManager = createMock(ViewManager.class);
+    OpalViewManager mockViewManager = Mockito.mock(OpalViewManager.class);
     View view = new View(viewName, mockFromTable);
-    expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
-    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(view), eqComment(null), eqOpContext(null));
-    expectLastCall().once();
+    Mockito.when(mockViewManager.getView(mockDatasourceName, viewName)).thenReturn(view);
 
     OpalConfigurationService mockOpalRuntime = createMock(OpalConfigurationService.class);
 
@@ -437,7 +438,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(mockDatasourceName, mockDatasource, mockOpalRuntime,
         mockViewManager, mockContext);
 
-    replay(mockDatasource, mockFromTable, mockViewManager, mockContext);
+    replay(mockDatasource, mockFromTable, mockContext);
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
@@ -448,7 +449,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
     // Verify behaviour
-    verify(mockViewManager, mockContext);
+    ArgumentCaptor<ValueView> updated = ArgumentCaptor.forClass(ValueView.class);
+    Mockito.verify(mockViewManager).addView(Mockito.eq(mockDatasourceName), updated.capture(), Mockito.isNull(String.class),
+        Mockito.isNull(VariableOperationContext.class));
+    assertThat(updated.getValue().getName()).isEqualTo(viewName);
+    verify(mockContext);
   }
 
   @Test
@@ -464,11 +469,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     expect(mockFromTable.getDatasource()).andReturn(mockDatasource).atLeastOnce();
 
-    ViewManager mockViewManager = createMock(ViewManager.class);
+    OpalViewManager mockViewManager = Mockito.mock(OpalViewManager.class);
     View view = new View(viewName, mockFromTable);
-    expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
-    mockViewManager.removeView(mockDatasourceName, viewName);
-    expectLastCall().once();
+    Mockito.when(mockViewManager.getView(mockDatasourceName, viewName)).thenReturn(view);
 
     SubjectProfileService mockSubjectProfileService = createMock(SubjectProfileService.class);
     mockSubjectProfileService.deleteBookmarks("/datasource/" + mockDatasourceName + "/table/" + viewName);
@@ -485,13 +488,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(mockDatasourceName, mockDatasource,
         createMock(OpalConfigurationService.class), mockViewManager, mockContext);
 
-    replay(mockDatasource, mockFromTable, mockViewManager, mockSubjectProfileService, mockContext);
+    replay(mockDatasource, mockFromTable, mockSubjectProfileService, mockContext);
 
     // Exercise
     Response response = datasourceResource.getView(viewName).removeView();
 
     // Verify behaviour
-    verify(mockViewManager, mockSubjectProfileService, mockContext);
+    Mockito.verify(mockViewManager).removeView(mockDatasourceName, viewName);
+    verify(mockSubjectProfileService, mockContext);
 
     // Verify state
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

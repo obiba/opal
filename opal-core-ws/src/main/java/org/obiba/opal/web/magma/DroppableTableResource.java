@@ -23,6 +23,7 @@ public interface DroppableTableResource extends TableResource {
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Table dropped successfully"),
     @ApiResponse(responseCode = "404", description = "Table not found"),
+    @ApiResponse(responseCode = "409", description = "Table is used by at least one view"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   Response drop();

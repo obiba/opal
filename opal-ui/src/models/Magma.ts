@@ -221,6 +221,8 @@ export interface TableDto {
   timestamps?: TimestampsDto | undefined;
   viewType?: string | undefined;
   status?: TableStatusDto | undefined;
+  dependents: string[];
+  hiddenDependents?: number | undefined;
 }
 
 export interface VariableDto {

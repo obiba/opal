@@ -59,6 +59,7 @@ public interface TableResource {
     @ApiResponse(responseCode = "200", description = "Table updated successfully", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "400", description = "Invalid table data"),
     @ApiResponse(responseCode = "404", description = "Table not found"),
+    @ApiResponse(responseCode = "409", description = "Table cannot be renamed, it is used by at least one view"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   Response update(Magma.TableDto table);

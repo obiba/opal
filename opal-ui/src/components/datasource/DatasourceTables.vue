@@ -189,6 +189,7 @@
 </template>
 
 <script setup lang="ts">
+import { notifyError } from 'src/utils/notify';
 import type { TableDto } from 'src/models/Magma';
 import { u } from 'src/boot/api';
 import AddTableDialog from 'src/components/datasource/AddTableDialog.vue';
@@ -344,10 +345,13 @@ function onShowDeleteTables() {
 }
 
 function onDeleteTables() {
-  datasourceStore.deleteTables(removableTables.value.map((t) => t.name)).then(() => {
-    selected.value = [];
-    init();
-  });
+  datasourceStore
+    .deleteTables(removableTables.value.map((t) => t.name))
+    .then(() => {
+      selected.value = [];
+      init();
+    })
+    .catch(notifyError);
 }
 
 function onShowImportFile() {

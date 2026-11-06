@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ValueViewDtoExtension;
@@ -52,7 +52,7 @@ public class ViewResourceTest {
     // Exercise
     ViewResourceImpl sut = new ViewResourceImpl();
     sut.setValueTable(view);
-    sut.setViewManager(createMock(ViewManager.class));
+    sut.setViewManager(org.mockito.Mockito.mock(OpalViewManager.class));
     sut.setViewDtos(newViewDtos());
 
     // Verify
@@ -71,7 +71,7 @@ public class ViewResourceTest {
     ValueTable view = new View("testView", fromTableMock);
     ViewResourceImpl viewResource = new ViewResourceImpl();
     viewResource.setValueTable(view);
-    viewResource.setViewManager(createMock(ViewManager.class));
+    viewResource.setViewManager(org.mockito.Mockito.mock(OpalViewManager.class));
     viewResource.setViewDtos(newViewDtos());
     viewResource.setApplicationContext(mockContext);
 

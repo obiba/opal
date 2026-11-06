@@ -19,7 +19,8 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager.DependentView;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
@@ -63,7 +64,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private Datasource datasource;
 
-  private ViewManager viewManager;
+  private OpalViewManager viewManager;
 
   @Autowired
   protected OpalSearchService opalSearchService;
@@ -80,7 +81,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   @Autowired
-  public void setViewManager(ViewManager viewManager) {
+  public void setViewManager(OpalViewManager viewManager) {
     this.viewManager = viewManager;
   }
 
@@ -180,17 +181,27 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @DELETE
   public Response deleteTables(@QueryParam("table") List<String> tables) {
     if (datasource == null) throw new NoSuchDatasourceException("?");
-    for(String table : tables) {
-      if(datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table)) {
-        ValueTable toDrop = datasource.getValueTable(table);
-        if(toDrop.isView()) {
-          viewManager.removeView(datasource.getName(), table);
-        } else {
-          datasource.dropTable(table);
-        }
-        getEventBus().post(new ValueTableDeletedEvent(toDrop));
-        subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
+    // a dependent counts as deleted only if it is really dropped, not if it is skipped for lack of permission
+    List<String> droppable = tables.stream()
+        .filter(table -> datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table))
+        .distinct()
+        .toList();
+    List<DependentView> dependents = droppable.stream()
+        .flatMap(table -> viewManager.getDependentViews(datasource.getName(), table).stream())
+        .filter(view -> !view.datasource().equals(datasource.getName()) || !droppable.contains(view.name()))
+        .distinct()
+        .toList();
+    if(!dependents.isEmpty()) return TableDependents.conflict(dependents);
+
+    for(String table : droppable) {
+      ValueTable toDrop = datasource.getValueTable(table);
+      if(toDrop.isView()) {
+        viewManager.removeView(datasource.getName(), table);
+      } else {
+        datasource.dropTable(table);
       }
+      getEventBus().post(new ValueTableDeletedEvent(toDrop));
+      subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
     }
 
     return Response.ok().build();

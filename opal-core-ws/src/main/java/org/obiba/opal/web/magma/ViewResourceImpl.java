@@ -16,7 +16,7 @@ import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager.DependentView;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -43,8 +44,6 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
 
-  private ViewManager viewManager;
-
   private ViewDtos viewDtos;
 
   private SubjectProfileService subjectProfileService;
@@ -52,11 +51,6 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Autowired
   public void setViewDtos(ViewDtos viewDtos) {
     this.viewDtos = viewDtos;
-  }
-
-  @Autowired
-  public void setViewManager(ViewManager viewManager) {
-    this.viewManager = viewManager;
   }
 
   @Autowired
@@ -85,11 +79,13 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
     ValueTable table = getValueTable();
     if (!viewDto.getName().equals(table.getName())) {
+      List<DependentView> dependents = getDependentViews();
+      if (!dependents.isEmpty()) return TableDependents.conflict(dependents);
       getEventBus().post(new ValueTableRenamedEvent(table, viewDto.getName()));
-      viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+      getViewManager().removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     }
-    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment, null);
+    getViewManager().addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment, null);
 
     return Response.ok().build();
   }
@@ -105,8 +101,10 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Override
   public Response removeView() {
     try {
+      List<DependentView> dependents = getDependentViews();
+      if (!dependents.isEmpty()) return TableDependents.conflict(dependents);
       getEventBus().post(new ValueTableDeletedEvent(getValueTable()));
-      viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+      getViewManager().removeView(getDatasource().getName(), getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore
@@ -116,7 +114,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   @Override
   public Response initView() {
-    viewManager.initView(getDatasource().getName(), getValueTable().getName());
+    getViewManager().initView(getDatasource().getName(), getValueTable().getName());
     return ValueTableStatus.READY.equals(getValueTable().getStatus()) ? Response.ok().build() : Response.serverError().build();
   }
 
