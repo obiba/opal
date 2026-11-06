@@ -118,10 +118,11 @@ These need no action, but change what an administrator is accountable for.
   registered database still leaves the database itself alone. `DELETE /project/{name}?archive=true` keeps the internal
   database; it then shows in the databases page with no project using it, and can be deleted from there. The web
   interface always deletes without archiving.
-- **A table or view that a view refers to can no longer be deleted or renamed.** `DELETE` and rename requests now
-  answer 409, in any project and even if the view is not readable by the caller, and a delete of several tables
-  deletes nothing in that case. Scripts using the R or Python clients may have to delete the views first. Deleting a
-  project is not affected.
+- **A table or view that a view refers to can no longer be deleted or renamed from the web interface or the REST API.**
+  `DELETE` and rename requests now answer 409, in any project and even if the view is not readable by the caller, and
+  a delete of several tables deletes nothing in that case. Scripts using the R or Python clients may have to delete the
+  views first. Deleting a project is not affected, and a project restore with the override option still replaces the
+  tables and views it restores.
 - **Whoever may create projects can now provision storage** for that project, without system administration rights.
   This gives no access to the H2 folder or to other databases.
 - **Unregistering an H2 database can now delete its files**, as a checkbox in the confirmation dialog or as

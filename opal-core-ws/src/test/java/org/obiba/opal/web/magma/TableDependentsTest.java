@@ -17,6 +17,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamps;
@@ -33,8 +34,11 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -215,8 +219,54 @@ public class TableDependentsTest {
     Response response = tablesResource().deleteTables(List.of("t", "v"));
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-    verify(datasource).dropTable("t");
-    verify(viewManager).removeView(DS, "v");
+    InOrder order = inOrder(viewManager, datasource);
+    order.verify(viewManager).removeView(DS, "v");
+    order.verify(datasource).dropTable("t");
+  }
+
+  @Test
+  public void batch_deletes_a_chain_from_its_end() throws Exception {
+    table("t", false);
+    table("v1", true);
+    table("v2", true);
+    dependents("t", new DependentView(DS, "v1"));
+    dependents("v1", new DependentView(DS, "v2"));
+
+    tablesResource().deleteTables(List.of("t", "v1", "v2"));
+
+    InOrder order = inOrder(viewManager, datasource);
+    order.verify(viewManager).removeView(DS, "v2");
+    order.verify(viewManager).removeView(DS, "v1");
+    order.verify(datasource).dropTable("t");
+  }
+
+  @Test
+  public void failed_removal_of_a_view_keeps_its_table() throws Exception {
+    table("t", false);
+    table("v", true);
+    dependents("t", new DependentView(DS, "v"));
+    doThrow(new IllegalStateException()).when(viewManager).removeView(DS, "v");
+
+    try {
+      tablesResource().deleteTables(List.of("t", "v"));
+      failBecauseExceptionWasNotThrown(IllegalStateException.class);
+    } catch(IllegalStateException e) {
+      verify(datasource, never()).dropTable(anyString());
+    }
+  }
+
+  @Test
+  public void batch_deletes_views_referring_to_each_other() throws Exception {
+    table("a", true);
+    table("b", true);
+    dependents("a", new DependentView(DS, "b"));
+    dependents("b", new DependentView(DS, "a"));
+
+    Response response = tablesResource().deleteTables(List.of("a", "b"));
+
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    verify(viewManager).removeView(DS, "a");
+    verify(viewManager).removeView(DS, "b");
   }
 
   @Test

@@ -50,9 +50,15 @@ import jakarta.ws.rs.core.UriBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -186,14 +192,16 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
         .filter(table -> datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table))
         .distinct()
         .toList();
-    List<DependentView> dependents = droppable.stream()
-        .flatMap(table -> viewManager.getDependentViews(datasource.getName(), table).stream())
-        .filter(view -> !view.datasource().equals(datasource.getName()) || !droppable.contains(view.name()))
+    Map<String, List<DependentView>> dependents = new LinkedHashMap<>();
+    droppable.forEach(table -> dependents.put(table, viewManager.getDependentViews(datasource.getName(), table)));
+    List<DependentView> remaining = dependents.values().stream()
+        .flatMap(List::stream)
+        .filter(view -> !isIn(view, droppable))
         .distinct()
         .toList();
-    if(!dependents.isEmpty()) return TableDependents.conflict(dependents);
+    if(!remaining.isEmpty()) return TableDependents.conflict(remaining);
 
-    for(String table : droppable) {
+    for(String table : dependentsFirst(dependents)) {
       ValueTable toDrop = datasource.getValueTable(table);
       if(toDrop.isView()) {
         viewManager.removeView(datasource.getName(), table);
@@ -205,6 +213,28 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     }
 
     return Response.ok().build();
+  }
+
+  /**
+   * Order the tables so that a failure part way through does not leave a view without the table it refers to.
+   */
+  private List<String> dependentsFirst(Map<String, List<DependentView>> dependents) {
+    List<String> ordered = new ArrayList<>();
+    Set<String> left = new LinkedHashSet<>(dependents.keySet());
+    while(!left.isEmpty()) {
+      List<String> next = left.stream()
+          .filter(table -> dependents.get(table).stream().noneMatch(view -> isIn(view, left)))
+          .toList();
+      // views that refer to each other have no order
+      if(next.isEmpty()) next = List.copyOf(left);
+      ordered.addAll(next);
+      next.forEach(left::remove);
+    }
+    return ordered;
+  }
+
+  private boolean isIn(DependentView view, Collection<String> tables) {
+    return view.datasource().equals(datasource.getName()) && tables.contains(view.name());
   }
 
   private boolean hasDropPermission(String table) {

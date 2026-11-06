@@ -101,6 +101,42 @@ public class OpalViewManagerTest {
   }
 
   @Test
+  public void view_is_not_its_own_dependent() {
+    decorate("a", new View("self", reference("a.self")));
+
+    assertThat(manager.getDependentViews("a", "self")).isEmpty();
+  }
+
+  @Test
+  public void view_of_the_same_name_in_another_datasource_is_a_dependent() {
+    decorate("b", new View("t", reference("a.t")));
+
+    assertThat(manager.getDependentViews("a", "t")).containsExactly(new DependentView("b", "t"));
+  }
+
+  @Test
+  public void malformed_view_does_not_fail_the_lookup() {
+    ValueTable noDatasource = mock(ValueTable.class);
+    when(noDatasource.getEntityType()).thenReturn("Participant");
+    decorate("a", new View("malformed", noDatasource), new View("v", reference("ds.t")));
+
+    assertThat(manager.getDependentViews("ds", "t")).containsExactly(new DependentView("a", "v"));
+  }
+
+  @Test
+  public void reads_the_views_under_the_lock_of_those_changing_them() throws Exception {
+    Datasource datasource = decorate("a", new View("v", reference("ds.t")));
+    Thread lookup = new Thread(() -> manager.getDependentViews("ds", "t"));
+
+    synchronized (datasource) {
+      lookup.start();
+      lookup.join(200);
+      assertThat(lookup.isAlive()).isTrue();
+    }
+    lookup.join();
+  }
+
+  @Test
   public void forgets_released_and_unregistered_datasources() {
     Datasource released = decorate("a", new View("v", reference("ds.t")));
     decorate("b", new View("v", reference("ds.t")));
