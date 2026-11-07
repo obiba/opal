@@ -219,7 +219,7 @@ public class RSQLService implements Service, SQLService {
         throw new SQLException("Table " + fromTable + " has too much variables (limit is " + (SQLITE_MAX_COLUMN - 1) + ")");
       String tableSymbol = normalizeTableSymbol(fromTable);
       if (!fromTable.equals(tableSymbol))
-        queryStr = queryStr.replaceAll(fromTable, tableSymbol);
+        queryStr = queryStr.replace(fromTable, "`" + tableSymbol + "`");
       MagmaAssignROperation mop = new MagmaAssignROperation(tableSymbol, valueTable,
           dataExportService, rCacheHelper,
           Strings.isNullOrEmpty(idName) ? DEFAULT_ID_COLUMN : idName,
