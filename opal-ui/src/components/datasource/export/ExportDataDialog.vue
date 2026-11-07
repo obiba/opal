@@ -137,7 +137,6 @@ const builtinFileExporters: ExporterOption[] = [
   { label: 'CSV', value: 'csv' },
   { label: 'Opal archive', value: 'opal' },
   { label: 'RDS (R)', value: 'haven_rds' },
-  { label: 'SAS (R)', value: 'haven_sas' },
   { label: 'SAS Transport (R)', value: 'haven_sast' },
   { label: 'SPSS (R)', value: 'haven_spss' },
   { label: 'Stata (R)', value: 'haven_stata' },

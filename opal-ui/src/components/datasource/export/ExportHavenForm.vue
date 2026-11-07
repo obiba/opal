@@ -35,7 +35,6 @@ const extensions: {
   [key: string]: string;
 } = {
   haven_rds: '.rds',
-  haven_sas: '.sas7bdat',
   haven_sast: '.xpt',
   haven_spss: '.sav',
   haven_stata: '.dta',
