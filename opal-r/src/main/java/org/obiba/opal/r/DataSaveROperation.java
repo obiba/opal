@@ -22,11 +22,26 @@ public class DataSaveROperation extends AbstractROperation {
 
   private enum WriteCmd {
 
-    SAS("haven::write_sas", "sas7bdat"),
+    SAS("haven::write_sas", "sas7bdat") {
+      @Override
+      public String getCommand(String symbol, String path) {
+        return String.format("%s(%s, '%s')", command, withValidNames(symbol), path);
+      }
+    },
 
-    XPT("haven::write_xpt", "xpt"),
+    XPT("haven::write_xpt", "xpt") {
+      @Override
+      public String getCommand(String symbol, String path) {
+        return String.format("%s(%s, '%s')", command, withValidNames(symbol), path);
+      }
+    },
 
-    DTA("haven::write_dta", "dta"),
+    DTA("haven::write_dta", "dta") {
+      @Override
+      public String getCommand(String symbol, String path) {
+        return String.format("%s(%s, '%s')", command, withValidNames(symbol), path);
+      }
+    },
 
     SAV("haven::write_sav", "sav", "zsav") {
       @Override
@@ -61,6 +76,16 @@ public class DataSaveROperation extends AbstractROperation {
 
     public String getCommand(String symbol, String path) {
       return String.format("%s(`%s`, '%s')", command, symbol, path);
+    }
+
+    /**
+     * SAS and Stata column names are limited to 32 ASCII letters, digits and underscores, not starting with a digit.
+     * The symbol is left untouched, only the written copy is renamed.
+     */
+    // ponytail: names still colliding after truncation to 32 chars make the writer fail, as they did before
+    private static String withValidNames(String symbol) {
+      return String.format("stats::setNames(`%1$s`, base::make.unique(base::substr(base::sub('^([0-9])', '_\\\\1', " +
+          "base::gsub('[^A-Za-z0-9_]', '_', base::names(`%1$s`))), 1, 32), sep='_'))", symbol);
     }
 
     public static WriteCmd forPath(String path) {
