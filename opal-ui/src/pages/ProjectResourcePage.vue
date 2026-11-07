@@ -43,8 +43,18 @@
           :disable="!resourceProvider"
           class="on-right"
         />
-        <q-btn color="positive" size="sm" outline icon="terminal" :label="t('test')" @click="onTest" class="on-right" />
         <q-btn
+          v-if="resourcesStore.perms.resource?.canUpdate()"
+          color="positive"
+          size="sm"
+          outline
+          icon="terminal"
+          :label="t('test')"
+          @click="onTest"
+          class="on-right"
+        />
+        <q-btn
+          v-if="resourcesStore.perms.resources?.canCreate()"
           color="secondary"
           size="sm"
           icon="content_copy"

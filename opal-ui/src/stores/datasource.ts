@@ -21,6 +21,8 @@ interface DatasourcePerms {
   table: Perms | undefined;
   tablePermissions: Perms | undefined;
   tableValueSets: Perms | undefined;
+  tableIndex: Perms | undefined;
+  viewXml: Perms | undefined;
   variables: Perms | undefined;
   variable: Perms | undefined;
   variableSummary: Perms | undefined;
@@ -185,6 +187,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
       tableIndex.value = {} as TableIndexStatusDto;
       perms.value.table = undefined;
       perms.value.tableValueSets = undefined;
+      perms.value.tableIndex = undefined;
+      perms.value.viewXml = undefined;
       variables.value = [];
       perms.value.variables = undefined;
     }
@@ -247,8 +251,18 @@ export const useDatasourceStore = defineStore('datasource', () => {
     view.value = {} as ViewDto;
     return api.get(u`/datasource/${datasource.value.name}/view/${name}`).then((response) => {
       view.value = response.data;
-      return response;
+      return api.options(u`/datasource/${datasource.value.name}/view/${name}/xml`).then((xmlResponse) => {
+        perms.value.viewXml = new Perms(xmlResponse);
+        return response;
+      });
     });
+  }
+
+  async function getViewDestinations(projectNames: string[]) {
+    const destinations = await Promise.all(
+      projectNames.map((name) => api.options(u`/datasource/${name}/views`).then((response) => new Perms(response))),
+    );
+    return projectNames.filter((_, idx) => destinations[idx]?.canCreate());
   }
 
   async function loadTableVariables() {
@@ -282,7 +296,6 @@ export const useDatasourceStore = defineStore('datasource', () => {
               perms.value.variablePermissions = new Perms(response);
               return response;
             }),
-          // FIXME: OPTIONS not working for variable summary endpoint
           api
             .options(u`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
             .then((response) => {
@@ -633,7 +646,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadTableIndex() {
     return api
       .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
-      .then((response) => (tableIndex.value = response.data));
+      .then((response) => {
+        perms.value.tableIndex = new Perms(response);
+        tableIndex.value = response.data;
+      });
   }
 
   async function updateTableIndex() {
@@ -696,6 +712,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadTablesDictionary,
     downloadTableDictionary,
     downloadViews,
+    getViewDestinations,
     downloadView,
     loadValueSets,
     loadTableVariable,

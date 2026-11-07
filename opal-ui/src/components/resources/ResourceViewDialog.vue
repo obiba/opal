@@ -104,7 +104,7 @@ const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
-const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const projectNames = ref<string[]>([]);
 const editMode = computed(() => props.view);
 const nameLocked = computed(() => !!editMode.value && datasourceStore.tableHasDependents);
 const processing = ref(false);
@@ -122,7 +122,8 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = projectsStore.project.name || datasourceStore.datasource.name;
+      const current = projectsStore.project.name || datasourceStore.datasource.name;
+      projectDestination.value = projectNames.value.includes(current) ? current : projectNames.value[0] || '';
       id.value = '';
       entityType.value = 'Participant';
       allColumns.value = true;
@@ -147,7 +148,11 @@ watch(
 );
 
 onMounted(() => {
-  projectsStore.initProjects();
+  projectsStore.initProjects().then(() => {
+    datasourceStore
+      .getViewDestinations(projectsStore.projects.map((p) => p.name))
+      .then((names) => (projectNames.value = names));
+  });
 });
 
 function onHide() {

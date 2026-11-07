@@ -3,7 +3,7 @@
     <div>
       <span>{{ t(`table_index.status_title.${datasourceStore.tableIndex.status}`) }}</span>
       <q-btn
-        v-if="statusActionIcon"
+        v-if="statusActionIcon && canUpdate"
         :color="statusActionColor"
         :icon="statusActionIcon"
         :title="t(statusActionLabel)"
@@ -15,7 +15,7 @@
         @click="onStatusAction"
       />
       <q-btn
-        v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE"
+        v-if="datasourceStore.tableIndex.status === TableIndexationStatus.UPTODATE && canDelete"
         :color="statusActionColor"
         icon="cleaning_services"
         :title="t('clear')"
@@ -26,7 +26,7 @@
         @click="onClear"
       />
       <q-btn
-        v-if="statusActionIcon"
+        v-if="statusActionIcon && canUpdate"
         :color="statusActionColor"
         icon="event"
         :title="t('schedule')"
@@ -56,6 +56,8 @@ const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
 
 const showDialog = ref(false);
+const canUpdate = computed(() => datasourceStore.perms.tableIndex?.canUpdate());
+const canDelete = computed(() => datasourceStore.perms.tableIndex?.canDelete());
 
 const statusClass = computed(() => {
   switch (datasourceStore.tableIndex.status) {

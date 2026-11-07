@@ -41,6 +41,26 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
     assertThat(isTableEditPermitted("/datasource/patate/views", "POST")).isFalse();
   }
 
+  @Test
+  public void testTableValuesContingencyButNoIndexation() {
+    String table = "/datasource/patate/table/pwel";
+    assertThat(isTableValuesPermitted(table + "/_contingency", "GET")).isTrue();
+    assertThat(isTableValuesPermitted(table + "/index", "GET")).isTrue();
+    assertThat(isTableValuesPermitted(table + "/index", "PUT")).isFalse();
+    assertThat(isTableValuesPermitted(table + "/index", "DELETE")).isFalse();
+    assertThat(isTableValuesPermitted(table + "/index/schedule", "PUT")).isFalse();
+  }
+
+  private boolean isTableValuesPermitted(String node, String method) {
+    OpalPermissionResolver resolver = new OpalPermissionResolver();
+    Permission requested = resolver.resolvePermission("rest:" + node + ":" + method);
+    for(String granted : newConverter().convert("opal", "/datasource/patate/table/pwel",
+        TablePermissionConverter.Permission.TABLE_VALUES.toString())) {
+      if(resolver.resolvePermission(granted).implies(requested)) return true;
+    }
+    return false;
+  }
+
   private boolean isTableEditPermitted(String node, String method) {
     OpalPermissionResolver resolver = new OpalPermissionResolver();
     Permission requested = resolver.resolvePermission("rest:" + node + ":" + method);
@@ -60,12 +80,15 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/identifiers-mappings:GET:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
-        "rest:/project/patate/commands/_refresh:POST:GET",
         "rest:/project/patate:GET:GET",
         "rest:/project/patate/resources:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/permissions/table/pwel:*:GET/*",
+        "rest:/project/patate/commands/_analyse:POST:GET",
+        "rest:/project/patate/analyses:GET:GET",
+        "rest:/project/patate/table/pwel/analyses:*:GET/*",
+        "rest:/project/patate/table/pwel/analysis:*:GET/*",
         "rest:/files/projects/patate:GET:GET/*",
         "rest:/files/projects/patate:POST:GET/*",
         "rest:/files/projects/patate:PUT:GET/*",
@@ -81,12 +104,15 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/identifiers-mappings:GET:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
-        "rest:/project/patate/commands/_refresh:POST:GET",
         "rest:/project/patate:GET:GET",
         "rest:/project/patate/resources:GET:GET",
         "rest:/project/patate/state:GET:GET",
         "rest:/project/patate/summary:GET:GET",
         "rest:/project/patate/permissions/table/pwel:*:GET/*",
+        "rest:/project/patate/commands/_analyse:POST:GET",
+        "rest:/project/patate/analyses:GET:GET",
+        "rest:/project/patate/table/pwel/analyses:*:GET/*",
+        "rest:/project/patate/table/pwel/analysis:*:GET/*",
         "rest:/files/projects/patate:GET:GET/*",
         "rest:/files/projects/patate:POST:GET/*",
         "rest:/files/projects/patate:PUT:GET/*",
@@ -130,13 +156,13 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/index/_search:GET",
         "rest:/datasource/patate/table/pwel/index/_search:POST",
         "rest:/datasource/patate/table/pwel/index/_schema:GET",
+        "rest:/datasource/patate/table/pwel/_contingency:GET",
         "rest:/datasource/patate/_sql:POST:GET",
         "rest:/datasources/_sql:POST",
         "rest:/project/patate/identifiers-mappings:GET:GET",
         "rest:/project/patate/commands/_analyse:POST:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
-        "rest:/project/patate/commands/_refresh:POST:GET",
         "rest:/project/patate:GET:GET",
         "rest:/project/patate/resources:GET:GET",
         "rest:/project/patate/state:GET:GET",
@@ -206,13 +232,13 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/datasource/patate/table/pwel/index/_search:GET",
         "rest:/datasource/patate/table/pwel/index/_search:POST",
         "rest:/datasource/patate/table/pwel/index/_schema:GET",
+        "rest:/datasource/patate/table/pwel/_contingency:GET",
         "rest:/datasource/patate/_sql:POST:GET",
         "rest:/datasources/_sql:POST",
         "rest:/project/patate/identifiers-mappings:GET:GET",
         "rest:/project/patate/commands/_analyse:POST:GET",
         "rest:/project/patate/commands/_export:POST:GET",
         "rest:/project/patate/commands/_copy:POST:GET",
-        "rest:/project/patate/commands/_refresh:POST:GET",
         "rest:/project/patate:GET:GET",
         "rest:/project/patate/resources:GET:GET",
         "rest:/project/patate/state:GET:GET",

@@ -31,7 +31,14 @@
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="t('copy')" color="primary" @click="onCopyView" v-close-popup />
+        <q-btn
+          flat
+          :label="t('copy')"
+          color="primary"
+          :disable="!projectDestination"
+          @click="onCopyView"
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -56,7 +63,7 @@ const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
-const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const projectNames = ref<string[]>([]);
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
@@ -66,7 +73,9 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = props.table.datasourceName as string;
+      projectDestination.value = projectNames.value.includes(props.table.datasourceName as string)
+        ? (props.table.datasourceName as string)
+        : projectNames.value[0] || '';
       newTableName.value = '';
       const tableNames = datasourceStore.tables.map((t) => t.name);
       let idx = 1;
@@ -83,7 +92,11 @@ watch(
 );
 
 onMounted(() => {
-  projectsStore.initProjects();
+  projectsStore.initProjects().then(() => {
+    datasourceStore
+      .getViewDestinations(projectsStore.projects.map((p) => p.name))
+      .then((names) => (projectNames.value = names));
+  });
 });
 
 function onHide() {

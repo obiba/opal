@@ -3,7 +3,7 @@
     <div class="text-h6 q-mb-sm">
       {{ profile.name }}
       <q-btn
-        v-if="authStore.isAdministrator && (missingCluster || !builtinProfile)"
+        v-if="authStore.isDatashieldAdministrator && (missingCluster || !builtinProfile)"
         outline
         color="red"
         icon="delete"
@@ -26,7 +26,7 @@
             v-model="enabled"
             :label="t('datashield.profile_status_toggle')"
             left-label
-            :disable="!authStore.isAdministrator"
+            :disable="!authStore.isDatashieldAdministrator"
             @update:model-value="datashieldStore.updateProfileStatus(enabled)"
           />
         </div>
@@ -38,7 +38,7 @@
           v-model="restricted"
           :label="t('datashield.profile_access_toggle')"
           left-label
-          :disable="!authStore.isAdministrator"
+          :disable="!authStore.isDatashieldAdministrator"
           @update:model-value="datashieldStore.applyProfileAccess(!profile.restrictedAccess)"
         />
         <div v-if="profile?.restrictedAccess">
@@ -70,7 +70,7 @@
         :label="t('initialize')"
         :title="t('datashield.settings_init')"
         size="sm"
-        :disable="!authStore.isAdministrator"
+        :disable="!authStore.isDatashieldAdministrator"
         @click="onShowInitSettings"
       />
     </div>

@@ -63,7 +63,7 @@
             @click="onDuplicateAnalysis(props.row)"
           />
           <q-btn
-            v-if="projectsStore.perms.analyse?.canCreate()"
+            v-if="projectsStore.perms.analysis?.canDelete()"
             rounded
             dense
             flat

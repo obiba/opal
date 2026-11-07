@@ -68,6 +68,7 @@ public class ProjectCommandResource {
   )
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Command successfully deleted", useReturnTypeSchema = true),
+    @ApiResponse(responseCode = "403", description = "Only a system administrator can delete commands"),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
     @ApiResponse(responseCode = "500", description = "Internal server error")

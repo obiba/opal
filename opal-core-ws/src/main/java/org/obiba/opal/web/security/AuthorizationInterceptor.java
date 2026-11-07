@@ -90,9 +90,12 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   @Override
   public void postProcess(HttpServletRequest httpServletRequest, ResourceMethodInvoker resourceMethod, ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     if(GET.equals(requestContext.getMethod()) || OPTIONS.equals(requestContext.getMethod())) {
-      Set<String> allowed = allowed(requestContext, resourceMethod);
-      if(!allowed.isEmpty()) {
-        responseContext.getHeaders().putSingle(ALLOW_HTTP_HEADER, asHeader(allowed));
+      // without an explicit @OPTIONS there is no resource method: DefaultOptionsMethodExceptionMapper has set the header
+      if(resourceMethod != null || responseContext.getHeaderString(ALLOW_HTTP_HEADER) == null) {
+        Set<String> allowed = allowed(requestContext, resourceMethod);
+        if(!allowed.isEmpty()) {
+          responseContext.getHeaders().putSingle(ALLOW_HTTP_HEADER, asHeader(allowed));
+        }
       }
     } else if(HttpMethod.DELETE.equals(requestContext.getMethod()) && responseContext.getStatus() == HttpStatus.SC_OK) {
       // TODO delete all nodes starting with resource

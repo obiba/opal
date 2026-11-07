@@ -13,6 +13,9 @@ package org.obiba.opal.web.security;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -26,6 +29,7 @@ import org.obiba.opal.web.system.subject.SubjectProfileResource;
 import java.lang.reflect.Method;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * The authorization interceptor must submit every non-self-service method to the {@code rest:} permission check.
@@ -74,6 +78,24 @@ public class AuthorizationInterceptorTest {
     verify(subject);
   }
 
+  @Test
+  public void defaultOptionsKeepsTheAllowHeaderOfTheExceptionMapper() {
+    Subject subject = createNiceMock(Subject.class);
+    replay(subject);
+    ThreadContext.bind(subject);
+    MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+    headers.putSingle("Allow", "GET, POST, OPTIONS");
+    ContainerResponseContext response = createNiceMock(ContainerResponseContext.class);
+    expect(response.getHeaders()).andReturn(headers).anyTimes();
+    expect(response.getHeaderString("Allow")).andReturn("GET, POST, OPTIONS").anyTimes();
+    replay(response);
+
+    new AuthorizationInterceptor().postProcess(null, null, requestWithHeaders(HttpMethod.OPTIONS, "/datasource/ds/_sql"),
+        response);
+
+    assertEquals("GET, POST, OPTIONS", headers.getFirst("Allow"));
+  }
+
   private Subject bindAuthenticatedSubject() {
     Subject subject = createStrictMock(Subject.class);
     expect(subject.isAuthenticated()).andReturn(true).anyTimes();
@@ -112,6 +134,18 @@ public class AuthorizationInterceptorTest {
     public Class<?> getResourceClass() {
       return resourceClass;
     }
+  }
+
+  private ContainerRequestContext requestWithHeaders(String httpMethod, String path) {
+    UriInfo uriInfo = createNiceMock(UriInfo.class);
+    expect(uriInfo.getPath()).andReturn(path).anyTimes();
+    replay(uriInfo);
+    ContainerRequestContext request = createNiceMock(ContainerRequestContext.class);
+    expect(request.getMethod()).andReturn(httpMethod).anyTimes();
+    expect(request.getUriInfo()).andReturn(uriInfo).anyTimes();
+    expect(request.getHeaders()).andReturn(new MultivaluedHashMap<>()).anyTimes();
+    replay(request);
+    return request;
   }
 
   private ContainerRequestContext requestOf(String httpMethod, String path) {
