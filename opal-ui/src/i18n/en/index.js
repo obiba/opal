@@ -1458,7 +1458,7 @@ export default {
   table_identifiers_import_hint: 'The table which identifiers will be imported as system identifiers to be mapped.',
   table_name: 'Table name',
   table_dependents: 'Used by views',
-  table_dependents_hidden: 'Other views not accessible',
+  table_dependents_hidden: 'Used by views (not accessible)',
   table_dependents_hint: 'This table cannot be deleted or renamed while views use it',
   table_references: 'Table references',
   table: 'Table',

@@ -376,6 +376,7 @@ const items1 = computed(() => {
     {
       field: 'hiddenDependents',
       label: 'table_dependents_hidden',
+      badge: (val: TableDto) => val.hiddenDependents,
       visible: (val: TableDto) => !!val.hiddenDependents,
     },
     {

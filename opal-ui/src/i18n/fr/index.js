@@ -1458,7 +1458,7 @@ export default {
   table_identifiers_import_hint: "La table dont les identifiants seront importés en tant qu'identifiants système à mapper.",
   table_name: 'Nom de la table',
   table_dependents: 'Utilisée par les vues',
-  table_dependents_hidden: 'Autres vues non accessibles',
+  table_dependents_hidden: 'Utilisée par les vues (non accessibles)',
   table_dependents_hint: 'Cette table ne peut pas être supprimée ou renommée tant que des vues l\'utilisent',
   table_references: 'Tables référencées',
   table: 'Table',

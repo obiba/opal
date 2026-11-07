@@ -26,6 +26,7 @@
           <span v-else-if="item.icon">
             <q-icon :name="item.icon(dbobject)" />
           </span>
+          <q-badge v-else-if="item.badge" color="info" :label="item.badge(dbobject)" />
           <span v-else>
             {{
               (dbobject as any)[item.field] !== undefined
@@ -68,6 +69,8 @@ export interface FieldItem {
   links?: (val: any) => FieldLink[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: (val: any) => string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  badge?: (val: any) => string | number | undefined;
 }
 
 export interface FieldsListProps {
