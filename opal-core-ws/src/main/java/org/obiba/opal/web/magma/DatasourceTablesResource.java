@@ -83,6 +83,7 @@ public interface DatasourceTablesResource {
     @ApiResponse(responseCode = "204", description = "Tables deleted successfully"),
     @ApiResponse(responseCode = "400", description = "Invalid table selection"),
     @ApiResponse(responseCode = "404", description = "Tables not found"),
+    @ApiResponse(responseCode = "409", description = "A table is used by a view that is not deleted with it, nothing was deleted"),
     @ApiResponse(responseCode = "500", description = "Server error during deletion")
   })
   Response deleteTables(@QueryParam("table") List<String> tables);

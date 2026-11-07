@@ -58,6 +58,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return bundles;
   });
 
+  const tableHasDependents = computed(() => !!table.value.dependents?.length || !!table.value.hiddenDependents);
+
   function reset() {
     datasource.value = {} as DatasourceDto;
     tables.value = [];
@@ -84,13 +86,13 @@ export const useDatasourceStore = defineStore('datasource', () => {
         if (table.value?.name !== tName) {
           return loadTable(tName).then(() => Promise.resolve());
         } else {
-          return Promise.resolve();
+          return loadTableDependents(tName);
         }
       });
     } else if (table.value?.name !== tName) {
       return loadTable(tName);
     } else {
-      return Promise.resolve();
+      return loadTableDependents(tName);
     }
   }
 
@@ -203,6 +205,16 @@ export const useDatasourceStore = defineStore('datasource', () => {
           return response;
         }),
       ]);
+    });
+  }
+
+  // the views using a table are not part of its state: they change while the table stays the current one
+  async function loadTableDependents(name: string) {
+    return api.get(u`/datasource/${datasource.value.name}/table/${name}`).then((response) => {
+      if (table.value.name === name) {
+        table.value.dependents = response.data.dependents;
+        table.value.hiddenDependents = response.data.hiddenDependents;
+      }
     });
   }
 
@@ -654,6 +666,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     tablesCountsLoading,
     view,
     tableIndex,
+    tableHasDependents,
     variables,
     variable,
     variableAttributesBundles,

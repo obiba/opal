@@ -53,6 +53,7 @@ public interface ViewResource extends TableResource {
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "View removed successfully"),
     @ApiResponse(responseCode = "404", description = "View not found"),
+    @ApiResponse(responseCode = "409", description = "View is used by at least one other view"),
     @ApiResponse(responseCode = "500", description = "Server error")
   })
   Response removeView();

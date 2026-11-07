@@ -29,6 +29,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.opal.core.cfg.OpalViewManager;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
@@ -83,6 +84,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   private TableResource createResource(ValueTable table, Set<Locale> locales, ApplicationContext applicationContext) {
     TableResource tableResource = new TableResourceImpl();
     ((AbstractValueTableResource) tableResource).setApplicationContext(applicationContext);
+    ((TableResourceImpl) tableResource).setViewManager(mock(OpalViewManager.class));
     tableResource.setLocales(locales);
     tableResource.setValueTable(table);
     return tableResource;

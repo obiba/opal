@@ -19,7 +19,8 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager.DependentView;
 import org.obiba.opal.core.event.ValueTableAddedEvent;
 import org.obiba.opal.core.event.ValueTableDeletedEvent;
 import org.obiba.opal.core.security.OpalPermissions;
@@ -49,9 +50,15 @@ import jakarta.ws.rs.core.UriBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,7 +70,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private Datasource datasource;
 
-  private ViewManager viewManager;
+  private OpalViewManager viewManager;
 
   @Autowired
   protected OpalSearchService opalSearchService;
@@ -80,7 +87,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   @Autowired
-  public void setViewManager(ViewManager viewManager) {
+  public void setViewManager(OpalViewManager viewManager) {
     this.viewManager = viewManager;
   }
 
@@ -180,20 +187,54 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @DELETE
   public Response deleteTables(@QueryParam("table") List<String> tables) {
     if (datasource == null) throw new NoSuchDatasourceException("?");
-    for(String table : tables) {
-      if(datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table)) {
-        ValueTable toDrop = datasource.getValueTable(table);
-        if(toDrop.isView()) {
-          viewManager.removeView(datasource.getName(), table);
-        } else {
-          datasource.dropTable(table);
-        }
-        getEventBus().post(new ValueTableDeletedEvent(toDrop));
-        subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
+    // a dependent counts as deleted only if it is really dropped, not if it is skipped for lack of permission
+    List<String> droppable = tables.stream()
+        .filter(table -> datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table))
+        .distinct()
+        .toList();
+    Map<String, List<DependentView>> dependents = new LinkedHashMap<>();
+    droppable.forEach(table -> dependents.put(table, viewManager.getDependentViews(datasource.getName(), table)));
+    List<DependentView> remaining = dependents.values().stream()
+        .flatMap(List::stream)
+        .filter(view -> !isIn(view, droppable))
+        .distinct()
+        .toList();
+    if(!remaining.isEmpty()) return TableDependents.conflict(remaining);
+
+    for(String table : dependentsFirst(dependents)) {
+      ValueTable toDrop = datasource.getValueTable(table);
+      if(toDrop.isView()) {
+        viewManager.removeView(datasource.getName(), table);
+      } else {
+        datasource.dropTable(table);
       }
+      getEventBus().post(new ValueTableDeletedEvent(toDrop));
+      subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
     }
 
     return Response.ok().build();
+  }
+
+  /**
+   * Order the tables so that a failure part way through does not leave a view without the table it refers to.
+   */
+  private List<String> dependentsFirst(Map<String, List<DependentView>> dependents) {
+    List<String> ordered = new ArrayList<>();
+    Set<String> left = new LinkedHashSet<>(dependents.keySet());
+    while(!left.isEmpty()) {
+      List<String> next = left.stream()
+          .filter(table -> dependents.get(table).stream().noneMatch(view -> isIn(view, left)))
+          .toList();
+      // views that refer to each other have no order
+      if(next.isEmpty()) next = List.copyOf(left);
+      ordered.addAll(next);
+      next.forEach(left::remove);
+    }
+    return ordered;
+  }
+
+  private boolean isIn(DependentView view, Collection<String> tables) {
+    return view.datasource().equals(datasource.getName()) && tables.contains(view.name());
   }
 
   private boolean hasDropPermission(String table) {

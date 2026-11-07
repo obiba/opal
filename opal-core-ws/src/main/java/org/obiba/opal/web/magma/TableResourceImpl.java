@@ -13,6 +13,8 @@ import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.core.cfg.OpalViewManager;
+import org.obiba.opal.core.cfg.OpalViewManager.DependentView;
 import org.obiba.opal.core.event.ValueTableRenamedEvent;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
@@ -42,9 +44,24 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   private DataImportService dataImportService;
 
+  private OpalViewManager viewManager;
+
   @Autowired
   public void setDataImportService(DataImportService dataImportService) {
     this.dataImportService = dataImportService;
+  }
+
+  @Autowired
+  public void setViewManager(OpalViewManager viewManager) {
+    this.viewManager = viewManager;
+  }
+
+  protected OpalViewManager getViewManager() {
+    return viewManager;
+  }
+
+  protected List<DependentView> getDependentViews() {
+    return viewManager.getDependentViews(getDatasource().getName(), getValueTable().getName());
   }
 
   @Override
@@ -54,6 +71,10 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     if (getValueTable().isView()) {
       builder.setViewLink(path.replaceFirst("/table/", "/view/"));
     }
+    List<DependentView> dependents = getDependentViews();
+    List<String> visible = TableDependents.visible(dependents);
+    builder.addAllDependents(visible);
+    if (visible.size() < dependents.size()) builder.setHiddenDependents(dependents.size() - visible.size());
     return builder.build();
   }
 
@@ -73,6 +94,9 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
     if (getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
+
+    List<DependentView> dependents = getDependentViews();
+    if (!dependents.isEmpty()) return TableDependents.conflict(dependents);
 
     getEventBus().post(new ValueTableRenamedEvent(getValueTable(), table.getName()));
     getDatasource().renameTable(valueTable.getName(), table.getName());

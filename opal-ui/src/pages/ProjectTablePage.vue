@@ -102,24 +102,21 @@
           </q-list>
         </q-btn-dropdown>
 
-        <q-btn
-          v-if="canUpdate"
-          outline
-          color="secondary"
-          icon="edit"
-          size="sm"
-          @click="onShowEdit"
-          class="on-right"
-        ></q-btn>
-        <q-btn
-          v-if="canDelete"
-          outline
-          color="red"
-          icon="delete"
-          size="sm"
-          @click="onShowDelete"
-          class="on-right"
-        ></q-btn>
+        <span v-if="canUpdate" class="on-right">
+          <q-btn
+            outline
+            color="secondary"
+            icon="edit"
+            size="sm"
+            :disable="!isView && hasDependents"
+            @click="onShowEdit"
+          ></q-btn>
+          <q-tooltip v-if="!isView && hasDependents">{{ t('table_dependents_hint') }}</q-tooltip>
+        </span>
+        <span v-if="canDelete" class="on-right">
+          <q-btn outline color="red" icon="delete" size="sm" :disable="hasDependents" @click="onShowDelete"></q-btn>
+          <q-tooltip v-if="hasDependents">{{ t('table_dependents_hint') }}</q-tooltip>
+        </span>
         <q-btn
           v-if="isView && canUpdate"
           no-caps
@@ -317,6 +314,7 @@ const exportType = ref<'file' | 'server' | 'database'>('file');
 const isView = computed(() => datasourceStore.table.viewType !== undefined);
 const isTablesView = computed(() => datasourceStore.table.viewType === 'View');
 const isResourceView = computed(() => datasourceStore.table.viewType === 'ResourceView');
+const hasDependents = computed(() => datasourceStore.tableHasDependents);
 const canExport = computed(() => projectsStore.perms.export?.canCreate());
 const canCopy = computed(() => projectsStore.perms.copy?.canCreate());
 const canAnalyseValidate = computed(() => projectsStore.perms.analyses?.canRead());
@@ -364,6 +362,22 @@ const items1 = computed(() => {
             })
           : [],
       visible: () => isView.value,
+    },
+    {
+      field: 'dependents',
+      label: 'table_dependents',
+      links: (val: TableDto) =>
+        val.dependents?.map((f) => ({
+          label: f,
+          to: u`/project/${f.slice(0, f.indexOf('.'))}/table/${f.slice(f.indexOf('.') + 1)}`,
+        })) ?? [],
+      visible: (val: TableDto) => !!val.dependents?.length,
+    },
+    {
+      field: 'hiddenDependents',
+      label: 'table_dependents_hidden',
+      badge: (val: TableDto) => val.hiddenDependents,
+      visible: (val: TableDto) => !!val.hiddenDependents,
     },
     {
       field: 'idColumn',
@@ -449,7 +463,10 @@ function onShowDelete() {
 }
 
 function onDeleteTable() {
-  datasourceStore.deleteTable(tName.value).then(() => router.push(u`/project/${dsName.value}/tables`));
+  datasourceStore
+    .deleteTable(tName.value)
+    .then(() => router.push(u`/project/${dsName.value}/tables`))
+    .catch(notifyError);
 }
 
 function onTableUpdate(updated: TableDto) {

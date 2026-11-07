@@ -252,6 +252,8 @@ message TableDto {
   optional TimestampsDto timestamps = 9;
   optional string viewType = 10;
   optional TableStatusDto status = 11;
+  repeated string dependents = 12;
+  optional int32 hiddenDependents = 13;
 }
 
 message VariableDto {

@@ -21,7 +21,8 @@
           dense
           type="text"
           :label="t('view_name')"
-          :hint="t('resource_ref.view_destination_hint')"
+          :disable="nameLocked"
+          :hint="nameLocked ? t('table_dependents_hint') : t('resource_ref.view_destination_hint')"
           class="q-mb-md"
         />
         <div v-if="editMode && name !== view?.name" class="q-mb-md box-warning">
@@ -105,6 +106,7 @@ const datasourceStore = useDatasourceStore();
 
 const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
 const editMode = computed(() => props.view);
+const nameLocked = computed(() => !!editMode.value && datasourceStore.tableHasDependents);
 const processing = ref(false);
 
 const showDialog = ref(props.modelValue);
