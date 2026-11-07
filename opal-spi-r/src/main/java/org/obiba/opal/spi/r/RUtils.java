@@ -43,6 +43,17 @@ public class RUtils {
   }
 
   /**
+   * Make a syntactically valid R name from a table name, safe to be used unquoted in R code. The constant prefix
+   * covers the names that start with a digit and the R reserved words.
+   *
+   * @param tableName
+   * @return
+   */
+  public static String getValidSymbol(String tableName) {
+    return "table_" + tableName.replaceAll("[^A-Za-z0-9._]", "_");
+  }
+
+  /**
    * Validate locale 2-letters string extracted from label.
    *
    * @param localeStr

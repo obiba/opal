@@ -140,7 +140,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
               .collect(Collectors.toList()));
         }
 
-        RAnalysis analysis = builder.session(sessionHandler.getSession()).symbol(RUtils.getSymbol(tibbleName)).build();
+        RAnalysis analysis = builder.session(sessionHandler.getSession()).symbol(RUtils.getValidSymbol(tibbleName)).build();
 
         if (existingAnalysis == null)
           analysisService.save(OpalAnalysis.Builder.create(datasource.getName(), table.getName(), analysis).build());
@@ -227,7 +227,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
     void write(@NotNull ValueTable valueTable, RSessionHandler rSessionHandler) {
       if (valueTable.getValueSetCount() > 0) {
-        String finalSymbol = RUtils.getSymbol(valueTable.getName());
+        String finalSymbol = RUtils.getValidSymbol(valueTable.getName());
         rSessionHandler
             .getSession()
             .execute(new MagmaAssignROperation(finalSymbol, valueTable, dataExportService, rCacheHelper, "id"));

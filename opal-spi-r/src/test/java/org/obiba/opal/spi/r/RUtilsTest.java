@@ -13,6 +13,13 @@ public class RUtilsTest {
   }
 
   @Test
+  public void testValidSymbol() {
+    assertThat(RUtils.getValidSymbol("1000G_covarsView")).isEqualTo("table_1000G_covarsView");
+    assertThat(RUtils.getValidSymbol("NA")).isEqualTo("table_NA");
+    assertThat(RUtils.getValidSymbol("my-table (v1.2)")).isEqualTo("table_my_table__v1.2_");
+  }
+
+  @Test
   public void testNormalizeLabel() {
     assertThat(RUtils.normalizeLabel("I don't know")).isEqualTo("I don\\'t know");
     assertThat(RUtils.normalizeLabel("I don't know, I'm not sure")).isEqualTo("I don\\'t know, I\\'m not sure");
