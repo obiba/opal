@@ -249,20 +249,32 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadView(name: string) {
     view.value = {} as ViewDto;
-    return api.get(u`/datasource/${datasource.value.name}/view/${name}`).then((response) => {
-      view.value = response.data;
-      return api.options(u`/datasource/${datasource.value.name}/view/${name}/xml`).then((xmlResponse) => {
-        perms.value.viewXml = new Perms(xmlResponse);
-        return response;
-      });
-    });
+    const [response, viewXml] = await Promise.all([
+      api.get(u`/datasource/${datasource.value.name}/view/${name}`),
+      api
+        .options(u`/datasource/${datasource.value.name}/view/${name}/xml`)
+        .then((xmlResponse) => new Perms(xmlResponse))
+        .catch(() => undefined),
+    ]);
+    view.value = response.data;
+    perms.value.viewXml = viewXml;
+    return response;
   }
 
-  async function getViewDestinations(projectNames: string[]) {
+  // the projects in which a view can be created; one that cannot be checked is left out
+  async function getViewDestinations() {
+    const projectsStore = useProjectsStore();
+    await projectsStore.initProjects();
+    const projectNames = projectsStore.projects.map((p) => p.name);
     const destinations = await Promise.all(
-      projectNames.map((name) => api.options(u`/datasource/${name}/views`).then((response) => new Perms(response))),
+      projectNames.map((name) =>
+        api
+          .options(u`/datasource/${name}/views`)
+          .then((response) => new Perms(response).canCreate())
+          .catch(() => false),
+      ),
     );
-    return projectNames.filter((_, idx) => destinations[idx]?.canCreate());
+    return projectNames.filter((_, idx) => destinations[idx]);
   }
 
   async function loadTableVariables() {

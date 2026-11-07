@@ -10,11 +10,14 @@
 
 package org.obiba.opal.web.analysis;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.web.ws.util.ContentDisposition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.service.AnalysisExportService;
 import org.obiba.opal.core.service.OpalAnalysisService;
@@ -32,6 +35,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.io.BufferedOutputStream;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -73,7 +77,7 @@ public class ProjectAnalysisResource {
   @Path("/analyses")
   @Operation(
     summary = "Get project analyses",
-    description = "Retrieves all analyses associated with the project, including analysis metadata, status, and results from all data tables within the project."
+    description = "Retrieves the analyses of the project tables that the user can access, including analysis metadata, status, and results."
   )
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Project analyses successfully retrieved", useReturnTypeSchema = true),
@@ -85,7 +89,19 @@ public class ProjectAnalysisResource {
 
     return Projects.OpalAnalysesDto.newBuilder()
       .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
+        .filter(allowedAnalyses())
         .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
+  }
+
+  /**
+   * This route is also granted on a single table, so an analysis is listed only if its table's own analyses are
+   * readable. The permissions on the whole datasource do not include the table routes, they are recognized by the
+   * export of the project analyses, which is not granted on a table.
+   */
+  private Predicate<OpalAnalysis> allowedAnalyses() {
+    Subject subject = SecurityUtils.getSubject();
+    if(subject.isPermitted("rest:/project/" + name + "/analyses/_export:GET")) return analysis -> true;
+    return analysis -> subject.isPermitted("rest:/project/" + name + "/table/" + analysis.getTable() + "/analyses:GET");
   }
 
   @GET

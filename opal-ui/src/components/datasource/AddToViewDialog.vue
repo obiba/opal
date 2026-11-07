@@ -91,11 +91,10 @@ const props = defineProps<DialogProps>();
 const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
-const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 const { t } = useI18n();
 
-const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const projectNames = ref<string[]>([]);
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
@@ -113,7 +112,19 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = props.table?.datasourceName as string;
+      projectNames.value = [];
+      projectDestination.value = '';
+      datasourceStore
+        .getViewDestinations()
+        .then((names) => {
+          const source = props.table?.datasourceName as string;
+          // variables can be added to an editable view without the permission to create one in its project
+          const keepSource =
+            props.table?.viewType && datasourceStore.perms.table?.canUpdate() && !names.includes(source);
+          projectNames.value = keepSource ? [source, ...names] : names;
+          projectDestination.value = projectNames.value.includes(source) ? source : '';
+        })
+        .catch(notifyError);
       newTableName.value = '';
       const tableNames = datasourceStore.tables.map((t) => t.name);
       if (props.table) {
@@ -131,10 +142,6 @@ watch(
     showDialog.value = value;
   },
 );
-
-onMounted(() => {
-  projectsStore.initProjects();
-});
 
 function onHide() {
   emit('update:modelValue', false);

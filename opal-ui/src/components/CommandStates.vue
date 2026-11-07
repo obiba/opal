@@ -261,10 +261,14 @@ watch(
 
 function isDeletable(row: CommandStateDto) {
   return (
-    authStore.isAdministrator &&
+    (authStore.isAdministrator || isOwnFileBundle(row)) &&
     row.status !== CommandStateDto_Status.IN_PROGRESS &&
     row.status !== CommandStateDto_Status.CANCEL_PENDING
   );
+}
+
+function isOwnFileBundle(row: CommandStateDto) {
+  return !row.project && row.command === 'file-bundle' && row.owner === authStore.profile.principal;
 }
 
 function isCancelable(row: CommandStateDto) {

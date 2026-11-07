@@ -132,11 +132,10 @@ public class WebShellResource extends AbstractCommandsResource {
   @Path("/commands/completed")
   @Operation(
     summary = "Delete completed commands",
-    description = "Deletes all completed command jobs from the system to clean up the command history."
+    description = "Deletes the completed command jobs to clean up the command history: all of them for a system administrator, only the user's own file bundles otherwise."
   )
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "All completed commands successfully deleted", useReturnTypeSchema = true),
-    @ApiResponse(responseCode = "403", description = "Only a system administrator can delete commands"),
+    @ApiResponse(responseCode = "200", description = "Completed commands successfully deleted", useReturnTypeSchema = true),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response deleteCompletedCommands() {

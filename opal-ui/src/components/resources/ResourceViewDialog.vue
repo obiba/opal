@@ -123,7 +123,18 @@ watch(
   (value) => {
     if (value) {
       const current = projectsStore.project.name || datasourceStore.datasource.name;
-      projectDestination.value = projectNames.value.includes(current) ? current : projectNames.value[0] || '';
+      projectNames.value = [];
+      // a view is edited where it is, which does not require the permission to create one there
+      projectDestination.value = editMode.value ? current : '';
+      if (!editMode.value) {
+        datasourceStore
+          .getViewDestinations()
+          .then((names) => {
+            projectNames.value = names;
+            projectDestination.value = names.includes(current) ? current : names[0] || '';
+          })
+          .catch(notifyError);
+      }
       id.value = '';
       entityType.value = 'Participant';
       allColumns.value = true;
@@ -146,14 +157,6 @@ watch(
     showDialog.value = value;
   },
 );
-
-onMounted(() => {
-  projectsStore.initProjects().then(() => {
-    datasourceStore
-      .getViewDestinations(projectsStore.projects.map((p) => p.name))
-      .then((names) => (projectNames.value = names));
-  });
-});
 
 function onHide() {
   processing.value = false;

@@ -60,7 +60,6 @@ const emit = defineEmits(['update:modelValue']);
 
 const { t } = useI18n();
 const router = useRouter();
-const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
 const projectNames = ref<string[]>([]);
@@ -73,9 +72,16 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = projectNames.value.includes(props.table.datasourceName as string)
-        ? (props.table.datasourceName as string)
-        : projectNames.value[0] || '';
+      projectNames.value = [];
+      projectDestination.value = '';
+      datasourceStore
+        .getViewDestinations()
+        .then((names) => {
+          const current = props.table.datasourceName as string;
+          projectNames.value = names;
+          projectDestination.value = names.includes(current) ? current : names[0] || '';
+        })
+        .catch(notifyError);
       newTableName.value = '';
       const tableNames = datasourceStore.tables.map((t) => t.name);
       let idx = 1;
@@ -90,14 +96,6 @@ watch(
     showDialog.value = value;
   },
 );
-
-onMounted(() => {
-  projectsStore.initProjects().then(() => {
-    datasourceStore
-      .getViewDestinations(projectsStore.projects.map((p) => p.name))
-      .then((names) => (projectNames.value = names));
-  });
-});
 
 function onHide() {
   emit('update:modelValue', false);

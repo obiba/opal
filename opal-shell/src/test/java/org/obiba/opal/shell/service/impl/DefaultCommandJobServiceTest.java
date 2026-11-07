@@ -342,11 +342,34 @@ public class DefaultCommandJobServiceTest {
     assertThat(jobsTerminated).isEmpty();
   }
 
-  @Test(expected = ForbiddenException.class)
-  public void testDeleteCompletedCommands_ForbiddenToNonAdministrator() {
+  @Test
+  public void testDeleteCompletedCommands_KeepsTheTasksOfANonAdministrator() {
+    terminatedJob("export", "testUser");
     bindNonAdministrator();
 
     sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).hasSize(1);
+  }
+
+  @Test
+  public void testDeleteCompletedCommands_KeepsTheFileBundleOfAnotherUser() {
+    terminatedJob("file-bundle", "otherUser");
+    bindNonAdministrator();
+
+    sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).hasSize(1);
+  }
+
+  @Test
+  public void testDeleteCompletedCommands_DeletesOwnFileBundle() {
+    terminatedJob("file-bundle", "testUser");
+    bindNonAdministrator();
+
+    sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).isEmpty();
   }
 
   private void bindNonAdministrator() {

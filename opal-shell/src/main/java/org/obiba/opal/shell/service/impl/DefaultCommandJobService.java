@@ -277,10 +277,10 @@ public class DefaultCommandJobService implements CommandJobService {
 
   @Override
   public void deleteCompletedCommands() {
-    if(!isAdmin(SecurityUtils.getSubject())) throw new ForbiddenException();
+    Subject subject = SecurityUtils.getSubject();
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
-      if(isDeletable(job) && removeTerminated(futureCommandJob)) {
+      if(isDeletionPermitted(job, subject) && isDeletable(job) && removeTerminated(futureCommandJob)) {
         cleanupResult(job);
       }
     }
@@ -442,8 +442,11 @@ public class DefaultCommandJobService implements CommandJobService {
    * are temporary downloads that their owner cleans up.
    */
   private void ensureDeletionPermitted(CommandJob job) {
-    Subject subject = SecurityUtils.getSubject();
-    if(!isAdmin(subject) && !isOwnFileBundle(job, subject)) throw new ForbiddenException();
+    if(!isDeletionPermitted(job, SecurityUtils.getSubject())) throw new ForbiddenException();
+  }
+
+  private boolean isDeletionPermitted(CommandJob job, Subject subject) {
+    return isAdmin(subject) || isOwnFileBundle(job, subject);
   }
 
   private boolean isOwnFileBundle(CommandJob job, Subject subject) {
