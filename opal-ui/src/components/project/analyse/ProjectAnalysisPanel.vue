@@ -227,10 +227,12 @@ async function onFilterFn(query: string, update: any) {
   try {
     loadingVariables.value = true;
 
-    const fullQuery = `query=${query} AND (project:"${props.projectName}") AND (table:"${props.tableName}")`;
+    const scope = `(project:"${props.projectName}") AND (table:"${props.tableName}")`;
+    const text = query.trim();
+    const fullQuery = text ? `(${text}) AND ${scope}` : scope;
     const result: QueryResultDto = await searchStore.search(fullQuery, 5, ['label', 'label-en'], undefined);
+    variableOptions.value = [];
     if (result.totalHits > 0) {
-      variableOptions.value = [];
       result.hits.map((hit) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fieldMap = getSearchHitFieldMap((hit as any)['Search.ItemFieldsDto.item'].fields, ['name', 'label-en']);
