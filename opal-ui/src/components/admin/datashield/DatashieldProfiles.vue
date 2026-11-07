@@ -17,7 +17,7 @@
           ></q-btn>
         </div>
         <q-btn
-          v-if="authStore.isAdministrator"
+          v-if="authStore.isDatashieldAdministrator"
           color="primary"
           text-color="white"
           icon="add"

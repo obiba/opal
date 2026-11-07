@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -89,6 +90,7 @@ public class DefaultCommandJobServiceTest {
 
     expect(mockSubject.getPrincipal()).andReturn("testUser").anyTimes();
     expect(mockSubject.getSession(false)).andStubReturn(null);
+    expect(mockSubject.isPermitted("rest:/:POST")).andStubReturn(true);
 
     ThreadContext.bind(mockSubject);
     replay(mockSubject);
@@ -312,6 +314,92 @@ public class DefaultCommandJobServiceTest {
     initCommandJob(Status.CANCEL_PENDING);
 
     sut.deleteCommand(commandJob.getId());
+  }
+
+  @Test(expected = ForbiddenException.class)
+  public void testDeleteCommand_ForbiddenToTheOwnerOfATask() {
+    CommandJob task = terminatedJob("export", "testUser");
+    bindNonAdministrator();
+
+    sut.deleteCommand(task.getId());
+  }
+
+  @Test(expected = ForbiddenException.class)
+  public void testDeleteCommand_ForbiddenOnTheFileBundleOfAnotherUser() {
+    CommandJob bundle = terminatedJob("file-bundle", "otherUser");
+    bindNonAdministrator();
+
+    sut.deleteCommand(bundle.getId());
+  }
+
+  @Test
+  public void testDeleteCommand_PermittedOnOwnFileBundle() {
+    CommandJob bundle = terminatedJob("file-bundle", "testUser");
+    bindNonAdministrator();
+
+    sut.deleteCommand(bundle.getId());
+
+    assertThat(jobsTerminated).isEmpty();
+  }
+
+  @Test
+  public void testDeleteCompletedCommands_KeepsTheTasksOfANonAdministrator() {
+    terminatedJob("export", "testUser");
+    bindNonAdministrator();
+
+    sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).hasSize(1);
+  }
+
+  @Test
+  public void testDeleteCompletedCommands_KeepsTheFileBundleOfAnotherUser() {
+    terminatedJob("file-bundle", "otherUser");
+    bindNonAdministrator();
+
+    sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).hasSize(1);
+  }
+
+  @Test
+  public void testDeleteCompletedCommands_DeletesOwnFileBundle() {
+    terminatedJob("file-bundle", "testUser");
+    bindNonAdministrator();
+
+    sut.deleteCompletedCommands();
+
+    assertThat(jobsTerminated).isEmpty();
+  }
+
+  private void bindNonAdministrator() {
+    Subject subject = createMock(Subject.class);
+    expect(subject.getPrincipal()).andStubReturn("testUser");
+    expect(subject.isPermitted("rest:/:POST")).andStubReturn(false);
+    replay(subject);
+    ThreadContext.bind(subject);
+  }
+
+  private CommandJob terminatedJob(String commandName, String owner) {
+    Command<?> cmd = createMock(Command.class);
+    expect(cmd.getName()).andStubReturn(commandName);
+    cmd.setShell((OpalShell) EasyMock.anyObject());
+    expectLastCall().anyTimes();
+    cmd.setOwner(EasyMock.anyString());
+    expectLastCall().anyTimes();
+    replay(cmd);
+    CommandJob job = new CommandJob(commandName, cmd);
+    job.setId(1);
+    job.setOwner(owner);
+    job.setSubmitTime(new Date(1));
+    job.setStatus(Status.SUCCEEDED);
+    FutureCommandJob future = new FutureCommandJob(mockSubject, job);
+    futureCommandJobs = new ArrayList<>(List.of(future));
+    jobsTerminated = new ArrayList<>(List.of(future));
+    TaskStateRepository repository = EasyMock.createNiceMock(TaskStateRepository.class);
+    replay(repository);
+    sut.setTaskStateRepository(repository);
+    return job;
   }
 
   @Test

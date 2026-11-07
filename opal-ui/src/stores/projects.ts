@@ -40,7 +40,12 @@ interface ProjectPerms {
 
   analyse: Perms | undefined;
   analyses: Perms | undefined;
-  analyses_export: Perms | undefined;
+  analysis: Perms | undefined;
+  backup: Perms | undefined;
+  restore: Perms | undefined;
+  resources: Perms | undefined;
+  subjects: Perms | undefined;
+  projectPermissions: Perms | undefined;
 }
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -118,8 +123,28 @@ export const useProjectsStore = defineStore('projects', () => {
           perms.value.summary = new Perms(response);
           return response;
         }),
-        api.options(u`/project/${project.value.name}/files`).then((response) => {
+        api.options(u`/files/projects/${project.value.name}`).then((response) => {
           perms.value.files = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${project.value.name}/resources`).then((response) => {
+          perms.value.resources = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${project.value.name}/permissions/subjects`).then((response) => {
+          perms.value.subjects = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${project.value.name}/permissions/project`).then((response) => {
+          perms.value.projectPermissions = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${project.value.name}/commands/_backup`).then((response) => {
+          perms.value.backup = new Perms(response);
+          return response;
+        }),
+        api.options(u`/project/${project.value.name}/commands/_restore`).then((response) => {
+          perms.value.restore = new Perms(response);
           return response;
         }),
         api.options(u`/project/${project.value.name}/commands`).then((response) => {
@@ -161,10 +186,11 @@ export const useProjectsStore = defineStore('projects', () => {
   async function loadAnalysesPermissions(name: string, tableName: string) {
     return Promise.all([
       api.options(u`/project/${name}/table/${tableName}/analyses`),
-      api.options(u`/project/${name}/table/${tableName}/analyses_export`),
-    ]).then(([analyses, analyses_export]) => {
+      // the permission applies to all the analyses of the table, whatever the name
+      api.options(u`/project/${name}/table/${tableName}/analysis/_`),
+    ]).then(([analyses, analysis]) => {
       perms.value.analyses = new Perms(analyses);
-      perms.value.vcfs = new Perms(analyses_export);
+      perms.value.analysis = new Perms(analysis);
     });
   }
 
@@ -236,14 +262,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function clearCommandStates(commands: CommandStateDto[]) {
-    if (commands.length === 0) {
-      return api.delete(u`/project/${project.value.name}/commands/completed`).then((response) => {
-        commandStates.value = [];
-        return response;
-      });
-    } else {
-      return Promise.all(commands.map((cmd) => api.delete(u`/project/${project.value.name}/command/${cmd.id}`)));
-    }
+    return Promise.all(commands.map((cmd) => api.delete(u`/project/${project.value.name}/command/${cmd.id}`)));
   }
 
   function cancelCommandState(command: CommandStateDto) {

@@ -19,22 +19,24 @@
             :options="['DATASHIELD_USE', 'DATASHIELD_ALL']"
             :read-only="authStore.isAuditor"
           />
-          <div class="text-h5 q-mt-md q-mb-md">{{ t('datashield.audit') }}</div>
-          <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
-          <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
-            <q-list>
-              <q-item clickable v-close-popup @click="onDownloadLogs(true)">
-                <q-item-section>
-                  <q-item-label>{{ t('datashield.download_all_logs') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click="onDownloadLogs(false)">
-                <q-item-section>
-                  <q-item-label>{{ t('datashield.download_latest_logs') }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
+          <template v-if="authStore.isAdministrator || authStore.isAuditor">
+            <div class="text-h5 q-mt-md q-mb-md">{{ t('datashield.audit') }}</div>
+            <div class="text-help q-mb-md">{{ t('datashield.audit_info') }}</div>
+            <q-btn-dropdown :label="t('download')" icon="download" size="sm" color="primary">
+              <q-list>
+                <q-item clickable v-close-popup @click="onDownloadLogs(true)">
+                  <q-item-section>
+                    <q-item-label>{{ t('datashield.download_all_logs') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup @click="onDownloadLogs(false)">
+                  <q-item-section>
+                    <q-item-label>{{ t('datashield.download_latest_logs') }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </template>
         </div>
         <div class="col-12 col-md-6">
           <div class="text-h5 q-mb-md">{{ t('r_quota.title') }}</div>

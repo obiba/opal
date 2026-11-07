@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
@@ -262,6 +263,7 @@ public class DefaultCommandJobService implements CommandJobService {
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
       if(job.getId().equals(id)) {
+        ensureDeletionPermitted(job);
         if(!isDeletable(job) || !removeTerminated(futureCommandJob)) {
           log.info("CommandJob {} is not deletable (current status: {})", id, job.getStatus());
           throw new IllegalStateException("commandJob not deletable");
@@ -275,9 +277,10 @@ public class DefaultCommandJobService implements CommandJobService {
 
   @Override
   public void deleteCompletedCommands() {
+    Subject subject = SecurityUtils.getSubject();
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       CommandJob job = futureCommandJob.getCommandJob();
-      if(isDeletable(job) && removeTerminated(futureCommandJob)) {
+      if(isDeletionPermitted(job, subject) && isDeletable(job) && removeTerminated(futureCommandJob)) {
         cleanupResult(job);
       }
     }
@@ -429,13 +432,26 @@ public class DefaultCommandJobService implements CommandJobService {
       if (subject.isPermitted("rest:/project/" + job.getProject() + ":POST")) return true;
       // project regular user can only see own jobs
       return subject.getPrincipal().toString().equals(job.getOwner());
-    } else if (job.getCommand().getName().equals("file-bundle")) {
-      // own file bundle commands are visible, and admin can see them all
-      return subject.getPrincipal().toString().equals(job.getOwner()) || isAdmin(subject);
-    } else {
-      // no project context, only for admins
-      return subject.isPermitted("rest:/" + ":POST");
     }
+    // no project context, only for admins, except own file bundle commands
+    return isOwnFileBundle(job, subject) || isAdmin(subject);
+  }
+
+  /**
+   * Tasks are an audit trail, so only a system administrator can delete them. The file bundles are the exception: they
+   * are temporary downloads that their owner cleans up.
+   */
+  private void ensureDeletionPermitted(CommandJob job) {
+    if(!isDeletionPermitted(job, SecurityUtils.getSubject())) throw new ForbiddenException();
+  }
+
+  private boolean isDeletionPermitted(CommandJob job, Subject subject) {
+    return isAdmin(subject) || isOwnFileBundle(job, subject);
+  }
+
+  private boolean isOwnFileBundle(CommandJob job, Subject subject) {
+    return !job.hasProject() && "file-bundle".equals(job.getCommand().getName()) &&
+        subject.getPrincipal().toString().equals(job.getOwner());
   }
 
   private boolean isAdmin(Subject subject) {

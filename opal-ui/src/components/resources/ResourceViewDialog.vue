@@ -104,7 +104,7 @@ const router = useRouter();
 const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
-const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const projectNames = ref<string[]>([]);
 const editMode = computed(() => props.view);
 const nameLocked = computed(() => !!editMode.value && datasourceStore.tableHasDependents);
 const processing = ref(false);
@@ -122,7 +122,19 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = projectsStore.project.name || datasourceStore.datasource.name;
+      const current = projectsStore.project.name || datasourceStore.datasource.name;
+      projectNames.value = [];
+      // a view is edited where it is, which does not require the permission to create one there
+      projectDestination.value = editMode.value ? current : '';
+      if (!editMode.value) {
+        datasourceStore
+          .getViewDestinations()
+          .then((names) => {
+            projectNames.value = names;
+            projectDestination.value = names.includes(current) ? current : names[0] || '';
+          })
+          .catch(notifyError);
+      }
       id.value = '';
       entityType.value = 'Participant';
       allColumns.value = true;
@@ -145,10 +157,6 @@ watch(
     showDialog.value = value;
   },
 );
-
-onMounted(() => {
-  projectsStore.initProjects();
-});
 
 function onHide() {
   processing.value = false;

@@ -27,7 +27,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="u`/project/${projectsStore.project.name}/resources`">
+      <q-item v-if="projectsStore.perms.resources?.canRead()" :to="u`/project/${projectsStore.project.name}/resources`">
         <q-item-section avatar>
           <q-icon name="link" />
         </q-item-section>
@@ -45,7 +45,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="u`/project/${projectsStore.project.name}/files`">
+      <q-item v-if="projectsStore.perms.files?.canRead()" :to="u`/project/${projectsStore.project.name}/files`">
         <q-item-section avatar>
           <q-icon name="folder" />
         </q-item-section>
@@ -65,7 +65,7 @@
         </q-item-section>
       </q-item>
 
-      <q-item :to="u`/project/${projectsStore.project.name}/perms`">
+      <q-item v-if="projectsStore.perms.subjects?.canRead()" :to="u`/project/${projectsStore.project.name}/perms`">
         <q-item-section avatar>
           <q-icon name="lock" />
         </q-item-section>
@@ -104,6 +104,9 @@ watchEffect(() => {
     projectsStore.perms.project?.canCreate() ||
     projectsStore.perms.project?.canUpdate() ||
     projectsStore.perms.project?.canDelete() ||
+    projectsStore.perms.reload?.canCreate() ||
+    projectsStore.perms.backup?.canCreate() ||
+    projectsStore.perms.restore?.canCreate() ||
     false;
 
   hasVcfStorePermission.value =

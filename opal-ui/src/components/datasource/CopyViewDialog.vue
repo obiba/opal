@@ -31,7 +31,14 @@
 
       <q-card-actions align="right" class="bg-grey-3">
         <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
-        <q-btn flat :label="t('copy')" color="primary" @click="onCopyView" v-close-popup />
+        <q-btn
+          flat
+          :label="t('copy')"
+          color="primary"
+          :disable="!projectDestination"
+          @click="onCopyView"
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -53,10 +60,9 @@ const emit = defineEmits(['update:modelValue']);
 
 const { t } = useI18n();
 const router = useRouter();
-const projectsStore = useProjectsStore();
 const datasourceStore = useDatasourceStore();
 
-const projectNames = computed(() => projectsStore.projects.map((p) => p.name));
+const projectNames = ref<string[]>([]);
 
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
@@ -66,7 +72,16 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
-      projectDestination.value = props.table.datasourceName as string;
+      projectNames.value = [];
+      projectDestination.value = '';
+      datasourceStore
+        .getViewDestinations()
+        .then((names) => {
+          const current = props.table.datasourceName as string;
+          projectNames.value = names;
+          projectDestination.value = names.includes(current) ? current : names[0] || '';
+        })
+        .catch(notifyError);
       newTableName.value = '';
       const tableNames = datasourceStore.tables.map((t) => t.name);
       let idx = 1;
@@ -81,10 +96,6 @@ watch(
     showDialog.value = value;
   },
 );
-
-onMounted(() => {
-  projectsStore.initProjects();
-});
 
 function onHide() {
   emit('update:modelValue', false);

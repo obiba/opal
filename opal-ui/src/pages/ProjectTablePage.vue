@@ -43,7 +43,12 @@
                 <q-item-label>{{ t('download_dictionary') }}</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item v-if="isView" clickable v-close-popup @click="onDownloadView">
+            <q-item
+              v-if="isView && datasourceStore.perms.viewXml?.canRead()"
+              clickable
+              v-close-popup
+              @click="onDownloadView"
+            >
               <q-item-section>
                 <q-item-label>{{ t('download_view') }}</q-item-label>
               </q-item-section>

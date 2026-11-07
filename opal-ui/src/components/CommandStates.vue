@@ -20,6 +20,7 @@
           class="q-mb-sm"
         />
         <q-btn
+          v-if="authStore.isAdministrator"
           outline
           color="secondary"
           icon="cleaning_services"
@@ -166,6 +167,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const authStore = useAuthStore();
 const emit = defineEmits(['refresh', 'clear', 'cancel']);
 
 const { t } = useI18n();
@@ -258,11 +260,22 @@ watch(
 );
 
 function isDeletable(row: CommandStateDto) {
-  return row.status !== CommandStateDto_Status.IN_PROGRESS && row.status !== CommandStateDto_Status.CANCEL_PENDING;
+  return (
+    (authStore.isAdministrator || isOwnFileBundle(row)) &&
+    row.status !== CommandStateDto_Status.IN_PROGRESS &&
+    row.status !== CommandStateDto_Status.CANCEL_PENDING
+  );
+}
+
+function isOwnFileBundle(row: CommandStateDto) {
+  return !row.project && row.command === 'file-bundle' && row.owner === authStore.profile.principal;
 }
 
 function isCancelable(row: CommandStateDto) {
-  return row.status === CommandStateDto_Status.IN_PROGRESS;
+  return (
+    row.status === CommandStateDto_Status.IN_PROGRESS &&
+    (authStore.isAdministrator || row.owner === authStore.profile.principal)
+  );
 }
 
 function onRefresh() {

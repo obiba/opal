@@ -68,6 +68,7 @@ public class ProjectCommandResource {
   )
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Command successfully deleted", useReturnTypeSchema = true),
+    @ApiResponse(responseCode = "403", description = "Only a system administrator can delete project commands"),
     @ApiResponse(responseCode = "404", description = "Command not found"),
     @ApiResponse(responseCode = "400", description = "Command cannot be deleted (still running)"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -76,7 +77,7 @@ public class ProjectCommandResource {
     try {
       CommandJob commandJob = getCommandJob();
       if(commandJob == null) {
-        Response.status(Response.Status.NOT_FOUND).build();
+        return Response.status(Response.Status.NOT_FOUND).build();
       }
       commandJobService.deleteCommand(id);
       return Response.ok().build();

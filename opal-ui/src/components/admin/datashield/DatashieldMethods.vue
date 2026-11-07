@@ -12,12 +12,12 @@
       :pagination="initialPagination"
       :filter="filter"
       :filter-method="onFilter"
-      :selection="authStore.isAdministrator ? 'multiple' : undefined"
+      :selection="authStore.isDatashieldAdministrator ? 'multiple' : undefined"
       v-model:selected="selected"
     >
       <template v-slot:top-left>
         <q-btn
-          v-if="authStore.isAdministrator"
+          v-if="authStore.isDatashieldAdministrator"
           color="primary"
           text-color="white"
           icon="add"
@@ -35,7 +35,7 @@
           @click="updateMethods"
         />
         <q-btn
-          v-if="authStore.isAdministrator"
+          v-if="authStore.isDatashieldAdministrator"
           outline
           color="red"
           icon="delete"
@@ -68,7 +68,7 @@
               @click="onShowEdit(props.row)"
             />
             <q-btn
-              v-if="authStore.isAdministrator"
+              v-if="authStore.isDatashieldAdministrator"
               rounded
               dense
               flat

@@ -154,7 +154,13 @@ const itemResults = computed(() => (results.value?.hits as ItemFieldsResultDto[]
 
 onMounted(() => {
   router.beforeEach((to, from, next) => {
-    if (to.path.startsWith('/admin') && !authStore.isAdministrator && !authStore.isAuditor) {
+    const isDatashieldPath = to.path === '/admin' || to.path.startsWith('/admin/datashield');
+    if (
+      to.path.startsWith('/admin') &&
+      !authStore.isAdministrator &&
+      !authStore.isAuditor &&
+      !(authStore.isDatashieldAdministrator && isDatashieldPath)
+    ) {
       next('/');
     } else {
       next();

@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   const bookmarks = ref<BookmarkDto[]>([]);
   const isAdministrator = ref(false);
   const isAuditor = ref(false);
+  const isDatashieldAdministrator = ref(false);
   const reAuthRequired = ref(false);
 
   const otpMessage = computed(
@@ -26,17 +27,27 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   async function checkIsAdministrator() {
-    return api
-      .options('/system/subject-profiles')
-      .then((response) => {
-        const headers = response.headers['allow'] || '';
-        isAdministrator.value = headers.includes('DELETE');
-        isAuditor.value = headers.includes('GET') && !isAdministrator.value;
-      })
-      .catch(() => {
-        isAdministrator.value = false;
-        isAuditor.value = false;
-      });
+    return Promise.all([
+      api
+        .options('/system/subject-profiles')
+        .then((response) => {
+          const headers = response.headers['allow'] || '';
+          isAdministrator.value = headers.includes('DELETE');
+          isAuditor.value = headers.includes('GET') && !isAdministrator.value;
+        })
+        .catch(() => {
+          isAdministrator.value = false;
+          isAuditor.value = false;
+        }),
+      api
+        .options('/datashield/profiles')
+        .then((response) => {
+          isDatashieldAdministrator.value = (response.headers['allow'] || '').includes('POST');
+        })
+        .catch(() => {
+          isDatashieldAdministrator.value = false;
+        }),
+    ]);
   }
 
   async function signin(username: string, password: string, authMethod: string, token: string) {
@@ -115,6 +126,7 @@ export const useAuthStore = defineStore('auth', () => {
     bookmarks,
     isAdministrator,
     isAuditor,
+    isDatashieldAdministrator,
     otpMessage,
     reAuthRequired,
     signin,

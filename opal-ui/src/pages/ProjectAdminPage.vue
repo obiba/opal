@@ -78,7 +78,7 @@
         </q-card>
       </template>
 
-      <template v-if="projectsStore.perms.project?.canRead()">
+      <template v-if="projectsStore.perms.projectPermissions?.canRead()">
         <q-card flat>
           <q-card-section class="q-px-none">
             <span class="text-h6 q-mb-md">{{ t('permissions') }}</span>
@@ -113,24 +113,26 @@
         </q-card>
       </template>
 
-      <template v-if="hasAdminPermission">
+      <template v-if="hasBackupPermission || hasRestorePermission">
         <q-card flat>
           <q-card-section class="q-px-none q-pb-none">
             <span class="text-h6">{{ t('project_admin.backup_restore') }}</span>
           </q-card-section>
 
           <q-card-section class="q-pa-none">
-            <div class="text-help">{{ t('project_admin.backup_hint') }}</div>
-            <q-btn
-              size="sm"
-              class="q-mt-xs"
-              icon="download"
-              color="primary"
-              :label="t('backup')"
-              @click="onBackup"
-            ></q-btn>
+            <template v-if="hasBackupPermission">
+              <div class="text-help">{{ t('project_admin.backup_hint') }}</div>
+              <q-btn
+                size="sm"
+                class="q-mt-xs"
+                icon="download"
+                color="primary"
+                :label="t('backup')"
+                @click="onBackup"
+              ></q-btn>
+            </template>
 
-            <q-card-section class="q-px-none">
+            <q-card-section v-if="hasRestorePermission" class="q-px-none">
               <div class="text-help">{{ t('project_admin.restore_hint') }}</div>
               <q-btn
                 size="sm"
@@ -143,7 +145,9 @@
             </q-card-section>
           </q-card-section>
         </q-card>
+      </template>
 
+      <template v-if="hasAdminPermission">
         <div class="q-my-md">
           <q-card flat class="q-mt-md o-border-negative rounded-borders">
             <q-card-section>
@@ -225,6 +229,8 @@ const hasAdminPermission = computed(
 );
 const hasReloadPermission = computed(() => projectsStore.perms.reload?.canCreate() || false);
 const hasKeystorePermission = computed(() => projectsStore.perms.keystore?.canCreate() || false);
+const hasBackupPermission = computed(() => projectsStore.perms.backup?.canCreate() || false);
+const hasRestorePermission = computed(() => projectsStore.perms.restore?.canCreate() || false);
 const hasDatabase = computed(() => project.value.database !== undefined || project.value.internalDatabase === true);
 const hasVcfStores = computed(() => pluginsStore.vcfStorePlugins.length > 0);
 

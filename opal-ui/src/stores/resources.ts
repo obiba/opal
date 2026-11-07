@@ -98,6 +98,10 @@ export const useResourcesStore = defineStore('resources', () => {
     perms.value.resource = undefined;
     perms.value.resourcePermissions = undefined;
     return Promise.all([
+      api.options(u`/project/${pName}/resources`).then((response) => {
+        perms.value.resources = new Perms(response);
+        return response;
+      }),
       api.options(u`/project/${pName}/resource/${name}`).then((response) => {
         perms.value.resource = new Perms(response);
         return response;

@@ -21,6 +21,8 @@ interface DatasourcePerms {
   table: Perms | undefined;
   tablePermissions: Perms | undefined;
   tableValueSets: Perms | undefined;
+  tableIndex: Perms | undefined;
+  viewXml: Perms | undefined;
   variables: Perms | undefined;
   variable: Perms | undefined;
   variableSummary: Perms | undefined;
@@ -185,6 +187,8 @@ export const useDatasourceStore = defineStore('datasource', () => {
       tableIndex.value = {} as TableIndexStatusDto;
       perms.value.table = undefined;
       perms.value.tableValueSets = undefined;
+      perms.value.tableIndex = undefined;
+      perms.value.viewXml = undefined;
       variables.value = [];
       perms.value.variables = undefined;
     }
@@ -245,10 +249,32 @@ export const useDatasourceStore = defineStore('datasource', () => {
 
   async function loadView(name: string) {
     view.value = {} as ViewDto;
-    return api.get(u`/datasource/${datasource.value.name}/view/${name}`).then((response) => {
-      view.value = response.data;
-      return response;
-    });
+    const [response, viewXml] = await Promise.all([
+      api.get(u`/datasource/${datasource.value.name}/view/${name}`),
+      api
+        .options(u`/datasource/${datasource.value.name}/view/${name}/xml`)
+        .then((xmlResponse) => new Perms(xmlResponse))
+        .catch(() => undefined),
+    ]);
+    view.value = response.data;
+    perms.value.viewXml = viewXml;
+    return response;
+  }
+
+  // the projects in which a view can be created; one that cannot be checked is left out
+  async function getViewDestinations() {
+    const projectsStore = useProjectsStore();
+    await projectsStore.initProjects();
+    const projectNames = projectsStore.projects.map((p) => p.name);
+    const destinations = await Promise.all(
+      projectNames.map((name) =>
+        api
+          .options(u`/datasource/${name}/views`)
+          .then((response) => new Perms(response).canCreate())
+          .catch(() => false),
+      ),
+    );
+    return projectNames.filter((_, idx) => destinations[idx]);
   }
 
   async function loadTableVariables() {
@@ -282,7 +308,6 @@ export const useDatasourceStore = defineStore('datasource', () => {
               perms.value.variablePermissions = new Perms(response);
               return response;
             }),
-          // FIXME: OPTIONS not working for variable summary endpoint
           api
             .options(u`/datasource/${datasource.value.name}/table/${table.value.name}/variable/${name}/summary`)
             .then((response) => {
@@ -633,7 +658,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
   async function loadTableIndex() {
     return api
       .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
-      .then((response) => (tableIndex.value = response.data));
+      .then((response) => {
+        perms.value.tableIndex = new Perms(response);
+        tableIndex.value = response.data;
+      });
   }
 
   async function updateTableIndex() {
@@ -696,6 +724,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     downloadTablesDictionary,
     downloadTableDictionary,
     downloadViews,
+    getViewDestinations,
     downloadView,
     loadValueSets,
     loadTableVariable,
