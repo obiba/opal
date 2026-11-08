@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import com.thoughtworks.xstream.converters.ConversionException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 
 import org.apache.shiro.subject.Subject;
@@ -64,6 +65,8 @@ public class ViewVcsLogResourceTest {
   private final ValueView restored = mock(ValueView.class,
       Mockito.withSettings().extraInterfaces(Initialisable.class, Disposable.class));
 
+  private final ValueView current = mock(ValueView.class);
+
   private ViewVcsLogResource resource;
 
   @Before
@@ -71,14 +74,15 @@ public class ViewVcsLogResourceTest {
     new MagmaEngine();
     ViewAwareDatasource datasource = mock(ViewAwareDatasource.class);
     when(datasource.getName()).thenReturn("ds");
-    ValueView current = mock(ValueView.class);
     when(current.getDatasource()).thenReturn(datasource);
     when(current.getName()).thenReturn("v");
+    when(current.getStatus()).thenReturn(ValueTableStatus.READY);
     when(viewManager.getView("ds", "v")).thenReturn(current);
     when(strategy.readView("ds", "v", COMMIT_ID)).thenReturn(restored);
     when(restored.getStatus()).thenReturn(ValueTableStatus.READY);
-    when(viewDtoExtension.isDtoOf(restored)).thenReturn(true);
+    when(viewDtoExtension.isDtoOf(any(ValueView.class))).thenReturn(true);
     when(viewDtoExtension.asDto(restored)).thenReturn(Magma.ViewDto.newBuilder().addFrom("ds.T").buildPartial());
+    when(viewDtoExtension.asDto(current)).thenReturn(Magma.ViewDto.newBuilder().addFrom("ds.T").buildPartial());
     ViewDtos viewDtos = new ViewDtos();
     viewDtos.setExtensions(List.of(viewDtoExtension));
 
@@ -146,6 +150,36 @@ public class ViewVcsLogResourceTest {
         .setExtension(Magma.ResourceViewDto.view, Magma.ResourceViewDto.getDefaultInstance()).buildPartial());
 
     assertRejected(resource.restore(COMMIT_ID), 403);
+  }
+
+  @Test
+  public void test_restore_of_another_script_forbidden_without_source_values() {
+    // cannot see any values, neither of the view nor of the resource behind it
+    Subject subject = mock(Subject.class);
+    ThreadContext.bind(subject);
+    MagmaEngine.get().extend(new MagmaSecurityExtension() {
+      @Override
+      public void initialise() {
+      }
+    });
+    when(viewDtoExtension.asDto(current)).thenReturn(resourceView("1"));
+    when(viewDtoExtension.asDto(restored)).thenReturn(resourceView("2"));
+
+    try {
+      resource.restore(COMMIT_ID);
+      org.junit.Assert.fail("expected forbidden");
+    } catch(ForbiddenException e) {
+      verify(viewManager, never()).addView(anyString(), any(ValueView.class), anyString(),
+          any(VariableOperationContext.class));
+      verify((Disposable) restored).dispose();
+    }
+  }
+
+  private static Magma.ViewDto resourceView(String script) {
+    return Magma.ViewDto.newBuilder().addFrom("ds.res").setExtension(Magma.ResourceViewDto.view,
+        Magma.ResourceViewDto.newBuilder().addVariables(Magma.VariableDto.newBuilder().setName("x")
+            .setEntityType("Participant").setValueType("integer").setIsRepeatable(false)
+            .addAttributes(Magma.AttributeDto.newBuilder().setName("script").setValue(script))).build()).buildPartial();
   }
 
   @Test

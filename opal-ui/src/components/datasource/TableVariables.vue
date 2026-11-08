@@ -38,7 +38,7 @@
               <span class="q-ml-xs">{{ t('variables_hint') }}</span>
             </div>
             <q-btn
-              v-if="selected.length > 0"
+              v-if="selected.length > 0 && datasourceStore.perms.tableValueSets?.canRead()"
               :label="t('add_to_view')"
               icon="add_circle"
               no-caps

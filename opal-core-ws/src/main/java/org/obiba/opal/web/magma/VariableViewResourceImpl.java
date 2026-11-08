@@ -17,6 +17,7 @@ import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.event.VariableRenamedEvent;
 import org.obiba.opal.core.event.VariablesUpdatedEvent;
+import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
   @Autowired
   private ViewManager viewManager;
+
+  @Autowired
+  private ViewDtos viewDtos;
 
   @Override
   public VariableDto get(UriInfo uriInfo) {
@@ -104,6 +108,9 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     }
 
     ValueView view = getValueTableAsView();
+    Magma.ViewDto viewDto = viewDtos.asDto(view);
+    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable,
+        viewDto.hasExtension(Magma.ResourceViewDto.view)));
     VariableOperationContext operationContext = new VariableOperationContext();
 
     try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {

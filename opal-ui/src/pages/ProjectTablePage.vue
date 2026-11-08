@@ -277,7 +277,8 @@
 
 <script setup lang="ts">
 import BookmarkIcon from 'src/components/BookmarkIcon.vue';
-import { u } from 'src/boot/api';
+import { api, u } from 'src/boot/api';
+import { Perms } from 'src/utils/authz';
 import TableVariables from 'src/components/datasource/TableVariables.vue';
 import TableValues from 'src/components/datasource/TableValues.vue';
 import AccessControlList from 'src/components/permissions/AccessControlList.vue';
@@ -339,6 +340,33 @@ const nextTable = computed(() => {
   return idx === datasourceStore.tables.length - 1 ? null : datasourceStore.tables[idx + 1];
 });
 
+// a reference the user cannot open (e.g. a table of a project without permission) is not a link
+function refPath(ref: string) {
+  const [project, name] = [ref.slice(0, ref.indexOf('.')), ref.slice(ref.indexOf('.') + 1)];
+  return isTablesView.value ? u`/project/${project}/table/${name}` : u`/project/${project}/resource/${name}`;
+}
+
+const readableRefs = ref<string[]>([]);
+
+watch(
+  () => [datasourceStore.view.from, isTablesView.value] as const,
+  ([from, tablesView]) => {
+    readableRefs.value = [];
+    (from ?? []).forEach((f) => {
+      const [project, name] = [f.slice(0, f.indexOf('.')), f.slice(f.indexOf('.') + 1)];
+      const url = tablesView ? u`/datasource/${project}/table/${name}` : u`/project/${project}/resource/${name}`;
+      // the allowed methods, without fetching the table or resource
+      api
+        .options(url)
+        .then((response) => {
+          if (new Perms(response).canRead()) readableRefs.value.push(f);
+        })
+        .catch(() => undefined);
+    });
+  },
+  { immediate: true },
+);
+
 const items1 = computed(() => {
   return [
     {
@@ -361,7 +389,7 @@ const items1 = computed(() => {
           ? datasourceStore.view.from?.map((f) => {
               return {
                 label: f,
-                to: u`/project/${f.slice(0, f.indexOf('.'))}/${isTablesView.value ? 'table' : 'resource'}/${f.slice(f.indexOf('.') + 1)}`,
+                to: readableRefs.value.includes(f) ? refPath(f) : undefined,
                 icon: datasourceStore.view.innerFrom?.includes(f) ? 'panorama_fish_eye' : 'circle',
               };
             })

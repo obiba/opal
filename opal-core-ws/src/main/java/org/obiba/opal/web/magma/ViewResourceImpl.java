@@ -33,9 +33,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Nullable;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -76,6 +81,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
     if (!checkValuesPermissions(getValueTable(), viewDto))
       return Response.status(Status.FORBIDDEN).build();
+    ensureDerivationPermitted(viewDto, () -> !sameDerivation(viewDtos.asDto(asValueView()), viewDto));
 
     ValueTable table = getValueTable();
     if (!viewDto.getName().equals(table.getName())) {
@@ -156,17 +162,109 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
         "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET"))
       return true;
 
+    return canReadSources(viewDto);
+  }
+
+  /**
+   * Whether the user can see the values of every source of the view, whatever the permissions on the view itself.
+   */
+  static boolean canReadSources(ViewDto viewDto) {
+    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return true;
     return viewDto.hasExtension(Magma.ResourceViewDto.view) ? checkResourceValuesPermissions(viewDto) : checkTableValuesPermissions(viewDto);
+  }
+
+  /**
+   * Changing how a view derives its values (scripts, sources, filters, resource columns) needs the values of every
+   * source: otherwise the summaries of the result can single out the values the user is not permitted to see. The
+   * change is only computed for users who cannot see the values of the sources.
+   */
+  public static void ensureDerivationPermitted(ViewDto viewDto, BooleanSupplier changed) {
+    if (!canReadSources(viewDto) && changed.getAsBoolean())
+      throw new ForbiddenException(Response.status(Status.FORBIDDEN)
+          .entity(ClientErrorDtos.getErrorMessage(Status.FORBIDDEN, "ViewDerivationNotPermitted").build()).build());
+  }
+
+  /**
+   * Whether the updated view derives its values as the current one does. With no current view, whether the view
+   * derives nothing on its own, i.e. it only selects the variables of its sources.
+   */
+  public static boolean sameDerivation(@Nullable ViewDto current, ViewDto updated) {
+    if (updated.hasExtension(Magma.FileViewDto.view)) return false;
+    boolean resource = updated.hasExtension(Magma.ResourceViewDto.view);
+    if (current == null) current = withoutDerivation(updated);
+    if (!Set.copyOf(current.getFromList()).equals(Set.copyOf(updated.getFromList()))
+        || !Set.copyOf(current.getInnerFromList()).equals(Set.copyOf(updated.getInnerFromList()))
+        || !current.getWhere().equals(updated.getWhere())
+        || current.hasExtension(Magma.JavaScriptViewDto.view) != updated.hasExtension(Magma.JavaScriptViewDto.view)
+        || current.hasExtension(Magma.VariableListViewDto.view) != updated.hasExtension(Magma.VariableListViewDto.view)
+        || current.hasExtension(Magma.ResourceViewDto.view) != resource
+        || !current.getExtension(Magma.JavaScriptViewDto.view).getSelect()
+        .equals(updated.getExtension(Magma.JavaScriptViewDto.view).getSelect())
+        || !sameColumns(current.getExtension(Magma.ResourceViewDto.view), updated.getExtension(Magma.ResourceViewDto.view)))
+      return false;
+
+    Map<String, Variable> currentVariables = variablesOf(current).stream()
+        .collect(Collectors.toMap(Variable::getName, v -> v, (a, b) -> a));
+    return variablesOf(updated).stream()
+        .allMatch(v -> sameDerivation(currentVariables.get(v.getName()), v, resource));
+  }
+
+  /**
+   * Whether the updated variable gets its values as the current one does. A variable without script nor sameAs
+   * gets no value in a table view, while in a resource view its name selects a column.
+   */
+  static boolean sameDerivation(@Nullable Variable current, Variable updated, boolean resource) {
+    if (resource && (current == null || !current.getName().equals(updated.getName()))) return false;
+    return derivationOf(current).equals(derivationOf(updated));
+  }
+
+  private static boolean sameColumns(Magma.ResourceViewDto current, Magma.ResourceViewDto updated) {
+    return current.getIdColumn().equals(updated.getIdColumn()) && current.getProfile().equals(updated.getProfile())
+        && current.getAllColumns() == updated.getAllColumns();
+  }
+
+  private static Set<String> derivationOf(@Nullable Variable variable) {
+    if (variable == null || !variable.hasAttributes()) return Set.of();
+    return variable.getAttributes().stream()
+        .filter(attr -> "script".equals(attr.getName()) || "sameAs".equals(attr.getName())
+            || (attr.hasNamespace() && "opal".equals(attr.getNamespace()) && "column".equals(attr.getName())))
+        .map(attr -> (attr.hasNamespace() ? attr.getNamespace() : "") + ":" + attr.getName() + ":"
+            + (attr.isLocalised() ? attr.getLocale() : "") + ":" + attr.getValue())
+        .collect(Collectors.toSet());
+  }
+
+  private static List<Variable> variablesOf(ViewDto viewDto) {
+    List<Magma.VariableDto> dtos = viewDto.hasExtension(Magma.ResourceViewDto.view)
+        ? viewDto.getExtension(Magma.ResourceViewDto.view).getVariablesList()
+        : viewDto.getExtension(Magma.VariableListViewDto.view).getVariablesList();
+    return dtos.stream().map(Dtos::fromDto).collect(Collectors.toList());
+  }
+
+  /**
+   * Same sources and type of view, with no variables, filter nor select script.
+   */
+  private static ViewDto withoutDerivation(ViewDto viewDto) {
+    ViewDto.Builder builder = ViewDto.newBuilder()
+        .addAllFrom(viewDto.getFromList())
+        .addAllInnerFrom(viewDto.getInnerFromList());
+    if (viewDto.hasExtension(Magma.JavaScriptViewDto.view))
+      builder.setExtension(Magma.JavaScriptViewDto.view, Magma.JavaScriptViewDto.getDefaultInstance());
+    if (viewDto.hasExtension(Magma.VariableListViewDto.view))
+      builder.setExtension(Magma.VariableListViewDto.view, Magma.VariableListViewDto.getDefaultInstance());
+    if (viewDto.hasExtension(Magma.ResourceViewDto.view))
+      builder.setExtension(Magma.ResourceViewDto.view,
+          viewDto.getExtension(Magma.ResourceViewDto.view).toBuilder().clearVariables().build());
+    return builder.build();
   }
 
   private static boolean checkTableValuesPermissions(ViewDto viewDto) {
     Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
     // user can see the values of the view, so make sure user is also permitted to see the referred tables values
     for (String tableName : viewDto.getFromList()) {
+      // from the reference, not the resolved table: a source the user cannot see at all does not resolve
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
-      ValueTable fromTable = resolver.resolveTable();
-      if (!authorizer.isPermitted(
-          "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
+      if (resolver.getDatasourceName() == null || !authorizer.isPermitted(
+          "rest:/datasource/" + resolver.getDatasourceName() + "/table/" + resolver.getTableName() + "/valueSet:GET")) {
         return false;
       }
     }

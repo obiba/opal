@@ -147,6 +147,7 @@ export default {
     TagNameRequired: "Le nom de l'étiquette est requis",
     ViewRestoreFailed: 'La version de la vue ne peut pas être restaurée',
     Forbidden: "L'operation est interdite",
+    ViewDerivationNotPermitted: 'Modifier la façon dont la vue calcule ses valeurs nécessite la permission de voir les valeurs de ses tables sources',
     NoSuchValueTableInDatasource: "La table n'existe pas ou vous n'y avez pas accès",
     PasswordTooWeak: 'Mot de passe trop faible',
     OldPasswordMismatch: "L'ancien mot n'est pas valide",

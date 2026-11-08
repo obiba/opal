@@ -53,6 +53,7 @@
           class="on-right"
         />
         <q-btn
+          v-if="datasourceStore.perms.tableValueSets?.canRead()"
           :label="t('add_to_view')"
           icon="add_circle"
           no-caps
