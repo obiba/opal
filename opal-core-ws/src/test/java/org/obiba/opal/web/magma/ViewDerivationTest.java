@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 OBiBa. All rights reserved.
+ * Copyright (c) 2026 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -15,9 +15,15 @@ import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTableStatus;
+import org.obiba.magma.ValueView;
 import org.obiba.magma.Variable;
 import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.web.magma.view.ValueViewDtoExtension;
+import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.FileViewDto;
 import org.obiba.opal.web.model.Magma.JavaScriptViewDto;
@@ -27,7 +33,11 @@ import org.obiba.opal.web.model.Magma.VariableListViewDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.obiba.opal.web.magma.ViewResourceImpl.ensureDerivationPermitted;
 import static org.obiba.opal.web.magma.ViewResourceImpl.sameDerivation;
@@ -162,6 +172,54 @@ public class ViewDerivationTest {
 
     when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
     ensureDerivationPermitted(view, () -> true);
+  }
+
+  @Test
+  public void test_rename_onto_another_variable_needs_source_values() throws Exception {
+    ThreadContext.bind(mock(Subject.class));
+    MagmaEngine.get().extend(new MagmaSecurityExtension() {
+      @Override
+      public void initialise() {
+      }
+    });
+    VariableDto x = variable("x", attr("script", "$('A')"));
+    VariableDto y = variable("y", attr("script", "$('B')"));
+    Datasource datasource = mock(Datasource.class);
+    when(datasource.getName()).thenReturn("ds");
+    ValueView view = mock(ValueView.class);
+    when(view.getDatasource()).thenReturn(datasource);
+    when(view.getName()).thenReturn("v");
+    when(view.getStatus()).thenReturn(ValueTableStatus.READY);
+    when(view.getVariable("x")).thenReturn(var(x));
+    when(view.hasVariable("y")).thenReturn(true);
+    when(view.getVariable("y")).thenReturn(var(y));
+    ViewManager viewManager = mock(ViewManager.class);
+    when(viewManager.getView("ds", "v")).thenReturn(view);
+    ValueViewDtoExtension extension = mock(ValueViewDtoExtension.class);
+    when(extension.isDtoOf(view)).thenReturn(true);
+    when(extension.asDto(view)).thenReturn(list(x, y));
+    ViewDtos viewDtos = new ViewDtos();
+    viewDtos.setExtensions(java.util.List.of(extension));
+
+    VariableViewResourceImpl resource = new VariableViewResourceImpl();
+    inject(resource, "viewManager", viewManager);
+    inject(resource, "viewDtos", viewDtos);
+    resource.setValueTable(view);
+    resource.setName("x");
+
+    // x keeps its script, but y would get it in place of its own
+    try {
+      resource.createOrUpdateVariable(x.toBuilder().setName("y").build(), null);
+      org.junit.Assert.fail("expected forbidden");
+    } catch(ForbiddenException e) {
+      verify(viewManager, never()).addView(anyString(), any(ValueView.class), anyString(), any(org.obiba.magma.views.support.VariableOperationContext.class));
+    }
+  }
+
+  private static void inject(Object target, String field, Object value) throws Exception {
+    java.lang.reflect.Field f = VariableViewResourceImpl.class.getDeclaredField(field);
+    f.setAccessible(true);
+    f.set(target, value);
   }
 
   //

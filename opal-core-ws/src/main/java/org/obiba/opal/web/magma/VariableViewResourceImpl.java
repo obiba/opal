@@ -109,8 +109,12 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
     ValueView view = getValueTableAsView();
     Magma.ViewDto viewDto = viewDtos.asDto(view);
-    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable,
-        viewDto.hasExtension(Magma.ResourceViewDto.view)));
+    boolean resource = viewDto.hasExtension(Magma.ResourceViewDto.view);
+    // a rename onto an existing variable replaces how that one gets its values too
+    Variable overwritten = !updatedVariable.getName().equals(variable.getName()) && table.hasVariable(updatedVariable.getName())
+        ? table.getVariable(updatedVariable.getName()) : null;
+    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable, resource)
+        || (overwritten != null && !ViewResourceImpl.sameDerivation(overwritten, updatedVariable, resource)));
     VariableOperationContext operationContext = new VariableOperationContext();
 
     try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {

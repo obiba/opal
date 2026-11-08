@@ -58,3 +58,6 @@ export const getVariableNature = (variable: VariableDto) => {
 
   return VariableNatures.UNDETERMINED;
 };
+
+// a table or resource reference, as `project.name`
+export const splitRef = (ref: string): [string, string] => [ref.slice(0, ref.indexOf('.')), ref.slice(ref.indexOf('.') + 1)];

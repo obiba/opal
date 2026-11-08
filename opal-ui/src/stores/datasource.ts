@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl, u } from 'src/boot/api';
 import type { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
+import { splitRef } from 'src/utils/magma';
 import { notifyError } from 'src/utils/notify';
 import type { AttributesBundle } from 'src/components/models';
 import type { QueryResultDto } from 'src/models/Search';
@@ -270,7 +271,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     const resourceView = table.value.viewType === 'ResourceView';
     const permitted = await Promise.all(
       (viewDto.from ?? []).map((f) => {
-        const [project, name] = [f.slice(0, f.indexOf('.')), f.slice(f.indexOf('.') + 1)];
+        const [project, name] = splitRef(f);
         const url = resourceView
           ? u`/project/${project}/resource/${name}`
           : u`/datasource/${project}/table/${name}/valueSets`;
@@ -678,10 +679,12 @@ export const useDatasourceStore = defineStore('datasource', () => {
   }
 
   async function loadTableIndex() {
-    return api.get(u`/datasource/${datasource.value.name}/table/${table.value.name}/index`).then((response) => {
-      perms.value.tableIndex = new Perms(response);
-      tableIndex.value = response.data;
-    });
+    return api
+      .get(u`/datasource/${datasource.value.name}/table/${table.value.name}/index`)
+      .then((response) => {
+        perms.value.tableIndex = new Perms(response);
+        tableIndex.value = response.data;
+      });
   }
 
   async function updateTableIndex() {
