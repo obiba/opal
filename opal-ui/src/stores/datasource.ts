@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { api, baseUrl, u } from 'src/boot/api';
 import type { DatasourceDto, TableDto, ViewDto, VariableDto, AttributeDto, ResourceViewDto } from 'src/models/Magma';
 import { Perms } from 'src/utils/authz';
+import { splitRef } from 'src/utils/magma';
 import { notifyError } from 'src/utils/notify';
 import type { AttributesBundle } from 'src/components/models';
 import type { QueryResultDto } from 'src/models/Search';
@@ -23,6 +24,8 @@ interface DatasourcePerms {
   tableValueSets: Perms | undefined;
   tableIndex: Perms | undefined;
   viewXml: Perms | undefined;
+  // whether the user can see the values of every source of the current view, which changing its scripts requires
+  viewSourceValues: boolean | undefined;
   variables: Perms | undefined;
   variable: Perms | undefined;
   variableSummary: Perms | undefined;
@@ -189,6 +192,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
       perms.value.tableValueSets = undefined;
       perms.value.tableIndex = undefined;
       perms.value.viewXml = undefined;
+      perms.value.viewSourceValues = undefined;
       variables.value = [];
       perms.value.variables = undefined;
     }
@@ -258,7 +262,26 @@ export const useDatasourceStore = defineStore('datasource', () => {
     ]);
     view.value = response.data;
     perms.value.viewXml = viewXml;
+    perms.value.viewSourceValues = await canReadViewSourceValues(view.value);
     return response;
+  }
+
+  // values of each source table, or edit of each source resource, as the server requires to change the scripts
+  async function canReadViewSourceValues(viewDto: ViewDto) {
+    const resourceView = table.value.viewType === 'ResourceView';
+    const permitted = await Promise.all(
+      (viewDto.from ?? []).map((f) => {
+        const [project, name] = splitRef(f);
+        const url = resourceView
+          ? u`/project/${project}/resource/${name}`
+          : u`/datasource/${project}/table/${name}/valueSets`;
+        return api
+          .options(url)
+          .then((response) => (resourceView ? new Perms(response).canUpdate() : new Perms(response).canRead()))
+          .catch(() => false);
+      }),
+    );
+    return permitted.every((p) => p);
   }
 
   // the projects in which a view can be created; one that cannot be checked is left out

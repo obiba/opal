@@ -222,8 +222,11 @@ public class DatasourceResource {
 
     // check the permissions and if table/resource exists for the user
     AclAction action = getAction(viewDto);
-
     ValueView view = viewDtos.fromDto(viewDto);
+    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(null, viewDto),
+        // the view saved below must not be initialised yet
+        () -> viewDto.hasExtension(Magma.FileViewDto.view) ? ViewResourceImpl.referencesOf(viewDtos.fromDto(viewDto))
+            : ViewResourceImpl.referencesOf(viewDto));
     viewManager.addView(getDatasource().getName(), view, comment, null);
     scheduleViewIndexation(view);
     getEventBus().post(new ValueTableAddedEvent(getDatasource().getName(), viewDto.getName()));

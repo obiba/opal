@@ -15,12 +15,12 @@
           <span v-if="item.html" v-html="item.html(dbobject)"></span>
           <span v-else-if="item.format">{{ item.format(dbobject) }}</span>
           <span v-else-if="item.links">
-            <div v-for="link in item.links(dbobject)" :key="link.to" class="text-caption">
-              <router-link :to="link.to">
+            <div v-for="link in item.links(dbobject)" :key="link.label" class="text-caption">
+              <component :is="link.to ? 'router-link' : 'span'" :to="link.to">
                 <q-icon v-if="link.icon" :name="link.icon" class="q-mr-xs" />
                 <span>{{ link.label }}</span>
                 <q-icon v-if="link.iconRight" :name="link.iconRight" class="q-ml-xs" />
-              </router-link>
+              </component>
             </div>
           </span>
           <span v-else-if="item.icon">
@@ -49,7 +49,8 @@ import { toMaxDecimals } from 'src/utils/numbers';
 
 export interface FieldLink {
   label: string;
-  to: string;
+  // without a target, the label is not a link
+  to?: string | undefined;
   icon?: string;
   iconRight?: string;
 }

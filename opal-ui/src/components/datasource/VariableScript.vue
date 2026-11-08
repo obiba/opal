@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="datasourceStore.perms.variable?.canUpdate()" class="row q-gutter-sm q-mb-md">
+    <div
+      v-if="datasourceStore.perms.variable?.canUpdate() && datasourceStore.perms.viewSourceValues"
+      class="row q-gutter-sm q-mb-md"
+    >
       <q-btn size="sm" color="primary" icon="edit" :title="t('edit')" @click="onShowEdit" />
     </div>
     <v-ace-editor v-model:value="script" @init="onEditorInit" lang="javascript" theme="monokai" style="height: 300px" />
@@ -12,6 +15,7 @@
 import type { VariableDto } from 'src/models/Magma';
 import { VAceEditor } from 'vue3-ace-editor';
 import VariableScriptDialog from 'src/components/datasource/VariableScriptDialog.vue';
+import { notifyError } from 'src/utils/notify';
 
 interface VariableScriptProps {
   variable: VariableDto;
@@ -40,6 +44,6 @@ function onEditorInit(editor: any) {
 }
 
 function onSave(newVariable: VariableDto, comment: string) {
-  datasourceStore.saveDerivedVariable(newVariable, comment);
+  datasourceStore.saveDerivedVariable(newVariable, comment).catch(notifyError);
 }
 </script>

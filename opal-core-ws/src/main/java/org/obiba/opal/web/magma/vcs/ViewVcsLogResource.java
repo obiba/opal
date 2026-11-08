@@ -37,6 +37,7 @@ import org.obiba.opal.core.vcs.OpalGitUtils;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.ViewResourceImpl;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.ws.util.ContentDisposition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,8 +134,12 @@ public class ViewVcsLogResource {
         return Response.status(Response.Status.BAD_REQUEST)
             .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", view).build())
             .build();
-      if(!ViewResourceImpl.checkValuesPermissions(current, viewDtos.asDto(restored)))
+      Magma.ViewDto restoredDto = viewDtos.asDto(restored);
+      if(!ViewResourceImpl.checkValuesPermissions(current, restoredDto))
         return Response.status(Response.Status.FORBIDDEN).build();
+      ViewResourceImpl.ensureDerivationPermitted(restoredDto,
+          () -> !ViewResourceImpl.sameDerivation(viewDtos.asDto(current), restoredDto),
+          () -> ViewResourceImpl.referencesOf(restoredDto));
       viewManager.addView(datasource, restored,
           "Restore view from " + commitId.substring(0, Math.min(7, commitId.length())), null);
       added = true;

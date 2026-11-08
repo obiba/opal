@@ -34,6 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("variablesViewResource")
@@ -63,6 +64,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     ValueView view = viewDtos.fromDto(viewDto);
     Initialisables.initialise(view);
     ValueView source = getValueTableAsView();
+    ensureDerivationPermitted(source, view.getVariables());
     VariableOperationContext operationContext = new VariableOperationContext();
     try (VariableWriter variableWriter = source.createVariableWriter()) {
       for (Variable variable : view.getVariables()) {
@@ -86,6 +88,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
 
   private void addOrUpdateViewVariables(Iterable<Variable> variables, @Nullable String comment) {
     ValueView view = getValueTableAsView();
+    ensureDerivationPermitted(view, variables);
     VariableOperationContext operationContext = new VariableOperationContext();
     try (VariableWriter variableWriter = view.createVariableWriter()) {
       for (Variable variable : variables) {
@@ -117,6 +120,21 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
       viewManager.addView(getDatasource().getName(), view, "Remove " + Joiner.on(',').join(names), operationContext);
     }
     return Response.ok().build();
+  }
+
+  /**
+   * Covers the attribute and order routes too, as they rewrite the variables through here.
+   */
+  private void ensureDerivationPermitted(ValueView view, Iterable<Variable> variables) {
+    Magma.ViewDto viewDto = viewDtos.asDto(view);
+    boolean resource = viewDto.hasExtension(Magma.ResourceViewDto.view);
+    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> {
+      for (Variable variable : variables) {
+        Variable current = view.hasVariable(variable.getName()) ? view.getVariable(variable.getName()) : null;
+        if (!ViewResourceImpl.sameDerivation(current, variable, resource)) return true;
+      }
+      return false;
+    }, () -> ViewResourceImpl.referencesOf(viewDto, variables, Set.of()));
   }
 
   private ValueView getValueTableAsView() {

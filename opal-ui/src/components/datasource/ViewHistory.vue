@@ -39,6 +39,7 @@
                   @click="datasourceStore.downloadViewTag(tag.name)"
                 />
                 <q-btn
+                  v-if="datasourceStore.perms.viewSourceValues"
                   rounded
                   dense
                   flat

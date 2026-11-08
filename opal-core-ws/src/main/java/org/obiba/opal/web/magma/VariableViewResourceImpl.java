@@ -17,6 +17,7 @@ import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.core.event.VariableDeletedEvent;
 import org.obiba.opal.core.event.VariableRenamedEvent;
 import org.obiba.opal.core.event.VariablesUpdatedEvent;
+import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Set;
 
 @Component("variableViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -37,6 +39,9 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
   @Autowired
   private ViewManager viewManager;
+
+  @Autowired
+  private ViewDtos viewDtos;
 
   @Override
   public VariableDto get(UriInfo uriInfo) {
@@ -104,6 +109,14 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     }
 
     ValueView view = getValueTableAsView();
+    Magma.ViewDto viewDto = viewDtos.asDto(view);
+    boolean resource = viewDto.hasExtension(Magma.ResourceViewDto.view);
+    // a rename onto an existing variable replaces how that one gets its values too
+    Variable overwritten = !updatedVariable.getName().equals(variable.getName()) && table.hasVariable(updatedVariable.getName())
+        ? table.getVariable(updatedVariable.getName()) : null;
+    ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable, resource)
+        || (overwritten != null && !ViewResourceImpl.sameDerivation(overwritten, updatedVariable, resource)),
+        () -> ViewResourceImpl.referencesOf(viewDto, List.of(updatedVariable), Set.of(variable.getName())));
     VariableOperationContext operationContext = new VariableOperationContext();
 
     try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {

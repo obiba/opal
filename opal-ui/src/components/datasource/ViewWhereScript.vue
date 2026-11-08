@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="datasourceStore.perms.table?.canUpdate()" class="row q-gutter-sm q-mb-md">
+    <div v-if="canEdit" class="row q-gutter-sm q-mb-md">
       <q-btn outline size="sm" color="secondary" icon="edit" :title="t('edit')" @click="onShowEdit" />
       <q-btn
         outline
@@ -35,6 +35,7 @@
         :diff="(id: string) => datasourceStore.getVariableCommit(WHERE, id)"
         :diff-with-head="(id: string) => datasourceStore.getVariableCommitFromHead(WHERE, id)"
         :restore="onRestore"
+        :can-restore="canEdit"
       />
     </div>
   </div>
@@ -46,6 +47,7 @@ import ScriptDialog from 'src/components/datasource/ScriptDialog.vue';
 import GitHistory from 'src/components/git/GitHistory.vue';
 import type { ViewDto } from 'src/models/Magma';
 import type { VcsCommitInfoDto } from 'src/models/Opal';
+import { notifyError } from 'src/utils/notify';
 
 // name of the where script file in the view git folder, without the .js extension
 const WHERE = '__where';
@@ -58,6 +60,9 @@ const props = defineProps<VariableScriptProps>();
 
 const { t } = useI18n();
 const datasourceStore = useDatasourceStore();
+
+// the entity filter decides which values are summarised: only for users who can see them
+const canEdit = computed(() => !!datasourceStore.perms.table?.canUpdate() && !!datasourceStore.perms.viewSourceValues);
 
 const showEdit = ref(false);
 
@@ -81,8 +86,12 @@ async function onSave(script: string, comment: string) {
   const newView = { ...props.view, where: newScript };
   if (!newView.name) return;
   const updateComment = comment || 'Update view where script';
-  await datasourceStore.updateView(datasourceStore.datasource.name, newView.name, newView, updateComment);
-  await datasourceStore.loadTable(newView.name);
+  try {
+    await datasourceStore.updateView(datasourceStore.datasource.name, newView.name, newView, updateComment);
+    await datasourceStore.loadTable(newView.name);
+  } catch (error) {
+    notifyError(error);
+  }
 }
 
 // a view that never had a where script has no history: hide it
