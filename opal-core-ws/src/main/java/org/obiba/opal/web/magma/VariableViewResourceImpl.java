@@ -30,6 +30,7 @@ import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Set;
 
 @Component("variableViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -115,7 +116,7 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
         ? table.getVariable(updatedVariable.getName()) : null;
     ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable, resource)
         || (overwritten != null && !ViewResourceImpl.sameDerivation(overwritten, updatedVariable, resource)),
-        () -> ViewResourceImpl.addedReferences(view.getVariables(), List.of(updatedVariable)));
+        () -> ViewResourceImpl.referencesOf(viewDto, List.of(updatedVariable), Set.of(variable.getName())));
     VariableOperationContext operationContext = new VariableOperationContext();
 
     try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {

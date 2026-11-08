@@ -34,6 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("variablesViewResource")
@@ -133,7 +134,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
         if (!ViewResourceImpl.sameDerivation(current, variable, resource)) return true;
       }
       return false;
-    }, () -> ViewResourceImpl.addedReferences(view.getVariables(), variables));
+    }, () -> ViewResourceImpl.referencesOf(viewDto, variables, Set.of()));
   }
 
   private ValueView getValueTableAsView() {

@@ -42,13 +42,12 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
 import java.util.stream.Collectors;
 
 @Component
@@ -57,6 +56,9 @@ import java.util.stream.Collectors;
 public class ViewResourceImpl extends TableResourceImpl implements ViewResource {
 
   private final static Authorizer authorizer = new ShiroAuthorizer();
+
+  // same test as the web shell
+  private static final String ADMINISTRATOR = "rest:/:POST";
 
   private ViewDtos viewDtos;
 
@@ -90,9 +92,8 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
     if (!checkValuesPermissions(getValueTable(), viewDto))
       return Response.status(Status.FORBIDDEN).build();
-    Supplier<ViewDto> current = Suppliers.memoize(() -> viewDtos.asDto(asValueView()));
-    ensureDerivationPermitted(viewDto, () -> !sameDerivation(current.get(), viewDto),
-        () -> addedReferences(current.get(), viewDto));
+    ensureDerivationPermitted(viewDto, () -> !sameDerivation(viewDtos.asDto(asValueView()), viewDto),
+        () -> referencesOf(viewDto));
 
     ValueTable table = getValueTable();
     if (!viewDto.getName().equals(table.getName())) {
@@ -186,61 +187,66 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   /**
    * Changing how a view derives its values (scripts, sources, filters, resource columns) needs the values of every
-   * source, and of every table the added scripts read: otherwise the summaries of the result can single out the values
-   * the user is not permitted to see. The change is only computed for users who cannot see the values of the sources.
+   * source, and of every table its scripts read: otherwise the summaries of the result can single out the values the
+   * user is not permitted to see. All the scripts of the resulting view count, not only the changed ones, as a new
+   * script or filter can work on what the others read. Administrators can see all values and are not checked.
    */
   public static void ensureDerivationPermitted(ViewDto viewDto, BooleanSupplier changed,
-                                               Supplier<? extends Collection<ScriptReferences>> added) {
+                                               Supplier<? extends Collection<ScriptReferences>> references) {
     if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return;
-    if ((!canReadSources(viewDto) && changed.getAsBoolean()) || !canReadReferences(viewDto, added.get()))
+    Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
+    if (authorizer.isPermitted(ADMINISTRATOR) || !changed.getAsBoolean()) return;
+    if (!canReadSources(viewDto) || !canReadReferences(viewDto, references.get()))
       throw new ForbiddenException(Response.status(Status.FORBIDDEN)
           .entity(ClientErrorDtos.getErrorMessage(Status.FORBIDDEN, "ViewDerivationNotPermitted").build()).build());
   }
 
   /**
-   * What the scripts of the updated view read that the current view does not already: the variable scripts and sameAs
-   * it does not have, and the entity filter and select script if changed.
+   * What the scripts and sameAs of the view read, entity filter and select script included.
    */
-  public static List<ScriptReferences> addedReferences(@Nullable ViewDto current, ViewDto updated) {
+  public static List<ScriptReferences> referencesOf(ViewDto viewDto) {
+    return referencesOf(viewDto, List.of(), Set.of());
+  }
+
+  /**
+   * What the scripts of the view read once the variables are saved in it: they replace the variables of the same name
+   * and the removed ones (e.g. renamed).
+   */
+  public static List<ScriptReferences> referencesOf(ViewDto viewDto, Iterable<Variable> saved, Set<String> removed) {
     // the scripts are in a file, see referencesOf(ValueView)
-    if (updated.hasExtension(Magma.FileViewDto.view)) return List.of(new ScriptReferences(Set.of(), true));
-    List<ScriptReferences> added = addedReferences(current == null ? List.of() : variablesOf(current), variablesOf(updated));
-    String where = current == null ? "" : current.getWhere();
-    if (!where.equals(updated.getWhere())) added.add(ScriptReferences.of(updated.getWhere()));
-    String select = current == null ? "" : current.getExtension(Magma.JavaScriptViewDto.view).getSelect();
-    String updatedSelect = updated.getExtension(Magma.JavaScriptViewDto.view).getSelect();
-    if (!select.equals(updatedSelect)) added.add(ScriptReferences.of(updatedSelect));
-    return added;
+    if (viewDto.hasExtension(Magma.FileViewDto.view)) return List.of(new ScriptReferences(Set.of(), true));
+    Map<String, Variable> variables = new LinkedHashMap<>();
+    variablesOf(viewDto).forEach(variable -> variables.put(variable.getName(), variable));
+    removed.forEach(variables::remove);
+    saved.forEach(variable -> variables.put(variable.getName(), variable));
+    List<ScriptReferences> refs = referencesOf(variables.values());
+    refs.add(ScriptReferences.of(viewDto.getWhere()));
+    refs.add(ScriptReferences.of(viewDto.getExtension(Magma.JavaScriptViewDto.view).getSelect()));
+    return refs;
   }
 
   /**
-   * The scripts and sameAs of the updated variables that none of the current variables has.
-   */
-  public static List<ScriptReferences> addedReferences(Iterable<Variable> current, Iterable<Variable> updated) {
-    Set<String> known = new java.util.HashSet<>();
-    current.forEach(v -> v.getAttributes().forEach(attr -> known.add(attr.getName() + ":" + attr.getValue())));
-    List<ScriptReferences> added = new ArrayList<>();
-    for (Variable variable : updated) {
-      for (Attribute attr : variable.getAttributes()) {
-        boolean script = "script".equals(attr.getName());
-        if ((!script && !"sameAs".equals(attr.getName())) || known.contains(attr.getName() + ":" + attr.getValue()))
-          continue;
-        String value = attr.getValue().isNull() ? "" : attr.getValue().toString();
-        added.add(script ? ScriptReferences.of(value) : new ScriptReferences(Set.of(value), false));
-      }
-    }
-    return added;
-  }
-
-  /**
-   * What the scripts of a view built from a file read.
+   * What the scripts of a view built from a file read. The view is initialised to get its variables, so it must not be
+   * the one that is saved.
    */
   public static List<ScriptReferences> referencesOf(ValueView view) {
     Initialisables.initialise(view);
-    List<ScriptReferences> refs = addedReferences(List.of(), view.getVariables());
+    List<ScriptReferences> refs = referencesOf(view.getVariables());
     if (view instanceof View tableView) {
       if (tableView.getWhereClause() instanceof JavascriptClause where) refs.add(ScriptReferences.of(where.getScript()));
       if (tableView.getSelectClause() instanceof JavascriptClause select) refs.add(ScriptReferences.of(select.getScript()));
+    }
+    return refs;
+  }
+
+  private static List<ScriptReferences> referencesOf(Iterable<Variable> variables) {
+    List<ScriptReferences> refs = new ArrayList<>();
+    for (Variable variable : variables) {
+      for (Attribute attr : variable.getAttributes()) {
+        String value = attr.getValue().isNull() ? "" : attr.getValue().toString();
+        if ("script".equals(attr.getName())) refs.add(ScriptReferences.of(value));
+        else if ("sameAs".equals(attr.getName())) refs.add(new ScriptReferences(Set.of(value), false));
+      }
     }
     return refs;
   }
@@ -251,10 +257,10 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
    * table are in the sources, see {@link #canReadSources(ViewDto)}. Scripts that name tables dynamically are left to
    * administrators.
    */
-  private static boolean canReadReferences(ViewDto viewDto, Collection<ScriptReferences> added) {
+  private static boolean canReadReferences(ViewDto viewDto, Collection<ScriptReferences> references) {
     Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
-    for (ScriptReferences refs : added) {
-      if (refs.dynamic() && !authorizer.isPermitted("rest:/:POST")) return false;
+    for (ScriptReferences refs : references) {
+      if (refs.dynamic()) return false;
       for (String variable : refs.variables()) {
         MagmaEngineVariableResolver ref = MagmaEngineVariableResolver.valueOf(variable);
         if (!ref.hasTableName()) continue;

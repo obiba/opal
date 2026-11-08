@@ -139,7 +139,7 @@ public class ViewVcsLogResource {
         return Response.status(Response.Status.FORBIDDEN).build();
       ViewResourceImpl.ensureDerivationPermitted(restoredDto,
           () -> !ViewResourceImpl.sameDerivation(viewDtos.asDto(current), restoredDto),
-          () -> ViewResourceImpl.addedReferences(viewDtos.asDto(current), restoredDto));
+          () -> ViewResourceImpl.referencesOf(restoredDto));
       viewManager.addView(datasource, restored,
           "Restore view from " + commitId.substring(0, Math.min(7, commitId.length())), null);
       added = true;

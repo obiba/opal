@@ -39,8 +39,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.obiba.opal.web.magma.ViewResourceImpl.addedReferences;
 import static org.obiba.opal.web.magma.ViewResourceImpl.ensureDerivationPermitted;
+import static org.obiba.opal.web.magma.ViewResourceImpl.referencesOf;
 import static org.obiba.opal.web.magma.ViewResourceImpl.sameDerivation;
 
 public class ViewDerivationTest {
@@ -206,15 +206,37 @@ public class ViewDerivationTest {
   }
 
   @Test
-  public void test_scripts_already_in_view_are_not_checked_again() {
+  public void test_any_change_needs_values_of_the_tables_the_view_reads() {
     Subject subject = secured();
     when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
     VariableDto x = variable("x", attr("script", "$join('p2.B:secret', 'id')"));
     ViewDto current = list(x);
 
+    // metadata only
     check(current, list(x.toBuilder().addAttributes(attr("label", "X")).build()));
-    // nor moved to another variable of the view
-    check(current, list(x, x.toBuilder().setName("y").build()));
+    // works on what x reads
+    assertForbidden(current, list(x, variable("z", attr("script", "$('id').eq('1') ? $this('x') : null"))));
+    assertForbidden(current, current.toBuilder().setWhere("$('id').eq('1')").build());
+    assertForbidden(current, list(x, x.toBuilder().setName("y").build()));
+
+    when(subject.isPermitted("rest:/datasource/p2/table/B/valueSet:GET")).thenReturn(true);
+    check(current, current.toBuilder().setWhere("$('id').eq('1')").build());
+  }
+
+  @Test
+  public void test_references_of_saved_variables() {
+    ViewDto view = list(variable("x", attr("script", "$('ds.A:a')")), variable("y", attr("sameAs", "ds.B:b")));
+
+    assertThat(variablesOf(referencesOf(view))).containsOnly("ds.A:a", "ds.B:b");
+    // x replaced, y renamed to w
+    assertThat(variablesOf(referencesOf(view, java.util.List.of(var(variable("x", attr("script", "$('ds.C:c')"))),
+        var(variable("w"))), java.util.Set.of("y"))))
+        .containsOnly("ds.C:c");
+    assertThat(variablesOf(referencesOf(view.toBuilder().setWhere("$('ds.D:d')").build()))).contains("ds.D:d");
+  }
+
+  private static java.util.Set<String> variablesOf(java.util.List<org.obiba.magma.js.validation.ScriptReferences> refs) {
+    return refs.stream().flatMap(r -> r.variables().stream()).collect(java.util.stream.Collectors.toSet());
   }
 
   private static Subject secured() {
@@ -229,7 +251,7 @@ public class ViewDerivationTest {
   }
 
   private static void check(ViewDto current, ViewDto updated) {
-    ensureDerivationPermitted(updated, () -> !sameDerivation(current, updated), () -> addedReferences(current, updated));
+    ensureDerivationPermitted(updated, () -> !sameDerivation(current, updated), () -> referencesOf(updated));
   }
 
   private static void assertForbidden(ViewDto current, ViewDto updated) {
