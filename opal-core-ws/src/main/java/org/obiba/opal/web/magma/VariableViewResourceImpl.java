@@ -114,7 +114,8 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     Variable overwritten = !updatedVariable.getName().equals(variable.getName()) && table.hasVariable(updatedVariable.getName())
         ? table.getVariable(updatedVariable.getName()) : null;
     ViewResourceImpl.ensureDerivationPermitted(viewDto, () -> !ViewResourceImpl.sameDerivation(variable, updatedVariable, resource)
-        || (overwritten != null && !ViewResourceImpl.sameDerivation(overwritten, updatedVariable, resource)));
+        || (overwritten != null && !ViewResourceImpl.sameDerivation(overwritten, updatedVariable, resource)),
+        () -> ViewResourceImpl.addedReferences(view.getVariables(), List.of(updatedVariable)));
     VariableOperationContext operationContext = new VariableOperationContext();
 
     try (ValueTableWriter.VariableWriter variableWriter = view.createVariableWriter()) {

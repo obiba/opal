@@ -39,6 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.obiba.opal.web.magma.ViewResourceImpl.addedReferences;
 import static org.obiba.opal.web.magma.ViewResourceImpl.ensureDerivationPermitted;
 import static org.obiba.opal.web.magma.ViewResourceImpl.sameDerivation;
 
@@ -138,16 +139,16 @@ public class ViewDerivationTest {
     });
     ViewDto view = resource(true);
 
-    ensureDerivationPermitted(view, () -> false);
+    ensureDerivationPermitted(view, () -> false, java.util.List::of);
     try {
-      ensureDerivationPermitted(view, () -> true);
+      ensureDerivationPermitted(view, () -> true, java.util.List::of);
       org.junit.Assert.fail("expected forbidden");
     } catch(ForbiddenException e) {
       assertThat(e.getResponse().getStatus()).isEqualTo(403);
     }
 
     when(subject.isPermitted("rest:/project/ds/resource/res:PUT")).thenReturn(true);
-    ensureDerivationPermitted(view, () -> true);
+    ensureDerivationPermitted(view, () -> true, java.util.List::of);
   }
 
   @Test
@@ -162,16 +163,82 @@ public class ViewDerivationTest {
     });
     ViewDto view = list(variable("x", attr("script", "$('A')")));
 
-    ensureDerivationPermitted(view, () -> false);
+    ensureDerivationPermitted(view, () -> false, java.util.List::of);
     try {
-      ensureDerivationPermitted(view, () -> true);
+      ensureDerivationPermitted(view, () -> true, java.util.List::of);
       org.junit.Assert.fail("expected forbidden");
     } catch(ForbiddenException e) {
       assertThat(e.getResponse().getStatus()).isEqualTo(403);
     }
 
     when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
-    ensureDerivationPermitted(view, () -> true);
+    ensureDerivationPermitted(view, () -> true, java.util.List::of);
+  }
+
+  @Test
+  public void test_added_script_needs_values_of_the_tables_it_reads() {
+    Subject subject = secured();
+    when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
+    ViewDto current = list(variable("x", attr("script", "$('A')")));
+
+    assertForbidden(current, list(variable("x", attr("script", "$join('p2.B:secret', 'id')"))));
+    assertForbidden(current, list(variable("x", attr("sameAs", "p2.B:secret"))));
+    assertForbidden(current, current.toBuilder().setWhere("$('p2.B:secret').eq(1)").build());
+    // without datasource, a table of the datasource of the sources
+    assertForbidden(current, list(variable("x", attr("script", "$('B:secret')"))));
+
+    when(subject.isPermitted("rest:/datasource/p2/table/B/valueSet:GET")).thenReturn(true);
+    check(current, list(variable("x", attr("script", "$join('p2.B:secret', 'id')"))));
+    when(subject.isPermitted("rest:/datasource/ds/table/B/valueSet:GET")).thenReturn(true);
+    check(current, list(variable("x", attr("script", "$('B:secret')"))));
+  }
+
+  @Test
+  public void test_dynamic_script_needs_administrator() {
+    Subject subject = secured();
+    when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
+    ViewDto current = list(variable("x", attr("script", "$('A')")));
+    ViewDto dynamic = list(variable("x", attr("script", "$('p2.' + 'B:secret')")));
+
+    assertForbidden(current, dynamic);
+    when(subject.isPermitted("rest:/:POST")).thenReturn(true);
+    check(current, dynamic);
+  }
+
+  @Test
+  public void test_scripts_already_in_view_are_not_checked_again() {
+    Subject subject = secured();
+    when(subject.isPermitted("rest:/datasource/ds/table/T/valueSet:GET")).thenReturn(true);
+    VariableDto x = variable("x", attr("script", "$join('p2.B:secret', 'id')"));
+    ViewDto current = list(x);
+
+    check(current, list(x.toBuilder().addAttributes(attr("label", "X")).build()));
+    // nor moved to another variable of the view
+    check(current, list(x, x.toBuilder().setName("y").build()));
+  }
+
+  private static Subject secured() {
+    Subject subject = mock(Subject.class);
+    ThreadContext.bind(subject);
+    MagmaEngine.get().extend(new MagmaSecurityExtension() {
+      @Override
+      public void initialise() {
+      }
+    });
+    return subject;
+  }
+
+  private static void check(ViewDto current, ViewDto updated) {
+    ensureDerivationPermitted(updated, () -> !sameDerivation(current, updated), () -> addedReferences(current, updated));
+  }
+
+  private static void assertForbidden(ViewDto current, ViewDto updated) {
+    try {
+      check(current, updated);
+      org.junit.Assert.fail("expected forbidden: " + updated);
+    } catch(ForbiddenException e) {
+      assertThat(e.getResponse().getStatus()).isEqualTo(403);
+    }
   }
 
   @Test

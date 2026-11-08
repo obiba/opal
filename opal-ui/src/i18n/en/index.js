@@ -147,7 +147,7 @@ export default {
     TagNameRequired: 'The tag name is required',
     ViewRestoreFailed: 'The view version cannot be restored',
     Forbidden: 'This operation is forbidden',
-    ViewDerivationNotPermitted: 'Changing how the view computes its values requires permission to see the values of its source tables',
+    ViewDerivationNotPermitted: 'Changing how the view computes its values requires permission to see the values of its source tables and of the tables its scripts read; scripts that compute table names are reserved to administrators',
     NoSuchValueTableInDatasource: 'The table does not exist or you do not have access to it',
     PasswordTooWeak: 'Password is too weak',
     OldPasswordMismatch: 'Old password is invalid',

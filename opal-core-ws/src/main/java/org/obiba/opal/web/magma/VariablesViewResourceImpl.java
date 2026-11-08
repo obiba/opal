@@ -133,7 +133,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
         if (!ViewResourceImpl.sameDerivation(current, variable, resource)) return true;
       }
       return false;
-    });
+    }, () -> ViewResourceImpl.addedReferences(view.getVariables(), variables));
   }
 
   private ValueView getValueTableAsView() {
