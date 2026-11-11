@@ -19,7 +19,8 @@
     <!-- read by reference from the heap, not copied at each count -->
     <value-type copier="org.ehcache.impl.copy.IdentityCopier">java.io.Serializable</value-type>
     <resources>
-      <heap unit="entries">100</heap>
+      <!-- a few lists in memory: each one can hold millions of entities, the others are read from disk when asked for -->
+      <heap unit="entries">20</heap>
       <disk persistent="true" unit="GB">1</disk>
     </resources>
   </cache>

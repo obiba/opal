@@ -54,15 +54,17 @@ public class CacheConfigurationTest {
     VariableEntitiesCache cached = new VariableEntitiesCache(new VariableEntityList(List.of(entity)), 1L);
 
     javax.cache.CacheManager jcache = new CacheConfiguration().opalJCacheManager();
-    CacheManager cacheManager = cacheManager(jcache);
-    MagmaCacheExtension extension = new MagmaCacheExtension(cacheManager);
-    assertThat(extension.hasVariableEntitiesCache()).isTrue();
-    assertThat(extension.hasValueSetsCache()).isFalse();
-    extension.getVariableEntitiesCache().put("ds.view", cached);
-    // written to disk, then read once into memory, where each count finds it as it is
-    Object read = extension.getVariableEntitiesCache().get("ds.view").get();
-    assertThat(extension.getVariableEntitiesCache().get("ds.view").get()).isSameAs(read);
-    jcache.close();
+    try {
+      MagmaCacheExtension extension = new MagmaCacheExtension(cacheManager(jcache));
+      assertThat(extension.hasVariableEntitiesCache()).isTrue();
+      assertThat(extension.hasValueSetsCache()).isFalse();
+      extension.getVariableEntitiesCache().put("ds.view", cached);
+      // written to disk, then read once into memory, where each count finds it as it is
+      Object read = extension.getVariableEntitiesCache().get("ds.view").get();
+      assertThat(extension.getVariableEntitiesCache().get("ds.view").get()).isSameAs(read);
+    } finally {
+      jcache.close();
+    }
     assertThat(new File(folder.getRoot(), "work/ehcache-opal")).isDirectory();
 
     jcache = new CacheConfiguration().opalJCacheManager();

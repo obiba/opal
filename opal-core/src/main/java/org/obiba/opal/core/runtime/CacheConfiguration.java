@@ -11,6 +11,7 @@
 package org.obiba.opal.core.runtime;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.cache.Caching;
 
@@ -29,8 +30,9 @@ public class CacheConfiguration {
    */
   @Bean(destroyMethod = "close")
   public javax.cache.CacheManager opalJCacheManager() throws URISyntaxException {
-    return Caching.getCachingProvider()
-        .getCacheManager(getClass().getResource("/ehcache-opal.xml").toURI(), getClass().getClassLoader());
+    URL config = getClass().getResource("/ehcache-opal.xml");
+    if (config == null) throw new IllegalStateException("Resource '/ehcache-opal.xml' not found on classpath");
+    return Caching.getCachingProvider().getCacheManager(config.toURI(), getClass().getClassLoader());
   }
 
   @Bean
