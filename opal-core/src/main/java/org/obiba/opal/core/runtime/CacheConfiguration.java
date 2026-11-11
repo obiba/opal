@@ -10,21 +10,32 @@
 
 package org.obiba.opal.core.runtime;
 
+import java.net.URISyntaxException;
+
+import javax.cache.Caching;
+
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.cache.Caching;
-
 @Configuration
 @EnableCaching
 public class CacheConfiguration {
 
+  /**
+   * Closed with the application, so that the caches kept on disk are found again at the next start.
+   */
+  @Bean(destroyMethod = "close")
+  public javax.cache.CacheManager opalJCacheManager() throws URISyntaxException {
+    return Caching.getCachingProvider()
+        .getCacheManager(getClass().getResource("/ehcache-opal.xml").toURI(), getClass().getClassLoader());
+  }
+
   @Bean
-  public CacheManager cacheManager() {
-    return new JCacheCacheManager(Caching.getCachingProvider().getCacheManager());
+  public CacheManager cacheManager(javax.cache.CacheManager opalJCacheManager) {
+    return new JCacheCacheManager(opalJCacheManager);
   }
 
 }
