@@ -18,6 +18,18 @@
         </q-badge>
         <div class="float-right">
           <q-btn
+            v-if="blob"
+            rounded
+            dense
+            flat
+            size="sm"
+            color="secondary"
+            :title="t('view')"
+            :icon="toolsVisible[props.row.commitId] ? 'visibility' : 'none'"
+            class="q-ml-xs"
+            @click="onView(props.row)"
+          />
+          <q-btn
             rounded
             dense
             flat
@@ -81,11 +93,19 @@
     @confirm="doRestore"
   />
 
+  <script-dialog
+    v-model="showView"
+    readonly
+    :script="viewScript"
+    :title="`${t('script')} ${commitInfo.commitId?.slice(0, 7) ?? ''}`"
+  />
+
   <git-diff-viewer-dialog v-model="showDiff" :commit-info="commitInfo" @update:modelValue="onCloseDiffViewer" />
 </template>
 
 <script setup lang="ts">
 import GitDiffViewerDialog from 'src/components/git/GitDiffViewerDialog.vue';
+import ScriptDialog from 'src/components/datasource/ScriptDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import { getDateLabel } from 'src/utils/dates';
 import type { VcsCommitInfoDto, VcsCommitInfosDto } from 'src/models/Opal';
@@ -99,6 +119,8 @@ interface Props {
   diff: (commitId: string) => Promise<VcsCommitInfoDto>;
   diffWithHead: (commitId: string) => Promise<VcsCommitInfoDto>;
   restore: (commit: VcsCommitInfoDto) => Promise<unknown>;
+  // the script at a commit, enables the view action
+  blob?: (commitId: string) => Promise<VcsCommitInfoDto>;
   canRestore?: boolean;
   restoreConfirmKey?: string;
 }
@@ -110,6 +132,8 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n({ useScope: 'global' });
 const showDiff = ref(false);
 const showRestore = ref(false);
+const showView = ref(false);
+const viewScript = ref('');
 const commits = ref<VcsCommitInfoDto[]>([]);
 const commitInfo = ref<VcsCommitInfoDto>({} as VcsCommitInfoDto);
 const initialPagination = ref({
@@ -174,6 +198,18 @@ async function onCompareWith(row: VcsCommitInfoDto) {
   try {
     commitInfo.value = await props.diffWithHead(row.commitId);
     showDiff.value = true;
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
+async function onView(row: VcsCommitInfoDto) {
+  if (!props.blob) return;
+  try {
+    const { blob } = await props.blob(row.commitId);
+    commitInfo.value = row;
+    viewScript.value = blob && blob !== 'null' ? blob : '';
+    showView.value = true;
   } catch (error) {
     notifyError(error);
   }

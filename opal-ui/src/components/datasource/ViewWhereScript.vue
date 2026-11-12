@@ -34,6 +34,7 @@
         :load-commits="loadCommits"
         :diff="(id: string) => datasourceStore.getVariableCommit(WHERE, id)"
         :diff-with-head="(id: string) => datasourceStore.getVariableCommitFromHead(WHERE, id)"
+        :blob="(id: string) => datasourceStore.getVariableBlob(WHERE, id)"
         :restore="onRestore"
         :can-restore="canEdit"
       />

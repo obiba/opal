@@ -3,7 +3,7 @@
     <q-card :class="maximizedToggle ? '' : 'dialog-lg'">
       <q-card-section>
         <div class="row">
-          <div class="text-h6">{{ t('edit_script') }}</div>
+          <div class="text-h6">{{ title || t('edit_script') }}</div>
           <q-space />
           <q-btn dense flat icon="close_fullscreen" @click="maximizedToggle = false" v-if="maximizedToggle" />
           <q-btn dense flat icon="open_in_full" @click="maximizedToggle = true" v-if="!maximizedToggle" />
@@ -24,7 +24,10 @@
 
       <q-separator />
 
-      <q-card-actions align="right" class="bg-grey-3">
+      <q-card-actions v-if="readonly" align="right" class="bg-grey-3">
+        <q-btn flat :label="t('close')" color="secondary" v-close-popup />
+      </q-card-actions>
+      <q-card-actions v-else align="right" class="bg-grey-3">
         <q-input v-model="comment" :label="t('comment')" dense />
         <q-space />
         <q-btn flat :label="t('cancel')" color="secondary" v-close-popup />
@@ -46,6 +49,8 @@ import { VAceEditor } from 'vue3-ace-editor';
 interface DialogProps {
   modelValue: boolean;
   script?: string | undefined;
+  readonly?: boolean;
+  title?: string;
 }
 
 const props = defineProps<DialogProps>();
@@ -75,6 +80,7 @@ function onHide() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function onEditorInit(editor: any) {
   editor.setOptions({
+    readOnly: !!props.readonly,
     enableBasicAutocompletion: true,
     enableSnippets: true,
     enableLiveAutocompletion: true,

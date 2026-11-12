@@ -5,6 +5,7 @@
     :load-commits="() => datasourceStore.getVariableCommits(variable.name)"
     :diff="(id: string) => datasourceStore.getVariableCommit(variable.name, id)"
     :diff-with-head="(id: string) => datasourceStore.getVariableCommitFromHead(variable.name, id)"
+    :blob="(id: string) => datasourceStore.getVariableBlob(variable.name, id)"
     :restore="onRestore"
     :can-restore="!!datasourceStore.perms.variable?.canUpdate() && !!datasourceStore.perms.viewSourceValues"
     restore-confirm-key="git.restore_script_confirm"
