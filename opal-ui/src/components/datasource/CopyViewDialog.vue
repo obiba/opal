@@ -2,7 +2,7 @@
   <q-dialog v-model="showDialog" @hide="onHide">
     <q-card class="dialog-sm">
       <q-card-section>
-        <div class="text-h6">{{ t('copy_view') }}</div>
+        <div class="text-h6">{{ title || t('copy_view') }}</div>
       </q-card-section>
 
       <q-separator />
@@ -37,14 +37,21 @@
           color="primary"
           :disable="!projectDestination"
           @click="onCopyView"
-          v-close-popup
         />
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <confirm-dialog
+    v-model="showOverride"
+    :title="t('override')"
+    :text="t('copy_view_override_confirm', { name: newTableName, project: projectDestination })"
+    @confirm="doOverride"
+  />
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from 'src/components/ConfirmDialog.vue';
 import type { TableDto, ViewDto } from 'src/models/Magma';
 import { u } from 'src/boot/api';
 import { notifyError } from 'src/utils/notify';
@@ -53,6 +60,9 @@ interface DialogProps {
   modelValue: boolean;
   table: TableDto;
   view: ViewDto;
+  // default name of the new view, a unique name derived from the table name otherwise
+  name?: string;
+  title?: string;
 }
 
 const props = defineProps<DialogProps>();
@@ -67,6 +77,7 @@ const projectNames = ref<string[]>([]);
 const showDialog = ref(props.modelValue);
 const projectDestination = ref('');
 const newTableName = ref('');
+const showOverride = ref(false);
 
 watch(
   () => props.modelValue,
@@ -82,7 +93,7 @@ watch(
           projectDestination.value = names.includes(current) ? current : names[0] || '';
         })
         .catch(notifyError);
-      newTableName.value = '';
+      newTableName.value = props.name || '';
       const tableNames = datasourceStore.tables.map((t) => t.name);
       let idx = 1;
       while (newTableName.value === '') {
@@ -95,20 +106,44 @@ watch(
     }
     showDialog.value = value;
   },
+  // also when mounted already open, e.g. under a v-if
+  { immediate: true },
 );
 
 function onHide() {
   emit('update:modelValue', false);
 }
 
-function onCopyView() {
-  const newView = { ...props.view };
-  newView.name = newTableName.value;
+function newView(): ViewDto {
+  return { ...props.view, name: newTableName.value };
+}
+
+function goToView() {
+  showDialog.value = false;
+  router.push(u`/project/${projectDestination.value}/table/${newTableName.value}`);
+}
+
+async function onCopyView() {
+  const exists = await datasourceStore
+    .getView(projectDestination.value, newTableName.value)
+    .then(() => true)
+    .catch(() => false);
+  if (exists) {
+    showOverride.value = true;
+    return;
+  }
+  datasourceStore.createView(projectDestination.value, newView()).then(goToView).catch(notifyError);
+}
+
+function doOverride() {
+  showOverride.value = false;
+  const view = newView();
+  delete view.datasourceName;
+  delete view.status;
+  const comment = `Override with view ${props.table.datasourceName}.${props.table.name}`;
   datasourceStore
-    .createView(projectDestination.value, newView)
-    .then(() => router.push(u`/project/${projectDestination.value}/table/${newTableName.value}`))
-    .catch((err) => {
-      notifyError(err);
-    });
+    .updateView(projectDestination.value, newTableName.value, view, comment)
+    .then(goToView)
+    .catch(notifyError);
 }
 </script>

@@ -165,6 +165,43 @@ public class ViewVcsLogResource {
     return Response.status(Response.Status.NOT_FOUND).build();
   }
 
+  /**
+   * The view at the tag, to create a new view from it. The view is read, not added.
+   */
+  @GET
+  @Path("/tag/view")
+  public Response getViewAtTag(@QueryParam("name") String name) {
+    String commitId = null;
+    for(TagInfo tag : vcs.getTags(datasource, view)) {
+      if(tag.getName().equals(name)) commitId = tag.getCommitId();
+    }
+    if(commitId == null) return Response.status(Response.Status.NOT_FOUND).build();
+    if(!(viewManager.getView(datasource, view).getDatasource() instanceof ViewAwareDatasource viewAwareDatasource))
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", view).build())
+          .build();
+    ValueView tagged;
+    try {
+      tagged = viewPersistenceStrategy.readView(datasource, view, commitId);
+    } catch(XStreamException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", e)).build();
+    }
+    // the view dto needs a datasource, and its variables an initialised view
+    tagged.setDatasource(viewAwareDatasource);
+    try {
+      Initialisables.initialise(tagged);
+      return Response.ok().entity(viewDtos.asDto(tagged)).build();
+    } catch(RuntimeException e) {
+      // for instance a source table does not exist anymore
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "ViewRestoreFailed", e)).build();
+    } finally {
+      // for instance a resource view holds an R session
+      Disposables.silentlyDispose(tagged);
+    }
+  }
+
   @GET
   @Path("/tags")
   public Response getTags() {

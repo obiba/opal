@@ -39,6 +39,16 @@
                   @click="datasourceStore.downloadViewTag(tag.name)"
                 />
                 <q-btn
+                  rounded
+                  dense
+                  flat
+                  size="sm"
+                  color="secondary"
+                  :title="t('git.create_view_from_tag')"
+                  icon="add_circle_outline"
+                  @click="onCreateView(tag)"
+                />
+                <q-btn
                   v-if="datasourceStore.perms.viewSourceValues"
                   rounded
                   dense
@@ -85,6 +95,15 @@
       </q-card>
     </q-dialog>
 
+    <copy-view-dialog
+      v-if="taggedView"
+      v-model="showCreateView"
+      :table="datasourceStore.table"
+      :view="taggedView"
+      :name="taggedViewName"
+      :title="t('git.create_view_from_tag')"
+    />
+
     <confirm-dialog
       v-model="showRestore"
       :title="t('restore')"
@@ -97,7 +116,9 @@
 <script setup lang="ts">
 import type { QForm } from 'quasar';
 import GitHistory from 'src/components/git/GitHistory.vue';
+import CopyViewDialog from 'src/components/datasource/CopyViewDialog.vue';
 import ConfirmDialog from 'src/components/ConfirmDialog.vue';
+import type { ViewDto } from 'src/models/Magma';
 import type { VcsTagInfoDto } from 'src/models/Opal';
 import { getDateLabel } from 'src/utils/dates';
 import { notifyError } from 'src/utils/notify';
@@ -114,6 +135,9 @@ const tagName = ref('');
 const tagMessage = ref('');
 const showRestore = ref(false);
 const tagToRestore = ref<VcsTagInfoDto>();
+const showCreateView = ref(false);
+const taggedView = ref<ViewDto>();
+const taggedViewName = ref('');
 
 // the history rows are not restored, only the tags
 const noRestore = () => Promise.resolve();
@@ -149,6 +173,17 @@ async function onAddTag() {
     showAddTag.value = false;
     await loadTags();
     historyKey.value++;
+  } catch (error) {
+    notifyError(error);
+  }
+}
+
+async function onCreateView(tag: VcsTagInfoDto) {
+  try {
+    taggedView.value = await datasourceStore.getViewAtTag(tag.name);
+    // a tag name can hold a slash, not a table name
+    taggedViewName.value = `${datasourceStore.table.name}_${tag.name.replace(/\//g, '_')}`;
+    showCreateView.value = true;
   } catch (error) {
     notifyError(error);
   }

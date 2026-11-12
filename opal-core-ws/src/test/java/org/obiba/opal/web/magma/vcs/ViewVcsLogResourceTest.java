@@ -202,6 +202,26 @@ public class ViewVcsLogResourceTest {
   }
 
   @Test
+  public void test_view_at_tag_is_read_not_added() {
+    when(vcs.getTags("ds", "v")).thenReturn(List.of(new TagInfo.Builder().name("t1").commitId(COMMIT_ID).build()));
+
+    Response response = resource.getViewAtTag("t1");
+
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(((Magma.ViewDto) response.getEntity()).getFrom(0)).isEqualTo("ds.T");
+    verify(viewManager, never()).addView(anyString(), any(ValueView.class), anyString(),
+        any(VariableOperationContext.class));
+    verify((Disposable) restored).dispose();
+  }
+
+  @Test
+  public void test_view_at_unknown_tag_not_found() {
+    when(vcs.getTags("ds", "v")).thenReturn(List.of());
+
+    assertThat(resource.getViewAtTag("t1").getStatus()).isEqualTo(404);
+  }
+
+  @Test
   public void test_create_tag_of_removed_view_not_found() throws Exception {
     when(viewManager.getView("ds", "gone")).thenThrow(new org.obiba.magma.NoSuchValueTableException("gone"));
     setField("view", "gone");

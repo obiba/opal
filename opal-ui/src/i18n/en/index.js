@@ -514,6 +514,7 @@ export default {
     no_database_warning: 'There are no identifiers database configured.',
   },
   git: {
+    create_view_from_tag: 'Create view from tag',
     add_tag: 'Add tag',
     tag_name_hint: 'No spaces',
     tag_name_invalid: 'The tag name is required and must not contain spaces or any of these characters: ~ ^ : ? * [ \\',
@@ -1042,6 +1043,8 @@ export default {
   copy_tables_data_task_created: 'Copy tables data task created with identifier [ {id} ].',
   copy_tables_data_text: 'No tables to be copied | One table will be copied | {count} tables will be copied.',
   copy_tables_data: 'Copy table data | Copy table data | Copy tables data',
+  override: 'Override',
+  copy_view_override_confirm: "View '{name}' already exists in project '{project}'. Do you want to override it?",
   copy_view: 'Copy view',
   copy: 'Copy',
   cpu: 'CPU',

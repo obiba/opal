@@ -554,6 +554,10 @@ export const useDatasourceStore = defineStore('datasource', () => {
     return api.post(`${viewVcsUrl()}/tags`, params);
   }
 
+  async function getViewAtTag(name: string): Promise<ViewDto> {
+    return api.get(`${viewVcsUrl()}/tag/view`, { params: { name } }).then((response) => response.data);
+  }
+
   async function restoreViewCommit(commitId: string) {
     return api.post(viewVcsUrl() + u`/commit/${commitId}/_restore`);
   }
@@ -764,6 +768,7 @@ export const useDatasourceStore = defineStore('datasource', () => {
     getViewCommitFromHead,
     getViewTags,
     createViewTag,
+    getViewAtTag,
     restoreViewCommit,
     downloadViewTag,
     getAllTables,

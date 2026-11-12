@@ -514,6 +514,7 @@ export default {
     no_database_warning: "Aucune base de données d'identifiants n'est configurée.",
   },
   git: {
+    create_view_from_tag: "Créer une vue à partir de l'étiquette",
     add_tag: 'Ajouter une étiquette',
     tag_name_hint: 'Sans espaces',
     tag_name_invalid: "Le nom de l'étiquette est requis et ne doit pas contenir d'espaces ni aucun de ces caractères : ~ ^ : ? * [ \\",
@@ -1042,6 +1043,8 @@ export default {
   copy_tables_data_task_created: "La tâche de copie des tables a été créée avec l'identifiant [ {id} ].",
   copy_tables_data_text: 'Aucune table à copier | Une table sera copiée | {count} tables seront copiées.',
   copy_tables_data: 'Copier la table | Copier la table | Copier les tables',
+  override: 'Remplacer',
+  copy_view_override_confirm: "La vue '{name}' existe déjà dans le projet '{project}'. Voulez-vous la remplacer ?",
   copy_view: 'Copier la vue',
   copy: 'Copier',
   cpu: 'CPU',
