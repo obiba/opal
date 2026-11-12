@@ -218,7 +218,10 @@ public class ConfigDatabaseConfiguration {
       throw new ConfigDatabaseException(
           "Cannot create the Opal configuration database folder: " + configFolder.getAbsolutePath());
     }
-    return "jdbc:h2:file:" + new File(configFolder, DATABASE_NAME).getAbsolutePath();
+    // H2's own shutdown hook would close the database while Opal's hook is still closing the Spring context, whose
+    // beans read the configuration on the way down. Closing the pool (inferred destroy method) closes the database
+    // instead, as DB_CLOSE_DELAY is left at 0, and that close still writes the store to disk.
+    return "jdbc:h2:file:" + new File(configFolder, DATABASE_NAME).getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE";
   }
 
   private boolean isEmbedded() {
