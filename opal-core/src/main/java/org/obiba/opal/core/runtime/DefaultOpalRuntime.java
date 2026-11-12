@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -55,10 +56,12 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private Integer readDataPointsCount;
 
+  private final CacheManager cacheManager;
+
   @Autowired
   public DefaultOpalRuntime(TransactionTemplate transactionTemplate, OpalConfigurationService opalConfigurationService,
                             PluginsManager pluginsManager, Set<Service> services,
-                            ViewManager viewManager, ProjectService projectService,
+                            ViewManager viewManager, ProjectService projectService, CacheManager cacheManager,
                             @Value("${org.obiba.magma.readDataPointsCount}") Integer readDataPointsCount) {
     this.transactionTemplate = transactionTemplate;
     this.opalConfigurationService = opalConfigurationService;
@@ -67,6 +70,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     this.viewManager = viewManager;
     this.projectService = projectService;
     this.readDataPointsCount = readDataPointsCount;
+    this.cacheManager = cacheManager;
   }
 
   @Override
@@ -212,7 +216,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
         for (MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
           MagmaEngine.get().extend(extension);
         }
-        //MagmaEngine.get().extend(new MagmaCacheExtension(new EhCacheCacheManager(cacheManager)));
+        MagmaEngine.get().extend(new MagmaCacheExtension(cacheManager));
         MagmaParametersExtension paramsExt = new MagmaParametersExtension();
         paramsExt.setParameter(AbstractValueTable.READ_DATA_POINTS_COUNT_KEY, readDataPointsCount);
         MagmaEngine.get().extend(paramsExt);
