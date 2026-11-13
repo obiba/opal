@@ -51,12 +51,28 @@
           flat
           dense
           emit-value
-          use-input
-          input-debounce="0"
-          @filter="onFilterTables"
           @update:model-value="onTableSelected"
+          @popup-hide="tableFilter = ''"
           style="width: 400px"
-        />
+        >
+          <template v-slot:before-options>
+            <div class="sticky-filter bg-white">
+              <q-input v-model="tableFilter" :placeholder="t('filter')" dense autofocus clearable class="q-px-sm">
+                <template v-slot:prepend><q-icon name="search" /></template>
+              </q-input>
+              <q-separator />
+            </div>
+          </template>
+          <template v-slot:no-option>
+            <q-input v-model="tableFilter" :placeholder="t('filter')" dense autofocus clearable class="q-px-sm">
+              <template v-slot:prepend><q-icon name="search" /></template>
+            </q-input>
+            <q-separator />
+            <q-item>
+              <q-item-section class="text-hint">{{ t('no_results') }}</q-item-section>
+            </q-item>
+          </template>
+        </q-select>
         <q-table
           :rows="rows"
           row-key="variable"
@@ -119,7 +135,7 @@ const tableOptions = computed(
 );
 const tableFilter = ref<string>('');
 const filteredTableOptions = computed(() => {
-  const needle = tableFilter.value.toLowerCase();
+  const needle = (tableFilter.value || '').toLowerCase();
   return needle ? tableOptions.value.filter((opt) => opt.label.toLowerCase().includes(needle)) : tableOptions.value;
 });
 const table = computed(() => tables.value?.find((t) => asTableId(t) === tableId.value));
@@ -158,12 +174,6 @@ onMounted(() => {
     onSubmit();
   }
 });
-
-function onFilterTables(val: string, update: (fn: () => void) => void) {
-  update(() => {
-    tableFilter.value = val;
-  });
-}
 
 function onClear() {
   tables.value = undefined;
@@ -254,3 +264,11 @@ function getVariable(name: string) {
   return variables.value?.find((v) => v.name === name) || ({ name: name } as VariableDto);
 }
 </script>
+
+<style scoped>
+.sticky-filter {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+</style>
