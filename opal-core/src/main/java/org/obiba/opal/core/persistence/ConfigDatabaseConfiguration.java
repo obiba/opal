@@ -33,6 +33,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,12 +132,14 @@ public class ConfigDatabaseConfiguration {
     DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
     factoryBean.setDriverClass(Strings.isNullOrEmpty(driverClass) ? DEFAULT_DRIVER_CLASS : driverClass);
     factoryBean.setUrl(jdbcUrl);
-    factoryBean.setUsername(Strings.isNullOrEmpty(username) ? DEFAULT_USERNAME : username);
-    factoryBean.setPassword(resolvePassword(opalConfigurationService, cryptoService, embedded));
+    String user = Strings.isNullOrEmpty(username) ? DEFAULT_USERNAME : username;
+    String pwd = resolvePassword(opalConfigurationService, cryptoService, embedded);
+    factoryBean.setUsername(user);
+    factoryBean.setPassword(pwd);
 
     log.info("Opal configuration database: {}", jdbcUrl);
     DataSource dataSource = factoryBean.getObject();
-    verifyConnection(dataSource, jdbcUrl, embedded);
+    verifyConnection(dataSource, jdbcUrl, user, pwd, embedded);
     return dataSource;
   }
 
@@ -265,8 +268,13 @@ public class ConfigDatabaseConfiguration {
    * Open a connection now rather than letting the first Liquibase statement fail: at this point it is still possible
    * to say which of the two files is the problem.
    */
-  private void verifyConnection(DataSource dataSource, String jdbcUrl, boolean embedded) {
-    try(Connection ignored = dataSource.getConnection()) {
+  private void verifyConnection(DataSource dataSource, String jdbcUrl, String user, String pwd, boolean embedded) {
+    // The pool opens and closes a validation connection of its own before it fills up, and H2 closes the embedded
+    // database with its last connection (DB_CLOSE_DELAY=0). The database would then be reopened for the pool, and a
+    // close that fails on a damaged store leaves the file locked in this JVM: the reopen reports "The file is locked"
+    // instead of the actual error, which is only in the trace file. Holding a connection keeps it open throughout.
+    try(Connection held = embedded ? DriverManager.getConnection(jdbcUrl, user, pwd) : null;
+        Connection ignored = dataSource.getConnection()) {
       // opening it is the check
     } catch(SQLException e) {
       throw new ConfigDatabaseException(explain(e, jdbcUrl, embedded), e);
