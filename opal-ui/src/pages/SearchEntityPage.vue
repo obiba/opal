@@ -45,13 +45,17 @@
         <q-chip class="q-mb-md q-ml-none text-bold">{{ type }} - {{ identifier }}</q-chip>
         <q-select
           v-model="tableId"
-          :options="tableOptions"
+          :options="filteredTableOptions"
           :label="t('table')"
+          :hint="`${filteredTableOptions.length} / ${tableOptions.length}`"
           flat
           dense
           emit-value
+          use-input
+          input-debounce="0"
+          @filter="onFilterTables"
           @update:model-value="onTableSelected"
-          style="width: 300px"
+          style="width: 400px"
         />
         <q-table
           :rows="rows"
@@ -113,6 +117,11 @@ const isValid = computed(() => type.value && identifier.value);
 const tableOptions = computed(
   () => tables.value?.map((table) => ({ label: asTableId(table), value: asTableId(table) })) || [],
 );
+const tableFilter = ref<string>('');
+const filteredTableOptions = computed(() => {
+  const needle = tableFilter.value.toLowerCase();
+  return needle ? tableOptions.value.filter((opt) => opt.label.toLowerCase().includes(needle)) : tableOptions.value;
+});
 const table = computed(() => tables.value?.find((t) => asTableId(t) === tableId.value));
 
 const columns = computed(() => {
@@ -149,6 +158,12 @@ onMounted(() => {
     onSubmit();
   }
 });
+
+function onFilterTables(val: string, update: (fn: () => void) => void) {
+  update(() => {
+    tableFilter.value = val;
+  });
+}
 
 function onClear() {
   tables.value = undefined;
