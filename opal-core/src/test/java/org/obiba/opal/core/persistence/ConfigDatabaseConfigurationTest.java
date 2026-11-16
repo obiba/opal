@@ -67,6 +67,16 @@ public class ConfigDatabaseConfigurationTest {
   }
 
   @Test
+  public void test_closing_the_context_closes_the_database_even_with_a_borrowed_connection() throws Exception {
+    Connection borrowed;
+    try(AnnotationConfigApplicationContext context = open(PASSWORD)) {
+      borrowed = context.getBean(DataSource.class).getConnection();
+    }
+    // The pool leaves a borrowed connection open, and with it the database: only the SHUTDOWN closes it.
+    assertThat(borrowed.isClosed()).isTrue();
+  }
+
+  @Test
   public void test_liquibase_runs_against_the_configuration_database() throws Exception {
     try(AnnotationConfigApplicationContext context = open(PASSWORD)) {
       try(Connection connection = context.getBean(DataSource.class).getConnection();

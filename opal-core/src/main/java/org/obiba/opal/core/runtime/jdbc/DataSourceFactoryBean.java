@@ -42,7 +42,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   @Override
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
-    BasicDataSource dataSource = new BasicDataSource();
+    BasicDataSource dataSource = newDataSource();
 
     dataSource.setDriverClassName(driverClass);
     dataSource.setUrl(url);
@@ -59,6 +59,13 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     dataSource.setValidationQuery(guessValidationQuery());
 
     return dataSource;
+  }
+
+  /**
+   * The pool to configure, for a caller that needs to add to what closing it does.
+   */
+  protected BasicDataSource newDataSource() {
+    return new BasicDataSource();
   }
 
   private String guessValidationQuery() {
