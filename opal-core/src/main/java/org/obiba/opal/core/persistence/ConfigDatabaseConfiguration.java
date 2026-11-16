@@ -293,7 +293,8 @@ public class ConfigDatabaseConfiguration {
    * borrowed when the context closes - a task or a session record being written on the way down - kept the database
    * open, and with DB_CLOSE_ON_EXIT=FALSE nothing else closes it: the JVM exited in the middle of the background
    * writer's chunk, and the next start found the store corrupted. SHUTDOWN closes the database whatever is still open.
-   * When the pool did close it, this reopens it only to close it again.
+   * The connection that sends it is opened before the pool closes, while the database is still open, so that it does not
+   * reopen the store only to close it again; it does not come from the pool, which may have none left to lend.
    */
   static class EmbeddedDataSource extends BasicDataSource {
 
@@ -311,14 +312,21 @@ public class ConfigDatabaseConfiguration {
 
     @Override
     public synchronized void close() throws SQLException {
+      Connection held = null;
+      try {
+        held = DriverManager.getConnection(jdbcUrl, user, pwd);
+      } catch(SQLException e) {
+        log.warn("Cannot shut down the Opal configuration database at {}: {}", jdbcUrl, e.getMessage());
+      }
       try {
         super.close();
       } finally {
-        try(Connection connection = DriverManager.getConnection(jdbcUrl, user, pwd);
-            Statement statement = connection.createStatement()) {
-          statement.execute("SHUTDOWN");
-        } catch(SQLException e) {
-          log.warn("Cannot shut down the Opal configuration database at {}: {}", jdbcUrl, e.getMessage());
+        if(held != null) {
+          try(Connection connection = held; Statement statement = connection.createStatement()) {
+            statement.execute("SHUTDOWN");
+          } catch(SQLException e) {
+            log.warn("Cannot shut down the Opal configuration database at {}: {}", jdbcUrl, e.getMessage());
+          }
         }
       }
     }
