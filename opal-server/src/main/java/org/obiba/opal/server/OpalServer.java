@@ -288,7 +288,6 @@ public class OpalServer {
       if (args.length>0) {
         if ("--upgrade".equals(args[0])) {
           new OpalServer(true);
-          TimeoutFileLock.release();
           System.exit(0);
         } else {
           System.out.println("Unknown arguments, exiting");
@@ -299,11 +298,7 @@ public class OpalServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
           @Override
           public void run() {
-            try {
-              opal.shutdown();
-            } finally {
-              TimeoutFileLock.release();
-            }
+            opal.shutdown();
           }
         });
         System.out.println("Opal is attached to this console. Press ctrl-c to stop.");

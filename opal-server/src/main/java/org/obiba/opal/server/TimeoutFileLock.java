@@ -56,23 +56,22 @@ public class TimeoutFileLock {
       // Optional: Write PID or timestamp
       raf.writeBytes("Locked by PID: " + ProcessHandle.current().pid() + "\n");
 
-      // Not released from a shutdown hook of its own: hooks run concurrently, and the lock would let the next Opal start
-      // while this one is still closing its databases. The owner calls release() once it has stopped.
+      // Register shutdown hook for cleanup
+      Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        try {
+          log.info("Releasing lock and deleting lock file...");
+          if (lock != null && lock.isValid()) lock.release();
+          if (channel != null && channel.isOpen()) channel.close();
+          if (lockFile.exists()) lockFile.delete();
+        } catch (IOException e) {
+          log.error("Error while releasing lock", e);
+        }
+      }));
+
       return true;
     } catch (Exception e) {
       log.error("Error while setting up lock", e);
       return false;
-    }
-  }
-
-  public static void release() {
-    try {
-      log.info("Releasing lock and deleting lock file...");
-      if (lock != null && lock.isValid()) lock.release();
-      if (channel != null && channel.isOpen()) channel.close();
-      if (lockFile != null && lockFile.exists()) lockFile.delete();
-    } catch (IOException e) {
-      log.error("Error while releasing lock", e);
     }
   }
 }
