@@ -67,6 +67,39 @@ public class ConfigDatabaseConfigurationTest {
   }
 
   @Test
+  public void test_closing_the_context_closes_the_database_even_with_a_borrowed_connection() throws Exception {
+    Connection borrowed;
+    try(AnnotationConfigApplicationContext context = open(PASSWORD)) {
+      borrowed = context.getBean(DataSource.class).getConnection();
+    }
+    // The pool leaves a borrowed connection open, and with it the database: only the SHUTDOWN closes it.
+    assertThat(borrowed.isClosed()).isTrue();
+  }
+
+  @Test
+  public void test_store_reopens_after_closing_with_a_borrowed_connection_that_wrote() throws Exception {
+    try(AnnotationConfigApplicationContext context = open(PASSWORD)) {
+      Connection borrowed = context.getBean(DataSource.class).getConnection();
+      try(Statement statement = borrowed.createStatement()) {
+        statement.execute("create table shutdown_check(x int)");
+        // Enough rows to leave the background writer something to flush when the context closes.
+        statement.execute("insert into shutdown_check select x from system_range(1, 100000)");
+        borrowed.commit();
+        // Still in flight when the context closes: the shutdown must roll it back, not half-write it.
+        statement.execute("insert into shutdown_check select x from system_range(1, 50000)");
+      }
+    }
+    // A store left half-written by the close would fail to open here, or come back with the wrong count.
+    try(AnnotationConfigApplicationContext context = open(PASSWORD);
+        Connection connection = context.getBean(DataSource.class).getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("select count(*) from shutdown_check")) {
+      assertThat(rs.next()).isTrue();
+      assertThat(rs.getInt(1)).isEqualTo(100000);
+    }
+  }
+
+  @Test
   public void test_liquibase_runs_against_the_configuration_database() throws Exception {
     try(AnnotationConfigApplicationContext context = open(PASSWORD)) {
       try(Connection connection = context.getBean(DataSource.class).getConnection();

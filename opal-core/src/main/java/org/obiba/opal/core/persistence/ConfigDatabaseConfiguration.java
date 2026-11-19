@@ -12,6 +12,7 @@ package org.obiba.opal.core.persistence;
 import com.google.common.base.Strings;
 import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,11 +131,16 @@ public class ConfigDatabaseConfiguration {
     String jdbcUrl = resolveUrl();
     boolean embedded = isEmbedded();
 
-    DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
-    factoryBean.setDriverClass(Strings.isNullOrEmpty(driverClass) ? DEFAULT_DRIVER_CLASS : driverClass);
-    factoryBean.setUrl(jdbcUrl);
     String user = Strings.isNullOrEmpty(username) ? DEFAULT_USERNAME : username;
     String pwd = resolvePassword(opalConfigurationService, cryptoService, embedded);
+    DataSourceFactoryBean factoryBean = new DataSourceFactoryBean() {
+      @Override
+      protected BasicDataSource newDataSource() {
+        return embedded ? new EmbeddedDataSource(jdbcUrl, user, pwd) : super.newDataSource();
+      }
+    };
+    factoryBean.setDriverClass(Strings.isNullOrEmpty(driverClass) ? DEFAULT_DRIVER_CLASS : driverClass);
+    factoryBean.setUrl(jdbcUrl);
     factoryBean.setUsername(user);
     factoryBean.setPassword(pwd);
 
@@ -223,7 +230,7 @@ public class ConfigDatabaseConfiguration {
     }
     // H2's own shutdown hook would close the database while Opal's hook is still closing the Spring context, whose
     // beans read the configuration on the way down. Closing the pool (inferred destroy method) closes the database
-    // instead, as DB_CLOSE_DELAY is left at 0, and that close still writes the store to disk.
+    // instead, see EmbeddedDataSource, and that close still writes the store to disk.
     return "jdbc:h2:file:" + new File(configFolder, DATABASE_NAME).getAbsolutePath() + ";DB_CLOSE_ON_EXIT=FALSE";
   }
 
@@ -278,6 +285,50 @@ public class ConfigDatabaseConfiguration {
       // opening it is the check
     } catch(SQLException e) {
       throw new ConfigDatabaseException(explain(e, jdbcUrl, embedded), e);
+    }
+  }
+
+  /**
+   * Closing the pool closes only its idle connections, and H2 closes the database with the last one. A connection still
+   * borrowed when the context closes - a task or a session record being written on the way down - kept the database
+   * open, and with DB_CLOSE_ON_EXIT=FALSE nothing else closes it: the JVM exited in the middle of the background
+   * writer's chunk, and the next start found the store corrupted. SHUTDOWN closes the database whatever is still open.
+   * The connection that sends it is opened before the pool closes, while the database is still open, so that it does not
+   * reopen the store only to close it again; it does not come from the pool, which may have none left to lend.
+   */
+  static class EmbeddedDataSource extends BasicDataSource {
+
+    private final String jdbcUrl;
+
+    private final String user;
+
+    private final String pwd;
+
+    EmbeddedDataSource(String jdbcUrl, String user, String pwd) {
+      this.jdbcUrl = jdbcUrl;
+      this.user = user;
+      this.pwd = pwd;
+    }
+
+    @Override
+    public synchronized void close() throws SQLException {
+      Connection held = null;
+      try {
+        held = DriverManager.getConnection(jdbcUrl, user, pwd);
+      } catch(SQLException e) {
+        log.warn("Cannot shut down the Opal configuration database at {}: {}", jdbcUrl, e.getMessage());
+      }
+      try {
+        super.close();
+      } finally {
+        if(held != null) {
+          try(Connection connection = held; Statement statement = connection.createStatement()) {
+            statement.execute("SHUTDOWN");
+          } catch(SQLException e) {
+            log.warn("Cannot shut down the Opal configuration database at {}: {}", jdbcUrl, e.getMessage());
+          }
+        }
+      }
     }
   }
 
