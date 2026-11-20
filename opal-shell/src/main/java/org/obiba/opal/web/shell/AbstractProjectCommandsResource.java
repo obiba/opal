@@ -71,7 +71,8 @@ public abstract class AbstractProjectCommandsResource extends AbstractCommandsRe
     String projectState = projectsState.getProjectState(projectName);
 
     if (forProjectRefresh) {
-      return !State.READY.name().equals(projectState);
+      // a project in error can be reloaded, e.g. once its database is reachable
+      return !State.READY.name().equals(projectState) && !State.ERRORS.name().equals(projectState);
     } else {
       return State.LOADING.name().equals(projectState);
     }

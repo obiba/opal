@@ -10,7 +10,6 @@
 
 package org.obiba.opal.shell.commands;
 
-import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;
@@ -51,15 +50,17 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
     String projectName = getOptions().getProject();
     Project project = projectRepository.findByName(projectName).orElse(null);
 
-    if (project != null && MagmaEngine.get().hasDatasource(project.getName())) {
+    if (project != null) {
       projectsState.updateProjectState(projectName, State.LOADING);
 
       transactionTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override
         protected void doInTransactionWithoutResult(TransactionStatus status) {
-          Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
-          MagmaEngine.get().removeDatasource(datasource);
-          viewManager.unregisterDatasource(datasource.getName());
+          // datasource is not registered if its initial load failed
+          if (MagmaEngine.get().hasDatasource(projectName)) {
+            MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(projectName));
+          }
+          viewManager.unregisterDatasource(projectName);
 
           try {
             datasourceLoaderService.reloadDatasource(project);
