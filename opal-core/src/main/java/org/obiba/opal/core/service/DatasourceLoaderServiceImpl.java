@@ -11,12 +11,15 @@
 package org.obiba.opal.core.service;
 
 import com.beust.jcommander.internal.Lists;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.repository.ProjectRepository;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +150,15 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
       try {
         //noinspection InfiniteLoopStatement
         while (true) {
-          load(datasourceLoadQueue.take());
+          LoadRequest request = datasourceLoadQueue.take();
+          // as system user: the secured MagmaEngine would not see, hence not replace, a datasource already registered
+          try {
+            getSystemSubject().execute(() -> load(request));
+          } catch (RuntimeException e) {
+            // keep the loader alive for the next projects
+            log.error("{}: loading datasource of project {} failed", getName(), request.project().getName(), e);
+            projectsState.updateProjectState(request.project().getName(), ProjectsState.State.ERRORS);
+          }
         }
       } catch (InterruptedException ignored) {
         log.debug("{}: interrupted", getName());
@@ -186,6 +197,12 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
           }
         }
       }
+    }
+
+    private Subject getSystemSubject() {
+      return new Subject.Builder()
+          .principals(SecurityUtils.getSecurityManager().authenticate(BackgroundJobServiceAuthToken.INSTANCE).getPrincipals())
+          .authenticated(true).buildSubject();
     }
 
     private void loadAttempt(Project project) {
