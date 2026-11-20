@@ -16,10 +16,12 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -38,15 +40,19 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   private final DatabaseRegistry databaseRegistry;
 
-  private final BlockingQueue<Project> datasourceLoadQueue = new LinkedBlockingQueue<>();
+  private final ProjectRepository projectRepository;
+
+  private final BlockingQueue<LoadRequest> datasourceLoadQueue = new LinkedBlockingQueue<>();
 
   private List<DatasourceLoader> datasourceLoaders = Lists.newArrayList();
 
   @Autowired
-  public DatasourceLoaderServiceImpl(TransactionTemplate transactionTemplate, ProjectsState projectsState, DatabaseRegistry databaseRegistry) {
+  public DatasourceLoaderServiceImpl(TransactionTemplate transactionTemplate, ProjectsState projectsState, DatabaseRegistry databaseRegistry,
+                                     ProjectRepository projectRepository) {
     this.transactionTemplate = transactionTemplate;
     this.projectsState = projectsState;
     this.databaseRegistry = databaseRegistry;
+    this.projectRepository = projectRepository;
   }
 
   @Override
@@ -108,12 +114,31 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   @Override
   public void registerDatasource(Project project) {
-    datasourceLoadQueue.offer(project);
+    datasourceLoadQueue.offer(new LoadRequest(project, LoadRequest.MAX_LOAD_ATTEMPTS));
+  }
+
+  /**
+   * A datasource that could not be loaded, typically because its database was not reachable when Opal started, is
+   * loaded again once its database is back, without an administrator having to reload the project.
+   */
+  @Scheduled(initialDelayString = "${org.obiba.opal.datasource.retryInterval}",
+      fixedDelayString = "${org.obiba.opal.datasource.retryInterval}")
+  public void retryFailedDatasources() {
+    for (Project project : projectRepository.findAll()) {
+      if (ProjectsState.State.ERRORS.name().equals(projectsState.getProjectState(project.getName()))) {
+        // LOADING keeps the project from being queued twice and from being written to meanwhile
+        projectsState.updateProjectState(project.getName(), ProjectsState.State.LOADING);
+        datasourceLoadQueue.offer(new LoadRequest(project, 1));
+      }
+    }
+  }
+
+  private record LoadRequest(Project project, int maxAttempts) {
+    private static final int MAX_LOAD_ATTEMPTS = 5;
   }
 
   private class DatasourceLoader extends Thread {
 
-    private static final int MAX_LOAD_ATTEMPTS = 5;
     private static final int LOAD_ATTEMPT_DELAY = 1000;
 
     @Override
@@ -130,18 +155,25 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
       log.info("{}: Stopped", getName());
     }
 
-    private void load(Project project) {
+    private void load(LoadRequest request) {
+      Project project = request.project();
+      boolean retry = request.maxAttempts() == 1;
       log.info("{}: loading datasource of project {}", getName(), project.getName());
       int attempt = 1;
       boolean done = false;
-      while (!done && attempt < MAX_LOAD_ATTEMPTS) {
+      while (!done && attempt <= request.maxAttempts()) {
         try {
           loadAttempt(project);
           done = true;
         } catch (Exception e) {
-          log.error("{}: #{} loading datasource of project {} failed for database: {}", getName(), attempt, project.getName(), project.getDatabase(), e);
+          if (retry) {
+            // retried every interval while the database is down, a stack trace each time would flood the log
+            log.warn("{}: loading datasource of project {} failed again for database {}: {}", getName(), project.getName(), project.getDatabase(), e.getMessage());
+          } else {
+            log.error("{}: #{} loading datasource of project {} failed for database: {}", getName(), attempt, project.getName(), project.getDatabase(), e);
+          }
           attempt++;
-          if (attempt >= MAX_LOAD_ATTEMPTS) {
+          if (attempt > request.maxAttempts()) {
             databaseRegistry.unregister(project.getDatabase(), project.getName());
             projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
           } else {
