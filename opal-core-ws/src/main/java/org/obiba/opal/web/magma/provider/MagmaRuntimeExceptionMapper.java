@@ -17,6 +17,7 @@ import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.obiba.opal.web.model.Ws;
@@ -28,6 +29,16 @@ import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 public class MagmaRuntimeExceptionMapper extends ErrorDtoExceptionMapper<MagmaRuntimeException> {
 
   private static final Logger log = LoggerFactory.getLogger(MagmaRuntimeExceptionMapper.class);
+
+  @Autowired
+  private DatabaseConnectionFailure databaseConnectionFailure;
+
+  @Override
+  public Response toResponse(MagmaRuntimeException exception) {
+    return DatabaseConnectionFailure.isConnectionFailure(exception)
+        ? databaseConnectionFailure.toResponse(exception)
+        : super.toResponse(exception);
+  }
 
   @Override
   protected Response.Status getStatus() {

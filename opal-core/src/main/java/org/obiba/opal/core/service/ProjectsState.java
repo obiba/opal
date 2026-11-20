@@ -45,6 +45,17 @@ public class ProjectsState {
     }
   }
 
+  /**
+   * Change the state of the project only if it is in the expected one, so that concurrent loads do not both start.
+   *
+   * @return true if the state was changed
+   */
+  public synchronized boolean updateProjectState(@NotNull String name, State expected, State state) {
+    if (Strings.isNullOrEmpty(name) || !expected.name().equals(getProjectState(name))) return false;
+    updateProjectState(name, state);
+    return true;
+  }
+
   public enum State {
     BUSY, // project has read, write and refresh commands that are pending or being processed
     READY,
