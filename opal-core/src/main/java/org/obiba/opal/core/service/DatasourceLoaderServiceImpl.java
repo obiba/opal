@@ -49,6 +49,8 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   private List<DatasourceLoader> datasourceLoaders = Lists.newArrayList();
 
+  private volatile boolean stopped;
+
   @Autowired
   public DatasourceLoaderServiceImpl(TransactionTemplate transactionTemplate, ProjectsState projectsState, DatabaseRegistry databaseRegistry,
                                      ProjectRepository projectRepository) {
@@ -65,6 +67,7 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
 
   @Override
   public void stop() {
+    stopped = true;
     terminateDatasourceLoaderThreads();
   }
 
@@ -127,10 +130,10 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
   @Scheduled(initialDelayString = "${org.obiba.opal.datasource.retryInterval}",
       fixedDelayString = "${org.obiba.opal.datasource.retryInterval}")
   public void retryFailedDatasources() {
+    if (stopped) return;
     for (Project project : projectRepository.findAll()) {
-      if (ProjectsState.State.ERRORS.name().equals(projectsState.getProjectState(project.getName()))) {
-        // LOADING keeps the project from being queued twice and from being written to meanwhile
-        projectsState.updateProjectState(project.getName(), ProjectsState.State.LOADING);
+      // LOADING keeps the project from being queued twice, or reloaded by a user meanwhile
+      if (projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS, ProjectsState.State.LOADING)) {
         datasourceLoadQueue.offer(new LoadRequest(project, 1));
       }
     }
@@ -193,6 +196,8 @@ public class DatasourceLoaderServiceImpl implements DatasourceLoaderService {
             } catch (InterruptedException ex) {
               projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
               done = true;
+              // so that the loader stops instead of waiting for the next project
+              Thread.currentThread().interrupt();
             }
           }
         }

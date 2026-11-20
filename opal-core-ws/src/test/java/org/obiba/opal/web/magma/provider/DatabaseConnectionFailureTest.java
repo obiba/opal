@@ -10,7 +10,9 @@
 
 package org.obiba.opal.web.magma.provider;
 
+import com.mongodb.MongoSocketReadTimeoutException;
 import com.mongodb.MongoTimeoutException;
+import com.mongodb.ServerAddress;
 import org.junit.Test;
 import org.obiba.magma.MagmaRuntimeException;
 
@@ -33,6 +35,8 @@ public class DatabaseConnectionFailureTest {
     assertThat(DatabaseConnectionFailure.isConnectionFailure(new SQLException("syntax error", "42000"))).isFalse();
     assertThat(DatabaseConnectionFailure.isConnectionFailure(new SQLException("no state"))).isFalse();
     assertThat(DatabaseConnectionFailure.isConnectionFailure(new RuntimeException("other"))).isFalse();
+    assertThat(DatabaseConnectionFailure.isConnectionFailure(new MagmaRuntimeException(
+        new MongoSocketReadTimeoutException("slow query", new ServerAddress(), new RuntimeException())))).isFalse();
   }
 
 }

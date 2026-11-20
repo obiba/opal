@@ -11,6 +11,7 @@
 package org.obiba.opal.web.magma.provider;
 
 import com.mongodb.MongoSocketException;
+import com.mongodb.MongoSocketReadTimeoutException;
 import com.mongodb.MongoTimeoutException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
@@ -51,6 +52,8 @@ public class DatabaseConnectionFailure {
     for (Throwable cause = exception; cause != null; cause = cause.getCause() == cause ? null : cause.getCause()) {
       // SQL state class 08 is "connection exception", whatever the server
       if (cause instanceof SQLException sql && sql.getSQLState() != null && sql.getSQLState().startsWith("08")) return true;
+      // a read timeout is a slow query, not a lost database
+      if (cause instanceof MongoSocketReadTimeoutException) return false;
       if (cause instanceof MongoSocketException || cause instanceof MongoTimeoutException) return true;
     }
     return false;
@@ -58,10 +61,17 @@ public class DatabaseConnectionFailure {
 
   Response toResponse(Throwable exception) {
     String project = getRequestedProject();
-    log.warn("Database of project {} could not be reached: {}", project, exception.getMessage());
-    if (project != null && projectRepository.findByName(project).isPresent()
-        && ProjectsState.State.READY.name().equals(projectsState.getProjectState(project))) {
-      projectsState.updateProjectState(project, ProjectsState.State.ERRORS);
+    try {
+      // logged once, not on each request while the database is down
+      if (project != null && projectRepository.findByName(project).isPresent()
+          && projectsState.updateProjectState(project, ProjectsState.State.READY, ProjectsState.State.ERRORS)) {
+        log.warn("Database of project {} could not be reached: {}", project, exception.getMessage());
+      } else {
+        log.debug("Database could not be reached: {}", exception.getMessage());
+      }
+    } catch (RuntimeException e) {
+      // the configuration database may be the one that is down
+      log.warn("Database could not be reached: {}", exception.getMessage());
     }
     return Response.status(SERVICE_UNAVAILABLE).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build()).build();

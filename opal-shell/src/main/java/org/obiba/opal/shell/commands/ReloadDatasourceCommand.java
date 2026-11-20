@@ -50,28 +50,31 @@ public class ReloadDatasourceCommand extends AbstractOpalRuntimeDependentCommand
     String projectName = getOptions().getProject();
     Project project = projectRepository.findByName(projectName).orElse(null);
 
-    if (project != null) {
-      projectsState.updateProjectState(projectName, State.LOADING);
-
-      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          // datasource is not registered if its initial load failed
-          if (MagmaEngine.get().hasDatasource(projectName)) {
-            MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(projectName));
-          }
-          viewManager.unregisterDatasource(projectName);
-
-          try {
-            datasourceLoaderService.reloadDatasource(project);
-            projectsState.updateProjectState(projectName, State.READY);
-          } catch (Exception e) {
-            log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
-            projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
-          }
-        }
-      });
+    if (project == null) return CommandResultCode.SUCCESS;
+    // since this command was submitted, the scheduled retry may have started loading the project, or a task may use it
+    if (!projectsState.updateProjectState(projectName, State.READY, State.LOADING)
+        && !projectsState.updateProjectState(projectName, State.ERRORS, State.LOADING)) {
+      log.info("{}: project {} not reloaded, its state is {}", getName(), projectName, projectsState.getProjectState(projectName));
+      return CommandResultCode.SUCCESS;
     }
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        // datasource is not registered if its initial load failed
+        if (MagmaEngine.get().hasDatasource(projectName)) {
+          MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(projectName));
+        }
+        viewManager.unregisterDatasource(projectName);
+
+        try {
+          datasourceLoaderService.reloadDatasource(project);
+          projectsState.updateProjectState(projectName, State.READY);
+        } catch (Exception e) {
+          log.error("{}: loading datasource of project {} failed for database: {}", getName(), project.getName(), project.getDatabase(), e);
+          projectsState.updateProjectState(project.getName(), ProjectsState.State.ERRORS);
+        }
+      }
+    });
     return CommandResultCode.SUCCESS;
   }
 }
