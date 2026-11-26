@@ -31,4 +31,9 @@ public interface RestoreCommandOptions extends HelpOption {
   boolean getOverride();
 
   boolean isOverride();
+
+  @Option(longName="permissions", description = "Restore the project permissions (optional, default is false).")
+  boolean getPermissions();
+
+  boolean isPermissions();
 }

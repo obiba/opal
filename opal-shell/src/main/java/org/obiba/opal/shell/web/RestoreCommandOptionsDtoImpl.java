@@ -55,6 +55,16 @@ public class RestoreCommandOptionsDtoImpl implements RestoreCommandOptions {
   }
 
   @Override
+  public boolean getPermissions() {
+    return isPermissions() && dto.getPermissions();
+  }
+
+  @Override
+  public boolean isPermissions() {
+    return dto.hasPermissions();
+  }
+
+  @Override
   public boolean isHelp() {
     return false;
   }

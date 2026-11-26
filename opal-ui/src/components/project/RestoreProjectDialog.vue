@@ -32,6 +32,10 @@
           >
           </q-input>
           <q-checkbox v-model="restoreOptions.override" :label="t('project_admin.restore_override')" />
+          <div>
+            <q-checkbox v-model="restoreOptions.permissions" :label="t('project_admin.restore_permissions')" />
+            <div class="text-hint q-ml-sm">{{ t('project_admin.restore_permissions_hint') }}</div>
+          </div>
         </q-form>
       </q-card-section>
       <q-separator />
@@ -75,7 +79,7 @@ const showDialog = ref(props.modelValue);
 const formRef = ref();
 const emit = defineEmits(['update:modelValue']);
 const backupFolder = ref({ ...emptyFileDto } as FileDto);
-const emptyOption = { archive: '', password: '', override: false } as RestoreCommandOptionsDto;
+const emptyOption = { archive: '', password: '', override: false, permissions: false } as RestoreCommandOptionsDto;
 const restoreOptions = ref(emptyOption);
 const folderError = ref('');
 const validateRequiredFolder = (val: string) => val && val.trim().length > 0;

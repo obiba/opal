@@ -127,12 +127,15 @@ export interface BackupCommandOptionsDto {
   override?: boolean | undefined;
   /** backup as a view (logical) or a table (data dump) */
   viewsAsTables?: boolean | undefined;
+  /** backup the project permissions */
+  permissions?: boolean | undefined;
 }
 
 export interface RestoreCommandOptionsDto {
   archive: string;
   password?: string | undefined;
   override?: boolean | undefined;
+  permissions?: boolean | undefined;
 }
 
 export interface RPackagesCommandOptionsDto {

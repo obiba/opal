@@ -22,6 +22,7 @@
           </file-select>
 
           <q-checkbox v-model="backupOptions.viewsAsTables" :label="t('project_admin.views_as_table')" />
+          <q-checkbox v-model="backupOptions.permissions" :label="t('project_admin.backup_permissions')" />
         </q-form>
       </q-card-section>
       <q-separator />
@@ -66,7 +67,12 @@ const showDialog = ref(props.modelValue);
 const formRef = ref();
 const emit = defineEmits(['update:modelValue']);
 const backupFolder = ref({ ...emptyFileDto } as FileDto);
-const emptyOption = { archive: '', viewsAsTables: false, override: true } as BackupCommandOptionsDto;
+const emptyOption = {
+  archive: '',
+  viewsAsTables: false,
+  override: true,
+  permissions: false,
+} as BackupCommandOptionsDto;
 const backupOptions = ref(emptyOption);
 const folderError = ref('');
 const validateRequiredFolder = (val: string) => val && val.trim().length > 0;

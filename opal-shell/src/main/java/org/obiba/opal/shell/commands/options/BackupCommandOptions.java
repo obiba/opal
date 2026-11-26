@@ -31,4 +31,9 @@ public interface BackupCommandOptions extends HelpOption {
   boolean getViewsAsTables();
 
   boolean isViewsAsTables();
+
+  @Option(longName="permissions", description = "Backup the project permissions (optional, default is false).")
+  boolean getPermissions();
+
+  boolean isPermissions();
 }

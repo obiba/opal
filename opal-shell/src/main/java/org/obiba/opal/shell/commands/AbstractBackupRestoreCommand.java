@@ -19,6 +19,8 @@ public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntim
 
   private static final Logger log = LoggerFactory.getLogger(AbstractBackupRestoreCommand.class);
 
+  protected static final String PERMISSIONS_DOMAIN = "opal";
+
   /**
    * Get archive folder from options.
    *
@@ -66,6 +68,10 @@ public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntim
 
   protected File getFilesFolder() {
     return getFolder("files");
+  }
+
+  protected File getPermissionsFile() {
+    return new File(getArchiveFolder(), "permissions.json");
   }
 
   protected File getReportsFolder() {
