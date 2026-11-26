@@ -10,14 +10,23 @@
 
 package org.obiba.opal.shell.commands;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntimeDependentCommand<T> {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractBackupRestoreCommand.class);
+
+  protected static final String PERMISSIONS_DOMAIN = "opal";
+
+  private static final Pattern DATASOURCE_ITEM_NODE = Pattern.compile("^/datasource/[^/]+/(table|view)/([^/]+)(?:/variable/(.+))?$");
 
   /**
    * Get archive folder from options.
@@ -66,6 +75,31 @@ public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntim
 
   protected File getFilesFolder() {
     return getFolder("files");
+  }
+
+  protected File getPermissionsFile() {
+    return new File(getArchiveFolder(), "permissions.json");
+  }
+
+  /**
+   * Whether the table, view or variable that a datasource permission node designates is in the project. Looked up by
+   * name in the project's datasource, as table and variable names may contain characters that a Magma reference would
+   * misread. Other datasource nodes are considered to be in the project.
+   */
+  protected boolean isDatasourceItem(String node) {
+    Matcher matcher = DATASOURCE_ITEM_NODE.matcher(node);
+    if (!matcher.matches()) return true;
+    try {
+      Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
+      if (!datasource.hasValueTable(matcher.group(2))) return false;
+      ValueTable table = datasource.getValueTable(matcher.group(2));
+      if (table.isView() != "view".equals(matcher.group(1))) return false;
+      return matcher.group(3) == null || table.hasVariable(matcher.group(3));
+    } catch (Exception e) {
+      // a broken view for instance
+      log.warn("Cannot access the item of the permission {}: {}", node, e.getMessage());
+      return false;
+    }
   }
 
   protected File getReportsFolder() {

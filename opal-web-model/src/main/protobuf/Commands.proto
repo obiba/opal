@@ -121,12 +121,14 @@ message BackupCommandOptionsDto {
   required string archive = 1;
   optional bool override = 2 [default = false];
   optional bool viewsAsTables = 3 [default = false]; // backup as a view (logical) or a table (data dump)
+  optional bool permissions = 4 [default = false]; // backup the project permissions
 }
 
 message RestoreCommandOptionsDto {
   required string archive = 1;
   optional string password = 2;
   optional bool override = 3 [default = false];
+  optional bool permissions = 4 [default = false]; // restore the project permissions, if any in the archive
 }
 
 message RPackagesCommandOptionsDto {

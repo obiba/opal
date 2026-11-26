@@ -34,11 +34,16 @@ import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.ResourceReferenceService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.shell.commands.options.BackupCommandOptions;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
+import org.obiba.opal.web.security.PermissionsToAclFunction;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +55,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@CommandUsage(description = "Backup a project's data.", syntax = "Syntax: backup --project PROJECT --archive FILE [--viewsAsTables BOOL] [--override BOOL]")
+@CommandUsage(description = "Backup a project's data and, optionally, its permissions.", syntax = "Syntax: backup --project PROJECT --archive FILE [--viewsAsTables BOOL] [--override BOOL] [--permissions BOOL]")
 public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
@@ -78,6 +84,9 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
   @Autowired
   private ResourceReferenceService resourceReferenceService;
 
+  @Autowired
+  private SubjectAclService subjectAclService;
+
   private File archiveFolder;
 
   @Override
@@ -101,6 +110,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
           backupViews();
           backupResources();
           backupFiles();
+          if (getOptions().getPermissions()) backupPermissions();
         }
         errorCode = CommandResultCode.SUCCESS;
       } catch (Exception e) {
@@ -140,6 +150,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
         if (getOptions().getOverride()) {
           log.warn("Deleting the existing archive {}", getOptions().getArchive());
           FileUtil.delete(archiveFolder);
+          if (!archiveFolder.mkdirs()) throw new RuntimeException("Backup archive folder creation failed");
         } else {
           throw new RuntimeException("Backup archive already exists, use override option");
         }
@@ -260,6 +271,40 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     log.info("Backup of {} files done in {}", getProjectName(), stopwatch.stop());
   }
 
+  private void backupPermissions() {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    log.debug("Backup of {} permissions started", getProjectName());
+    Stream<SubjectAclService.Permissions> projectPermissions = StreamSupport.stream(
+        subjectAclService.getNodeHierarchyPermissions(PERMISSIONS_DOMAIN, "/project/" + getProjectName(), null).spliterator(), false);
+    // permissions on tables or variables that no longer exist are left out
+    Stream<SubjectAclService.Permissions> datasourcePermissions = StreamSupport.stream(
+        subjectAclService.getNodeHierarchyPermissions(PERMISSIONS_DOMAIN, "/datasource/" + getProjectName(), null).spliterator(), false)
+        .filter(permissions -> isDatasourceItem(permissions.getNode()));
+    List<Opal.Acl> acls = Stream.concat(projectPermissions, datasourcePermissions)
+        .map(PermissionsToAclFunction.INSTANCE)
+        .map(acl -> getOptions().getViewsAsTables()
+            // views are backed up as tables, and so are their permissions
+            ? acl.toBuilder().setResource(acl.getResource().replaceFirst("^(/datasource/[^/]+)/view/", "$1/table/")).build()
+            : acl)
+        .collect(Collectors.toList());
+
+    if (acls.isEmpty()) {
+      getShell().printf("No permissions to backup.\n");
+    } else {
+      JSONArray array = new JSONArray();
+      acls.forEach(acl -> array.put(new JSONObject(JsonFormat.printToString(acl))));
+      File permissionsFile = getPermissionsFile();
+      try (FileWriter writer = new FileWriter(permissionsFile)) {
+        writer.write(array.toString(2));
+      } catch (Exception e) {
+        log.error("Permissions backup failed: {}", permissionsFile.getAbsolutePath(), e);
+        throw new RuntimeException("Permissions backup failed", e);
+      }
+      getShell().printf("Successful backup of " + acls.size() + " permissions.\n");
+    }
+    log.info("Backup of {} permissions done in {}", getProjectName(), stopwatch.stop());
+  }
+
   private void writeDto(File file, Message message) throws IOException {
     try (FileWriter writer = new FileWriter(file)) {
       writer.write(JsonFormat.printToString(message));
@@ -309,6 +354,9 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     }
     if (options.isOverride()) {
       sb.append(" --override ").append(options.getOverride());
+    }
+    if (options.isPermissions()) {
+      sb.append(" --permissions ").append(options.getPermissions());
     }
 
     return sb.toString();

@@ -30,14 +30,28 @@ import org.obiba.opal.core.repository.ProjectRepository;
 import org.obiba.opal.core.service.ProjectsState;
 import org.obiba.opal.core.service.ProjectsState.State;
 import org.obiba.opal.core.service.ResourceReferenceService;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.shell.commands.options.RestoreCommandOptions;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
+import org.obiba.opal.core.security.DatasourcePermissionConverter;
+import org.obiba.opal.core.security.ProjectPermissionConverter;
+import org.obiba.opal.core.security.ProjectResourceReferencePermissionConverter;
+import org.obiba.opal.core.security.ProjectResourceReferencesPermissionConverter;
+import org.obiba.opal.core.security.TablePermissionConverter;
+import org.obiba.opal.core.security.VCFStorePermissionsConverter;
+import org.obiba.opal.core.security.VariablePermissionConverter;
+import com.google.common.collect.Lists;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -45,14 +59,30 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-@CommandUsage(description = "Restore a project's data.", syntax = "Syntax: restore --project PROJECT --archive FILE [--password PASSWORD] [--override BOOL]")
+@CommandUsage(description = "Restore a project's data and, optionally, its permissions.", syntax = "Syntax: restore --project PROJECT --archive FILE [--password PASSWORD] [--override BOOL] [--permissions BOOL]")
 public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(RestoreCommand.class);
+
+  /**
+   * The permission nodes a project backup may hold: the project itself, its resources and VCF store, and its
+   * datasource, tables, views and variables. Group 1 is the node type, group 2 the project name and group 3 what
+   * follows it, which depends on the node type.
+   */
+  private static final List<Pattern> PROJECT_NODES = List.of(
+      Pattern.compile("^/(project)/([^/]+)(|/resources|/vcf-store|/resource/[^/]+)$"),
+      Pattern.compile("^/(datasource)/([^/]+)(|/(?:table|view)/[^/]+(?:/variable/.+)?)$"));
 
   private static final String WORK_DIR = System.getProperty("OPAL_HOME") + File.separator + "work" + File.separator + "tmp";
 
@@ -76,6 +106,14 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
 
   @Autowired
   private ResourceReferenceService resourceReferenceService;
+
+  @Autowired
+  private SubjectAclService subjectAclService;
+
+  // the configuration database's, not the application's which belongs to the Magma datasources
+  @Autowired
+  @Qualifier("configTransactionManager")
+  private PlatformTransactionManager configTransactionManager;
 
   private File archiveFolder;
 
@@ -101,6 +139,8 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
           restoreViews();
           restoreResources();
           restoreFiles();
+          // last, as replacing a table removes its permissions
+          if (getOptions().getPermissions()) restorePermissions();
           errorCode = CommandResultCode.SUCCESS;
         } catch (Exception e) {
           if (!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
@@ -288,6 +328,121 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     log.info("Restore of {} files done in {}", getProjectName(), stopwatch.stop());
   }
 
+  private void restorePermissions() {
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    log.debug("Restore of {} permissions started", getProjectName());
+    File permissionsFile = getPermissionsFile();
+    if (!permissionsFile.exists()) {
+      getShell().printf("No permissions to restore.\n");
+      return;
+    }
+    // read and check them all before writing any, so that a bad file changes nothing
+    List<Opal.Acl> acls = Lists.newArrayList();
+    try {
+      JSONArray array = new JSONArray(Files.readString(permissionsFile.toPath(), StandardCharsets.UTF_8));
+      for (int i = 0; i < array.length(); i++) {
+        Opal.Acl.Builder builder = Opal.Acl.newBuilder();
+        JsonFormat.merge(array.getJSONObject(i).toString(), builder);
+        Opal.Acl acl = builder.build();
+        String node = PERMISSIONS_DOMAIN.equals(acl.getDomain()) ? toProjectNode(acl.getResource(), getProjectName()) : null;
+        if (node == null) {
+          log.warn("Skipping permission outside of the project scope: {} {}", acl.getDomain(), acl.getResource());
+        } else if (acl.getSubject().getPrincipal().isBlank()) {
+          log.warn("Skipping permission without subject name on {}", node);
+        } else if (!isAllowed(node, acl.getActionsList())) {
+          log.warn("Skipping permission not applicable to {}: {}", node, acl.getActionsList());
+        } else if (!isRestoredItem(node)) {
+          log.warn("Skipping permission on an item that is not in the project: {}", node);
+        } else {
+          acls.add(acl.toBuilder().setResource(node).build());
+        }
+      }
+    } catch (Exception e) {
+      log.error("Permissions restore failed: {}", permissionsFile.getAbsolutePath(), e);
+      throw new RuntimeException("Permissions restore failed", e);
+    }
+    // in one transaction, so that a failure while writing them changes nothing either
+    new TransactionTemplate(configTransactionManager).executeWithoutResult(status -> replacePermissions(subjectAclService, acls));
+    getShell().printf("Successful restore of " + acls.size() + " permissions.\n");
+    log.info("Restore of {} permissions done in {}", getProjectName(), stopwatch.stop());
+  }
+
+  /**
+   * Replace the permissions of each subject on each item of the list, as setting one in the UI does, and keep all the
+   * others: replacing them all could take away the access of the one restoring.
+   *
+   * @param subjectAclService where the permissions are stored
+   * @param acls checked permissions, on nodes of the restored project
+   */
+  static void replacePermissions(SubjectAclService subjectAclService, List<Opal.Acl> acls) {
+    Set<String> replaced = Sets.newHashSet();
+    for (Opal.Acl acl : acls) {
+      SubjectAcl.Subject subject = SubjectAcl.SubjectType.valueOf(acl.getSubject().getType().name())
+          .subjectFor(acl.getSubject().getPrincipal());
+      // only once per subject and item, so that a second entry for the same pair does not remove the first one
+      if (replaced.add(acl.getResource() + "|" + subject.getType() + "|" + subject.getPrincipal()))
+        subjectAclService.deleteSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject);
+      subjectAclService.addSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject, acl.getActionsList());
+    }
+  }
+
+  /**
+   * Check that the table, view, variable or resource that a permission applies to is in the restored project.
+   */
+  private boolean isRestoredItem(String node) {
+    if (node.startsWith("/datasource/")) return isDatasourceItem(node);
+    String resourcePrefix = "/project/" + getProjectName() + "/resource/";
+    if (node.startsWith(resourcePrefix))
+      return resourceReferenceService.hasResourceReference(getProjectName(), node.substring(resourcePrefix.length()));
+    return true;
+  }
+
+  /**
+   * Re-target a backed up permission node to the project being restored.
+   *
+   * @param node the backed up node
+   * @param project the name of the project being restored
+   * @return the node in the restored project, or null if the node is not one a project backup may hold
+   */
+  static String toProjectNode(String node, String project) {
+    Matcher matcher = matchProjectNode(node);
+    return matcher == null ? null : "/" + matcher.group(1) + "/" + project + matcher.group(3);
+  }
+
+  private static Matcher matchProjectNode(String node) {
+    for (Pattern pattern : PROJECT_NODES) {
+      Matcher matcher = pattern.matcher(node);
+      if (matcher.matches()) return matcher;
+    }
+    return null;
+  }
+
+  /**
+   * Whether the permissions are ones that apply to the node. Permissions are converted to REST grants by name alone,
+   * whatever their node, so a permission of another kind (SYSTEM_ALL for instance) must not be restored on a project node.
+   *
+   * @param node a project node, as returned by {@link #toProjectNode(String, String)}
+   * @param permissions the permission names
+   */
+  static boolean isAllowed(String node, List<String> permissions) {
+    Matcher matcher = matchProjectNode(node);
+    if (matcher == null || permissions.isEmpty()) return false;
+    String suffix = matcher.group(3);
+    Enum<?>[] allowed;
+    if ("project".equals(matcher.group(1))) {
+      if (suffix.isEmpty()) allowed = ProjectPermissionConverter.Permission.values();
+      else if (suffix.equals("/resources")) allowed = ProjectResourceReferencesPermissionConverter.Permission.values();
+      else if (suffix.equals("/vcf-store")) allowed = VCFStorePermissionsConverter.Permission.values();
+      else allowed = ProjectResourceReferencePermissionConverter.Permission.values();
+    } else {
+      if (suffix.isEmpty()) allowed = DatasourcePermissionConverter.Permission.values();
+      else if (suffix.matches("/(?:table|view)/[^/]+")) allowed = TablePermissionConverter.Permission.values();
+      else allowed = VariablePermissionConverter.Permission.values();
+    }
+    Set<String> names = Arrays.stream(allowed).map(Enum::name).collect(Collectors.toSet());
+    return names.containsAll(permissions);
+  }
+
   private Datasource getSourceDatasource(Map<String, File> tableFoldersMap) {
     CsvDatasource sourceDatasource = new CsvDatasource("tables");
     Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
@@ -341,6 +496,9 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
     }
     if (options.isOverride()) {
       sb.append(" --override ").append(options.getOverride());
+    }
+    if (options.isPermissions()) {
+      sb.append(" --permissions ").append(options.getPermissions());
     }
 
     return sb.toString();
