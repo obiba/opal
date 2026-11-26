@@ -120,7 +120,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
               @NotNull
               @Override
               public Thread newThread(@NotNull Runnable r) {
-                return new TransactionalThread(r);
+                return new TransactionalThread(org.obiba.opal.core.tx.TransactionalThread.withCurrentSubject(r));
               }
             }) //
             .withProgressListener(progressListener) //
