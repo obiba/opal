@@ -350,10 +350,14 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       log.error("Permissions restore failed: {}", permissionsFile.getAbsolutePath(), e);
       throw new RuntimeException("Permissions restore failed", e);
     }
-    // added to the existing ones: replacing them could take away the access of the one restoring
+    // replace the permissions of each subject on each item of the archive, as setting one in the UI does, and keep all
+    // the others: replacing them all could take away the access of the one restoring
+    Set<String> replaced = Sets.newHashSet();
     for (Opal.Acl acl : acls) {
       SubjectAcl.Subject subject = SubjectAcl.SubjectType.valueOf(acl.getSubject().getType().name())
           .subjectFor(acl.getSubject().getPrincipal());
+      if (replaced.add(acl.getResource() + "|" + subject.getType() + "|" + subject.getPrincipal()))
+        subjectAclService.deleteSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject);
       subjectAclService.addSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject, acl.getActionsList());
     }
     getShell().printf("Successful restore of " + acls.size() + " permissions.\n");
