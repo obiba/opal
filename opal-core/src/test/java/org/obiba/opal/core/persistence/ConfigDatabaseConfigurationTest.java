@@ -15,9 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.MapPropertySource;
@@ -26,8 +23,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -190,67 +185,5 @@ public class ConfigDatabaseConfigurationTest {
     context.register(ConfigDatabaseConfiguration.class);
     context.refresh();
     return context;
-  }
-
-  /**
-   * Stands in for {@code DefaultOpalConfigurationService}, which is both the holder of the generated database password
-   * and the service that decrypts it.
-   */
-  private static class TestOpalConfigurationService implements OpalConfigurationService, CryptoService {
-
-    private final OpalConfiguration configuration = new OpalConfiguration();
-
-    private TestOpalConfigurationService(String encryptedPassword) {
-      configuration.setSecretKey("testsecretkey1234");
-      configuration.setDatabasePassword(encryptedPassword);
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void readOpalConfiguration() {
-    }
-
-    @Override
-    public OpalConfiguration getOpalConfiguration() {
-      return configuration;
-    }
-
-    @Override
-    public void modifyConfiguration(ConfigModificationTask task) {
-      task.doWithConfig(configuration);
-    }
-
-    @Override
-    public String generateSecretKey() {
-      return "testsecretkey1234";
-    }
-
-    @Override
-    public String encrypt(String plain) {
-      return "enc:" + plain;
-    }
-
-    @Override
-    public String decrypt(String encrypted) {
-      if(!encrypted.startsWith("enc:")) throw new IllegalArgumentException("Cannot decrypt " + encrypted);
-      return encrypted.substring("enc:".length());
-    }
-
-    @Override
-    public InputStream newCipherInputStream(InputStream in) {
-      return in;
-    }
-
-    @Override
-    public OutputStream newCipherOutputStream(OutputStream out) {
-      return out;
-    }
   }
 }
