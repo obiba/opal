@@ -88,11 +88,18 @@ class EmbeddedConfigMigration {
     MIGRATED
   }
 
+  /** H2's error code for a wrong user name or password. */
+  private static final int WRONG_USER_OR_PASSWORD = 28000;
+
   private final File store;
 
-  private final String user;
+  /**
+   * A user and a password the embedded store may have been created with, the password only asked for when tried.
+   * {@code source} says where they come from, for the log.
+   */
+  record Login(String user, Supplier<String> password, String source) {}
 
-  private final Supplier<String> password;
+  private final List<Login> logins;
 
   private final DataSource target;
 
@@ -100,16 +107,15 @@ class EmbeddedConfigMigration {
 
   /**
    * @param store the embedded store file, {@code opal-config.mv.db}
-   * @param user the embedded database user
-   * @param password the embedded database password, only asked for when there is something to migrate, so that a
-   *                 setting left in place cannot fail a startup over a password the target does not need
+   * @param logins the credentials to open the embedded store with, tried in this order. Passwords are only asked for
+   *               when there is something to migrate, so that a setting left in place cannot fail a startup over a
+   *               password the target does not need
    * @param target the configuration database Opal is configured with, its schema already created by Liquibase
    * @param changelog the class path of the changelog that created it
    */
-  EmbeddedConfigMigration(File store, String user, Supplier<String> password, DataSource target, String changelog) {
+  EmbeddedConfigMigration(File store, List<Login> logins, DataSource target, String changelog) {
     this.store = store;
-    this.user = user;
-    this.password = password;
+    this.logins = logins;
     this.target = target;
     this.changelog = changelog;
   }
@@ -156,7 +162,7 @@ class EmbeddedConfigMigration {
     }
 
     Path copy = copyStore();
-    try(Connection from = DriverManager.getConnection(urlOf(copy), user, password.get())) {
+    try(Connection from = openStore(copy)) {
       from.setAutoCommit(false);
       checkSameChangelog(from, to);
       migrate(from, to, tables, postgres);
@@ -165,6 +171,29 @@ class EmbeddedConfigMigration {
       deleteQuietly(copy);
     }
     return Outcome.MIGRATED;
+  }
+
+  private Connection openStore(Path copy) throws SQLException {
+    List<String> refused = new ArrayList<>();
+    for(Login login : logins) {
+      String password;
+      try {
+        password = login.password().get();
+      } catch(RuntimeException e) {
+        refused.add(login.source() + " (" + e.getMessage() + ")");
+        continue;
+      }
+      try {
+        return DriverManager.getConnection(urlOf(copy), login.user(), password);
+      } catch(SQLException e) {
+        if(e.getErrorCode() != WRONG_USER_OR_PASSWORD) throw e;
+        refused.add(login.source());
+      }
+    }
+    throw new ConfigDatabaseException("Cannot open the embedded configuration database at " + store.getAbsolutePath() +
+        ": it refused " + String.join(", then ", refused) + ", so it was created with other credentials. Give the " +
+        "PostgreSQL user the config.datasource.username and config.datasource.password the embedded database was " +
+        "used with, and start again. Nothing was written.");
   }
 
   private void migrate(Connection from, Connection to, List<String> tables, boolean postgres) throws SQLException {

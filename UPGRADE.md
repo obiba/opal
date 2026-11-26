@@ -19,7 +19,9 @@ once. If you keep the embedded database, there is nothing to do.
 3. **Create an empty PostgreSQL database**, owned by the user Opal connects with, in `UTF8`. Do not use a database,
    or a schema, that is also registered in Opal for project data: a database registered for import lists every table
    of its schema, the configuration ones included (credentials, tokens, keystores). The PostgreSQL server can be the
-   same; use a separate database with its own user, which the user of the data databases cannot read.
+   same; use a separate database with its own user, which the user of the data databases cannot read. If
+   `config.datasource.username` and `config.datasource.password` were already set while on the embedded database, give
+   the PostgreSQL user those same two values: the embedded database only opens with them.
 
 4. **Add to `${OPAL_HOME}/conf/opal-config.properties`**, and make that file readable by the Opal user only, as it now
    holds a password:

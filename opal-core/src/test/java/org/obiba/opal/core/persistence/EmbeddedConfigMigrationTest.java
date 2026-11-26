@@ -228,6 +228,25 @@ public class EmbeddedConfigMigrationTest {
   }
 
   @Test
+  public void test_a_store_created_with_the_credentials_the_target_has_now_is_migrated() throws Exception {
+    // config.datasource.username and password set while embedded, then kept for the external database
+    try(AnnotationConfigApplicationContext ignored = openEmbedded(targetUser, targetPassword)) {
+      // only creates the store and its schema
+    }
+    try(AnnotationConfigApplicationContext context = openExternal(true)) {
+      assertThat(context.getBean("configEmbeddedMigration")).isEqualTo(EmbeddedConfigMigration.Outcome.MIGRATED);
+    }
+  }
+
+  @Test
+  public void test_a_store_created_with_other_credentials_is_refused_and_nothing_is_written() throws Exception {
+    try(AnnotationConfigApplicationContext ignored = openEmbedded("someone", "something-else")) {
+      // only creates the store and its schema
+    }
+    assertMigrationFails("created with other credentials");
+  }
+
+  @Test
   public void test_without_an_embedded_store_there_is_nothing_to_migrate() {
     try(AnnotationConfigApplicationContext context = openExternal(true)) {
       assertThat(context.getBean("configEmbeddedMigration"))
@@ -314,6 +333,13 @@ public class EmbeddedConfigMigrationTest {
 
   private AnnotationConfigApplicationContext openEmbedded() {
     return open(new HashMap<>());
+  }
+
+  private AnnotationConfigApplicationContext openEmbedded(String username, String password) {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put("config.datasource.username", username);
+    properties.put("config.datasource.password", password);
+    return open(properties);
   }
 
   private AnnotationConfigApplicationContext openExternal(boolean migrateEmbedded) {

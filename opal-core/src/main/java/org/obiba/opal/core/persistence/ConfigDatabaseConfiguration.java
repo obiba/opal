@@ -37,7 +37,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -188,8 +190,16 @@ public class ConfigDatabaseConfiguration {
       return EmbeddedConfigMigration.Outcome.NOTHING_TO_MIGRATE;
     }
     File store = new File(configFolder, DATABASE_NAME + ".mv.db");
-    return new EmbeddedConfigMigration(store, DEFAULT_USERNAME,
-        () -> embeddedPassword(opalConfigurationService, cryptoService), configDataSource, CHANGELOG).run();
+    // An embedded store is opened with config.datasource.username and password when they are set, so it may have been
+    // created with those rather than the generated ones. They now hold the target's credentials, which can only open it
+    // if they were kept the same.
+    List<EmbeddedConfigMigration.Login> logins = new ArrayList<>();
+    logins.add(new EmbeddedConfigMigration.Login(DEFAULT_USERNAME,
+        () -> embeddedPassword(opalConfigurationService, cryptoService),
+        "user " + DEFAULT_USERNAME + " with the <databasePassword> of opal-config.xml"));
+    if(!Strings.isNullOrEmpty(username)) logins.add(new EmbeddedConfigMigration.Login(username, () -> password,
+        "user " + username + " with config.datasource.password"));
+    return new EmbeddedConfigMigration(store, logins, configDataSource, CHANGELOG).run();
   }
 
   @Bean
