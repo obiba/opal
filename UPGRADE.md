@@ -1,8 +1,53 @@
 # Opal Upgrade Notes
 
-What a system administrator has to do when upgrading a production Opal instance to 6.0.0. The actions are listed in
+What a system administrator has to do when upgrading a production Opal instance. The actions are listed in
 the order they are taken: before stopping the old Opal, at the first start of the new one, and afterwards. Items
 marked *optional* enable something new and can be skipped. For what changed and why, see the release notes.
+
+## Upgrading to 6.3.0
+
+### Optional: move the configuration database to PostgreSQL
+
+Opal can copy its embedded configuration database (`${OPAL_HOME}/data/config`) into an empty PostgreSQL database
+once. If you keep the embedded database, there is nothing to do.
+
+1. **Start 6.3.0 once on the embedded database, then stop it cleanly.** The copy requires both databases at the
+   same schema version, and refuses to run otherwise.
+
+2. **Back up `data/config` and `data/opal-config.xml` together.**
+
+3. **Create an empty PostgreSQL database**, owned by the user Opal connects with, in `UTF8`. Do not use a database,
+   or a schema, that is also registered in Opal for project data: a database registered for import lists every table
+   of its schema, the configuration ones included (credentials, tokens, keystores). The PostgreSQL server can be the
+   same; use a separate database with its own user, which the user of the data databases cannot read.
+
+4. **Add to `${OPAL_HOME}/conf/opal-config.properties`**, and make that file readable by the Opal user only, as it now
+   holds a password:
+
+       config.datasource.url=jdbc:postgresql://localhost:5432/opal_config
+       config.datasource.driverClass=org.postgresql.Driver
+       config.datasource.username=opal
+       config.datasource.password=secret
+       config.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+       config.datasource.migrateEmbedded=true
+
+5. **Start Opal and read the startup log.** It reports the rows copied per table. A failure names the table, and
+   leaves PostgreSQL empty and `data/config` untouched; fix the cause and start again. A PostgreSQL database that
+   already holds a configuration is never written to.
+
+6. **Check the instance**: log in, open projects, permissions, databases, resources and tokens, create and delete a
+   test user.
+
+7. **Remove `config.datasource.migrateEmbedded`** from `opal-config.properties`.
+
+8. **Back up the PostgreSQL database (`pg_dump`) and `data/opal-config.xml` as a pair** from now on. Encrypted values
+   in the configuration still need the `<secretKey>` of that file.
+
+9. **Keep `data/config` until the instance is verified, then delete it.** Rolling back means stopping Opal and removing
+   the `config.datasource.*` and `config.hibernate.dialect` lines: Opal starts again on the embedded database, and
+   configuration changes made since the copy are lost.
+
+The H2 databases in `${OPAL_HOME}/data/h2` that hold project data are not moved.
 
 ## Upgrading to 6.0.0
 
@@ -15,7 +60,8 @@ marked *optional* enable something new and can be skipped. For what changed and 
 2. **Decide where the configuration database will live.** By default it becomes an embedded H2 database in
    `${OPAL_HOME}/data/config`, and nothing has to be done. To keep it on PostgreSQL instead, do this *before* the first
    start of the new Opal, because the migration writes to whatever is configured at that moment. Pointing an
-   already-migrated Opal at an empty PostgreSQL gives you an empty configuration.
+   already-migrated Opal at an empty PostgreSQL gives you an empty configuration; from 6.3.0 the embedded
+   configuration can be copied there instead, see [Upgrading to 6.3.0](#upgrading-to-630).
 
    Create an empty database, then add to `${OPAL_HOME}/conf/opal-config.properties`:
 

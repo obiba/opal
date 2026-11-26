@@ -96,6 +96,8 @@ public class ConfigDatabaseConfiguration {
 
   private static final String DATABASE_NAME = "opal-config";
 
+  static final String CHANGELOG = "db/changelog/config/db.changelog-master.xml";
+
   private static final int DATABASE_PASSWORD_LENGTH = 15;
 
   /**
@@ -125,6 +127,9 @@ public class ConfigDatabaseConfiguration {
 
   @Value("${config.hibernate.dialect:}")
   private String dialect;
+
+  @Value("${config.datasource.migrateEmbedded:false}")
+  private boolean migrateEmbedded;
 
   @Bean
   public DataSource configDataSource(OpalConfigurationService opalConfigurationService, CryptoService cryptoService) {
@@ -158,15 +163,37 @@ public class ConfigDatabaseConfiguration {
   public SpringLiquibase configLiquibase(DataSource configDataSource) {
     SpringLiquibase liquibase = new SpringLiquibase();
     liquibase.setDataSource(configDataSource);
-    liquibase.setChangeLog("classpath:db/changelog/config/db.changelog-master.xml");
+    liquibase.setChangeLog("classpath:" + CHANGELOG);
     // Prefixed, because on an external server the configuration schema may not be alone.
     liquibase.setDatabaseChangeLogTable("opal_changelog");
     liquibase.setDatabaseChangeLogLockTable("opal_changelog_lock");
     return liquibase;
   }
 
+  /**
+   * Copy the embedded configuration into the external database, when asked to. Between Liquibase, which has just
+   * created the schema, and Hibernate, before which nothing reads or writes the configuration. This configuration is
+   * part of both runs of {@code bin/opal}: the upgrade run, which opens the configuration database first, performs the
+   * copy, and the server run finds the target populated and skips it.
+   */
   @Bean
   @DependsOn("configLiquibase")
+  public EmbeddedConfigMigration.Outcome configEmbeddedMigration(DataSource configDataSource,
+                                                                 OpalConfigurationService opalConfigurationService,
+                                                                 CryptoService cryptoService) {
+    if(!migrateEmbedded) return EmbeddedConfigMigration.Outcome.NOTHING_TO_MIGRATE;
+    if(isEmbedded()) {
+      log.warn("config.datasource.migrateEmbedded is set but no config.datasource.url is: the embedded " +
+          "configuration database is the one in use, there is nothing to migrate it to");
+      return EmbeddedConfigMigration.Outcome.NOTHING_TO_MIGRATE;
+    }
+    File store = new File(configFolder, DATABASE_NAME + ".mv.db");
+    return new EmbeddedConfigMigration(store, DEFAULT_USERNAME,
+        () -> embeddedPassword(opalConfigurationService, cryptoService), configDataSource, CHANGELOG).run();
+  }
+
+  @Bean
+  @DependsOn({ "configLiquibase", "configEmbeddedMigration" })
   public LocalContainerEntityManagerFactoryBean configEntityManagerFactory(DataSource configDataSource) {
     LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
     factoryBean.setDataSource(configDataSource);
@@ -247,6 +274,13 @@ public class ConfigDatabaseConfiguration {
               "config.datasource.password in opal-config.properties; only the embedded database uses " +
               "the password Opal generates for itself.");
     }
+    return embeddedPassword(opalConfigurationService, cryptoService);
+  }
+
+  /**
+   * The password of the embedded database: the {@code <databasePassword>} of {@code opal-config.xml}, decrypted.
+   */
+  private String embeddedPassword(OpalConfigurationService opalConfigurationService, CryptoService cryptoService) {
     String encrypted = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
     if(Strings.isNullOrEmpty(encrypted)) {
       throw new ConfigDatabaseException(
