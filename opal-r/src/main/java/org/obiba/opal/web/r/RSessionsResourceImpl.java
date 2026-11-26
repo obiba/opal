@@ -93,7 +93,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
       if (wait) {
         waiter.run();
       } else {
-        CompletableFuture.runAsync(waiter);
+        CompletableFuture.runAsync(SecurityUtils.getSubject().associateWith(waiter));
       }
     }
     URI location = getLocation(info, rSession.getId());

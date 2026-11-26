@@ -135,13 +135,10 @@ public class ValuesIndexerImpl implements IndexSynchronization {
         // index.updateTimestamps();
         log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
 
-        // compute summaries in a new thread
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            indexManager.getVariableSummaryHandler().computeSummaries(getValueTable());
-          }
-        }).start();
+        // compute summaries in a new thread, as the indexing subject
+        indexManager.getThreadFactory()
+            .newThread(() -> indexManager.getVariableSummaryHandler().computeSummaries(getValueTable()))
+            .start();
       }
     }
 
