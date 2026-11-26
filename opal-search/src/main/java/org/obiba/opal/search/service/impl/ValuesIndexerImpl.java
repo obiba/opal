@@ -17,6 +17,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.support.VariableNature;
+import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.search.service.IndexManager;
 import org.obiba.opal.search.service.IndexSynchronization;
 import org.obiba.opal.search.service.ValueTableIndex;
@@ -98,6 +99,17 @@ public class ValuesIndexerImpl implements IndexSynchronization {
         .read();
   }
 
+  /**
+   * Compute summaries in a new thread, as the indexing subject. Not a transactional thread: the computation can be long
+   * and does not write to the data databases.
+   */
+  Thread computeSummaries() {
+    Thread thread = new Thread(TransactionalThread.withCurrentSubject(
+        () -> indexManager.getVariableSummaryHandler().computeSummaries(getValueTable())));
+    thread.start();
+    return thread;
+  }
+
   private class ValuesReaderCallback implements ConcurrentValueTableReader.ConcurrentReaderCallback {
 
     private final Map<Variable, VariableNature> natures = new HashMap<>();
@@ -135,13 +147,7 @@ public class ValuesIndexerImpl implements IndexSynchronization {
         // index.updateTimestamps();
         log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
 
-        // compute summaries in a new thread
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            indexManager.getVariableSummaryHandler().computeSummaries(getValueTable());
-          }
-        }).start();
+        computeSummaries();
       }
     }
 
