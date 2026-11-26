@@ -11,6 +11,7 @@ package org.obiba.opal.search.service.impl;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -44,8 +45,8 @@ public class ValuesIndexerImplTest {
     AtomicReference<Object> principal = new AtomicReference<>();
     VariableSummaryHandler summaryHandler = mock(VariableSummaryHandler.class);
     doAnswer(invocation -> {
-      Subject current = ThreadContext.getSubject();
-      principal.set(current == null ? null : current.getPrincipal());
+      // fails when no subject is bound, as no security manager is set: the principal then stays null
+      principal.set(SecurityUtils.getSubject().getPrincipal());
       return null;
     }).when(summaryHandler).computeSummaries(any(ValueTable.class));
 

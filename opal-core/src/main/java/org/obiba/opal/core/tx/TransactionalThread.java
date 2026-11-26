@@ -11,6 +11,7 @@
 package org.obiba.opal.core.tx;
 
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ScopedValues;
 import org.apache.shiro.util.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,24 @@ public class TransactionalThread extends Thread {
   }
 
   /**
-   * Shiro 3 binds the subject to a plain thread local, so a thread does not inherit it from the one that creates it.
-   * Run the runnable as the creator's subject, if any, so that secured lookups (e.g. a script referring to another
-   * project's table) are authorized as that user.
+   * Shiro 3 binds the subject to a plain thread local, or to a scoped value from Java 25, and a thread inherits neither
+   * from the one that creates it. Run the runnable as the creator's subject, if any, so that secured lookups (e.g. a
+   * script referring to another project's table) are authorized as that user.
    */
   public static Runnable withCurrentSubject(Runnable runnable) {
-    Subject subject = ThreadContext.getSubject();
+    Subject subject = getBoundSubject();
     return subject == null ? runnable : subject.associateWith(runnable);
+  }
+
+  /**
+   * Looks up the subject where {@link org.apache.shiro.SecurityUtils#getSubject()} does, without creating and binding
+   * an anonymous one when there is none.
+   */
+  private static Subject getBoundSubject() {
+    if (ScopedValues.INSTANCE.isSupported() && ScopedValues.INSTANCE.isBound()) {
+      return ScopedValues.INSTANCE.get().subject();
+    }
+    return ThreadContext.getSubject();
   }
 
   @Override
