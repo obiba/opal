@@ -98,6 +98,16 @@ public class ValuesIndexerImpl implements IndexSynchronization {
         .read();
   }
 
+  /**
+   * Compute summaries in a new thread from the index manager's factory, so that it runs as the indexing subject.
+   */
+  Thread computeSummaries() {
+    Thread thread = indexManager.getThreadFactory()
+        .newThread(() -> indexManager.getVariableSummaryHandler().computeSummaries(getValueTable()));
+    thread.start();
+    return thread;
+  }
+
   private class ValuesReaderCallback implements ConcurrentValueTableReader.ConcurrentReaderCallback {
 
     private final Map<Variable, VariableNature> natures = new HashMap<>();
@@ -135,10 +145,7 @@ public class ValuesIndexerImpl implements IndexSynchronization {
         // index.updateTimestamps();
         log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
 
-        // compute summaries in a new thread, as the indexing subject
-        indexManager.getThreadFactory()
-            .newThread(() -> indexManager.getVariableSummaryHandler().computeSummaries(getValueTable()))
-            .start();
+        computeSummaries();
       }
     }
 
