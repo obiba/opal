@@ -13,6 +13,7 @@ package org.obiba.opal.core.tx;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ScopedValues;
 import org.apache.shiro.util.ThreadContext;
+import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
@@ -37,11 +38,12 @@ public class TransactionalThread extends Thread {
   /**
    * Shiro 3 binds the subject to a plain thread local, or to a scoped value from Java 25, and a thread inherits neither
    * from the one that creates it. Run the runnable as the creator's subject, if any, so that secured lookups (e.g. a
-   * script referring to another project's table) are authorized as that user.
+   * script referring to another project's table) are authorized as that user. The subject is detached from its web
+   * session, so that the thread keeps it after the user logs out or the session expires.
    */
   public static Runnable withCurrentSubject(Runnable runnable) {
     Subject subject = getBoundSubject();
-    return subject == null ? runnable : subject.associateWith(runnable);
+    return subject == null ? runnable : SessionDetachedSubject.asSessionDetachedSubject(subject).associateWith(runnable);
   }
 
   /**

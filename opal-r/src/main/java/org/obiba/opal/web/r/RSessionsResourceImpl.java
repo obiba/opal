@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.security.realm.OpalTokenRealm;
 import org.obiba.opal.r.service.*;
@@ -93,7 +94,8 @@ public class RSessionsResourceImpl implements RSessionsResource {
       if (wait) {
         waiter.run();
       } else {
-        CompletableFuture.runAsync(SecurityUtils.getSubject().associateWith(waiter));
+        // detached from the web session, as the waiter outlives the request
+        CompletableFuture.runAsync(SessionDetachedSubject.asSessionDetachedSubject(SecurityUtils.getSubject()).associateWith(waiter));
       }
     }
     URI location = getLocation(info, rSession.getId());

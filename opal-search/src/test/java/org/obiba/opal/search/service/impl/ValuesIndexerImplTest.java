@@ -20,9 +20,6 @@ import org.junit.After;
 import org.junit.Test;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.VariableSummaryHandler;
-import org.obiba.opal.core.tx.TransactionalThread;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -50,13 +47,8 @@ public class ValuesIndexerImplTest {
       return null;
     }).when(summaryHandler).computeSummaries(any(ValueTable.class));
 
-    TransactionTemplate tx = new TransactionTemplate() {
-      @Override
-      public <T> T execute(TransactionCallback<T> action) {
-        return action.doInTransaction(null);
-      }
-    };
-    ValuesIndexManagerImpl indexManager = new ValuesIndexManagerImpl(summaryHandler, r -> new TransactionalThread(tx, r));
+    // summaries do not use the transactional thread factory of the indexing
+    ValuesIndexManagerImpl indexManager = new ValuesIndexManagerImpl(summaryHandler, null);
     ValueTable table = mock(ValueTable.class);
     ValuesIndexerImpl indexer = new ValuesIndexerImpl(indexManager, table, new ValuesIndexImpl(indexManager, table));
 
