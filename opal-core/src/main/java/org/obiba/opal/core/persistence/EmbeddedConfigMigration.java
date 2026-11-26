@@ -133,7 +133,11 @@ class EmbeddedConfigMigration {
         else to.rollback();
         return outcome;
       } catch(SQLException | RuntimeException e) {
-        to.rollback();
+        try {
+          to.rollback();
+        } catch(SQLException rollback) {
+          e.addSuppressed(rollback);
+        }
         throw e;
       }
     } catch(SQLException e) {
@@ -193,7 +197,10 @@ class EmbeddedConfigMigration {
     throw new ConfigDatabaseException("Cannot open the embedded configuration database at " + store.getAbsolutePath() +
         ": it refused " + String.join(", then ", refused) + ", so it was created with other credentials. Give the " +
         "PostgreSQL user the config.datasource.username and config.datasource.password the embedded database was " +
-        "used with, and start again. Nothing was written.");
+        "used with, and start again. If it was used with the generated ones, the <databasePassword> of " +
+        "opal-config.xml, encrypted with the <secretKey> of that same file, no longer opens it when that file and " +
+        "the database folder come from different installations, or when the secret key was replaced. " +
+        "Nothing was written.");
   }
 
   private void migrate(Connection from, Connection to, List<String> tables, boolean postgres) throws SQLException {
@@ -419,7 +426,8 @@ class EmbeddedConfigMigration {
 
   private List<String> tables(Connection connection) throws SQLException {
     List<String> tables = new ArrayList<>();
-    try(ResultSet rs = connection.getMetaData().getTables(connection.getCatalog(), connection.getSchema(), "%", null)) {
+    DatabaseMetaData meta = connection.getMetaData();
+    try(ResultSet rs = meta.getTables(connection.getCatalog(), pattern(meta, connection.getSchema()), "%", null)) {
       while(rs.next()) {
         String type = rs.getString("TABLE_TYPE");
         if("TABLE".equals(type) || "BASE TABLE".equals(type)) tables.add(rs.getString("TABLE_NAME"));
@@ -430,11 +438,22 @@ class EmbeddedConfigMigration {
 
   private List<Column> columns(Connection connection, String table) throws SQLException {
     List<Column> columns = new ArrayList<>();
-    try(ResultSet rs = connection.getMetaData()
-        .getColumns(connection.getCatalog(), connection.getSchema(), table, null)) {
+    DatabaseMetaData meta = connection.getMetaData();
+    try(ResultSet rs = meta.getColumns(connection.getCatalog(), pattern(meta, connection.getSchema()),
+        pattern(meta, table), null)) {
       while(rs.next()) columns.add(new Column(rs.getString("COLUMN_NAME"), rs.getInt("DATA_TYPE")));
     }
     return columns;
+  }
+
+  /**
+   * Metadata methods take schema and table names as LIKE patterns, where the {@code _} most table names contain matches
+   * any character.
+   */
+  private static String pattern(DatabaseMetaData meta, String name) throws SQLException {
+    if(name == null) return null;
+    String escape = meta.getSearchStringEscape();
+    return name.replace(escape, escape + escape).replace("_", escape + "_").replace("%", escape + "%");
   }
 
   /**
