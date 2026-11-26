@@ -507,11 +507,13 @@ class EmbeddedConfigMigration {
    * exactly as it was. The copy lives next to it, on the same file system.
    */
   private Path copyStore() {
+    Path folder = null;
     try {
-      Path folder = Files.createTempDirectory(store.getParentFile().getParentFile().toPath(), "config-migration-");
+      folder = Files.createTempDirectory(store.getParentFile().getParentFile().toPath(), "config-migration-");
       Files.copy(store.toPath(), folder.resolve(store.getName()), StandardCopyOption.COPY_ATTRIBUTES);
       return folder;
     } catch(IOException e) {
+      if(folder != null) deleteQuietly(folder);
       throw new ConfigDatabaseException("Cannot copy the embedded configuration database " + store + ": " +
           e.getMessage(), e);
     }
