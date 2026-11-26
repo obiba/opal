@@ -59,6 +59,12 @@ public class RestoreCommandTest {
     assertNull(RestoreCommand.toProjectNode("/datasource/source/table/T1/other", "target"));
     assertNull(RestoreCommand.toProjectNode("/project/source/../other", "target"));
     assertNull(RestoreCommand.toProjectNode("x/project/source", "target"));
+    // a project item under a datasource node, and the other way round
+    assertNull(RestoreCommand.toProjectNode("/datasource/source/resources", "target"));
+    assertNull(RestoreCommand.toProjectNode("/datasource/source/vcf-store", "target"));
+    assertNull(RestoreCommand.toProjectNode("/datasource/source/resource/r", "target"));
+    assertNull(RestoreCommand.toProjectNode("/project/source/table/T1", "target"));
+    assertNull(RestoreCommand.toProjectNode("/project/source/view/V1/variable/V1", "target"));
   }
 
   @Test
@@ -85,6 +91,8 @@ public class RestoreCommandTest {
     assertFalse(RestoreCommand.isAllowed("/datasource/p/table/t/variable/x", List.of("TABLE_ALL")));
     assertFalse(RestoreCommand.isAllowed("/project/p", List.of()));
     assertFalse(RestoreCommand.isAllowed("/", List.of("SYSTEM_ALL")));
+    assertFalse(RestoreCommand.isAllowed("/datasource/p/resources", List.of("VARIABLE_READ")));
+    assertFalse(RestoreCommand.isAllowed("/project/p/table/t", List.of("RESOURCE_VIEW")));
   }
 
   @Test

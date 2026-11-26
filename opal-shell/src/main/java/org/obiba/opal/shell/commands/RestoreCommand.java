@@ -50,6 +50,8 @@ import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -75,10 +77,12 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
 
   /**
    * The permission nodes a project backup may hold: the project itself, its resources and VCF store, and its
-   * datasource, tables, views and variables. Group 1 is the node type, group 3 what follows the project name.
+   * datasource, tables, views and variables. Group 1 is the node type, group 2 the project name and group 3 what
+   * follows it, which depends on the node type.
    */
-  private static final Pattern PROJECT_NODE = Pattern.compile(
-      "^/(project|datasource)/([^/]+)(|/resources|/vcf-store|/resource/[^/]+|/(?:table|view)/[^/]+(?:/variable/.+)?)$");
+  private static final List<Pattern> PROJECT_NODES = List.of(
+      Pattern.compile("^/(project)/([^/]+)(|/resources|/vcf-store|/resource/[^/]+)$"),
+      Pattern.compile("^/(datasource)/([^/]+)(|/(?:table|view)/[^/]+(?:/variable/.+)?)$"));
 
   private static final String WORK_DIR = System.getProperty("OPAL_HOME") + File.separator + "work" + File.separator + "tmp";
 
@@ -105,6 +109,11 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
 
   @Autowired
   private SubjectAclService subjectAclService;
+
+  // the configuration database's, not the application's which belongs to the Magma datasources
+  @Autowired
+  @Qualifier("configTransactionManager")
+  private PlatformTransactionManager configTransactionManager;
 
   private File archiveFolder;
 
@@ -338,6 +347,8 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
         String node = PERMISSIONS_DOMAIN.equals(acl.getDomain()) ? toProjectNode(acl.getResource(), getProjectName()) : null;
         if (node == null) {
           log.warn("Skipping permission outside of the project scope: {} {}", acl.getDomain(), acl.getResource());
+        } else if (acl.getSubject().getPrincipal().isBlank()) {
+          log.warn("Skipping permission without subject name on {}", node);
         } else if (!isAllowed(node, acl.getActionsList())) {
           log.warn("Skipping permission not applicable to {}: {}", node, acl.getActionsList());
         } else if (!isRestoredItem(node)) {
@@ -350,7 +361,8 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       log.error("Permissions restore failed: {}", permissionsFile.getAbsolutePath(), e);
       throw new RuntimeException("Permissions restore failed", e);
     }
-    replacePermissions(subjectAclService, acls);
+    // in one transaction, so that a failure while writing them changes nothing either
+    new TransactionTemplate(configTransactionManager).executeWithoutResult(status -> replacePermissions(subjectAclService, acls));
     getShell().printf("Successful restore of " + acls.size() + " permissions.\n");
     log.info("Restore of {} permissions done in {}", getProjectName(), stopwatch.stop());
   }
@@ -393,9 +405,16 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
    * @return the node in the restored project, or null if the node is not one a project backup may hold
    */
   static String toProjectNode(String node, String project) {
-    Matcher matcher = PROJECT_NODE.matcher(node);
-    if (!matcher.matches()) return null;
-    return "/" + matcher.group(1) + "/" + project + matcher.group(3);
+    Matcher matcher = matchProjectNode(node);
+    return matcher == null ? null : "/" + matcher.group(1) + "/" + project + matcher.group(3);
+  }
+
+  private static Matcher matchProjectNode(String node) {
+    for (Pattern pattern : PROJECT_NODES) {
+      Matcher matcher = pattern.matcher(node);
+      if (matcher.matches()) return matcher;
+    }
+    return null;
   }
 
   /**
@@ -406,8 +425,8 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
    * @param permissions the permission names
    */
   static boolean isAllowed(String node, List<String> permissions) {
-    Matcher matcher = PROJECT_NODE.matcher(node);
-    if (!matcher.matches() || permissions.isEmpty()) return false;
+    Matcher matcher = matchProjectNode(node);
+    if (matcher == null || permissions.isEmpty()) return false;
     String suffix = matcher.group(3);
     Enum<?>[] allowed;
     if ("project".equals(matcher.group(1))) {

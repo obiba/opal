@@ -150,6 +150,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
         if (getOptions().getOverride()) {
           log.warn("Deleting the existing archive {}", getOptions().getArchive());
           FileUtil.delete(archiveFolder);
+          if (!archiveFolder.mkdirs()) throw new RuntimeException("Backup archive folder creation failed");
         } else {
           throw new RuntimeException("Backup archive already exists, use override option");
         }

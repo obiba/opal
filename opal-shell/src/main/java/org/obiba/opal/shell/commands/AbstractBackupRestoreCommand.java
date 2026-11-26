@@ -89,11 +89,17 @@ public abstract class AbstractBackupRestoreCommand<T> extends AbstractOpalRuntim
   protected boolean isDatasourceItem(String node) {
     Matcher matcher = DATASOURCE_ITEM_NODE.matcher(node);
     if (!matcher.matches()) return true;
-    Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
-    if (!datasource.hasValueTable(matcher.group(2))) return false;
-    ValueTable table = datasource.getValueTable(matcher.group(2));
-    if (table.isView() != "view".equals(matcher.group(1))) return false;
-    return matcher.group(3) == null || table.hasVariable(matcher.group(3));
+    try {
+      Datasource datasource = MagmaEngine.get().getDatasource(getProjectName());
+      if (!datasource.hasValueTable(matcher.group(2))) return false;
+      ValueTable table = datasource.getValueTable(matcher.group(2));
+      if (table.isView() != "view".equals(matcher.group(1))) return false;
+      return matcher.group(3) == null || table.hasVariable(matcher.group(3));
+    } catch (Exception e) {
+      // a broken view for instance
+      log.warn("Cannot access the item of the permission {}: {}", node, e.getMessage());
+      return false;
+    }
   }
 
   protected File getReportsFolder() {
