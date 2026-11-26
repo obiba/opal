@@ -80,7 +80,7 @@ const formRef = ref();
 const emit = defineEmits(['update:modelValue']);
 const backupFolder = ref({ ...emptyFileDto } as FileDto);
 const emptyOption = { archive: '', password: '', override: false, permissions: false } as RestoreCommandOptionsDto;
-const restoreOptions = ref(emptyOption);
+const restoreOptions = ref({ ...emptyOption });
 const folderError = ref('');
 const validateRequiredFolder = (val: string) => val && val.trim().length > 0;
 
@@ -97,7 +97,7 @@ function onHide() {
   showDialog.value = false;
   folderError.value = '';
   backupFolder.value = emptyFileDto;
-  restoreOptions.value = emptyOption;
+  restoreOptions.value = { ...emptyOption };
   emit('update:modelValue', false);
 }
 

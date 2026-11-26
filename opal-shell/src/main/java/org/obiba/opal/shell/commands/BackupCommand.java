@@ -41,7 +41,6 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.project.Dtos;
-import org.obiba.opal.web.project.permissions.ProjectPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -279,7 +278,7 @@ public class BackupCommand extends AbstractBackupRestoreCommand<BackupCommandOpt
     // permissions on tables or variables that no longer exist are left out
     Stream<SubjectAclService.Permissions> datasourcePermissions = StreamSupport.stream(
         subjectAclService.getNodeHierarchyPermissions(PERMISSIONS_DOMAIN, "/datasource/" + getProjectName(), null).spliterator(), false)
-        .filter(new ProjectPermissionsResource.MagmaPermissionsPredicate());
+        .filter(permissions -> isDatasourceItem(permissions.getNode()));
     List<Opal.Acl> acls = Stream.concat(projectPermissions, datasourcePermissions)
         .map(PermissionsToAclFunction.INSTANCE)
         .map(acl -> getOptions().getViewsAsTables()

@@ -218,22 +218,15 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
   /**
    * Filter the accessible Magma objects.
    */
-  public static class MagmaPermissionsPredicate implements Predicate<SubjectAclService.Permissions> {
+  static class MagmaPermissionsPredicate implements Predicate<SubjectAclService.Permissions> {
     @Override
     public boolean apply(@Nullable SubjectAclService.Permissions input) {
-      assert input != null;
-      return exists(input.getNode());
-    }
-
-    /**
-     * Whether the table, view or variable a datasource node designates exists.
-     */
-    public static boolean exists(String node) {
       try {
-        String fullName = node.replace("/datasource/", "").replace("/table/", ".").replace("/view/", ".")
+        assert input != null;
+        String fullName = input.getNode().replace("/datasource/", "").replace("/table/", ".").replace("/view/", ".")
             .replace("/variable/", ":");
-        if(node.contains("/variable/")) MagmaEngineVariableResolver.valueOf(fullName).resolveSource();
-        else if(node.contains("/table/") || node.contains("/view/"))
+        if(input.getNode().contains("/variable/")) MagmaEngineVariableResolver.valueOf(fullName).resolveSource();
+        else if(input.getNode().contains("/table/") || input.getNode().contains("/view/"))
           MagmaEngineTableResolver.valueOf(fullName).resolveTable();
         return true;
       } catch(Exception e) {
