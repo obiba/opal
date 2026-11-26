@@ -1,7 +1,7 @@
 ##
 ## Makefile for Opal developers
 ##
-version=6.2-SNAPSHOT
+version=6.3-SNAPSHOT
 magma_version=6.1-SNAPSHOT
 commons_version=5.2-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:+UseG1GC"
