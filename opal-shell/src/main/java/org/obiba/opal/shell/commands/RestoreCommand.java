@@ -350,18 +350,28 @@ public class RestoreCommand extends AbstractBackupRestoreCommand<RestoreCommandO
       log.error("Permissions restore failed: {}", permissionsFile.getAbsolutePath(), e);
       throw new RuntimeException("Permissions restore failed", e);
     }
-    // replace the permissions of each subject on each item of the archive, as setting one in the UI does, and keep all
-    // the others: replacing them all could take away the access of the one restoring
+    replacePermissions(subjectAclService, acls);
+    getShell().printf("Successful restore of " + acls.size() + " permissions.\n");
+    log.info("Restore of {} permissions done in {}", getProjectName(), stopwatch.stop());
+  }
+
+  /**
+   * Replace the permissions of each subject on each item of the list, as setting one in the UI does, and keep all the
+   * others: replacing them all could take away the access of the one restoring.
+   *
+   * @param subjectAclService where the permissions are stored
+   * @param acls checked permissions, on nodes of the restored project
+   */
+  static void replacePermissions(SubjectAclService subjectAclService, List<Opal.Acl> acls) {
     Set<String> replaced = Sets.newHashSet();
     for (Opal.Acl acl : acls) {
       SubjectAcl.Subject subject = SubjectAcl.SubjectType.valueOf(acl.getSubject().getType().name())
           .subjectFor(acl.getSubject().getPrincipal());
+      // only once per subject and item, so that a second entry for the same pair does not remove the first one
       if (replaced.add(acl.getResource() + "|" + subject.getType() + "|" + subject.getPrincipal()))
         subjectAclService.deleteSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject);
       subjectAclService.addSubjectPermissions(PERMISSIONS_DOMAIN, acl.getResource(), subject, acl.getActionsList());
     }
-    getShell().printf("Successful restore of " + acls.size() + " permissions.\n");
-    log.info("Restore of {} permissions done in {}", getProjectName(), stopwatch.stop());
   }
 
   /**

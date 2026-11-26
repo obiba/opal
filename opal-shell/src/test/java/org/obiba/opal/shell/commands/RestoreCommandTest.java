@@ -10,14 +10,23 @@
 
 package org.obiba.opal.shell.commands;
 
+import com.google.common.collect.Sets;
 import org.junit.Test;
+import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.web.model.Opal;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 public class RestoreCommandTest {
 
@@ -76,5 +85,72 @@ public class RestoreCommandTest {
     assertFalse(RestoreCommand.isAllowed("/datasource/p/table/t/variable/x", List.of("TABLE_ALL")));
     assertFalse(RestoreCommand.isAllowed("/project/p", List.of()));
     assertFalse(RestoreCommand.isAllowed("/", List.of("SYSTEM_ALL")));
+  }
+
+  @Test
+  public void test_restored_permissions_replace_those_of_the_subject_on_the_item() {
+    Set<String> rows = Sets.newHashSet(
+        row("/datasource/p/table/t1", "bob", "TABLE_READ"),
+        row("/datasource/p/table/t1", "alice", "TABLE_READ"),
+        row("/datasource/p/table/t2", "bob", "TABLE_READ"),
+        row("/project/p", "admin", "PROJECT_ALL"));
+
+    RestoreCommand.replacePermissions(store(rows), List.of(
+        acl("/datasource/p/table/t1", "bob", "TABLE_ALL"),
+        acl("/datasource/p/table/t3", "carol", "TABLE_VALUES")));
+
+    assertEquals(Sets.newHashSet(
+        // replaced
+        row("/datasource/p/table/t1", "bob", "TABLE_ALL"),
+        // another subject on the same item, the same subject on another item and a subject not in the archive: kept
+        row("/datasource/p/table/t1", "alice", "TABLE_READ"),
+        row("/datasource/p/table/t2", "bob", "TABLE_READ"),
+        row("/project/p", "admin", "PROJECT_ALL"),
+        // new
+        row("/datasource/p/table/t3", "carol", "TABLE_VALUES")), rows);
+  }
+
+  @Test
+  public void test_entries_of_the_same_subject_and_item_are_all_restored() {
+    Set<String> rows = Sets.newHashSet(row("/datasource/p", "bob", "DATASOURCE_VIEW"));
+
+    RestoreCommand.replacePermissions(store(rows), List.of(
+        acl("/datasource/p", "bob", "TABLE_ADD"),
+        acl("/datasource/p", "bob", "DATASOURCE_ALL")));
+
+    assertEquals(Sets.newHashSet(
+        row("/datasource/p", "bob", "TABLE_ADD"),
+        row("/datasource/p", "bob", "DATASOURCE_ALL")), rows);
+  }
+
+  private static String row(String node, String user, String permission) {
+    return node + "|" + user + "|" + permission;
+  }
+
+  private static Opal.Acl acl(String node, String user, String permission) {
+    return Opal.Acl.newBuilder().setDomain("opal").setResource(node).addActions(permission)
+        .setSubject(Opal.Subject.newBuilder().setPrincipal(user).setType(Opal.Subject.SubjectType.USER)).build();
+  }
+
+  /**
+   * A permission store holding user permission rows, as the configuration database does one per permission.
+   */
+  @SuppressWarnings("unchecked")
+  private static SubjectAclService store(Set<String> rows) {
+    SubjectAclService service = mock(SubjectAclService.class);
+    doAnswer(invocation -> {
+      String node = (String) invocation.getArguments()[1];
+      SubjectAcl.Subject subject = (SubjectAcl.Subject) invocation.getArguments()[2];
+      rows.removeIf(row -> row.startsWith(node + "|" + subject.getPrincipal() + "|"));
+      return null;
+    }).when(service).deleteSubjectPermissions(anyString(), anyString(), any(SubjectAcl.Subject.class));
+    doAnswer(invocation -> {
+      String node = (String) invocation.getArguments()[1];
+      SubjectAcl.Subject subject = (SubjectAcl.Subject) invocation.getArguments()[2];
+      for (String permission : (Iterable<String>) invocation.getArguments()[3])
+        rows.add(row(node, subject.getPrincipal(), permission));
+      return null;
+    }).when(service).addSubjectPermissions(anyString(), anyString(), any(SubjectAcl.Subject.class), any(Iterable.class));
+    return service;
   }
 }
