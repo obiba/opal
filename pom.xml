@@ -85,6 +85,8 @@
     <kubernetes.version>7.2.0</kubernetes.version>
     <liquibase.version>5.0.4</liquibase.version>
     <liquibase-slf4j.version>5.1.0</liquibase-slf4j.version>
+    <!-- pulled in by fabric8 kubernetes-httpclient-vertx, pinned for its CVEs -->
+    <netty.version>4.1.141.Final</netty.version>
     <lang-tag.version>1.7</lang-tag.version>
     <logback.version>1.6.5</logback.version>
     <logstash-logback.version>7.4</logstash-logback.version>
@@ -868,6 +870,13 @@
         <groupId>net.logstash.logback</groupId>
         <artifactId>logstash-logback-encoder</artifactId>
         <version>${logstash-logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>${netty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>io.opentelemetry</groupId>
