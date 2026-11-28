@@ -107,7 +107,6 @@
     <obiba-commons.version>5.4.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
-    <orientdb.version>3.2.57</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <postgresql.version>42.7.14</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
@@ -1256,56 +1255,6 @@
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
         <version>${mongodb-driver.version}</version>
-      </dependency>
-
-      <!--
-        Only opal-upgrade still depends on this, to read the configuration of an installation being upgraded from a
-        version that kept it in OrientDB. It leaves with that upgrade step.
-      -->
-      <dependency>
-        <groupId>com.orientechnologies</groupId>
-        <artifactId>orientdb-core</artifactId>
-        <version>${orientdb.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
-          </exclusion>
-          <!-- Opal does not use OrientDB's JS scripting; graal-sdk is kept because
-               orientdb-core references org.graalvm.polyglot.PolyglotException directly -->
-          <exclusion>
-            <groupId>org.graalvm.truffle</groupId>
-            <artifactId>truffle-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js-scriptengine</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.graalvm.regex</groupId>
-            <artifactId>regex</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.graalvm.tools</groupId>
-            <artifactId>profiler</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.graalvm.tools</groupId>
-            <artifactId>chromeinspector</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>

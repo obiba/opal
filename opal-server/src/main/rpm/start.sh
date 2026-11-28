@@ -27,5 +27,5 @@ while IFS= read -r dir; do
 done < <(find "${OPAL_HOME}/plugins/" -type d -name lib | grep -v ".archive")
 
 APP_OPTS="${JAVA_ARGS} -cp ${CLASSPATH} -DOPAL_HOME=${OPAL_HOME} -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG} -Dpolyglot.log.file=${OPAL_LOG}/polyglot.log -Dpolyglot.engine.WarnInterpreterOnly=false"
-$JAVA $APP_OPTS org.obiba.opal.server.OpalServer --upgrade
+$JAVA $APP_OPTS org.obiba.opal.server.OpalServer --upgrade || exit 1
 exec $JAVA $APP_OPTS org.obiba.opal.server.OpalServer
