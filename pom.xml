@@ -82,7 +82,7 @@
     <json-smart.version>2.6.0</json-smart.version>
     <jsr305.version>3.0.2</jsr305.version>
     <junit.version>4.13.2</junit.version>
-    <kubernetes.version>7.2.0</kubernetes.version>
+    <kubernetes.version>7.9.0</kubernetes.version>
     <liquibase.version>5.0.4</liquibase.version>
     <liquibase-slf4j.version>5.1.0</liquibase-slf4j.version>
     <!-- pulled in by fabric8 kubernetes-httpclient-vertx, pinned for its CVEs -->
