@@ -118,7 +118,9 @@ public class RockSpawnerService implements RServerPodService {
         initDataShieldPackagesProperties(pod);
         defaultRServerState = getState(pod);
       } catch (Exception e) {
-        log.error("Error when reading installed packages and DataSHIELD properties", e);
+        // stop() cancels this task, e.g. when Opal shuts down before the Rock pod is ready
+        if (Thread.currentThread().isInterrupted()) log.debug("Rock pod initialization interrupted", e);
+        else log.error("Error when reading installed packages and DataSHIELD properties", e);
       } finally {
         running = true;
         initLock.unlock();
@@ -485,7 +487,8 @@ public class RockSpawnerService implements RServerPodService {
       }
       return pod;
     } catch (Exception e) {
-      log.error("Error when reading installed packages", e);
+      if (Thread.currentThread().isInterrupted()) throw new RuntimeException(e); // stopping, see start()
+      log.error("Error when creating the Rock pod", e);
       throw new RuntimeException(e);
     }
   }
