@@ -107,6 +107,8 @@ The H2 databases in `${OPAL_HOME}/data/h2` that hold project data are not moved.
    Opal generates and stores encrypted in `data/opal-config.xml`, under the secret key in that same file. Restored from
    different backups, or with a replaced `<secretKey>`, Opal cannot open its own configuration and there is no way to
    recover the database without the key that was in use when it was created. Test a restore before you need it.
+   Copy them with Opal stopped: a copy made while Opal writes to the database can
+   restore fine and fail later, when the damaged part is read. The same goes for `data/h2` below.
 
 8. **Back up `${OPAL_HOME}/data/h2` as a whole folder, not as a list of known files.** Besides the H2 databases
    registered by an administrator it now holds a folder per project that was created with an *internal database*:
