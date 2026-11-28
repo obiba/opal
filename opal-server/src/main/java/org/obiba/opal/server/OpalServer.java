@@ -287,7 +287,13 @@ public class OpalServer {
 
       if (args.length>0) {
         if ("--upgrade".equals(args[0])) {
-          new OpalServer(true);
+          try {
+            new OpalServer(true);
+          } catch(Exception e) {
+            // the start scripts do not start Opal after a failed upgrade
+            log.error("Upgrade failed", e);
+            System.exit(1);
+          }
           System.exit(0);
         } else {
           System.out.println("Unknown arguments, exiting");

@@ -55,14 +55,6 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-r</artifactId>
     </dependency>
-    <!--
-      Reading the store being migrated away from. A plocal database opens without a server, so orientdb-core is
-      enough here and this is the only module that still needs OrientDB at all.
-    -->
-    <dependency>
-      <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-core</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-password-hasher</artifactId>

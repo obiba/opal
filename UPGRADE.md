@@ -6,6 +6,12 @@ marked *optional* enable something new and can be skipped. For what changed and 
 
 ## Upgrading to 6.3.0
 
+### From 5.x: go through 6.2 first
+
+6.3.0 no longer migrates the configuration out of OrientDB. Upgrade to 6.2, start it once and follow
+[Upgrading to 6.0.0](#upgrading-to-600), then upgrade to 6.3.0. Started directly on a 5.x installation, 6.3.0 stops
+during the upgrade, before Opal starts, and the log says so; the installation is left as it was.
+
 ### Optional: move the configuration database to PostgreSQL
 
 Opal can copy its embedded configuration database (`${OPAL_HOME}/data/config`) into an empty PostgreSQL database
